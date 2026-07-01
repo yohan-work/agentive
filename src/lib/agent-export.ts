@@ -29,6 +29,7 @@ export function toPortableAgentCard(agent: Agent): PortableAgentCard {
     realUseCases: agent.realUseCases ?? [],
     installTargets: agent.installTargets ?? [],
     projectUse: agent.projectUse,
+    runbook: agent.runbook,
     instructions: agent.prompt,
     contextRequirements: agent.inputs,
     expectedProjectFiles: agent.projectUse?.setupFiles ?? [],
@@ -105,6 +106,21 @@ ${card.realUseCases.length
 ## Project install
 ${card.installTargets.length ? `Targets: ${card.installTargets.join(", ")}` : "Not installable yet"}
 ${card.projectUse ? `Recommended placement: ${card.projectUse.recommendedPlacement}` : ""}
+
+## Runbook
+${card.runbook
+  ? `### Project context
+${bulletList(card.runbook.projectContext)}
+
+### Input template
+${card.runbook.inputTemplate}
+
+### Output checklist
+${bulletList(card.runbook.outputChecklist)}
+
+### Failure modes
+${bulletList(card.runbook.failureModes)}`
+  : "Not provided"}
 
 ## Metadata
 - Slug: ${card.slug}

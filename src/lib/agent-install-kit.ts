@@ -98,6 +98,39 @@ ${list(agent.projectUse?.installNotes ?? [])}
 `;
 }
 
+export function toRunbookFile(agent: Agent) {
+  if (!agent.runbook) {
+    return `# ${agent.name} Runbook
+
+No runbook has been curated for this agent yet.
+`;
+  }
+
+  return `# ${agent.name} Runbook
+
+## Project Context To Prepare
+${list(agent.runbook.projectContext)}
+
+## Input Template
+${agent.runbook.inputTemplate}
+
+## Good Input Example
+${agent.runbook.goodInputExample}
+
+## Weak Input Example
+${agent.runbook.badInputExample}
+
+## Output Checklist
+${list(agent.runbook.outputChecklist)}
+
+## Failure Modes
+${list(agent.runbook.failureModes)}
+
+## Handoff Tips
+${list(agent.runbook.handoffTips)}
+`;
+}
+
 export function getInstallKitFiles(agent: Agent): InstallKitFile[] {
   if (!agent.installTargets?.length || !agent.projectUse) {
     return [];
@@ -127,6 +160,11 @@ export function getInstallKitFiles(agent: Agent): InstallKitFile[] {
     {
       filename: `${agent.slug}-README.md`,
       content: toInstallReadme(agent),
+      mimeType: "text/markdown;charset=utf-8"
+    },
+    {
+      filename: `${agent.slug}-RUNBOOK.md`,
+      content: toRunbookFile(agent),
       mimeType: "text/markdown;charset=utf-8"
     }
   ];
