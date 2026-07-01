@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AgentDetailHeader } from "@/components/agents/agent-detail-header";
 import { AgentExportPanel } from "@/components/agents/agent-export-panel";
+import { AgentUseCaseList } from "@/components/agents/agent-use-case-list";
 import { DetailSection } from "@/components/agents/detail-section";
 import { RelatedAgents } from "@/components/agents/related-agents";
 import { CodeBlock } from "@/components/common/code-block";
@@ -17,6 +18,7 @@ const toc = [
   { title: "Outputs", href: "#outputs" },
   { title: "Prompt", href: "#prompt" },
   { title: "Example", href: "#example" },
+  { title: "Real use cases", href: "#real-use-cases" },
   { title: "Best practices", href: "#best-practices" },
   { title: "Limitations", href: "#limitations" },
   { title: "Related agents", href: "#related-agents" }
@@ -77,6 +79,9 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ sl
           <ExampleBlock title="Example input" value={agent.exampleInput ?? "No example input provided."} />
           <ExampleBlock title="Example output" value={agent.exampleOutput ?? "No example output provided."} />
         </div>
+      </DetailSection>
+      <DetailSection id="real-use-cases" title="Real use cases">
+        <AgentUseCaseList useCases={agent.realUseCases ?? []} />
       </DetailSection>
       <DetailSection id="best-practices" title="Best practices">
         <List items={agent.bestPractices ?? []} />
