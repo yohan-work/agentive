@@ -1,10 +1,11 @@
 "use client";
 
-import { Check, Clipboard, FileJson, FileText } from "lucide-react";
+import { Check, Clipboard, FileArchive, FileJson, FileText } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Agent } from "@/types/agent";
 import { Button } from "@/components/common/button";
 import { Card } from "@/components/common/card";
+import { getInstallKitFiles } from "@/lib/agent-install-kit";
 import { toAgentJson, toAgentMarkdown, toChatPromptBundle } from "@/lib/agent-export";
 
 type ActionState = "idle" | "copied" | "downloaded" | "error";
@@ -14,6 +15,8 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
   const markdown = useMemo(() => toAgentMarkdown(agent), [agent]);
   const json = useMemo(() => toAgentJson(agent), [agent]);
   const chatBundle = useMemo(() => toChatPromptBundle(agent), [agent]);
+  const installKitFiles = useMemo(() => getInstallKitFiles(agent), [agent]);
+  const installable = installKitFiles.length > 0;
 
   async function copyAgent() {
     try {
@@ -43,6 +46,16 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
     }
   }
 
+  function downloadKit() {
+    if (!installable) {
+      return;
+    }
+
+    for (const file of installKitFiles) {
+      window.setTimeout(() => download(file.content, file.filename, file.mimeType), 0);
+    }
+  }
+
   return (
     <Card className="p-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -52,10 +65,10 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
           </div>
           <h3 className="text-lg font-semibold text-primary">Use this agent elsewhere</h3>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-secondary">
-            Copy the complete agent card into ChatGPT or Claude, or download a portable Markdown/JSON version for your own archive.
+            Copy the complete agent card into ChatGPT or Claude, or download project-ready files for Codex, Claude, and Cursor.
           </p>
           <p className="mt-3 text-xs text-muted">
-            Includes role, use cases, inputs, expected outputs, operating instructions, examples, best practices, and limitations.
+            Includes role, use cases, inputs, expected outputs, operating instructions, examples, best practices, limitations, and install notes.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
@@ -77,7 +90,21 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
             <FileJson className="h-4 w-4" />
             Download .json
           </Button>
+          <Button onClick={downloadKit} variant={installable ? "primary" : "secondary"} disabled={!installable}>
+            <FileArchive className="h-4 w-4" />
+            {installable ? "Download Kit" : "Kit coming soon"}
+          </Button>
         </div>
+      </div>
+      <div className="mt-5 rounded-md border border-line bg-elevated/60 p-4">
+        <p className="text-sm font-semibold text-primary">
+          {installable ? "Project-ready install kit" : "Install kit coming soon"}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-secondary">
+          {installable
+            ? "Downloads AGENTS.md, CLAUDE.md, Cursor rule, agent.json, and README files that can be copied into a project."
+            : "This agent can still be copied as a prompt bundle, but project-ready files have not been curated yet."}
+        </p>
       </div>
       {state === "downloaded" ? (
         <p className="mt-4 rounded-md border border-green-500/25 bg-green-500/10 px-3 py-2 text-sm text-green-200">
