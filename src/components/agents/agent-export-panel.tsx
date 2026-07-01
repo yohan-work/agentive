@@ -16,11 +16,26 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
   const json = useMemo(() => toAgentJson(agent), [agent]);
   const chatBundle = useMemo(() => toChatPromptBundle(agent), [agent]);
   const installKitFiles = useMemo(() => getInstallKitFiles(agent), [agent]);
+  const inputTemplate = agent.runbook?.inputTemplate ?? "";
   const installable = installKitFiles.length > 0;
 
   async function copyAgent() {
     try {
       await navigator.clipboard.writeText(chatBundle);
+      setState("copied");
+      window.setTimeout(() => setState("idle"), 1400);
+    } catch {
+      setState("error");
+    }
+  }
+
+  async function copyInputTemplate() {
+    if (!inputTemplate) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(inputTemplate);
       setState("copied");
       window.setTimeout(() => setState("idle"), 1400);
     } catch {
@@ -89,6 +104,10 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
           >
             <FileJson className="h-4 w-4" />
             Download .json
+          </Button>
+          <Button onClick={copyInputTemplate} variant="secondary" disabled={!inputTemplate}>
+            <Clipboard className="h-4 w-4" />
+            Copy Input Template
           </Button>
           <Button onClick={downloadKit} variant={installable ? "primary" : "secondary"} disabled={!installable}>
             <FileArchive className="h-4 w-4" />
