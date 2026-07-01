@@ -48,6 +48,7 @@ const missingInstallable = unique(installableSlugs.filter((slug) => !uniqueAgent
 const duplicateInstallable = unique(installableSlugs).filter(
   (slug) => installableSlugs.filter((candidate) => candidate === slug).length > 1
 );
+const hasRunbookFactory = /function createRunbook/.test(installableSource) && /runbook:\s*createRunbook\(agent\)/.test(installableSource);
 
 const taxonomyRoles = parseStringArray(taxonomySource.match(/export const roles:[\s\S]*?\];/)?.[0] ?? "").filter((value) =>
   /^[a-z0-9-]+$/.test(value)
@@ -81,6 +82,7 @@ const failures = [
   missingInstallable.length ? `Missing installable agent slugs: ${missingInstallable.join(", ")}` : "",
   duplicateInstallable.length ? `Duplicate installable agent slugs: ${duplicateInstallable.join(", ")}` : "",
   installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
+  !hasRunbookFactory ? "Installable agents must receive runbook metadata" : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
   missingCategories.length ? `Unknown categories: ${missingCategories.join(", ")}` : "",
   totalAgents < 100 ? `Expected at least 100 agents, found ${totalAgents}` : ""
