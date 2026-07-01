@@ -121,7 +121,7 @@ const coreAgents: Agent[] = [
     exampleOutput: "Purpose, allowed use, prohibited use, examples, and escalation path.",
     limitations: ["Not legal advice."],
     bestPractices: ["Have legal or compliance review high-risk policies."],
-    relatedAgents: ["team-governance-agent", "best-practices-writer"],
+    relatedAgents: ["internal-ai-policy-agent", "operations-sop-agent"],
     verifiedStatus: "tested",
     updatedAt: "2026-07-01"
   },
