@@ -26,9 +26,23 @@ export function AgentSearchPanel({
   const [filters, setFilters] = useState<AgentFilters>({});
   const tools = useMemo(() => getUniqueTools(agents), [agents]);
   const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
+  const activeFilters = [
+    query ? `Search: ${query}` : undefined,
+    filters.role ? `Role: ${titleCase(filters.role)}` : undefined,
+    filters.category ? `Category: ${titleCase(filters.category)}` : undefined,
+    filters.difficulty ? `Difficulty: ${titleCase(filters.difficulty)}` : undefined,
+    filters.automationLevel ? `Automation: ${filters.automationLevel}/5` : undefined,
+    filters.tool ? `Tool: ${filters.tool}` : undefined,
+    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined
+  ].filter((item): item is string => Boolean(item));
 
   function setFilter(key: keyof AgentFilters, value: string) {
     setFilters((current) => ({ ...current, [key]: current[key] === value ? undefined : value }));
+  }
+
+  function clearAll() {
+    setQuery("");
+    setFilters({});
   }
 
   return (
@@ -52,10 +66,33 @@ export function AgentSearchPanel({
         <FilterRow title="Verified" values={statuses} active={filters.verifiedStatus} onSelect={(value) => setFilter("verifiedStatus", value)} />
       </div>
 
+      <div className="rounded-lg border border-line bg-panel/45 p-4">
+        <div className="flex flex-col gap-3 text-sm text-secondary sm:flex-row sm:items-center sm:justify-between">
+          <span>
+            Showing <span className="font-semibold text-primary">{results.length}</span> of {agents.length} agents
+          </span>
+          <button type="button" onClick={clearAll} className="self-start text-sky-200 transition hover:text-primary sm:self-auto">
+            Clear all
+          </button>
+        </div>
+        {activeFilters.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {activeFilters.map((filter) => (
+              <span key={filter} className="rounded-md border border-accent/25 bg-accent/10 px-2.5 py-1 text-xs font-medium text-sky-200">
+                {filter}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        <p className="mt-3 text-xs text-muted">
+          Search includes agent metadata, tools, prompt context, and Korean real-use-case scenarios.
+        </p>
+      </div>
+
       <div className="flex items-center justify-between text-sm text-secondary">
         <span>{results.length} agents</span>
         <button type="button" onClick={() => setFilters({})} className="text-sky-200 transition hover:text-primary">
-          Clear filters
+          Clear filters only
         </button>
       </div>
 

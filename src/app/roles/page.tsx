@@ -23,13 +23,16 @@ export default function RolesPage() {
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {roles.map((role) => {
-          const count = agents.filter((agent) => agent.roles.includes(role.slug)).length;
+          const roleAgents = agents.filter((agent) => agent.roles.includes(role.slug));
           return (
             <Link key={role.slug} href={`/roles/${role.slug}`}>
               <Card className="h-full p-5">
-                <p className="text-sm text-muted">{pluralize(count, "agent")}</p>
+                <p className="text-sm text-muted">{pluralize(roleAgents.length, "agent")}</p>
                 <h2 className="mt-2 text-xl font-semibold text-primary">{role.name}</h2>
                 <p className="mt-2 text-sm leading-6 text-secondary">{role.description}</p>
+                <p className="mt-4 text-xs leading-5 text-muted">
+                  Featured: {roleAgents.slice(0, 3).map((agent) => agent.name).join(", ") || "No agents yet"}
+                </p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
                   Browse role <ArrowRight className="h-4 w-4" />
                 </span>

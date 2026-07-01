@@ -23,13 +23,16 @@ export default function CategoriesPage() {
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {categories.map((category) => {
-          const count = agents.filter((agent) => agent.categories.includes(category.slug)).length;
+          const categoryAgents = agents.filter((agent) => agent.categories.includes(category.slug));
           return (
             <Link key={category.slug} href={`/categories/${category.slug}`}>
               <Card className="h-full p-5">
-                <p className="text-sm text-muted">{pluralize(count, "agent")}</p>
+                <p className="text-sm text-muted">{pluralize(categoryAgents.length, "agent")}</p>
                 <h2 className="mt-2 text-xl font-semibold text-primary">{category.name}</h2>
                 <p className="mt-2 text-sm leading-6 text-secondary">{category.description}</p>
+                <p className="mt-4 text-xs leading-5 text-muted">
+                  Featured: {categoryAgents.slice(0, 3).map((agent) => agent.name).join(", ") || "No agents yet"}
+                </p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
                   Browse category <ArrowRight className="h-4 w-4" />
                 </span>
