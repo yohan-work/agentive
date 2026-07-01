@@ -24,6 +24,24 @@ export type AgentRunbook = {
   handoffTips: string[];
 };
 
+export type AgentSampleRun = {
+  title: string;
+  input: string;
+  expectedOutputSummary: string;
+  sampleOutput: string;
+  reviewNotes: string[];
+};
+
+export type AgentEvaluation = {
+  qualityScore: 1 | 2 | 3 | 4 | 5;
+  testedWith: InstallTarget[];
+  recommendedFor: string[];
+  notRecommendedFor: string[];
+  knownWeaknesses: string[];
+  evaluationCriteria: string[];
+  sampleRuns: AgentSampleRun[];
+};
+
 export type Agent = {
   id: string;
   slug: string;
@@ -53,6 +71,7 @@ export type Agent = {
     recommendedPlacement: string;
   };
   runbook?: AgentRunbook;
+  evaluation?: AgentEvaluation;
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;

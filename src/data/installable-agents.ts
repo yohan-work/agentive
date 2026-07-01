@@ -72,6 +72,49 @@ Constraints: keep the result specific, structured, and ready for handoff.`,
   };
 }
 
+function createEvaluation(agent: Agent): NonNullable<Agent["evaluation"]> {
+  return {
+    qualityScore: 4,
+    testedWith: defaultTargets,
+    recommendedFor: [
+      `Teams that need ${agent.outputs[0] ?? "a practical handoff"} from real project context`,
+      `Projects where ${agent.inputs[0] ?? "clear input context"} is available before the agent runs`,
+      "Repeatable work that benefits from a checklist-driven review step"
+    ],
+    notRecommendedFor: [
+      "Tasks with no project context, source material, or decision owner",
+      "Fully autonomous production changes without human review",
+      "Work requiring legal, financial, medical, or compliance sign-off"
+    ],
+    knownWeaknesses: [
+      "Output quality drops when the request omits constraints, examples, or target audience",
+      "The agent can over-generalize if the project state is not pasted or referenced",
+      "Final decisions still need review by the project owner"
+    ],
+    evaluationCriteria: [
+      "Uses only supplied project facts and labels assumptions clearly",
+      `Produces ${agent.outputs[0] ?? "the primary expected output"} in a usable handoff format`,
+      "Includes risks, missing context, and concrete next actions",
+      "Matches the tone, constraints, and level of detail requested by the user"
+    ],
+    sampleRuns: [
+      {
+        title: `${agent.name} project handoff`,
+        input: agent.exampleInput ?? agent.useCases[0] ?? agent.summary,
+        expectedOutputSummary: `A project-ready response that includes ${agent.outputs.slice(0, 2).join(" and ") || "the expected deliverable"}.`,
+        sampleOutput:
+          agent.exampleOutput ??
+          `The agent should return a structured draft with assumptions, project-specific recommendations, review notes, and next actions for ${agent.useCases[0] ?? agent.summary}.`,
+        reviewNotes: [
+          "Check that the output refers to the supplied project context instead of generic advice.",
+          "Confirm the deliverable can be pasted into a ticket, PR, document, or team handoff.",
+          "Ask one revision pass if the output misses risks, constraints, or owner-ready next steps."
+        ]
+      }
+    ]
+  };
+}
+
 export function isInstallableAgent(agent: Pick<Agent, "slug">) {
   return installableSet.has(agent.slug);
 }
@@ -86,15 +129,17 @@ export function withInstallMetadata(agent: Agent): Agent {
     installTargets: defaultTargets,
     projectUse: {
       recommendedPlacement: "Project root for AGENTS.md and CLAUDE.md; .cursor/rules for Cursor rules.",
-      setupFiles: ["AGENTS.md", "CLAUDE.md", ".cursor/rules/{agent-slug}.mdc", "agent.json", "README.md", "RUNBOOK.md"],
+      setupFiles: ["AGENTS.md", "CLAUDE.md", ".cursor/rules/{agent-slug}.mdc", "agent.json", "README.md", "RUNBOOK.md", "EVALUATION.md"],
       installNotes: [
         "Copy AGENTS.md into the project root for Codex-style coding-agent instructions.",
         "Copy CLAUDE.md into the project root when using Claude with project context.",
         "Copy the Cursor rule into .cursor/rules when using Cursor.",
         "Keep agent.json alongside project documentation if another tool needs machine-readable metadata.",
-        "Use RUNBOOK.md to prepare context, run the agent, and review the output before handoff."
+        "Use RUNBOOK.md to prepare context, run the agent, and review the output before handoff.",
+        "Use EVALUATION.md to understand tested scenarios, sample outputs, weaknesses, and review criteria."
       ]
     },
-    runbook: createRunbook(agent)
+    runbook: createRunbook(agent),
+    evaluation: createEvaluation(agent)
   };
 }
