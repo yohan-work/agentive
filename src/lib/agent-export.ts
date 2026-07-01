@@ -30,6 +30,7 @@ export function toPortableAgentCard(agent: Agent): PortableAgentCard {
     installTargets: agent.installTargets ?? [],
     projectUse: agent.projectUse,
     runbook: agent.runbook,
+    evaluation: agent.evaluation,
     instructions: agent.prompt,
     contextRequirements: agent.inputs,
     expectedProjectFiles: agent.projectUse?.setupFiles ?? [],
@@ -120,6 +121,36 @@ ${bulletList(card.runbook.outputChecklist)}
 
 ### Failure modes
 ${bulletList(card.runbook.failureModes)}`
+  : "Not provided"}
+
+## Quality evaluation
+${card.evaluation
+  ? `- Quality score: ${card.evaluation.qualityScore}/5
+- Tested with: ${card.evaluation.testedWith.join(", ")}
+
+### Recommended for
+${bulletList(card.evaluation.recommendedFor)}
+
+### Not recommended for
+${bulletList(card.evaluation.notRecommendedFor)}
+
+### Known weaknesses
+${bulletList(card.evaluation.knownWeaknesses)}
+
+### Evaluation criteria
+${bulletList(card.evaluation.evaluationCriteria)}
+
+### Sample runs
+${card.evaluation.sampleRuns
+  .map(
+    (sample) => `#### ${sample.title}
+- Input: ${sample.input}
+- Expected output: ${sample.expectedOutputSummary}
+- Sample output: ${sample.sampleOutput}
+- Review notes:
+${bulletList(sample.reviewNotes)}`
+  )
+  .join("\n\n")}`
   : "Not provided"}
 
 ## Metadata

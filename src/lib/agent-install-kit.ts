@@ -33,6 +33,10 @@ ${list(agent.outputs)}
 ## Review Checklist
 ${list(agent.bestPractices ?? [])}
 
+## Quality Evaluation
+${agent.evaluation ? `Quality score: ${agent.evaluation.qualityScore}/5` : "Not evaluated"}
+${agent.evaluation ? `Tested with: ${agent.evaluation.testedWith.join(", ")}` : ""}
+
 ## Limitations
 ${list(agent.limitations ?? [])}
 `;
@@ -95,6 +99,7 @@ ${list(agent.projectUse?.installNotes ?? [])}
 - Tools: ${agent.tools.join(", ")}
 - Difficulty: ${titleCase(agent.difficulty)}
 - Automation level: ${agent.automationLevel}/5
+${agent.evaluation ? `- Quality score: ${agent.evaluation.qualityScore}/5` : ""}
 `;
 }
 
@@ -128,6 +133,55 @@ ${list(agent.runbook.failureModes)}
 
 ## Handoff Tips
 ${list(agent.runbook.handoffTips)}
+`;
+}
+
+export function toEvaluationFile(agent: Agent) {
+  if (!agent.evaluation) {
+    return `# ${agent.name} Evaluation
+
+No quality evaluation has been curated for this agent yet.
+`;
+  }
+
+  return `# ${agent.name} Evaluation
+
+## Quality Score
+${agent.evaluation.qualityScore}/5
+
+## Tested With
+${list(agent.evaluation.testedWith)}
+
+## Recommended For
+${list(agent.evaluation.recommendedFor)}
+
+## Not Recommended For
+${list(agent.evaluation.notRecommendedFor)}
+
+## Known Weaknesses
+${list(agent.evaluation.knownWeaknesses)}
+
+## Evaluation Criteria
+${list(agent.evaluation.evaluationCriteria)}
+
+## Sample Runs
+${agent.evaluation.sampleRuns
+  .map(
+    (sample) => `### ${sample.title}
+
+Input:
+${sample.input}
+
+Expected output:
+${sample.expectedOutputSummary}
+
+Sample output:
+${sample.sampleOutput}
+
+Review notes:
+${list(sample.reviewNotes)}`
+  )
+  .join("\n\n")}
 `;
 }
 
@@ -165,6 +219,11 @@ export function getInstallKitFiles(agent: Agent): InstallKitFile[] {
     {
       filename: `${agent.slug}-RUNBOOK.md`,
       content: toRunbookFile(agent),
+      mimeType: "text/markdown;charset=utf-8"
+    },
+    {
+      filename: `${agent.slug}-EVALUATION.md`,
+      content: toEvaluationFile(agent),
       mimeType: "text/markdown;charset=utf-8"
     }
   ];
