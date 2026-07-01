@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AgentDetailHeader } from "@/components/agents/agent-detail-header";
+import { AgentEvaluationPanel } from "@/components/agents/agent-evaluation";
 import { AgentExportPanel } from "@/components/agents/agent-export-panel";
 import { AgentRunbookPanel } from "@/components/agents/agent-runbook";
 import { AgentUseCaseList } from "@/components/agents/agent-use-case-list";
@@ -15,6 +16,7 @@ const toc = [
   { title: "What this agent does", href: "#what-this-agent-does" },
   { title: "Use this agent", href: "#use-this-agent" },
   { title: "How to run this agent", href: "#how-to-run-this-agent" },
+  { title: "Quality evaluation", href: "#quality-evaluation" },
   { title: "When to use", href: "#when-to-use" },
   { title: "Inputs", href: "#inputs" },
   { title: "Outputs", href: "#outputs" },
@@ -66,6 +68,9 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ sl
       </DetailSection>
       <DetailSection id="how-to-run-this-agent" title="How to run this agent">
         <AgentRunbookPanel runbook={agent.runbook} />
+      </DetailSection>
+      <DetailSection id="quality-evaluation" title="Quality evaluation">
+        <AgentEvaluationPanel evaluation={agent.evaluation} />
       </DetailSection>
       <DetailSection id="when-to-use" title="When to use">
         <List items={agent.useCases} />

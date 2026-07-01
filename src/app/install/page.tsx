@@ -18,7 +18,9 @@ const toc = [
 ];
 
 export default function InstallPage() {
-  const installableAgents = agents.filter((agent) => agent.installTargets?.length);
+  const installableAgents = agents
+    .filter((agent) => agent.installTargets?.length)
+    .sort((a, b) => (b.evaluation?.qualityScore ?? 0) - (a.evaluation?.qualityScore ?? 0) || a.name.localeCompare(b.name));
 
   return (
     <AppShell toc={toc}>
@@ -50,7 +52,7 @@ export default function InstallPage() {
           <Card className="p-5">
             <CheckSquare className="mb-4 h-6 w-6 text-sky-200" />
             <h2 className="font-semibold text-primary">Review Output</h2>
-            <p className="mt-2 text-sm leading-6 text-secondary">Use RUNBOOK.md to check assumptions, risks, missing context, and handoff quality.</p>
+            <p className="mt-2 text-sm leading-6 text-secondary">Use RUNBOOK.md and EVALUATION.md to check assumptions, sample outputs, risks, and handoff quality.</p>
           </Card>
         </div>
       </section>
@@ -92,6 +94,7 @@ export default function InstallPage() {
               <Card className="h-full p-5">
                 <div className="mb-3 flex flex-wrap gap-2">
                   <Badge tone="success">Installable</Badge>
+                  {agent.evaluation ? <Badge tone="accent">Quality {agent.evaluation.qualityScore}/5</Badge> : null}
                   {agent.installTargets?.map((target) => (
                     <Badge key={target}>{target}</Badge>
                   ))}

@@ -10,6 +10,7 @@ export function AgentDetailHeader({ agent }: { agent: Agent }) {
         <StatusBadge status={agent.verifiedStatus} />
         <DifficultyBadge difficulty={agent.difficulty} />
         <Badge tone="accent">Automation {agent.automationLevel}/5</Badge>
+        {agent.evaluation ? <Badge tone="success">Quality {agent.evaluation.qualityScore}/5</Badge> : null}
       </div>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>

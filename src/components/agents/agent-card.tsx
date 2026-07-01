@@ -15,6 +15,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
           <StatusBadge status={agent.verifiedStatus} />
           <DifficultyBadge difficulty={agent.difficulty} />
           {agent.installTargets?.length ? <Badge tone="success">Installable</Badge> : null}
+          {agent.evaluation ? <Badge tone="accent">Quality {agent.evaluation.qualityScore}/5</Badge> : null}
         </div>
         <BookmarkButton slug={agent.slug} compact />
       </div>
@@ -35,7 +36,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
         </div>
         <p className="flex items-center gap-2">
           <Gauge className="h-4 w-4 text-muted" />
-          Automation level {agent.automationLevel}/5
+          Automation {agent.automationLevel}/5{agent.evaluation ? ` · Quality ${agent.evaluation.qualityScore}/5` : ""}
         </p>
         <p className="flex items-center gap-2">
           <Wrench className="h-4 w-4 text-muted" />
