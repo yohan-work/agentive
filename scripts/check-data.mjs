@@ -49,6 +49,9 @@ const duplicateInstallable = unique(installableSlugs).filter(
   (slug) => installableSlugs.filter((candidate) => candidate === slug).length > 1
 );
 const hasRunbookFactory = /function createRunbook/.test(installableSource) && /runbook:\s*createRunbook\(agent\)/.test(installableSource);
+const hasEvaluationFactory =
+  /function createEvaluation/.test(installableSource) && /evaluation:\s*createEvaluation\(agent\)/.test(installableSource);
+const hasEvaluationKitFile = /EVALUATION\.md/.test(installableSource) && /toEvaluationFile/.test(read("src/lib/agent-install-kit.ts"));
 
 const taxonomyRoles = parseStringArray(taxonomySource.match(/export const roles:[\s\S]*?\];/)?.[0] ?? "").filter((value) =>
   /^[a-z0-9-]+$/.test(value)
@@ -83,6 +86,8 @@ const failures = [
   duplicateInstallable.length ? `Duplicate installable agent slugs: ${duplicateInstallable.join(", ")}` : "",
   installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
   !hasRunbookFactory ? "Installable agents must receive runbook metadata" : "",
+  !hasEvaluationFactory ? "Installable agents must receive quality evaluation metadata" : "",
+  !hasEvaluationKitFile ? "Installable kits must include EVALUATION.md" : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
   missingCategories.length ? `Unknown categories: ${missingCategories.join(", ")}` : "",
   totalAgents < 100 ? `Expected at least 100 agents, found ${totalAgents}` : ""
