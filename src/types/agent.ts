@@ -2,6 +2,16 @@ export type Difficulty = "beginner" | "intermediate" | "advanced";
 
 export type VerifiedStatus = "unverified" | "tested" | "community" | "expert";
 
+export type AgentUseCase = {
+  title: string;
+  context: string;
+  problem: string;
+  howToUse: string;
+  exampleInput: string;
+  expectedResult: string;
+  recommendedWorkflow?: string;
+};
+
 export type Agent = {
   id: string;
   slug: string;
@@ -22,6 +32,8 @@ export type Agent = {
   exampleOutput?: string;
   limitations?: string[];
   bestPractices?: string[];
+  realUseCases?: AgentUseCase[];
+  sourceNotes?: string[];
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;

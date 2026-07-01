@@ -1,8 +1,9 @@
 import type { Agent } from "@/types/agent";
+import { additionalAgents } from "./agent-expansion";
 
 const prompt = (name: string, output: string) => `You are ${name}. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical ${output} with clear sections, assumptions, risks, and next actions.`;
 
-export const agents: Agent[] = [
+const coreAgents: Agent[] = [
   {
     id: "agent-001",
     slug: "service-brief-generator",
@@ -581,6 +582,28 @@ export const agents: Agent[] = [
     updatedAt: "2026-07-01"
   }
 ];
+
+function withDefaultUseCase(agent: Agent): Agent {
+  if (agent.realUseCases?.length) {
+    return agent;
+  }
+
+  return {
+    ...agent,
+    realUseCases: [
+      {
+        title: `${agent.name} 실무 활용`,
+        context: agent.useCases[0] ?? `${agent.name}가 필요한 업무 상황`,
+        problem: `${agent.summary} 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.`,
+        howToUse: `현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 ${agent.name}에게 ${agent.outputs[0] ?? "structured output"} 형태로 정리해 달라고 요청합니다.`,
+        exampleInput: `${agent.exampleInput ?? agent.useCases[0] ?? agent.summary} 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.`,
+        expectedResult: agent.exampleOutput ?? `${agent.outputs.join(", ")}가 포함된 실무형 초안이 생성됩니다.`
+      }
+    ]
+  };
+}
+
+export const agents: Agent[] = [...coreAgents.map(withDefaultUseCase), ...additionalAgents];
 
 export const featuredAgents = agents.slice(0, 6);
 
