@@ -21,6 +21,7 @@ function parseStringArray(source) {
 
 const agentsSource = read("src/data/agents.ts");
 const expansionSource = read("src/data/agent-expansion.ts");
+const installableSource = read("src/data/installable-agents.ts");
 const workflowsSource = read("src/data/workflows.ts");
 const taxonomySource = read("src/data/taxonomy.ts");
 
@@ -38,6 +39,15 @@ const missingRelated = unique(relatedAgentSlugs.filter((slug) => !uniqueAgentSlu
 
 const workflowAgentSlugs = matchAll(workflowsSource, /agentSlug:\s*"([^"]+)"/g);
 const missingWorkflowAgents = unique(workflowAgentSlugs.filter((slug) => !uniqueAgentSlugs.includes(slug)));
+
+const installableSlugs = Array.from(
+  installableSource.match(/INSTALLABLE_AGENT_SLUGS\s*=\s*\[([\s\S]*?)\]/)?.[1]?.matchAll(/"([^"]+)"/g) ?? [],
+  (match) => match[1]
+);
+const missingInstallable = unique(installableSlugs.filter((slug) => !uniqueAgentSlugs.includes(slug)));
+const duplicateInstallable = unique(installableSlugs).filter(
+  (slug) => installableSlugs.filter((candidate) => candidate === slug).length > 1
+);
 
 const taxonomyRoles = parseStringArray(taxonomySource.match(/export const roles:[\s\S]*?\];/)?.[0] ?? "").filter((value) =>
   /^[a-z0-9-]+$/.test(value)
@@ -68,6 +78,9 @@ const failures = [
   duplicateSlugs.length ? `Duplicate agent slugs: ${duplicateSlugs.join(", ")}` : "",
   missingRelated.length ? `Missing related agent slugs: ${missingRelated.join(", ")}` : "",
   missingWorkflowAgents.length ? `Missing workflow agent slugs: ${missingWorkflowAgents.join(", ")}` : "",
+  missingInstallable.length ? `Missing installable agent slugs: ${missingInstallable.join(", ")}` : "",
+  duplicateInstallable.length ? `Duplicate installable agent slugs: ${duplicateInstallable.join(", ")}` : "",
+  installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
   missingCategories.length ? `Unknown categories: ${missingCategories.join(", ")}` : "",
   totalAgents < 100 ? `Expected at least 100 agents, found ${totalAgents}` : ""
@@ -81,4 +94,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Data integrity check passed: ${totalAgents} agents, ${workflowAgentSlugs.length} workflow steps.`);
+console.log(
+  `Data integrity check passed: ${totalAgents} agents, ${workflowAgentSlugs.length} workflow steps, ${installableSlugs.length} installable agents.`
+);
