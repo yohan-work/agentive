@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Boxes, Compass, FilePlus, Home, Layers, Library, Users } from "lucide-react";
+import { BookOpen, Boxes, ClipboardList, Compass, FilePlus, Home, Layers, Library, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const primary = [
   { href: "/", label: "Overview", icon: Home },
   { href: "/agents", label: "Agents", icon: Library },
+  { href: "/cases", label: "Use Cases", icon: ClipboardList },
   { href: "/workflows", label: "Workflows", icon: Layers },
   { href: "/categories", label: "Categories", icon: Boxes },
   { href: "/roles", label: "Roles", icon: Users }
