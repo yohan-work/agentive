@@ -10,6 +10,8 @@ import { featuredAgents } from "@/data/agents";
 import { categories, roles, taskTags } from "@/data/taxonomy";
 import { workflows } from "@/data/workflows";
 
+const browseTasks = Array.from(new Set([...taskTags, ...categories.slice(0, 4).map((category) => category.slug)]));
+
 const toc = [
   { title: "Overview", href: "#overview" },
   { title: "Featured Agents", href: "#featured-agents" },
@@ -76,7 +78,7 @@ export default function HomePage() {
       <section id="browse-by-task" className="border-b border-line py-10">
         <SectionHeading title="Browse by Task" />
         <div className="flex flex-wrap gap-2">
-          {[...taskTags, ...categories.slice(0, 4).map((category) => category.slug)].map((task) => (
+          {browseTasks.map((task) => (
             <Link key={task} href={`/agents?query=${task}`} className="rounded-md border border-line bg-elevated px-3 py-2 text-sm text-secondary transition hover:border-accent/35 hover:text-primary">
               {task}
             </Link>
