@@ -14,6 +14,16 @@ export type AgentUseCase = {
   recommendedWorkflow?: string;
 };
 
+export type AgentRunbook = {
+  projectContext: string[];
+  inputTemplate: string;
+  goodInputExample: string;
+  badInputExample: string;
+  outputChecklist: string[];
+  failureModes: string[];
+  handoffTips: string[];
+};
+
 export type Agent = {
   id: string;
   slug: string;
@@ -42,6 +52,7 @@ export type Agent = {
     installNotes: string[];
     recommendedPlacement: string;
   };
+  runbook?: AgentRunbook;
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;

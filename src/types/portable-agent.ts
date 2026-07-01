@@ -1,4 +1,4 @@
-import type { AgentUseCase, Difficulty, InstallTarget, VerifiedStatus } from "./agent";
+import type { AgentRunbook, AgentUseCase, Difficulty, InstallTarget, VerifiedStatus } from "./agent";
 
 export type PortableAgentCard = {
   version: "1.0";
@@ -22,6 +22,7 @@ export type PortableAgentCard = {
     installNotes: string[];
     recommendedPlacement: string;
   };
+  runbook?: AgentRunbook;
   instructions: string;
   contextRequirements: string[];
   expectedProjectFiles: string[];
