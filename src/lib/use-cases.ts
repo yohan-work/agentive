@@ -8,6 +8,7 @@ export type AgentUseCaseRecord = AgentUseCase & {
   roles: string[];
   categories: string[];
   tags: string[];
+  installable: boolean;
 };
 
 export function getAgentUseCases(agents: Agent[]): AgentUseCaseRecord[] {
@@ -20,7 +21,8 @@ export function getAgentUseCases(agents: Agent[]): AgentUseCaseRecord[] {
       agentSummary: agent.summary,
       roles: agent.roles,
       categories: agent.categories,
-      tags: agent.tags
+      tags: agent.tags,
+      installable: Boolean(agent.installTargets?.length)
     }))
   );
 }

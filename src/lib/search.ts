@@ -7,6 +7,7 @@ export type AgentFilters = {
   automationLevel?: string;
   tool?: string;
   verifiedStatus?: string;
+  installableOnly?: boolean;
 };
 
 export function searchAgents(agents: Agent[], query: string) {
@@ -50,6 +51,7 @@ export function filterAgents(agents: Agent[], filters: AgentFilters) {
     if (filters.automationLevel && String(agent.automationLevel) !== filters.automationLevel) return false;
     if (filters.tool && !agent.tools.includes(filters.tool)) return false;
     if (filters.verifiedStatus && agent.verifiedStatus !== filters.verifiedStatus) return false;
+    if (filters.installableOnly && !agent.installTargets?.length) return false;
     return true;
   });
 }

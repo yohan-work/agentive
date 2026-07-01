@@ -96,6 +96,7 @@ function CaseCard({ useCase }: { useCase: AgentUseCaseRecord }) {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="mb-3 flex flex-wrap gap-2">
+            {useCase.installable ? <Badge tone="success">Project-ready</Badge> : null}
             {useCase.roles.slice(0, 2).map((role) => (
               <Badge key={role}>{titleCase(role)}</Badge>
             ))}

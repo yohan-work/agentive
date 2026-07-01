@@ -14,6 +14,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
         <div className="flex flex-wrap gap-2">
           <StatusBadge status={agent.verifiedStatus} />
           <DifficultyBadge difficulty={agent.difficulty} />
+          {agent.installTargets?.length ? <Badge tone="success">Installable</Badge> : null}
         </div>
         <BookmarkButton slug={agent.slug} compact />
       </div>

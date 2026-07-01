@@ -33,7 +33,8 @@ export function AgentSearchPanel({
     filters.difficulty ? `Difficulty: ${titleCase(filters.difficulty)}` : undefined,
     filters.automationLevel ? `Automation: ${filters.automationLevel}/5` : undefined,
     filters.tool ? `Tool: ${filters.tool}` : undefined,
-    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined
+    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined,
+    filters.installableOnly ? "Installable only" : undefined
   ].filter((item): item is string => Boolean(item));
 
   function setFilter(key: keyof AgentFilters, value: string) {
@@ -58,6 +59,15 @@ export function AgentSearchPanel({
       </label>
 
       <div className="space-y-4 rounded-lg border border-line bg-panel/60 p-4">
+        <label className="flex items-center gap-3 rounded-md border border-line bg-elevated px-3 py-2 text-sm text-secondary">
+          <input
+            type="checkbox"
+            checked={Boolean(filters.installableOnly)}
+            onChange={(event) => setFilters((current) => ({ ...current, installableOnly: event.target.checked }))}
+            className="h-4 w-4 accent-sky-400"
+          />
+          Installable only
+        </label>
         <FilterRow title="Role" values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
         <FilterRow title="Category" values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
         <FilterRow title="Difficulty" values={difficulties} active={filters.difficulty} onSelect={(value) => setFilter("difficulty", value)} />
