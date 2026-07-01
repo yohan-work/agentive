@@ -110,7 +110,7 @@ function CaseCard({ useCase }: { useCase: AgentUseCaseRecord }) {
           <p className="mt-2 text-sm leading-6 text-secondary">{useCase.problem}</p>
         </div>
         <Link href={`/agents/${useCase.agentSlug}`} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
-          {useCase.agentName} <ArrowRight className="h-4 w-4" />
+          Use this agent now <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
@@ -125,6 +125,7 @@ function CaseCard({ useCase }: { useCase: AgentUseCaseRecord }) {
         <p className="mb-2 font-mono text-xs text-muted">example input</p>
         <p className="text-sm leading-6 text-secondary">{useCase.exampleInput}</p>
       </div>
+      <p className="mt-3 text-xs text-muted">Agent: {useCase.agentName}</p>
     </Card>
   );
 }
