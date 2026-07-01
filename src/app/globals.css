@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0b0b0f;
+  --color-bg-secondary: #111217;
+  --color-bg-elevated: #17181f;
+  --color-border: #262832;
+  --color-text-primary: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  --color-accent: #60a5fa;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: "Geist", "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(180deg, rgba(96, 165, 250, 0.045), transparent 380px),
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.06), transparent 300px),
+    var(--color-bg-primary);
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.28);
+}
+
+@layer components {
+  .focus-ring {
+    @apply outline-none ring-2 ring-accent/45 ring-offset-2 ring-offset-canvas;
+  }
+}
