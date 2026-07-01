@@ -1,4 +1,4 @@
-import type { Difficulty, VerifiedStatus } from "./agent";
+import type { AgentUseCase, Difficulty, VerifiedStatus } from "./agent";
 
 export type PortableAgentCard = {
   version: "1.0";
@@ -15,6 +15,7 @@ export type PortableAgentCard = {
   exampleOutput?: string;
   bestPractices: string[];
   limitations: string[];
+  realUseCases: AgentUseCase[];
   tags: string[];
   metadata: {
     roles: string[];

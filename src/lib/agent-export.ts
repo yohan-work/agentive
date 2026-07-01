@@ -26,6 +26,7 @@ export function toPortableAgentCard(agent: Agent): PortableAgentCard {
     exampleOutput: agent.exampleOutput,
     bestPractices: agent.bestPractices ?? [],
     limitations: agent.limitations ?? [],
+    realUseCases: agent.realUseCases ?? [],
     tags: agent.tags,
     metadata: {
       roles: agent.roles,
@@ -77,6 +78,20 @@ ${bulletList(card.bestPractices)}
 
 ## Limitations
 ${bulletList(card.limitations)}
+
+## Real use cases
+${card.realUseCases.length
+  ? card.realUseCases
+      .map(
+        (useCase) => `### ${useCase.title}
+- Context: ${useCase.context}
+- Problem: ${useCase.problem}
+- How to use: ${useCase.howToUse}
+- Example input: ${useCase.exampleInput}
+- Expected result: ${useCase.expectedResult}${useCase.recommendedWorkflow ? `\n- Recommended workflow: ${useCase.recommendedWorkflow}` : ""}`
+      )
+      .join("\n\n")
+  : "Not provided"}
 
 ## Metadata
 - Slug: ${card.slug}

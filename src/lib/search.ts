@@ -24,7 +24,16 @@ export function searchAgents(agents: Agent[], query: string) {
       ...agent.tags,
       ...agent.categories,
       ...agent.roles,
-      ...agent.tools
+      ...agent.tools,
+      ...(agent.realUseCases ?? []).flatMap((useCase) => [
+        useCase.title,
+        useCase.context,
+        useCase.problem,
+        useCase.howToUse,
+        useCase.exampleInput,
+        useCase.expectedResult,
+        useCase.recommendedWorkflow ?? ""
+      ])
     ]
       .join(" ")
       .toLowerCase();
