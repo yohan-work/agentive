@@ -2,6 +2,8 @@ export type Difficulty = "beginner" | "intermediate" | "advanced";
 
 export type VerifiedStatus = "unverified" | "tested" | "community" | "expert";
 
+export type InstallTarget = "codex" | "claude" | "cursor";
+
 export type AgentUseCase = {
   title: string;
   context: string;
@@ -34,6 +36,12 @@ export type Agent = {
   bestPractices?: string[];
   realUseCases?: AgentUseCase[];
   sourceNotes?: string[];
+  installTargets?: InstallTarget[];
+  projectUse?: {
+    setupFiles: string[];
+    installNotes: string[];
+    recommendedPlacement: string;
+  };
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;

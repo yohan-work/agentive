@@ -1,5 +1,6 @@
 import type { Agent } from "@/types/agent";
 import { additionalAgents } from "./agent-expansion";
+import { withInstallMetadata } from "./installable-agents";
 
 const prompt = (name: string, output: string) => `You are ${name}. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical ${output} with clear sections, assumptions, risks, and next actions.`;
 
@@ -603,7 +604,7 @@ function withDefaultUseCase(agent: Agent): Agent {
   };
 }
 
-export const agents: Agent[] = [...coreAgents.map(withDefaultUseCase), ...additionalAgents];
+export const agents: Agent[] = [...coreAgents.map(withDefaultUseCase), ...additionalAgents].map(withInstallMetadata);
 
 export const featuredAgents = agents.slice(0, 6);
 

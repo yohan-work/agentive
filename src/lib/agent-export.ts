@@ -27,6 +27,15 @@ export function toPortableAgentCard(agent: Agent): PortableAgentCard {
     bestPractices: agent.bestPractices ?? [],
     limitations: agent.limitations ?? [],
     realUseCases: agent.realUseCases ?? [],
+    installTargets: agent.installTargets ?? [],
+    projectUse: agent.projectUse,
+    instructions: agent.prompt,
+    contextRequirements: agent.inputs,
+    expectedProjectFiles: agent.projectUse?.setupFiles ?? [],
+    usageExamples: [agent.exampleInput, ...(agent.realUseCases ?? []).map((useCase) => useCase.exampleInput)].filter(
+      (value): value is string => Boolean(value)
+    ),
+    targetFiles: agent.projectUse?.setupFiles ?? [],
     tags: agent.tags,
     metadata: {
       roles: agent.roles,
@@ -92,6 +101,10 @@ ${card.realUseCases.length
       )
       .join("\n\n")
   : "Not provided"}
+
+## Project install
+${card.installTargets.length ? `Targets: ${card.installTargets.join(", ")}` : "Not installable yet"}
+${card.projectUse ? `Recommended placement: ${card.projectUse.recommendedPlacement}` : ""}
 
 ## Metadata
 - Slug: ${card.slug}
