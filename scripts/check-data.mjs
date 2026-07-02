@@ -24,6 +24,7 @@ const expansionSource = read("src/data/agent-expansion.ts");
 const installableSource = read("src/data/installable-agents.ts");
 const workflowsSource = read("src/data/workflows.ts");
 const taxonomySource = read("src/data/taxonomy.ts");
+const impactSource = read("src/data/impact-scenarios.ts");
 
 const agentSlugs = [
   ...matchAll(agentsSource, /slug:\s*"([^"]+)"/g),
@@ -39,6 +40,14 @@ const missingRelated = unique(relatedAgentSlugs.filter((slug) => !uniqueAgentSlu
 
 const workflowAgentSlugs = matchAll(workflowsSource, /agentSlug:\s*"([^"]+)"/g);
 const missingWorkflowAgents = unique(workflowAgentSlugs.filter((slug) => !uniqueAgentSlugs.includes(slug)));
+const impactAgentSlugs = Array.from(impactSource.matchAll(/agentSlugs:\s*\[([\s\S]*?)\]/g)).flatMap((match) =>
+  parseStringArray(match[1])
+);
+const missingImpactAgents = unique(impactAgentSlugs.filter((slug) => !uniqueAgentSlugs.includes(slug)));
+const workflowSlugs = matchAll(workflowsSource, /slug:\s*"([^"]+)"/g);
+const impactWorkflowSlugs = matchAll(impactSource, /primaryWorkflowSlug:\s*"([^"]+)"/g);
+const missingImpactWorkflows = unique(impactWorkflowSlugs.filter((slug) => !workflowSlugs.includes(slug)));
+const impactScenarioCount = matchAll(impactSource, /slug:\s*"([^"]+)"/g).length;
 
 const installableSlugs = Array.from(
   installableSource.match(/INSTALLABLE_AGENT_SLUGS\s*=\s*\[([\s\S]*?)\]/)?.[1]?.matchAll(/"([^"]+)"/g) ?? [],
@@ -91,6 +100,9 @@ const failures = [
   duplicateSlugs.length ? `Duplicate agent slugs: ${duplicateSlugs.join(", ")}` : "",
   missingRelated.length ? `Missing related agent slugs: ${missingRelated.join(", ")}` : "",
   missingWorkflowAgents.length ? `Missing workflow agent slugs: ${missingWorkflowAgents.join(", ")}` : "",
+  missingImpactAgents.length ? `Missing impact scenario agent slugs: ${missingImpactAgents.join(", ")}` : "",
+  missingImpactWorkflows.length ? `Missing impact scenario workflow slugs: ${missingImpactWorkflows.join(", ")}` : "",
+  impactScenarioCount < 3 ? `Expected at least 3 impact scenarios, found ${impactScenarioCount}` : "",
   missingInstallable.length ? `Missing installable agent slugs: ${missingInstallable.join(", ")}` : "",
   duplicateInstallable.length ? `Duplicate installable agent slugs: ${duplicateInstallable.join(", ")}` : "",
   installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
