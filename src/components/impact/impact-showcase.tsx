@@ -3,27 +3,30 @@ import { ArrowRight, CheckCircle2, GitBranch, Sparkles, TriangleAlert } from "lu
 import { Badge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { getAgentBySlug } from "@/data/agents";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import type { ImpactScenario } from "@/types/impact";
 
-export function ImpactShowcase({ scenarios }: { scenarios: ImpactScenario[] }) {
+export function ImpactShowcase({ scenarios, locale = defaultLocale }: { scenarios: ImpactScenario[]; locale?: Locale }) {
   return (
     <div className="space-y-5">
       {scenarios.map((scenario) => (
-        <ImpactScenarioCard key={scenario.slug} scenario={scenario} />
+        <ImpactScenarioCard key={scenario.slug} scenario={scenario} locale={locale} />
       ))}
     </div>
   );
 }
 
-function ImpactScenarioCard({ scenario }: { scenario: ImpactScenario }) {
+function ImpactScenarioCard({ scenario, locale }: { scenario: ImpactScenario; locale: Locale }) {
   const agents = scenario.agentSlugs.map((slug) => getAgentBySlug(slug)).filter((agent): agent is NonNullable<typeof agent> => Boolean(agent));
+  const dictionary = getDictionary(locale);
 
   return (
     <Card className="overflow-hidden p-0">
       <div className="border-b border-line bg-elevated/45 p-5">
         <div className="mb-3 flex flex-wrap gap-2">
           <Badge tone="accent">{scenario.audience}</Badge>
-          <Badge tone="success">{agents.length} agents</Badge>
+          <Badge tone="success">{agents.length} {dictionary.nav.agents}</Badge>
           {scenario.primaryWorkflowSlug ? <Badge>Workflow-linked</Badge> : null}
         </div>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -32,8 +35,8 @@ function ImpactScenarioCard({ scenario }: { scenario: ImpactScenario }) {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">{scenario.problem}</p>
           </div>
           {scenario.primaryWorkflowSlug ? (
-            <Link href={`/workflows/${scenario.primaryWorkflowSlug}`} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
-              View workflow <ArrowRight className="h-4 w-4" />
+            <Link href={withLocale(`/workflows/${scenario.primaryWorkflowSlug}`, locale)} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
+              {dictionary.common.viewWorkflow} <ArrowRight className="h-4 w-4" />
             </Link>
           ) : null}
         </div>
@@ -41,7 +44,7 @@ function ImpactScenarioCard({ scenario }: { scenario: ImpactScenario }) {
 
       <div className="grid gap-px bg-line lg:grid-cols-[1fr_1.1fr_1fr]">
         <Panel title="Before" icon={<TriangleAlert className="h-4 w-4" />} tone="warning" items={scenario.before} />
-        <AgentFlow agents={agents} outputs={scenario.outputs} />
+        <AgentFlow agents={agents} outputs={scenario.outputs} locale={locale} />
         <Panel title="After" icon={<CheckCircle2 className="h-4 w-4" />} tone="success" items={scenario.after} />
       </div>
 
@@ -93,7 +96,7 @@ function Panel({
   );
 }
 
-function AgentFlow({ agents, outputs }: { agents: ReturnType<typeof getAgentBySlug>[]; outputs: string[] }) {
+function AgentFlow({ agents, outputs, locale }: { agents: ReturnType<typeof getAgentBySlug>[]; outputs: string[]; locale: Locale }) {
   return (
     <div className="bg-[#08090c] p-5">
       <div className="mb-4 flex items-center gap-2">
@@ -111,7 +114,7 @@ function AgentFlow({ agents, outputs }: { agents: ReturnType<typeof getAgentBySl
                   {index + 1}
                 </span>
                 <div className="min-w-0">
-                  <Link href={`/agents/${agent.slug}`} className="font-medium text-primary transition hover:text-sky-200">
+                  <Link href={withLocale(`/agents/${agent.slug}`, locale)} className="font-medium text-primary transition hover:text-sky-200">
                     {agent.name}
                   </Link>
                   <p className="mt-1 text-xs leading-5 text-secondary">{agent.summary}</p>

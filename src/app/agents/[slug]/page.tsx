@@ -11,6 +11,8 @@ import { CodeBlock } from "@/components/common/code-block";
 import { Tag } from "@/components/common/tag";
 import { AppShell } from "@/components/layout/app-shell";
 import { agents, getAgentBySlug } from "@/data/agents";
+import { defaultLocale, type Locale } from "@/i18n/config";
+import { getRequestLocale } from "@/i18n/server";
 
 const toc = [
   { title: "What this agent does", href: "#what-this-agent-does" },
@@ -40,7 +42,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function AgentDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+async function AgentDetailPageContent({
+  params,
+  locale = defaultLocale
+}: {
+  params: Promise<{ slug: string }>;
+  locale?: Locale;
+}) {
   const { slug } = await params;
   const agent = getAgentBySlug(slug);
 
@@ -100,10 +108,14 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ sl
         <List items={agent.limitations ?? []} />
       </DetailSection>
       <DetailSection id="related-agents" title="Related agents">
-        <RelatedAgents agents={related} />
+        <RelatedAgents agents={related} locale={locale} />
       </DetailSection>
     </AppShell>
   );
+}
+
+export default async function AgentDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  return <AgentDetailPageContent params={params} locale={await getRequestLocale()} />;
 }
 
 function List({ items }: { items: string[] }) {

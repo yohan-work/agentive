@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { EmptyState } from "@/components/common/empty-state";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
 import { searchUseCases, type AgentUseCaseRecord } from "@/lib/use-cases";
 import { titleCase } from "@/lib/utils";
 
@@ -19,12 +20,14 @@ export function CaseExplorer({
   useCases,
   roles,
   categories,
-  workflows
+  workflows,
+  locale = defaultLocale
 }: {
   useCases: AgentUseCaseRecord[];
   roles: string[];
   categories: string[];
   workflows: string[];
+  locale?: Locale;
 }) {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<CaseFilters>({});
@@ -80,7 +83,7 @@ export function CaseExplorer({
       {results.length ? (
         <div className="grid gap-4">
           {results.map((useCase) => (
-            <CaseCard key={useCase.id} useCase={useCase} />
+            <CaseCard key={useCase.id} useCase={useCase} locale={locale} />
           ))}
         </div>
       ) : (
@@ -90,7 +93,7 @@ export function CaseExplorer({
   );
 }
 
-function CaseCard({ useCase }: { useCase: AgentUseCaseRecord }) {
+function CaseCard({ useCase, locale }: { useCase: AgentUseCaseRecord; locale: Locale }) {
   return (
     <Card className="p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -109,7 +112,7 @@ function CaseCard({ useCase }: { useCase: AgentUseCaseRecord }) {
           <h2 className="text-xl font-semibold text-primary">{useCase.title}</h2>
           <p className="mt-2 text-sm leading-6 text-secondary">{useCase.problem}</p>
         </div>
-        <Link href={`/agents/${useCase.agentSlug}`} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
+        <Link href={withLocale(`/agents/${useCase.agentSlug}`, locale)} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
           Use this agent now <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

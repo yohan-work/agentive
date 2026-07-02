@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import type { Agent } from "@/types/agent";
+import { defaultLocale, type Locale } from "@/i18n/config";
 import { filterAgents, getUniqueTools, searchAgents, type AgentFilters } from "@/lib/search";
 import { titleCase } from "@/lib/utils";
 import { AgentGrid } from "./agent-grid";
@@ -15,12 +16,14 @@ export function AgentSearchPanel({
   agents,
   initialQuery = "",
   roles,
-  categories
+  categories,
+  locale = defaultLocale
 }: {
   agents: Agent[];
   initialQuery?: string;
   roles: string[];
   categories: string[];
+  locale?: Locale;
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [filters, setFilters] = useState<AgentFilters>({});
@@ -106,7 +109,7 @@ export function AgentSearchPanel({
         </button>
       </div>
 
-      <AgentGrid agents={results} />
+      <AgentGrid agents={results} locale={locale} />
     </div>
   );
 }

@@ -3,46 +3,49 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Boxes, ClipboardList, Compass, Download, FilePlus, Home, Layers, Library, Users } from "lucide-react";
+import { getLocaleFromPathname, stripLocale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import { cn } from "@/lib/utils";
-
-const primary = [
-  { href: "/", label: "Overview", icon: Home },
-  { href: "/agents", label: "Agents", icon: Library },
-  { href: "/cases", label: "Use Cases", icon: ClipboardList },
-  { href: "/install", label: "Install", icon: Download },
-  { href: "/workflows", label: "Workflows", icon: Layers },
-  { href: "/categories", label: "Categories", icon: Boxes },
-  { href: "/roles", label: "Roles", icon: Users }
-];
-
-const groups = [
-  {
-    title: "For users",
-    links: ["Getting started", "How to use agents", "Prompt templates", "Workflow packs"]
-  },
-  {
-    title: "For creators",
-    links: ["Submit an agent", "Agent card format", "Best practices", "Evaluation guide"]
-  },
-  {
-    title: "For teams",
-    links: ["Internal archive", "Team knowledge base", "Governance"]
-  }
-];
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const cleanPathname = stripLocale(pathname);
+  const dictionary = getDictionary(locale);
+  const primary = [
+    { href: "/", label: dictionary.nav.overview, icon: Home },
+    { href: "/agents", label: dictionary.nav.agents, icon: Library },
+    { href: "/cases", label: dictionary.nav.useCases, icon: ClipboardList },
+    { href: "/install", label: dictionary.nav.install, icon: Download },
+    { href: "/workflows", label: dictionary.nav.workflows, icon: Layers },
+    { href: "/categories", label: dictionary.nav.categories, icon: Boxes },
+    { href: "/roles", label: dictionary.nav.roles, icon: Users }
+  ];
+  const groups = [
+    {
+      title: dictionary.nav.forUsers,
+      links: [dictionary.nav.gettingStarted, dictionary.nav.howToUseAgents, dictionary.nav.promptTemplates, dictionary.nav.workflowPacks]
+    },
+    {
+      title: dictionary.nav.forCreators,
+      links: [dictionary.nav.submitAgent, dictionary.nav.agentCardFormat, dictionary.nav.bestPractices, dictionary.nav.evaluationGuide]
+    },
+    {
+      title: dictionary.nav.forTeams,
+      links: [dictionary.nav.internalArchive, dictionary.nav.teamKnowledgeBase, dictionary.nav.governance]
+    }
+  ];
 
   return (
     <nav className="space-y-7">
       <div className="space-y-1">
         {primary.map((item) => {
           const Icon = item.icon;
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const active = item.href === "/" ? cleanPathname === "/" : cleanPathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={withLocale(item.href, locale)}
               onClick={onNavigate}
               className={cn(
                 "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition",
@@ -55,37 +58,37 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           );
         })}
         <Link
-          href="/submit"
+          href={withLocale("/submit", locale)}
           onClick={onNavigate}
           className={cn(
             "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition",
-            pathname.startsWith("/submit") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
+            cleanPathname.startsWith("/submit") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
           )}
         >
           <FilePlus className="h-4 w-4" />
-          Submit
+          {dictionary.nav.submit}
         </Link>
         <Link
-          href="/bookmarks"
+          href={withLocale("/bookmarks", locale)}
           onClick={onNavigate}
           className={cn(
             "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition",
-            pathname.startsWith("/bookmarks") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
+            cleanPathname.startsWith("/bookmarks") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
           )}
         >
           <BookOpen className="h-4 w-4" />
-          Bookmarks
+          {dictionary.nav.bookmarks}
         </Link>
         <Link
-          href="/about"
+          href={withLocale("/about", locale)}
           onClick={onNavigate}
           className={cn(
             "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition",
-            pathname.startsWith("/about") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
+            cleanPathname.startsWith("/about") ? "bg-elevated text-primary" : "text-secondary hover:bg-elevated/70 hover:text-primary"
           )}
         >
           <Compass className="h-4 w-4" />
-          About
+          {dictionary.nav.about}
         </Link>
       </div>
 
@@ -96,7 +99,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             {group.links.map((link) => (
               <Link
                 key={link}
-                href={link === "Submit an agent" ? "/submit" : "/about"}
+                href={link === dictionary.nav.submitAgent ? withLocale("/submit", locale) : withLocale("/about", locale)}
                 onClick={onNavigate}
                 className="block rounded-md px-3 py-1.5 text-sm text-secondary transition hover:bg-elevated/70 hover:text-primary"
               >

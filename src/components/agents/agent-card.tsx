@@ -4,10 +4,13 @@ import type { Agent } from "@/types/agent";
 import { Badge, DifficultyBadge, StatusBadge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { Tag } from "@/components/common/tag";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
 import { titleCase } from "@/lib/utils";
 import { BookmarkButton } from "./bookmark-button";
 
-export function AgentCard({ agent }: { agent: Agent }) {
+export function AgentCard({ agent, locale = defaultLocale }: { agent: Agent; locale?: Locale }) {
+  const href = withLocale(`/agents/${agent.slug}`, locale);
+
   return (
     <Card className="group flex h-full flex-col p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
@@ -19,7 +22,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
         </div>
         <BookmarkButton slug={agent.slug} compact />
       </div>
-      <Link href={`/agents/${agent.slug}`} className="block">
+      <Link href={href} className="block">
         <h3 className="text-lg font-semibold text-primary transition group-hover:text-sky-200">{agent.name}</h3>
         <p className="mt-2 min-h-[48px] text-sm leading-6 text-secondary">{agent.summary}</p>
       </Link>
@@ -43,7 +46,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
           {agent.tools.slice(0, 3).join(", ")}
         </p>
       </div>
-      <Link href={`/agents/${agent.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
+      <Link href={href} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
         View agent <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>

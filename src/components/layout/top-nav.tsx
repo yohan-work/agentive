@@ -1,20 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Bot, Github, Menu, Moon, Search, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/common/button";
+import { getLocaleFromPathname, locales, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { cn } from "@/lib/utils";
 import { SidebarNav } from "./sidebar-nav";
 
 export function TopNav() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = getLocaleFromPathname(pathname);
+  const dictionary = getDictionary(locale);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push(`/agents?query=${encodeURIComponent(query)}`);
+    router.push(`${withLocale("/agents", locale)}?query=${encodeURIComponent(query)}`);
   }
 
   return (
@@ -29,7 +35,7 @@ export function TopNav() {
           >
             <Menu className="h-4 w-4" />
           </button>
-          <Link href="/" className="flex min-w-fit items-center gap-2 font-semibold text-primary">
+          <Link href={withLocale("/", locale)} className="flex min-w-fit items-center gap-2 font-semibold text-primary">
             <span className="flex h-8 w-8 items-center justify-center rounded-md border border-accent/25 bg-accent/12 text-sky-200">
               <Bot className="h-4 w-4" />
             </span>
@@ -41,15 +47,29 @@ export function TopNav() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search agents, workflows, roles..."
+                placeholder={dictionary.nav.searchPlaceholder}
                 className="h-10 w-full rounded-md border border-line bg-panel pl-9 pr-3 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20"
               />
             </label>
           </form>
           <div className="ml-auto flex items-center gap-2">
+            <div className="hidden rounded-md border border-line bg-elevated p-1 sm:flex">
+              {locales.map((item) => (
+                <Link
+                  key={item}
+                  href={withLocale(pathname, item)}
+                  className={cn(
+                    "rounded px-2 py-1 text-xs font-semibold uppercase transition",
+                    item === locale ? "bg-accent/15 text-sky-200" : "text-muted hover:text-primary"
+                  )}
+                >
+                  {item === "ko" ? "KOR" : "ENG"}
+                </Link>
+              ))}
+            </div>
             <Button variant="primary" className="hidden sm:inline-flex">
               <Sparkles className="h-4 w-4" />
-              Ask Assistant
+              {dictionary.nav.askAssistant}
             </Button>
             <Link
               href="https://github.com/yohan-work"
@@ -74,7 +94,7 @@ export function TopNav() {
         <div className="fixed inset-0 z-50 bg-[#050507]/80 lg:hidden">
           <aside className="h-full w-[310px] max-w-[86vw] border-r border-line bg-[#0b0b0f] p-4 shadow-glow">
             <div className="mb-4 flex items-center justify-between">
-              <span className="font-semibold text-primary">Navigation</span>
+              <span className="font-semibold text-primary">{dictionary.nav.navigation}</span>
               <button
                 type="button"
                 aria-label="Close navigation"
@@ -83,6 +103,21 @@ export function TopNav() {
               >
                 <X className="h-4 w-4" />
               </button>
+            </div>
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              {locales.map((item) => (
+                <Link
+                  key={item}
+                  href={withLocale(pathname, item)}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "rounded-md border px-3 py-2 text-center text-xs font-semibold uppercase",
+                    item === locale ? "border-accent/40 bg-accent/15 text-sky-200" : "border-line bg-elevated text-secondary"
+                  )}
+                >
+                  {item === "ko" ? "KOR" : "ENG"}
+                </Link>
+              ))}
             </div>
             <SidebarNav onNavigate={() => setOpen(false)} />
           </aside>

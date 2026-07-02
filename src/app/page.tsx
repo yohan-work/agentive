@@ -11,43 +11,46 @@ import { featuredAgents } from "@/data/agents";
 import { impactScenarios } from "@/data/impact-scenarios";
 import { categories, roles, taskTags } from "@/data/taxonomy";
 import { workflows } from "@/data/workflows";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { getRequestLocale } from "@/i18n/server";
 
 const browseTasks = Array.from(new Set([...taskTags, ...categories.slice(0, 4).map((category) => category.slug)]));
 
-const toc = [
-  { title: "Overview", href: "#overview" },
-  { title: "Impact", href: "#impact" },
-  { title: "Featured Agents", href: "#featured-agents" },
-  { title: "Browse by Role", href: "#browse-by-role" },
-  { title: "Browse by Task", href: "#browse-by-task" },
-  { title: "Workflow Packs", href: "#workflow-packs" }
-];
+function HomePageContent({ locale = defaultLocale }: { locale?: Locale }) {
+  const dictionary = getDictionary(locale);
+  const toc = [
+    { title: dictionary.home.overviewTitle, href: "#overview" },
+    { title: "Impact", href: "#impact" },
+    { title: dictionary.home.featuredAgents, href: "#featured-agents" },
+    { title: dictionary.home.browseByRole, href: "#browse-by-role" },
+    { title: dictionary.home.browseByTask, href: "#browse-by-task" },
+    { title: dictionary.home.workflowPacks, href: "#workflow-packs" }
+  ];
 
-export default function HomePage() {
   return (
     <AppShell toc={toc}>
       <section className="border-b border-line pb-10">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">AI agent archive</p>
-        <h1 className="max-w-3xl text-5xl font-semibold tracking-normal text-primary sm:text-6xl">Agent Archive</h1>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">{dictionary.home.eyebrow}</p>
+        <h1 className="max-w-3xl text-5xl font-semibold tracking-normal text-primary sm:text-6xl">{dictionary.home.title}</h1>
         <p className="mt-4 max-w-3xl text-xl leading-8 text-secondary">
-          Find, use, and organize AI agents for every workflow.
+          {dictionary.home.subtitle}
         </p>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-secondary">
-          A curated archive of AI agents, prompts, and workflow recipes for real work across planning, design,
-          development, marketing, sales, and operations.
+          {dictionary.home.description}
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <ButtonLink href="/agents" variant="primary">
-            Browse agents <ArrowRight className="h-4 w-4" />
+          <ButtonLink href={withLocale("/agents", locale)} variant="primary">
+            {dictionary.common.browseAgents} <ArrowRight className="h-4 w-4" />
           </ButtonLink>
-          <ButtonLink href="/workflows">Explore workflows</ButtonLink>
+          <ButtonLink href={withLocale("/workflows", locale)}>{dictionary.common.exploreWorkflows}</ButtonLink>
         </div>
       </section>
 
       <section id="overview" className="border-b border-line py-10">
         <SectionHeading
-          title="Overview"
-          description="Agent Archive is not just a prompt list. Each entry is framed as a reusable work recipe with inputs, expected outputs, practical limits, and related agents."
+          title={dictionary.home.overviewTitle}
+          description={dictionary.home.overviewDescription}
         />
         <div className="grid gap-4 md:grid-cols-3">
           {["Context first", "Copy-ready prompts", "Workflow packs"].map((item) => (
@@ -63,22 +66,22 @@ export default function HomePage() {
 
       <section id="impact" className="border-b border-line py-10">
         <SectionHeading
-          title="What changes when agents are used well"
-          description="These example scenarios show the practical shift from scattered requests to reusable outputs, review criteria, and cleaner handoffs."
+          title={dictionary.home.impactTitle}
+          description={dictionary.home.impactDescription}
         />
-        <ImpactShowcase scenarios={impactScenarios} />
+        <ImpactShowcase scenarios={impactScenarios} locale={locale} />
       </section>
 
       <section id="featured-agents" className="border-b border-line py-10">
-        <SectionHeading title="Featured Agents" description="A starting set of practical agents for common work handoffs." />
-        <AgentGrid agents={featuredAgents} />
+        <SectionHeading title={dictionary.home.featuredAgents} description={dictionary.home.featuredDescription} />
+        <AgentGrid agents={featuredAgents} locale={locale} />
       </section>
 
       <section id="browse-by-role" className="border-b border-line py-10">
-        <SectionHeading title="Browse by Role" />
+        <SectionHeading title={dictionary.home.browseByRole} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {roles.slice(0, 6).map((role) => (
-            <Link key={role.slug} href={`/roles/${role.slug}`} className="rounded-lg border border-line bg-panel p-4 transition hover:border-accent/35 hover:bg-elevated">
+            <Link key={role.slug} href={withLocale(`/roles/${role.slug}`, locale)} className="rounded-lg border border-line bg-panel p-4 transition hover:border-accent/35 hover:bg-elevated">
               <h3 className="font-semibold text-primary">{role.name}</h3>
               <p className="mt-1 text-sm leading-6 text-secondary">{role.description}</p>
             </Link>
@@ -87,10 +90,10 @@ export default function HomePage() {
       </section>
 
       <section id="browse-by-task" className="border-b border-line py-10">
-        <SectionHeading title="Browse by Task" />
+        <SectionHeading title={dictionary.home.browseByTask} />
         <div className="flex flex-wrap gap-2">
           {browseTasks.map((task) => (
-            <Link key={task} href={`/agents?query=${task}`} className="rounded-md border border-line bg-elevated px-3 py-2 text-sm text-secondary transition hover:border-accent/35 hover:text-primary">
+            <Link key={task} href={`${withLocale("/agents", locale)}?query=${task}`} className="rounded-md border border-line bg-elevated px-3 py-2 text-sm text-secondary transition hover:border-accent/35 hover:text-primary">
               {task}
             </Link>
           ))}
@@ -98,13 +101,17 @@ export default function HomePage() {
       </section>
 
       <section id="workflow-packs" className="py-10">
-        <SectionHeading title="Workflow Packs" description="Multi-agent playbooks for complete business and production workflows." />
+        <SectionHeading title={dictionary.home.workflowPacks} description={dictionary.home.workflowDescription} />
         <div className="grid gap-4">
           {workflows.slice(0, 4).map((workflow) => (
-            <WorkflowCard key={workflow.slug} workflow={workflow} />
+            <WorkflowCard key={workflow.slug} workflow={workflow} locale={locale} />
           ))}
         </div>
       </section>
     </AppShell>
   );
+}
+
+export default async function HomePage() {
+  return <HomePageContent locale={await getRequestLocale()} />;
 }

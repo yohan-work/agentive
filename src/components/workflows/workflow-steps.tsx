@@ -3,8 +3,12 @@ import { ArrowRight, Bot, FileInput, FileText } from "lucide-react";
 import type { WorkflowStep } from "@/types/workflow";
 import { Badge } from "@/components/common/badge";
 import { getAgentBySlug } from "@/data/agents";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 
-export function WorkflowSteps({ steps }: { steps: WorkflowStep[] }) {
+export function WorkflowSteps({ steps, locale = defaultLocale }: { steps: WorkflowStep[]; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
+
   return (
     <ol className="space-y-5">
       {steps.map((step) => {
@@ -28,20 +32,20 @@ export function WorkflowSteps({ steps }: { steps: WorkflowStep[] }) {
             <div className="grid gap-px bg-line md:grid-cols-3">
               <WorkflowField
                 icon={<FileInput className="h-4 w-4" />}
-                label="Input"
+                label={dictionary.common.input}
                 value={agent?.inputs.slice(0, 2).join(" + ") ?? "Project context"}
               />
               <WorkflowField
                 icon={<Bot className="h-4 w-4" />}
-                label="Agent"
+                label={dictionary.common.agent}
                 value={agent?.name ?? step.agentSlug}
-                href={agent ? `/agents/${agent.slug}` : undefined}
+                href={agent ? withLocale(`/agents/${agent.slug}`, locale) : undefined}
               />
-              <WorkflowField icon={<FileText className="h-4 w-4" />} label="Output" value={step.expectedOutput} />
+              <WorkflowField icon={<FileText className="h-4 w-4" />} label={dictionary.common.output} value={step.expectedOutput} />
             </div>
             {agent ? (
               <div className="p-5">
-                <Link href={`/agents/${agent.slug}`} className="inline-flex items-center gap-2 text-sm font-medium text-sky-200">
+                <Link href={withLocale(`/agents/${agent.slug}`, locale)} className="inline-flex items-center gap-2 text-sm font-medium text-sky-200">
                   Use {agent.name} <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

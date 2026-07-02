@@ -5,17 +5,13 @@ import { Badge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { AppShell } from "@/components/layout/app-shell";
 import { agents } from "@/data/agents";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { getRequestLocale } from "@/i18n/server";
 
 export const metadata: Metadata = {
   title: "Install Agents"
 };
-
-const toc = [
-  { title: "Install agents", href: "#install" },
-  { title: "How it works", href: "#how-it-works" },
-  { title: "Starter packs", href: "#starter-packs" },
-  { title: "Project-ready agents", href: "#project-ready" }
-];
 
 const starterPacks = [
   {
@@ -40,7 +36,14 @@ const starterPacks = [
   }
 ];
 
-export default function InstallPage() {
+function InstallPageContent({ locale = defaultLocale }: { locale?: Locale }) {
+  const dictionary = getDictionary(locale);
+  const toc = [
+    { title: dictionary.install.title, href: "#install" },
+    { title: "How it works", href: "#how-it-works" },
+    { title: dictionary.install.starterPacks, href: "#starter-packs" },
+    { title: dictionary.install.projectReadyAgents, href: "#project-ready" }
+  ];
   const installableAgents = agents
     .filter((agent) => agent.installTargets?.length)
     .sort((a, b) => (b.evaluation?.qualityScore ?? 0) - (a.evaluation?.qualityScore ?? 0) || a.name.localeCompare(b.name));
@@ -49,10 +52,10 @@ export default function InstallPage() {
   return (
     <AppShell toc={toc}>
       <header id="install" className="mb-8 border-b border-line pb-8">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">Project-ready</p>
-        <h1 className="text-4xl font-semibold text-primary">Install Agents</h1>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">{dictionary.install.eyebrow}</p>
+        <h1 className="text-4xl font-semibold text-primary">{dictionary.install.title}</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-secondary">
-          Download agent kits, copy the generated files into your project, and use the included runbook to prepare context and review outputs.
+          {dictionary.install.description}
         </p>
       </header>
 
@@ -82,7 +85,7 @@ export default function InstallPage() {
       </section>
 
       <section id="starter-packs" className="border-b border-line py-8">
-        <h2 className="text-2xl font-semibold text-primary">Starter packs</h2>
+        <h2 className="text-2xl font-semibold text-primary">{dictionary.install.starterPacks}</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">
           Pick a pack when you know the project role but not the exact agent. Each pack links to installable agents with runbooks and quality evaluations.
         </p>
@@ -104,7 +107,7 @@ export default function InstallPage() {
                   {packAgents.map((agent) => (
                     <Link
                       key={agent.slug}
-                      href={`/agents/${agent.slug}`}
+                      href={withLocale(`/agents/${agent.slug}`, locale)}
                       className="rounded-md border border-line bg-elevated px-2.5 py-1 text-xs font-medium text-secondary transition hover:border-accent/35 hover:text-primary"
                     >
                       {agent.name}
@@ -120,16 +123,16 @@ export default function InstallPage() {
       <section id="project-ready" className="py-8">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-primary">Project-ready agents</h2>
+            <h2 className="text-2xl font-semibold text-primary">{dictionary.install.projectReadyAgents}</h2>
             <p className="mt-2 text-sm text-secondary">{installableAgents.length} agents currently include install kits.</p>
           </div>
-          <Link href="/agents" className="hidden text-sm font-medium text-sky-200 sm:inline-flex">
+          <Link href={withLocale("/agents", locale)} className="hidden text-sm font-medium text-sky-200 sm:inline-flex">
             Browse all agents
           </Link>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {installableAgents.map((agent) => (
-            <Link key={agent.slug} href={`/agents/${agent.slug}`}>
+            <Link key={agent.slug} href={withLocale(`/agents/${agent.slug}`, locale)}>
               <Card className="h-full p-5">
                 <div className="mb-3 flex flex-wrap gap-2">
                   <Badge tone="success">Installable</Badge>
@@ -150,4 +153,8 @@ export default function InstallPage() {
       </section>
     </AppShell>
   );
+}
+
+export default async function InstallPage() {
+  return <InstallPageContent locale={await getRequestLocale()} />;
 }

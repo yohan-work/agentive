@@ -3,9 +3,10 @@ import { ArrowRight, Clock, Layers } from "lucide-react";
 import type { Workflow } from "@/types/workflow";
 import { Badge, DifficultyBadge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
+import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
 import { titleCase } from "@/lib/utils";
 
-export function WorkflowCard({ workflow }: { workflow: Workflow }) {
+export function WorkflowCard({ workflow, locale = defaultLocale }: { workflow: Workflow; locale?: Locale }) {
   return (
     <Card className="p-5">
       <div className="mb-4 flex flex-wrap gap-2">
@@ -24,7 +25,7 @@ export function WorkflowCard({ workflow }: { workflow: Workflow }) {
           {workflow.categories.map(titleCase).join(", ")}
         </p>
       </div>
-      <Link href={`/workflows/${workflow.slug}`} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
+      <Link href={withLocale(`/workflows/${workflow.slug}`, locale)} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
         View workflow <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>
