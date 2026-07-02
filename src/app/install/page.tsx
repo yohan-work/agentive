@@ -13,14 +13,38 @@ export const metadata: Metadata = {
 const toc = [
   { title: "Install agents", href: "#install" },
   { title: "How it works", href: "#how-it-works" },
-  { title: "Recommended starts", href: "#recommended-starts" },
+  { title: "Starter packs", href: "#starter-packs" },
   { title: "Project-ready agents", href: "#project-ready" }
+];
+
+const starterPacks = [
+  {
+    name: "Engineering",
+    summary: "Prepare, review, test, and de-risk coding-agent work.",
+    slugs: ["codex-task-brief", "pr-review-agent", "bug-root-cause-analyst", "qa-checklist-agent"]
+  },
+  {
+    name: "Product planning",
+    summary: "Turn product ideas into requirements, priorities, and handoff-ready plans.",
+    slugs: ["feature-requirements-analyst", "product-roadmap-prioritizer", "customer-feedback-clusterer"]
+  },
+  {
+    name: "Design QA",
+    summary: "Move from component behavior to visual QA and landing-page critique.",
+    slugs: ["component-spec-agent", "design-qa-agent", "landing-page-critique-agent"]
+  },
+  {
+    name: "Operations docs",
+    summary: "Create reusable documentation for meetings, policies, SOPs, releases, and READMEs.",
+    slugs: ["operations-sop-agent", "meeting-summary-agent", "policy-doc-writer", "release-notes-writer", "readme-generator"]
+  }
 ];
 
 export default function InstallPage() {
   const installableAgents = agents
     .filter((agent) => agent.installTargets?.length)
     .sort((a, b) => (b.evaluation?.qualityScore ?? 0) - (a.evaluation?.qualityScore ?? 0) || a.name.localeCompare(b.name));
+  const agentsBySlug = new Map(installableAgents.map((agent) => [agent.slug, agent]));
 
   return (
     <AppShell toc={toc}>
@@ -57,24 +81,39 @@ export default function InstallPage() {
         </div>
       </section>
 
-      <section id="recommended-starts" className="border-b border-line py-8">
-        <h2 className="text-2xl font-semibold text-primary">Recommended starts</h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {[
-            ["I want better Codex task briefs", "codex-task-brief"],
-            ["I want better PR/code review", "pr-review-agent"],
-            ["I want reusable team workflows", "operations-sop-agent"]
-          ].map(([title, slug]) => (
-            <Link key={slug} href={`/agents/${slug}`}>
-              <Card className="h-full p-5">
-                <h3 className="font-semibold text-primary">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-secondary">Open the agent, copy the input template, then download the kit when it fits your workflow.</p>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
-                  Start here <ArrowRight className="h-4 w-4" />
-                </span>
+      <section id="starter-packs" className="border-b border-line py-8">
+        <h2 className="text-2xl font-semibold text-primary">Starter packs</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">
+          Pick a pack when you know the project role but not the exact agent. Each pack links to installable agents with runbooks and quality evaluations.
+        </p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {starterPacks.map((pack) => {
+            const packAgents = pack.slugs.map((slug) => agentsBySlug.get(slug)).filter((agent): agent is NonNullable<typeof agent> => Boolean(agent));
+            const averageQuality =
+              packAgents.reduce((total, agent) => total + (agent.evaluation?.qualityScore ?? 0), 0) / Math.max(packAgents.length, 1);
+
+            return (
+              <Card key={pack.name} className="h-full p-5">
+                <div className="mb-3 flex flex-wrap gap-2">
+                  <Badge tone="success">{packAgents.length} agents</Badge>
+                  <Badge tone="accent">Avg quality {averageQuality.toFixed(1)}/5</Badge>
+                </div>
+                <h3 className="text-lg font-semibold text-primary">{pack.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-secondary">{pack.summary}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {packAgents.map((agent) => (
+                    <Link
+                      key={agent.slug}
+                      href={`/agents/${agent.slug}`}
+                      className="rounded-md border border-line bg-elevated px-2.5 py-1 text-xs font-medium text-secondary transition hover:border-accent/35 hover:text-primary"
+                    >
+                      {agent.name}
+                    </Link>
+                  ))}
+                </div>
               </Card>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 
