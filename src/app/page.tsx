@@ -4,9 +4,11 @@ import { AgentGrid } from "@/components/agents/agent-grid";
 import { ButtonLink } from "@/components/common/button";
 import { Card } from "@/components/common/card";
 import { SectionHeading } from "@/components/common/section-heading";
+import { ImpactShowcase } from "@/components/impact/impact-showcase";
 import { AppShell } from "@/components/layout/app-shell";
 import { WorkflowCard } from "@/components/workflows/workflow-card";
 import { featuredAgents } from "@/data/agents";
+import { impactScenarios } from "@/data/impact-scenarios";
 import { categories, roles, taskTags } from "@/data/taxonomy";
 import { workflows } from "@/data/workflows";
 
@@ -14,6 +16,7 @@ const browseTasks = Array.from(new Set([...taskTags, ...categories.slice(0, 4).m
 
 const toc = [
   { title: "Overview", href: "#overview" },
+  { title: "Impact", href: "#impact" },
   { title: "Featured Agents", href: "#featured-agents" },
   { title: "Browse by Role", href: "#browse-by-role" },
   { title: "Browse by Task", href: "#browse-by-task" },
@@ -56,6 +59,14 @@ export default function HomePage() {
             </Card>
           ))}
         </div>
+      </section>
+
+      <section id="impact" className="border-b border-line py-10">
+        <SectionHeading
+          title="What changes when agents are used well"
+          description="These example scenarios show the practical shift from scattered requests to reusable outputs, review criteria, and cleaner handoffs."
+        />
+        <ImpactShowcase scenarios={impactScenarios} />
       </section>
 
       <section id="featured-agents" className="border-b border-line py-10">
