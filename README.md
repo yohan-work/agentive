@@ -6,17 +6,32 @@
 
 ## Overview
 
-Agent Archive is a curated library of AI agents, prompts, and workflow recipes for real-world work.
+Agent Archive is a static-data-first library of practical AI agents, prompts, install kits, and workflow recipes for real-world work.
 
 ## Features
 
-- Browse agents by role, category, and task
-- Search agents
-- View detailed agent cards
-- Copy prompts
+- Browse 100 curated agents by role, category, task, and tool
+- Search agents and filter installable project-ready agents
+- View detailed agent cards with prompts, examples, real use cases, runbooks, and quality evaluations
+- Copy portable prompt bundles or download markdown/JSON exports
+- Download install kits for Codex, Claude, and Cursor
 - Explore workflow packs
 - Bookmark useful agents
 - Submit new agent ideas
+
+## Project-Ready Agents
+
+20 agents currently include project install metadata. Each install kit includes:
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- Cursor `.mdc` rule
+- `agent.json`
+- `README.md`
+- `RUNBOOK.md`
+- `EVALUATION.md`
+
+Quality evaluations include differentiated scores, recommended use cases, known weaknesses, review criteria, and sample runs.
 
 ## Tech Stack
 
@@ -29,6 +44,14 @@ Agent Archive is a curated library of AI agents, prompts, and workflow recipes f
 ```bash
 npm install
 npm run dev
+```
+
+## Validation
+
+```bash
+npm run check:data
+npm run lint
+npm run build
 ```
 
 ## Future Roadmap
