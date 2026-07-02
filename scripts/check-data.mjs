@@ -48,10 +48,19 @@ const missingInstallable = unique(installableSlugs.filter((slug) => !uniqueAgent
 const duplicateInstallable = unique(installableSlugs).filter(
   (slug) => installableSlugs.filter((candidate) => candidate === slug).length > 1
 );
-const hasRunbookFactory = /function createRunbook/.test(installableSource) && /runbook:\s*createRunbook\(agent\)/.test(installableSource);
+const hasRunbookFactory = /function createRunbook/.test(installableSource) && /createRunbook\(agent\)/.test(installableSource);
 const hasEvaluationFactory =
   /function createEvaluation/.test(installableSource) && /evaluation:\s*createEvaluation\(agent\)/.test(installableSource);
-const hasEvaluationKitFile = /EVALUATION\.md/.test(installableSource) && /toEvaluationFile/.test(read("src/lib/agent-install-kit.ts"));
+const installKitSource = read("src/lib/agent-install-kit.ts");
+const hasRunbookKitFile = /RUNBOOK\.md/.test(installableSource) && /toRunbookFile/.test(installKitSource);
+const hasEvaluationKitFile = /EVALUATION\.md/.test(installableSource) && /toEvaluationFile/.test(installKitSource);
+const evaluationProfileBlock = installableSource.match(/const evaluationProfiles:[\s\S]*?const runbookOverrides/)?.[0] ?? "";
+const missingEvaluationProfiles = installableSlugs.filter((slug) => !evaluationProfileBlock.includes(`"${slug}": {`));
+const evaluationScores = matchAll(evaluationProfileBlock, /qualityScore:\s*([1-5])/g).map(Number);
+const hasDifferentiatedQualityScores = unique(evaluationScores).length > 1;
+const hasTwoSampleRuns = /sampleRuns:\s*\[\s*{[\s\S]*?},\s*{/.test(installableSource);
+const runbookOverrideBlock = installableSource.match(/const runbookOverrides:[\s\S]*?function createRunbook/)?.[0] ?? "";
+const runbookOverrideCount = matchAll(runbookOverrideBlock, /"[^"]+":\s*{/g, 0).length;
 
 const taxonomyRoles = parseStringArray(taxonomySource.match(/export const roles:[\s\S]*?\];/)?.[0] ?? "").filter((value) =>
   /^[a-z0-9-]+$/.test(value)
@@ -87,7 +96,17 @@ const failures = [
   installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
   !hasRunbookFactory ? "Installable agents must receive runbook metadata" : "",
   !hasEvaluationFactory ? "Installable agents must receive quality evaluation metadata" : "",
+  !hasRunbookKitFile ? "Installable kits must include RUNBOOK.md" : "",
   !hasEvaluationKitFile ? "Installable kits must include EVALUATION.md" : "",
+  missingEvaluationProfiles.length
+    ? `Installable agents missing manual evaluation profiles: ${missingEvaluationProfiles.join(", ")}`
+    : "",
+  evaluationScores.length < installableSlugs.length
+    ? `Expected at least ${installableSlugs.length} manual quality scores, found ${evaluationScores.length}`
+    : "",
+  !hasDifferentiatedQualityScores ? "Installable agent quality scores must be differentiated" : "",
+  !hasTwoSampleRuns ? "Installable agent evaluations must include at least two sample runs" : "",
+  runbookOverrideCount < 5 ? `Expected at least 5 manual runbook overrides, found ${runbookOverrideCount}` : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
   missingCategories.length ? `Unknown categories: ${missingCategories.join(", ")}` : "",
   totalAgents < 100 ? `Expected at least 100 agents, found ${totalAgents}` : ""
