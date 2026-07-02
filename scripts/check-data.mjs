@@ -25,6 +25,7 @@ const installableSource = read("src/data/installable-agents.ts");
 const workflowsSource = read("src/data/workflows.ts");
 const taxonomySource = read("src/data/taxonomy.ts");
 const impactSource = read("src/data/impact-scenarios.ts");
+const dictionarySource = read("src/i18n/dictionaries.ts");
 
 const agentSlugs = [
   ...matchAll(agentsSource, /slug:\s*"([^"]+)"/g),
@@ -48,6 +49,10 @@ const workflowSlugs = matchAll(workflowsSource, /slug:\s*"([^"]+)"/g);
 const impactWorkflowSlugs = matchAll(impactSource, /primaryWorkflowSlug:\s*"([^"]+)"/g);
 const missingImpactWorkflows = unique(impactWorkflowSlugs.filter((slug) => !workflowSlugs.includes(slug)));
 const impactScenarioCount = matchAll(impactSource, /slug:\s*"([^"]+)"/g).length;
+const dictionaryEnKeys = matchAll(dictionarySource.match(/en:\s*{([\s\S]*?)},\n  ko:/)?.[1] ?? "", /([a-zA-Z][a-zA-Z0-9]*):/g);
+const dictionaryKoKeys = matchAll(dictionarySource.match(/ko:\s*{([\s\S]*?)\n  }\n} as const/)?.[1] ?? "", /([a-zA-Z][a-zA-Z0-9]*):/g);
+const missingKoDictionaryKeys = unique(dictionaryEnKeys.filter((key) => !dictionaryKoKeys.includes(key)));
+const missingEnDictionaryKeys = unique(dictionaryKoKeys.filter((key) => !dictionaryEnKeys.includes(key)));
 
 const installableSlugs = Array.from(
   installableSource.match(/INSTALLABLE_AGENT_SLUGS\s*=\s*\[([\s\S]*?)\]/)?.[1]?.matchAll(/"([^"]+)"/g) ?? [],
@@ -103,6 +108,8 @@ const failures = [
   missingImpactAgents.length ? `Missing impact scenario agent slugs: ${missingImpactAgents.join(", ")}` : "",
   missingImpactWorkflows.length ? `Missing impact scenario workflow slugs: ${missingImpactWorkflows.join(", ")}` : "",
   impactScenarioCount < 3 ? `Expected at least 3 impact scenarios, found ${impactScenarioCount}` : "",
+  missingKoDictionaryKeys.length ? `Korean dictionary missing keys: ${missingKoDictionaryKeys.join(", ")}` : "",
+  missingEnDictionaryKeys.length ? `English dictionary missing keys: ${missingEnDictionaryKeys.join(", ")}` : "",
   missingInstallable.length ? `Missing installable agent slugs: ${missingInstallable.join(", ")}` : "",
   duplicateInstallable.length ? `Duplicate installable agent slugs: ${duplicateInstallable.join(", ")}` : "",
   installableSlugs.length !== 20 ? `Expected 20 installable agents, found ${installableSlugs.length}` : "",
