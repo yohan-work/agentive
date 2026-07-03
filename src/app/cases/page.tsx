@@ -44,6 +44,7 @@ function CasesPageContent({ locale = defaultLocale }: { locale?: Locale }) {
           roles={roles.map((role) => role.slug)}
           categories={categories.map((category) => category.slug)}
           workflows={workflows}
+          labels={dictionary.cases}
           locale={locale}
         />
       </div>

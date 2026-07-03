@@ -16,17 +16,43 @@ type CaseFilters = {
   workflow?: string;
 };
 
+export type CaseExplorerLabels = {
+  guideTitle: string;
+  guideDescription: string;
+  searchPlaceholder: string;
+  showing: string;
+  of: string;
+  useCases: string;
+  activeFilters: string;
+  clearAll: string;
+  noResultsTitle: string;
+  noResultsDescription: string;
+  useAgentNow: string;
+  context: string;
+  howToUse: string;
+  expectedResult: string;
+  recommendedWorkflow: string;
+  standaloneAgent: string;
+  exampleInput: string;
+  agent: string;
+  role: string;
+  category: string;
+  workflow: string;
+};
+
 export function CaseExplorer({
   useCases,
   roles,
   categories,
   workflows,
+  labels,
   locale = defaultLocale
 }: {
   useCases: AgentUseCaseRecord[];
   roles: string[];
   categories: string[];
   workflows: string[];
+  labels: CaseExplorerLabels;
   locale?: Locale;
 }) {
   const [query, setQuery] = useState("");
@@ -54,46 +80,51 @@ export function CaseExplorer({
 
   return (
     <div className="space-y-6">
+      <div className="rounded-lg border border-line bg-panel/60 p-5">
+        <h2 className="text-xl font-semibold text-primary">{labels.guideTitle}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-secondary">{labels.guideDescription}</p>
+      </div>
+
       <label className="relative block">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search use cases by problem, workflow, agent, role..."
+          placeholder={labels.searchPlaceholder}
           className="h-12 w-full rounded-lg border border-line bg-panel pl-10 pr-4 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20"
         />
       </label>
 
       <div className="space-y-4 rounded-lg border border-line bg-panel/60 p-4">
-        <FilterRow title="Role" values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
-        <FilterRow title="Category" values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
-        <FilterRow title="Workflow" values={workflows} active={filters.workflow} onSelect={(value) => setFilter("workflow", value)} label={(value) => value} />
+        <FilterRow title={labels.role} values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+        <FilterRow title={labels.category} values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+        <FilterRow title={labels.workflow} values={workflows} active={filters.workflow} onSelect={(value) => setFilter("workflow", value)} label={(value) => value} />
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-line bg-panel/45 p-4 text-sm text-secondary sm:flex-row sm:items-center sm:justify-between">
         <span>
-          Showing <span className="font-semibold text-primary">{results.length}</span> of {useCases.length} use cases
-          {activeCount ? ` across ${activeCount} active filters` : ""}
+          {labels.showing} <span className="font-semibold text-primary">{results.length}</span> {labels.of} {useCases.length} {labels.useCases}
+          {activeCount ? ` · ${activeCount} ${labels.activeFilters}` : ""}
         </span>
         <button type="button" onClick={clearAll} className="self-start text-sky-200 transition hover:text-primary sm:self-auto">
-          Clear all
+          {labels.clearAll}
         </button>
       </div>
 
       {results.length ? (
         <div className="grid gap-4">
           {results.map((useCase) => (
-            <CaseCard key={useCase.id} useCase={useCase} locale={locale} />
+            <CaseCard key={useCase.id} useCase={useCase} labels={labels} locale={locale} />
           ))}
         </div>
       ) : (
-        <EmptyState title="No use cases found." description="Try another problem, role, workflow, or agent keyword." />
+        <EmptyState title={labels.noResultsTitle} description={labels.noResultsDescription} />
       )}
     </div>
   );
 }
 
-function CaseCard({ useCase, locale }: { useCase: AgentUseCaseRecord; locale: Locale }) {
+function CaseCard({ useCase, labels, locale }: { useCase: AgentUseCaseRecord; labels: CaseExplorerLabels; locale: Locale }) {
   return (
     <Card className="p-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -113,22 +144,22 @@ function CaseCard({ useCase, locale }: { useCase: AgentUseCaseRecord; locale: Lo
           <p className="mt-2 text-sm leading-6 text-secondary">{useCase.problem}</p>
         </div>
         <Link href={withLocale(`/agents/${useCase.agentSlug}`, locale)} className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-sky-200">
-          Use this agent now <ArrowRight className="h-4 w-4" />
+          {labels.useAgentNow} <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <Field label="Context" value={useCase.context} />
-        <Field label="How to use" value={useCase.howToUse} />
-        <Field label="Expected result" value={useCase.expectedResult} />
-        <Field label="Recommended workflow" value={useCase.recommendedWorkflow ?? "Standalone agent"} />
+        <Field label={labels.context} value={useCase.context} />
+        <Field label={labels.howToUse} value={useCase.howToUse} />
+        <Field label={labels.expectedResult} value={useCase.expectedResult} />
+        <Field label={labels.recommendedWorkflow} value={useCase.recommendedWorkflow ?? labels.standaloneAgent} />
       </div>
 
       <div className="mt-5 rounded-md border border-line bg-[#08090c] p-4">
-        <p className="mb-2 font-mono text-xs text-muted">example input</p>
+        <p className="mb-2 font-mono text-xs text-muted">{labels.exampleInput}</p>
         <p className="text-sm leading-6 text-secondary">{useCase.exampleInput}</p>
       </div>
-      <p className="mt-3 text-xs text-muted">Agent: {useCase.agentName}</p>
+      <p className="mt-3 text-xs text-muted">{labels.agent}: {useCase.agentName}</p>
     </Card>
   );
 }
