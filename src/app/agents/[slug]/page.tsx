@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AgentDetailHeader } from "@/components/agents/agent-detail-header";
+import { AgentEffectSummary } from "@/components/agents/agent-effect-summary";
 import { AgentEvaluationPanel } from "@/components/agents/agent-evaluation";
 import { AgentExportPanel } from "@/components/agents/agent-export-panel";
 import { AgentRunbookPanel } from "@/components/agents/agent-runbook";
@@ -12,9 +13,11 @@ import { Tag } from "@/components/common/tag";
 import { AppShell } from "@/components/layout/app-shell";
 import { agents, getAgentBySlug } from "@/data/agents";
 import { defaultLocale, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import { getRequestLocale } from "@/i18n/server";
 
 const toc = [
+  { title: "Expected effect", href: "#expected-effect" },
   { title: "What this agent does", href: "#what-this-agent-does" },
   { title: "Use this agent", href: "#use-this-agent" },
   { title: "How to run this agent", href: "#how-to-run-this-agent" },
@@ -57,6 +60,7 @@ async function AgentDetailPageContent({
     notFound();
   }
 
+  const dictionary = getDictionary(locale);
   const related = (agent.relatedAgents ?? [])
     .map((relatedSlug) => getAgentBySlug(relatedSlug))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -64,6 +68,9 @@ async function AgentDetailPageContent({
   return (
     <AppShell toc={toc}>
       <AgentDetailHeader agent={agent} />
+      <div id="expected-effect">
+        <AgentEffectSummary agent={agent} relatedAgent={related[0]} labels={dictionary.agentDetail} />
+      </div>
       <DetailSection id="what-this-agent-does" title="What this agent does">
         <p>{agent.description}</p>
         <div className="mt-4 flex flex-wrap gap-2">
