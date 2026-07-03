@@ -3,6 +3,19 @@ export type ImpactMetric = {
   value: string;
 };
 
+export type ImpactScenarioTranslation = {
+  title: string;
+  audience: string;
+  problem: string;
+  before: string[];
+  outputs: string[];
+  after: string[];
+  impactMetrics: ImpactMetric[];
+  plainBenefit: string;
+  effectTags: string[];
+  recommendedStart: string;
+};
+
 export type ImpactScenario = {
   slug: string;
   title: string;
@@ -13,5 +26,11 @@ export type ImpactScenario = {
   outputs: string[];
   after: string[];
   impactMetrics: ImpactMetric[];
+  plainBenefit: string;
+  effectTags: string[];
+  recommendedStart: string;
   primaryWorkflowSlug?: string;
+  translations?: {
+    ko?: ImpactScenarioTranslation;
+  };
 };

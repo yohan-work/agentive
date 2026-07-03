@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ClipboardCheck, GitPullRequestArrow, TimerReset } from "lucide-react";
 import { AgentGrid } from "@/components/agents/agent-grid";
 import { ButtonLink } from "@/components/common/button";
 import { Card } from "@/components/common/card";
@@ -16,10 +16,12 @@ import { getDictionary } from "@/i18n/dictionaries";
 import { getRequestLocale } from "@/i18n/server";
 
 const browseTasks = Array.from(new Set([...taskTags, ...categories.slice(0, 4).map((category) => category.slug)]));
+const benefitIcons = [TimerReset, ClipboardCheck, GitPullRequestArrow];
 
 function HomePageContent({ locale = defaultLocale }: { locale?: Locale }) {
   const dictionary = getDictionary(locale);
   const toc = [
+    { title: dictionary.home.benefitTitle, href: "#benefits" },
     { title: dictionary.home.overviewTitle, href: "#overview" },
     { title: "Impact", href: "#impact" },
     { title: dictionary.home.featuredAgents, href: "#featured-agents" },
@@ -44,6 +46,25 @@ function HomePageContent({ locale = defaultLocale }: { locale?: Locale }) {
             {dictionary.common.browseAgents} <ArrowRight className="h-4 w-4" />
           </ButtonLink>
           <ButtonLink href={withLocale("/workflows", locale)}>{dictionary.common.exploreWorkflows}</ButtonLink>
+        </div>
+      </section>
+
+      <section id="benefits" className="border-b border-line py-10">
+        <SectionHeading title={dictionary.home.benefitTitle} description={dictionary.home.benefitDescription} />
+        <div className="grid gap-4 md:grid-cols-3">
+          {dictionary.home.benefitCards.map((benefit, index) => {
+            const Icon = benefitIcons[index] ?? TimerReset;
+
+            return (
+              <Card key={benefit.title} className="p-5">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-md border border-accent/25 bg-accent/10 text-sky-200">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <h3 className="font-semibold text-primary">{benefit.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-secondary">{benefit.description}</p>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
