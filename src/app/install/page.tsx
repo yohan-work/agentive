@@ -5,6 +5,7 @@ import { Badge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { AppShell } from "@/components/layout/app-shell";
 import { agents } from "@/data/agents";
+import { starterPacks } from "@/data/starter-packs";
 import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getRequestLocale } from "@/i18n/server";
@@ -12,29 +13,6 @@ import { getRequestLocale } from "@/i18n/server";
 export const metadata: Metadata = {
   title: "Install Agents"
 };
-
-const starterPacks = [
-  {
-    name: "Engineering",
-    summary: "Prepare, review, test, and de-risk coding-agent work.",
-    slugs: ["codex-task-brief", "pr-review-agent", "bug-root-cause-analyst", "qa-checklist-agent"]
-  },
-  {
-    name: "Product planning",
-    summary: "Turn product ideas into requirements, priorities, and handoff-ready plans.",
-    slugs: ["feature-requirements-analyst", "product-roadmap-prioritizer", "customer-feedback-clusterer"]
-  },
-  {
-    name: "Design QA",
-    summary: "Move from component behavior to visual QA and landing-page critique.",
-    slugs: ["component-spec-agent", "design-qa-agent", "landing-page-critique-agent"]
-  },
-  {
-    name: "Operations docs",
-    summary: "Create reusable documentation for meetings, policies, SOPs, releases, and READMEs.",
-    slugs: ["operations-sop-agent", "meeting-summary-agent", "policy-doc-writer", "release-notes-writer", "readme-generator"]
-  }
-];
 
 function InstallPageContent({ locale = defaultLocale }: { locale?: Locale }) {
   const dictionary = getDictionary(locale);
@@ -91,28 +69,60 @@ function InstallPageContent({ locale = defaultLocale }: { locale?: Locale }) {
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           {starterPacks.map((pack) => {
-            const packAgents = pack.slugs.map((slug) => agentsBySlug.get(slug)).filter((agent): agent is NonNullable<typeof agent> => Boolean(agent));
+            const packAgents = pack.steps.map((step) => agentsBySlug.get(step.agentSlug)).filter((agent): agent is NonNullable<typeof agent> => Boolean(agent));
             const averageQuality =
               packAgents.reduce((total, agent) => total + (agent.evaluation?.qualityScore ?? 0), 0) / Math.max(packAgents.length, 1);
+            const firstAgent = agentsBySlug.get(pack.firstAgentSlug);
 
             return (
-              <Card key={pack.name} className="h-full p-5">
+              <Card key={pack.slug} className="h-full p-5">
                 <div className="mb-3 flex flex-wrap gap-2">
                   <Badge tone="success">{packAgents.length} agents</Badge>
                   <Badge tone="accent">Avg quality {averageQuality.toFixed(1)}/5</Badge>
+                  <Badge>{pack.estimatedTime}</Badge>
                 </div>
                 <h3 className="text-lg font-semibold text-primary">{pack.name}</h3>
                 <p className="mt-2 text-sm leading-6 text-secondary">{pack.summary}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {packAgents.map((agent) => (
+                <p className="mt-3 text-sm leading-6 text-secondary">
+                  Start with{" "}
+                  {firstAgent ? (
                     <Link
-                      key={agent.slug}
-                      href={withLocale(`/agents/${agent.slug}`, locale)}
-                      className="rounded-md border border-line bg-elevated px-2.5 py-1 text-xs font-medium text-secondary transition hover:border-accent/35 hover:text-primary"
+                      href={withLocale(`/agents/${firstAgent.slug}`, locale)}
+                      className="font-medium text-sky-200 transition hover:text-primary"
                     >
-                      {agent.name}
+                      {firstAgent.name}
                     </Link>
-                  ))}
+                  ) : (
+                    "the first listed agent"
+                  )}
+                  . Final output: {pack.finalOutput}
+                </p>
+                <div className="mt-4 space-y-3">
+                  {pack.steps.map((step) => {
+                    const agent = agentsBySlug.get(step.agentSlug);
+
+                    if (!agent) {
+                      return null;
+                    }
+
+                    return (
+                      <div key={`${pack.slug}-${step.agentSlug}`} className="rounded-md border border-line bg-elevated p-3">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-sm font-semibold text-primary">
+                            {step.order}. {agent.name}
+                          </p>
+                          <Link
+                            href={withLocale(`/agents/${agent.slug}`, locale)}
+                            className="text-xs font-medium text-sky-200 transition hover:text-primary"
+                          >
+                            Open agent
+                          </Link>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-secondary">{step.purpose}</p>
+                        <p className="mt-2 text-xs leading-5 text-muted">Handoff: {step.handoff}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </Card>
             );
