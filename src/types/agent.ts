@@ -17,8 +17,20 @@ export type AgentUseCase = {
 export type AgentRunbook = {
   projectContext: string[];
   inputTemplate: string;
+  starterInputs?: {
+    label: string;
+    description: string;
+    value: string;
+  }[];
   goodInputExample: string;
   badInputExample: string;
+  weakInputFixes?: {
+    weakInput: string;
+    whyItFails: string;
+    strongerInput: string;
+  }[];
+  expectedOutputShape?: string[];
+  setupContextNotes?: string[];
   outputChecklist: string[];
   failureModes: string[];
   handoffTips: string[];
@@ -40,6 +52,12 @@ export type AgentEvaluation = {
   knownWeaknesses: string[];
   evaluationCriteria: string[];
   sampleRuns: AgentSampleRun[];
+};
+
+export type AgentDecisionGuide = {
+  question: string;
+  guidance: string;
+  alternativeAgentSlug?: string;
 };
 
 export type Agent = {
@@ -72,6 +90,7 @@ export type Agent = {
   };
   runbook?: AgentRunbook;
   evaluation?: AgentEvaluation;
+  decisionGuide?: AgentDecisionGuide[];
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;

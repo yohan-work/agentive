@@ -35,6 +35,7 @@ type EvaluationProfile = {
   criterion: string;
   goodScenario: string;
   boundaryScenario: string;
+  setupNote: string;
 };
 
 const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], EvaluationProfile> = {
@@ -45,7 +46,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can become overly broad if the user asks it to define product strategy and implementation scope in one pass",
     criterion: "Names files, constraints, acceptance checks, and explicit non-goals before implementation begins",
     goodScenario: "Create a Codex brief for adding saved filters to a Next.js agent directory using localStorage only.",
-    boundaryScenario: "Plan a vague redesign request where the user only says the agents page should feel better."
+    boundaryScenario: "Plan a vague redesign request where the user only says the agents page should feel better.",
+    setupNote: "Prepare the goal, known files, acceptance criteria, non-goals, and validation commands before running it."
   },
   "pr-review-agent": {
     qualityScore: 5,
@@ -54,7 +56,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Line-level precision depends on receiving the actual changed files or patch",
     criterion: "Prioritizes actionable findings with severity, file references, and test gaps before summary",
     goodScenario: "Review a pull request that changes agent search filters and includes lint output.",
-    boundaryScenario: "Judge whether a large refactor is safe from a prose summary without seeing the diff."
+    boundaryScenario: "Judge whether a large refactor is safe from a prose summary without seeing the diff.",
+    setupNote: "Provide the actual diff, requirement, test output, and review focus so findings can be concrete."
   },
   "bug-root-cause-analyst": {
     qualityScore: 4,
@@ -63,7 +66,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "May over-rank plausible causes when logs are partial or reproduction is missing",
     criterion: "Separates evidence, hypotheses, reproduction plan, and fix direction",
     goodScenario: "Analyze why bookmarks disappear after refresh using browser logs and the storage helper.",
-    boundaryScenario: "Explain a production outage from a screenshot of an error toast only."
+    boundaryScenario: "Explain a production outage from a screenshot of an error toast only.",
+    setupNote: "Collect symptoms, logs, reproduction steps, recent changes, and affected environment details."
   },
   "feature-requirements-analyst": {
     qualityScore: 5,
@@ -72,7 +76,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can create excessive edge cases if release size and target platform are omitted",
     criterion: "Produces testable acceptance criteria, edge cases, dependencies, and out-of-scope notes",
     goodScenario: "Define requirements for installable-only filtering and quality score badges.",
-    boundaryScenario: "Write requirements for an undefined AI platform pivot."
+    boundaryScenario: "Write requirements for an undefined AI platform pivot.",
+    setupNote: "Bring the feature goal, users, current behavior, constraints, and release boundary."
   },
   "qa-checklist-agent": {
     qualityScore: 4,
@@ -81,7 +86,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Checklist quality drops when feature scope is provided without risk areas",
     criterion: "Splits smoke checks, regression checks, device coverage, and content verification",
     goodScenario: "Create QA checks for agent detail exports on desktop and mobile.",
-    boundaryScenario: "Test an entire product launch with no feature list or supported browser matrix."
+    boundaryScenario: "Test an entire product launch with no feature list or supported browser matrix.",
+    setupNote: "List changed surfaces, supported devices, known risks, and what must not regress."
   },
   "api-contract-agent": {
     qualityScore: 4,
@@ -90,7 +96,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can specify elegant schemas that do not match existing backend conventions unless examples are supplied",
     criterion: "Defines success payloads, validation errors, auth assumptions, and realistic examples",
     goodScenario: "Draft an API contract for submitting new agent ideas with moderation status.",
-    boundaryScenario: "Invent a full billing API without pricing rules or account model."
+    boundaryScenario: "Invent a full billing API without pricing rules or account model.",
+    setupNote: "Prepare domain rules, request examples, response needs, auth assumptions, and error cases."
   },
   "test-case-generator": {
     qualityScore: 4,
@@ -99,7 +106,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "May produce many low-value cases if priority and risk are not stated",
     criterion: "Covers happy path, empty states, combinations, persistence, and regression risk",
     goodScenario: "Generate tests for search, role filter, and installable-only filter combinations.",
-    boundaryScenario: "Create tests for a future feature without a spec."
+    boundaryScenario: "Create tests for a future feature without a spec.",
+    setupNote: "Provide expected behavior, known edge cases, supported environments, and priority risk areas."
   },
   "refactor-plan-agent": {
     qualityScore: 4,
@@ -108,7 +116,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Needs concrete module boundaries to avoid abstract refactor advice",
     criterion: "Sequences small changes, preserves behavior, and names verification commands",
     goodScenario: "Plan extraction of agent export formatting into smaller helpers without changing output.",
-    boundaryScenario: "Redesign the whole app architecture from a single component name."
+    boundaryScenario: "Redesign the whole app architecture from a single component name.",
+    setupNote: "Bring current module boundaries, risky dependencies, unchanged behavior, and validation commands."
   },
   "security-checklist-agent": {
     qualityScore: 3,
@@ -117,7 +126,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Checklist output is not a substitute for threat modeling or code-level security review",
     criterion: "Calls out auth, input handling, secrets, logging, dependency, and data exposure risks",
     goodScenario: "Review risks for a public submit-agent form before adding persistence.",
-    boundaryScenario: "Certify that a payments integration is compliant."
+    boundaryScenario: "Certify that a payments integration is compliant.",
+    setupNote: "Prepare feature scope, data handled, trust boundaries, dependencies, and deployment context."
   },
   "performance-audit-agent": {
     qualityScore: 3,
@@ -126,7 +136,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can only prioritize hypotheses until real performance traces are provided",
     criterion: "Links each recommendation to a measurable symptom and validation method",
     goodScenario: "Audit slow agent list rendering with build stats and browser timing notes.",
-    boundaryScenario: "Make the whole site faster without metrics."
+    boundaryScenario: "Make the whole site faster without metrics.",
+    setupNote: "Collect the target page, measured symptom, device/browser, bundle data, and timing traces when available."
   },
   "design-qa-agent": {
     qualityScore: 4,
@@ -135,7 +146,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can miss interaction details if only static screenshots are provided",
     criterion: "Finds layout, hierarchy, state, copy, and responsive issues with concrete fixes",
     goodScenario: "QA the mobile navigation overlay and agent detail page spacing.",
-    boundaryScenario: "Evaluate brand direction without seeing the interface."
+    boundaryScenario: "Evaluate brand direction without seeing the interface.",
+    setupNote: "Provide screenshots or a running URL, target viewports, design reference, and states to inspect."
   },
   "component-spec-agent": {
     qualityScore: 4,
@@ -144,7 +156,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can over-specify variants if the design system maturity is unclear",
     criterion: "Defines props, states, interactions, accessibility notes, and responsive constraints",
     goodScenario: "Specify an agent quality badge and installable filter control.",
-    boundaryScenario: "Design a full design system from one button example."
+    boundaryScenario: "Design a full design system from one button example.",
+    setupNote: "Prepare component purpose, required actions, variants, states, content constraints, and accessibility needs."
   },
   "landing-page-critique-agent": {
     qualityScore: 4,
@@ -153,7 +166,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Recommendations can be subjective without audience, offer, and traffic source context",
     criterion: "Ties critique to audience intent, offer clarity, proof, CTA, and section hierarchy",
     goodScenario: "Critique a SaaS landing page before writing a rebuild proposal.",
-    boundaryScenario: "Predict conversion lift without analytics or experiment data."
+    boundaryScenario: "Predict conversion lift without analytics or experiment data.",
+    setupNote: "Bring the page URL or copy, audience, offer, traffic source, conversion goal, and known constraints."
   },
   "readme-generator": {
     qualityScore: 4,
@@ -162,7 +176,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "May omit hidden setup requirements unless scripts and config are supplied",
     criterion: "Documents purpose, features, setup, scripts, validation, and roadmap accurately",
     goodScenario: "Update the Agent Archive README after adding install kits and evaluations.",
-    boundaryScenario: "Write complete onboarding docs for a repo without reading its config."
+    boundaryScenario: "Write complete onboarding docs for a repo without reading its config.",
+    setupNote: "Prepare package scripts, setup steps, environment variables, core features, and validation commands."
   },
   "release-notes-writer": {
     qualityScore: 4,
@@ -171,7 +186,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Needs audience and release type to avoid either too much detail or too little context",
     criterion: "Groups changes by user impact, includes caveats, and avoids internal-only noise",
     goodScenario: "Write release notes for the install kit and evaluation feature phase.",
-    boundaryScenario: "Announce a release from raw commit hashes with no descriptions."
+    boundaryScenario: "Announce a release from raw commit hashes with no descriptions.",
+    setupNote: "Bring merged changes, release date or boundary, audience, caveats, and support notes."
   },
   "meeting-summary-agent": {
     qualityScore: 4,
@@ -180,7 +196,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can assign ownership incorrectly if names and decisions are ambiguous",
     criterion: "Separates decisions, actions, owners, deadlines, risks, and follow-up questions",
     goodScenario: "Summarize a product planning call into decisions and next actions.",
-    boundaryScenario: "Infer commitments from informal notes that do not mention owners."
+    boundaryScenario: "Infer commitments from informal notes that do not mention owners.",
+    setupNote: "Provide notes or transcript, participant names, decision context, and deadline conventions."
   },
   "policy-doc-writer": {
     qualityScore: 3,
@@ -189,7 +206,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can make policy wording sound final when decisions are still provisional",
     criterion: "Labels scope, definitions, allowed use, prohibited use, exceptions, and escalation path",
     goodScenario: "Draft an internal AI tool usage policy from team-approved rules.",
-    boundaryScenario: "Create legally binding customer terms without counsel review."
+    boundaryScenario: "Create legally binding customer terms without counsel review.",
+    setupNote: "Prepare approved rules, audience, definitions, exceptions, escalation path, and required reviewers."
   },
   "operations-sop-agent": {
     qualityScore: 4,
@@ -198,7 +216,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Needs real exceptions and handoff points to avoid overly linear procedures",
     criterion: "Defines trigger, owner, steps, inputs, outputs, exceptions, and quality checks",
     goodScenario: "Write an SOP for installing and validating project agent kits.",
-    boundaryScenario: "Standardize a new process nobody has performed yet."
+    boundaryScenario: "Standardize a new process nobody has performed yet.",
+    setupNote: "Bring the trigger, owner, repeated steps, handoff points, exceptions, and quality checks."
   },
   "customer-feedback-clusterer": {
     qualityScore: 4,
@@ -207,7 +226,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Can overstate frequency if duplicate customers or channels are not identified",
     criterion: "Preserves representative quotes, counts themes, flags severity, and recommends next action",
     goodScenario: "Cluster 100 support notes into product improvement themes.",
-    boundaryScenario: "Prioritize roadmap changes from three anecdotal comments."
+    boundaryScenario: "Prioritize roadmap changes from three anecdotal comments.",
+    setupNote: "Prepare raw feedback, source channels, customer identifiers, date range, and known duplicates."
   },
   "product-roadmap-prioritizer": {
     qualityScore: 4,
@@ -216,7 +236,8 @@ const evaluationProfiles: Record<(typeof INSTALLABLE_AGENT_SLUGS)[number], Evalu
     weakness: "Scoring can look objective even when the inputs are subjective guesses",
     criterion: "Shows scoring assumptions, tradeoffs, confidence, dependencies, and sequencing rationale",
     goodScenario: "Rank 20 feature candidates for the next quarter with effort estimates.",
-    boundaryScenario: "Choose the company strategy from a brainstorm list."
+    boundaryScenario: "Choose the company strategy from a brainstorm list.",
+    setupNote: "Bring candidate items, scoring dimensions, strategy constraints, effort estimates, and dependencies."
   }
 };
 
@@ -285,6 +306,7 @@ Output: step-by-step SOP with review checkpoints and rollback notes.`,
 };
 
 function createRunbook(agent: Agent) {
+  const profile = evaluationProfiles[agent.slug as (typeof INSTALLABLE_AGENT_SLUGS)[number]];
   const contextFields = Array.from(new Set(["Project goal", "Current repository or workflow context", ...agent.inputs]));
   const outputChecklist = Array.from(
     new Set([
@@ -297,6 +319,11 @@ function createRunbook(agent: Agent) {
 
   return {
     projectContext: contextFields,
+    setupContextNotes: [
+      profile?.setupNote ?? "Prepare concrete source material, project constraints, and the decision owner before running this agent.",
+      "Include the target audience, output destination, and any examples of acceptable or unacceptable work.",
+      "Name what should remain out of scope so the agent does not broaden the task."
+    ],
     inputTemplate: `Project:
 
 Goal:
@@ -309,11 +336,62 @@ Available files, notes, or data:
 
 Expected output:
 ${agent.outputs.map((output) => `- ${output}`).join("\n")}`,
+    starterInputs: [
+      {
+        label: "First useful run",
+        description: "Use this when you know the goal but still need a structured first draft.",
+        value: `${profile?.goodScenario ?? agent.exampleInput ?? agent.useCases[0] ?? agent.summary}
+
+Context:
+- Current state:
+- Constraints:
+- Audience:
+- Success criteria:`
+      },
+      {
+        label: "Project handoff run",
+        description: "Use this when the output will be pasted into a ticket, PR, document, or project brief.",
+        value: `Goal: produce ${agent.outputs[0] ?? "the main deliverable"} for a real project.
+Source material:
+- 
+Constraints:
+- 
+Review needs:
+- Call out assumptions.
+- Flag missing context.
+- End with concrete next actions.`
+      },
+      {
+        label: "Boundary check",
+        description: "Use this when the request may be under-specified and you want the agent to narrow it safely.",
+        value: `${profile?.boundaryScenario ?? `Help me with ${agent.name}.`}
+
+Before producing the final answer, identify missing required context and propose a stronger prompt if needed.`
+      }
+    ],
     goodInputExample: `${agent.exampleInput ?? agent.useCases[0] ?? agent.summary}
 
 Goal: produce ${agent.outputs[0] ?? "a practical output"} for a real project.
 Constraints: keep the result specific, structured, and ready for handoff.`,
     badInputExample: `Help me with ${agent.name}.`,
+    weakInputFixes: [
+      {
+        weakInput: `Help me with ${agent.name}.`,
+        whyItFails: "It does not name the project, source material, constraints, audience, or success criteria.",
+        strongerInput: `${profile?.goodScenario ?? agent.exampleInput ?? agent.useCases[0] ?? agent.summary} Include current context, constraints, expected output, and review criteria.`
+      },
+      {
+        weakInput: "Make this better.",
+        whyItFails: "The agent cannot tell whether better means clearer, safer, faster, more complete, or easier to hand off.",
+        strongerInput: `Improve the output for ${agent.useCases[0] ?? agent.summary}. Optimize for ${agent.outputs[0] ?? "the primary deliverable"}, keep assumptions explicit, and list the changes made.`
+      }
+    ],
+    expectedOutputShape: [
+      `A short summary of the recommended ${agent.outputs[0] ?? "deliverable"}`,
+      ...agent.outputs.map((output) => `A clearly labeled ${output} section`),
+      "Assumptions and missing context separated from confirmed facts",
+      "Risks, review checkpoints, and concrete next actions"
+    ],
     outputChecklist,
     failureModes: [
       "The input is too broad or lacks project context",
@@ -425,6 +503,32 @@ function createEvaluation(agent: Agent): NonNullable<Agent["evaluation"]> {
   };
 }
 
+function createDecisionGuide(agent: Agent): NonNullable<Agent["decisionGuide"]> {
+  const profile = evaluationProfiles[agent.slug as (typeof INSTALLABLE_AGENT_SLUGS)[number]];
+  const primaryAlternative = agent.relatedAgents?.[0];
+  const secondaryAlternative = agent.relatedAgents?.[1];
+
+  return [
+    {
+      question: "Is this the right agent for my task?",
+      guidance: profile?.bestFit ?? `Use this when you need ${agent.outputs[0] ?? "the primary deliverable"} from concrete project context.`
+    },
+    {
+      question: "When should I choose something else?",
+      guidance: profile?.avoidWhen ?? "Choose another agent when the goal, audience, source material, or decision boundary is still unclear.",
+      alternativeAgentSlug: primaryAlternative
+    },
+    {
+      question: "What should I run next?",
+      guidance:
+        agent.categories.includes("development")
+          ? "After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests."
+          : "After this agent produces a draft, use a planning, documentation, or QA agent to turn it into a team-ready handoff.",
+      alternativeAgentSlug: secondaryAlternative ?? primaryAlternative
+    }
+  ];
+}
+
 export function isInstallableAgent(agent: Pick<Agent, "slug">) {
   return installableSet.has(agent.slug);
 }
@@ -450,6 +554,7 @@ export function withInstallMetadata(agent: Agent): Agent {
       ]
     },
     runbook: { ...createRunbook(agent), ...runbookOverrides[agent.slug as (typeof INSTALLABLE_AGENT_SLUGS)[number]] },
-    evaluation: createEvaluation(agent)
+    evaluation: createEvaluation(agent),
+    decisionGuide: createDecisionGuide(agent)
   };
 }

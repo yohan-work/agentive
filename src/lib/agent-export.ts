@@ -31,6 +31,7 @@ export function toPortableAgentCard(agent: Agent): PortableAgentCard {
     projectUse: agent.projectUse,
     runbook: agent.runbook,
     evaluation: agent.evaluation,
+    decisionGuide: agent.decisionGuide,
     instructions: agent.prompt,
     contextRequirements: agent.inputs,
     expectedProjectFiles: agent.projectUse?.setupFiles ?? [],
@@ -116,6 +117,33 @@ ${bulletList(card.runbook.projectContext)}
 ### Input template
 ${card.runbook.inputTemplate}
 
+### Starter inputs
+${card.runbook.starterInputs?.length
+  ? card.runbook.starterInputs
+      .map((starter) => `#### ${starter.label}
+${starter.description}
+
+${starter.value}`)
+      .join("\n\n")
+  : "Not provided"}
+
+### Setup context notes
+${bulletList(card.runbook.setupContextNotes ?? [])}
+
+### Weak input diagnostics
+${card.runbook.weakInputFixes?.length
+  ? card.runbook.weakInputFixes
+      .map(
+        (fix) => `#### ${fix.weakInput}
+- Why it fails: ${fix.whyItFails}
+- Stronger input: ${fix.strongerInput}`
+      )
+      .join("\n\n")
+  : "Not provided"}
+
+### Expected output shape
+${bulletList(card.runbook.expectedOutputShape ?? [])}
+
 ### Output checklist
 ${bulletList(card.runbook.outputChecklist)}
 
@@ -151,6 +179,16 @@ ${card.evaluation.sampleRuns
 ${bulletList(sample.reviewNotes)}`
   )
   .join("\n\n")}`
+  : "Not provided"}
+
+## Decision guide
+${agent.decisionGuide?.length
+  ? agent.decisionGuide
+      .map(
+        (item) => `### ${item.question}
+${item.guidance}${item.alternativeAgentSlug ? `\n\nRelated option: ${item.alternativeAgentSlug}` : ""}`
+      )
+      .join("\n\n")
   : "Not provided"}
 
 ## Metadata

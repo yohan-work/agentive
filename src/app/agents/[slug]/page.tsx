@@ -19,6 +19,7 @@ const toc = [
   { title: "Use this agent", href: "#use-this-agent" },
   { title: "How to run this agent", href: "#how-to-run-this-agent" },
   { title: "Quality evaluation", href: "#quality-evaluation" },
+  { title: "Decision guide", href: "#decision-guide" },
   { title: "When to use", href: "#when-to-use" },
   { title: "Inputs", href: "#inputs" },
   { title: "Outputs", href: "#outputs" },
@@ -80,6 +81,27 @@ async function AgentDetailPageContent({
       <DetailSection id="quality-evaluation" title="Quality evaluation">
         <AgentEvaluationPanel evaluation={agent.evaluation} />
       </DetailSection>
+      {agent.decisionGuide?.length ? (
+        <DetailSection id="decision-guide" title="Decision guide">
+          <div className="grid gap-4">
+            {agent.decisionGuide.map((item) => {
+              const alternative = item.alternativeAgentSlug ? getAgentBySlug(item.alternativeAgentSlug) : undefined;
+
+              return (
+                <div key={item.question} className="rounded-lg border border-line bg-panel p-4">
+                  <h3 className="text-sm font-semibold text-primary">{item.question}</h3>
+                  <p className="mt-2 text-sm leading-6 text-secondary">{item.guidance}</p>
+                  {alternative ? (
+                    <p className="mt-3 text-xs text-muted">
+                      Related option: <span className="text-sky-200">{alternative.name}</span>
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </DetailSection>
+      ) : null}
       <DetailSection id="when-to-use" title="When to use">
         <List items={agent.useCases} />
       </DetailSection>

@@ -37,6 +37,16 @@ ${list(agent.bestPractices ?? [])}
 ${agent.evaluation ? `Quality score: ${agent.evaluation.qualityScore}/5` : "Not evaluated"}
 ${agent.evaluation ? `Tested with: ${agent.evaluation.testedWith.join(", ")}` : ""}
 
+## Decision Guide
+${agent.decisionGuide?.length
+  ? agent.decisionGuide
+      .map(
+        (item) => `### ${item.question}
+${item.guidance}${item.alternativeAgentSlug ? `\n\nRelated option: ${item.alternativeAgentSlug}` : ""}`
+      )
+      .join("\n\n")
+  : "Not provided"}
+
 ## Limitations
 ${list(agent.limitations ?? [])}
 `;
@@ -119,11 +129,38 @@ ${list(agent.runbook.projectContext)}
 ## Input Template
 ${agent.runbook.inputTemplate}
 
+## Starter Inputs
+${agent.runbook.starterInputs?.length
+  ? agent.runbook.starterInputs
+      .map((starter) => `### ${starter.label}
+${starter.description}
+
+${starter.value}`)
+      .join("\n\n")
+  : "Not provided"}
+
+## Setup Context Notes
+${list(agent.runbook.setupContextNotes ?? [])}
+
 ## Good Input Example
 ${agent.runbook.goodInputExample}
 
 ## Weak Input Example
 ${agent.runbook.badInputExample}
+
+## Weak Input Diagnostics
+${agent.runbook.weakInputFixes?.length
+  ? agent.runbook.weakInputFixes
+      .map(
+        (fix) => `### ${fix.weakInput}
+- Why it fails: ${fix.whyItFails}
+- Stronger input: ${fix.strongerInput}`
+      )
+      .join("\n\n")
+  : "Not provided"}
+
+## Expected Output Shape
+${list(agent.runbook.expectedOutputShape ?? [])}
 
 ## Output Checklist
 ${list(agent.runbook.outputChecklist)}
