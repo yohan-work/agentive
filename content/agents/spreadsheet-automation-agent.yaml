@@ -51,6 +51,6 @@ realUseCases:
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Spreadsheet Automation Agent에게 spreadsheet automation plan 형태로 정리해 달라고 요청합니다.
     exampleInput: 리드 관리 시트에서 상태별 자동 집계를 만들고 싶은 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 spreadsheet automation plan을 만들어줘.
     expectedResult: spreadsheet automation plan 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

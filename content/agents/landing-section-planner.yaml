@@ -51,5 +51,5 @@ realUseCases:
 relatedAgents:
   - copywriting-agent
   - website-research-agent
-verifiedStatus: tested
+verifiedStatus: unverified
 updatedAt: 2026-07-01

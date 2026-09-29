@@ -32,9 +32,9 @@ We accept agents that describe a **real, repeatable piece of work**. Before subm
 | `unverified` | Drafted but not yet run against real inputs |
 | `community` | Run by the contributor with at least one AI tool; example output is real |
 | `tested` | Run by a maintainer across the evaluation criteria with sample runs recorded |
-| `expert` | Reviewed by a practitioner in the agent's domain |
+| `expert` | Meets `tested`, and reviewed by a practitioner in the agent's domain |
 
-New submissions start as `unverified` or `community`. Maintainers promote them after review.
+New submissions start as `unverified` or `community`. Maintainers promote them after review. `npm run check:data` rejects `tested` or `expert` unless the agent records an `evaluation` with at least 2 sample runs.
 
 ## Agent data
 

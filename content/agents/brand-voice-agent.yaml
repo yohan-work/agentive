@@ -51,6 +51,6 @@ realUseCases:
     exampleInput: 여러 사람이 같은 브랜드 계정의 글을 작성하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 brand voice guide을 만들어줘.
     expectedResult: brand voice guide 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Content Production Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

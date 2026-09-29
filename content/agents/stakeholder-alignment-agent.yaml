@@ -49,6 +49,6 @@ realUseCases:
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Stakeholder Alignment Agent에게 alignment memo 형태로 정리해 달라고 요청합니다.
     exampleInput: 마케팅팀과 개발팀이 출시 범위를 두고 충돌하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 alignment memo을 만들어줘.
     expectedResult: alignment memo 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

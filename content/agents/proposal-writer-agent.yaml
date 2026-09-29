@@ -54,5 +54,5 @@ realUseCases:
 relatedAgents:
   - pricing-policy-agent
   - codex-task-brief
-verifiedStatus: tested
+verifiedStatus: unverified
 updatedAt: 2026-07-01

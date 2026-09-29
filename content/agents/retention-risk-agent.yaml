@@ -52,6 +52,6 @@ realUseCases:
     exampleInput: 사용량이 줄어든 고객 계정을 점검하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 retention risk analysis을 만들어줘.
     expectedResult: retention risk analysis 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Local Business Validation Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

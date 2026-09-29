@@ -50,5 +50,5 @@ realUseCases:
 relatedAgents:
   - landing-section-planner
   - website-research-agent
-verifiedStatus: tested
+verifiedStatus: unverified
 updatedAt: 2026-07-01
