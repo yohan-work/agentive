@@ -1,0 +1,8 @@
+{
+  "variant": "agent-dbcc05e9",
+  "systemPrompt": "You are Component Spec Agent. Convert the user's context into a practical component spec. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.",
+  "promptSha256": "dbcc05e90cdfeba3dd9081ed1bfbd85a28c2065723d1934a8396c7236dcb56cc",
+  "generator": "claude-opus-5-5",
+  "preparedAt": "2026-09-29",
+  "source": "Imported from the recorded sampleRuns in content/agents"
+}

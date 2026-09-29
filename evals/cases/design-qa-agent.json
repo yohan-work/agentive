@@ -1,0 +1,15 @@
+{
+  "slug": "design-qa-agent",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Design QA of agents list page from a written screen description",
+      "input": "Please do a design QA pass. I can't attach images in this tool, so here's a precise description of the two screenshots plus the design requirements.\n\nProduct: Agent Archive, dark documentation-style UI (Tailwind tokens: canvas #0b0d12 background, panel #11141b, line #1f2430 borders, primary text #e6e8ee, secondary #a3a9b7, muted #6b7280, accent sky-400 #38bdf8, success emerald, warning amber). Font: Inter 14px body.\n\nDesign requirements:\n- 8px spacing grid; card padding 20px; grid gap 16px.\n- Body text contrast >= 4.5:1, small labels >= 4.5:1, interactive targets >= 44x44px on touch.\n- Filter chips must show selected state with more than color alone.\n- Max 2 lines for card summaries on desktop, no truncation mid-word.\n- Korean (/ko) must fit without wrapping badges onto 3+ lines.\n\nBreakpoints: 375px (mobile), 768px (md, grid becomes 2 columns), 1440px desktop with left sidebar (240px) and right table of contents (200px).\n\nScreenshot 1 — /ko/agents at 1440px:\n- Header: eyebrow \"에이전트 라이브러리\" in 12px uppercase sky-400, H1 \"에이전트\" 36px, description 14px secondary.\n- Search input 48px tall, placeholder \"이름, 역할, 작업, 태그, 도구로 검색...\" in muted #6b7280 on panel #11141b.\n- \"설치 가능만 보기\" checkbox is 16x16px with the label 14px.\n- 6 filter groups (역할, 카테고리, 난이도, 자동화, 도구, 검증). Group titles 12px uppercase muted #6b7280 with 0.16em tracking. Chips are 24px tall (px-2.5 py-1, 12px text). Selected chip: border sky-400 at 40% opacity, bg sky-400 at 15%, text sky-200. Unselected: border #1f2430, bg #161a22, text secondary.\n- The tool filter row has 49 chips and wraps to 7 lines.\n- Result bar: \"100개 중 100개 표시\" left, \"모두 지우기\" right as sky-200 text link, 14px, no underline.\n- Card grid 2 columns. Card top row: status badge \"검증됨\", difficulty badge \"중급\", \"설치 가능\" badge, \"품질 4/5\" badge, and a bookmark icon button 28x28px at the right. On some cards the four badges wrap to a second line and push the bookmark icon down so it is no longer top-aligned.\n- Card summary text is clamped with min-height 48px but not line-clamped; two cards show a 3-line summary so cards in the same row have different heights up to the footer.\n\nScreenshot 2 — /en/agents at 375px:\n- Sidebar hidden; right TOC hidden. Search input full width.\n- Filter groups stacked; the whole filter area is ~1100px tall before the first card appears.\n- Chips 24px tall with 8px gap.\n- Cards single column. \"View agent →\" link 14px at card bottom, tap area is text-only (~20px tall).\n- The bookmark icon button is 28x28px.\n- Horizontal scroll: none.\n\nPlease give QA findings with severity and concrete fix recommendations."
+    },
+    {
+      "id": "boundary",
+      "title": "Design QA request referencing screenshots that were never provided",
+      "input": "Here are the screenshots of the new checkout flow (mobile + desktop). Please QA them against our design system and tell me what's wrong.\n\n[screenshots]"
+    }
+  ]
+}

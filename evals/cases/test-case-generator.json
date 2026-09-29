@@ -1,0 +1,15 @@
+{
+  "slug": "test-case-generator",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Korean test matrix for the real /agents search and filter panel",
+      "input": "/agents 페이지의 검색·필터 기능을 이번에 한국어화(PR #19)하면서 회귀 테스트 케이스를 다시 정리하려고 합니다. QA 1명이 수동으로 돌리고, 일부는 node:test 단위 테스트로 옮길 예정이에요.\n\n프로젝트: Agent Archive (Next.js 16 정적 export, GitHub Pages). /en/agents, /ko/agents 두 경로. 에이전트 100개, 그중 installTargets가 있는(설치 가능) 에이전트 20개.\n\n현재 동작(코드 기준):\n- 검색어: name, summary, description, tags, categories, roles, tools, realUseCases(한국어 사용 사례 텍스트 포함)를 공백으로 이어 붙여 소문자화한 문자열에 `includes`로 부분 일치. 앞뒤 공백은 trim. 빈 문자열이면 전체.\n- 필터 7종(모두 단일 선택, AND 조합): 역할(role), 카테고리(category), 난이도(beginner/intermediate/advanced), 자동화 수준(1~5), 도구(tool, 에이전트 데이터에서 중복 제거해 정렬), 검증 상태(unverified/community/tested/expert), \"설치 가능만 보기\" 체크박스.\n- 같은 필터 칩을 다시 누르면 해당 필터가 해제됨(토글). 다른 값을 누르면 교체.\n- \"모두 지우기\"(Clear all): 검색어와 필터 모두 초기화. \"필터만 지우기\"(Clear filters only): 필터만 초기화, 검색어 유지.\n- 결과 카운트: \"100개 중 N개 표시\"(ko) / \"Showing N of 100 agents\"(en). 활성 필터는 칩으로 표시(예: \"난이도: 중급\").\n- URL: `?query=`만 읽음(상단 검색창에서 넘어올 때). 다른 필터는 URL에 저장 안 됨 → 새로고침하면 초기화. 상단 검색으로 query가 바뀌면 다른 필터는 유지.\n- 결과 0개면 EmptyState 컴포넌트 표시.\n- 정적 페이지이므로 JS 로드 전에는 필터 없는 전체 목록이 렌더됨.\n\n테스트 대상 사용자: 한국어/영어 UI 사용자, 모바일(375px)과 데스크톱.\n제약: 테스트 서버 없음(로컬 `npm run dev` 또는 배포된 GitHub Pages). 자동화는 node:test + tsx로 src/lib/search.ts 함수 단위만 가능, E2E 도구는 아직 없음.\n\n원하는 결과: ID/분류/전제조건/절차/기대결과/우선순위 컬럼이 있는 테스트 케이스 매트릭스(정상 흐름, 빈 결과, 필터 조합, 새로고침/URL 유지, 한국어 문자열, 회귀 위험), 단위 테스트로 옮길 후보 표시, 가정과 리스크."
+    },
+    {
+      "id": "boundary",
+      "title": "Test cases for a coupon feature with conflicting, unclear rules",
+      "input": "쿠폰 기능 테스트 케이스 뽑아주세요. 쿠폰은 중복 사용 가능하고, 한 주문에 하나만 쓸 수 있어요. 할인은 정률이나 정액인데 최대 할인 금액은 기획서 보고 알려드릴게요. 오늘 중으로 필요합니다."
+    }
+  ]
+}

@@ -31,6 +31,7 @@ Run `check:data`, `lint`, `typecheck`, `test`, and `build` before you consider a
 - `src/lib/`: search, exports, and install-kit generation (`agent-install-kit.ts`).
 - `src/i18n/dictionaries.ts`: UI strings. Add every new key to **both** `en` and `ko`.
 - `scripts/check-data.mjs`: data validation. Extend it when you add a new cross-reference.
+- `evals/`: agent evaluation cases, raw runs, and blind pairwise verdicts; `scripts/eval/` prepares and tallies them. Follow `evals/README.md` before changing an agent's prompt or evaluation.
 
 ## Conventions
 

@@ -1,0 +1,15 @@
+{
+  "slug": "component-spec-agent",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Korean spec for a reusable FilterChipGroup component",
+      "input": "디자인 시스템에 필터 칩 그룹 컴포넌트를 추가하려고 합니다. 개발/디자인이 같이 보는 컴포넌트 스펙을 써 주세요.\n\n프로젝트: Agent Archive (Next.js 16, React 19, TypeScript, Tailwind 3). 다크 테마 토큰: canvas, panel, elevated, line, primary, secondary, muted, accent(sky-400). 클래스 병합은 `cn()`(clsx). 영어/한국어 UI, 문자열은 src/i18n/dictionaries.ts에서 주입.\n\n현재 상태: src/components/agents/agent-search-panel.tsx 안에 내부 함수 `FilterRow`가 있습니다.\n```tsx\nfunction FilterRow({ title, values, active, onSelect, label = titleCase }: {\n  title: string; values: string[]; active?: string;\n  onSelect: (value: string) => void; label?: (value: string) => string;\n}) {\n  return (\n    <div>\n      <p className=\"mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted\">{title}</p>\n      <div className=\"flex flex-wrap gap-2\">\n        {values.map((value) => (\n          <button key={value} type=\"button\" onClick={() => onSelect(value)}\n            className={active === value\n              ? \"rounded-md border border-accent/40 bg-accent/15 px-2.5 py-1 text-xs font-medium text-sky-200\"\n              : \"rounded-md border border-line bg-elevated px-2.5 py-1 text-xs font-medium text-secondary transition hover:border-accent/35 hover:text-primary\"}>\n            {label(value)}\n          </button>\n        ))}\n      </div>\n    </div>\n  );\n}\n```\n- 단일 선택, 같은 값 다시 누르면 해제(부모의 setFilter가 토글).\n- 사용처: /agents 필터 6개 그룹(역할 9개, 카테고리 11개, 난이도 3개, 자동화 1~5, 도구 49개, 검증 상태 4개). 곧 /workflows와 /cases 페이지에도 쓸 예정.\n- 알려진 문제: 선택 상태가 색으로만 구분됨, aria-pressed 없음, 그룹 제목이 <p>라 버튼 그룹과 연결 안 됨, 도구 49개가 모바일에서 10줄 넘게 wrap, 칩 높이 약 24px라 터치 타깃 작음.\n\n요구사항:\n- src/components/common/filter-chip-group.tsx로 추출, 단일/다중 선택 둘 다 지원(다중은 /cases에서 필요).\n- 칩 개수가 많을 때 \"더 보기\"로 접기(기준 개수는 prop).\n- 개수 배지 선택적 표시(예: \"리뷰 12\").\n- 키보드: Tab으로 그룹 진입, 화살표로 이동하는 방식이 나은지 각 칩이 Tab 대상인지 결정 필요.\n- 375px부터 1440px까지.\n- 새 의존성 금지.\n\n원하는 결과: props(타입 포함), 상태(기본/hover/focus-visible/선택/비활성/접힘), 인터랙션, 접근성(역할, aria, 키보드), 반응형 규칙, 사용 예시, 마이그레이션 메모, 가정, 리스크, 다음 액션."
+    },
+    {
+      "id": "boundary",
+      "title": "Spec for a 'universal table' with no requirements",
+      "input": "테이블 컴포넌트 스펙 만들어줘. 모든 화면에서 다 쓸 수 있는 만능 테이블로. 디자인은 아직 없어."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "slug": "qa-checklist-agent",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Release QA for stable kit URLs, sitemap, and Korean UI",
+      "input": "I need a release QA checklist for this week's deploy of Agent Archive (https://yohan-work.github.io/agentive/). Static Next.js export on GitHub Pages; there's no staging — we QA the Pages preview of main right after CI passes, then announce.\n\nFeature scope in this release (merged PRs):\n- #13 Install kit files served from stable URLs: every project-ready agent (20 of them) now has /kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Agent pages show a curl one-liner: `mkdir -p agent-kits/<slug> && (cd agent-kits/<slug> && curl -fsSL --remote-name-all \"https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,...}\")`. Changed to avoid `--output-dir` so it works on curl < 7.73.\n- #14 61 agents lowered from \"tested\" to \"unverified\"; check:data now rejects tested/expert without >= 2 sample runs.\n- #15 and #19 Korean translation of the agent detail page, status/difficulty badges, agent and workflow cards, and the agents search panel (filters, counts, \"Clear all\").\n- #16 sitemap.xml and robots.txt with en/ko hreflang alternates; bookmarks page excluded.\n- #17 unit tests (no user-facing change).\n\nAffected surfaces: /en and /ko home, /agents (100 cards, search + 7 filter groups + installable-only toggle), /agents/<slug> (detail, Download Kit button, curl command, per-file links, bookmark button), /install, /workflows/<slug>, /bookmarks, /sitemap.xml, /robots.txt, /kits/*.\n\nSupported devices/browsers: Chrome, Safari, Firefox latest on macOS and Windows 11; iOS Safari 17+ (iPhone 13 mini, 375px); Android Chrome (Pixel 7). Terminals for the curl command: macOS zsh, Ubuntu 20.04 bash (curl 7.68), Windows PowerShell (curl.exe).\n\nKnown risks:\n- GitHub Pages serves .mdc and .md with odd content types; agent.json might be served as text.\n- Korean strings may overflow badge/chip widths on 375px.\n- Some /ko strings may still be English.\n- Brace expansion in the curl URL may not work in PowerShell.\n- Status badges must match the new verifiedStatus data (no stale \"Tested\").\n\nPlease give me a QA checklist split into smoke, regression, device matrix, and content checks, with a pass/fail column I can paste into a GitHub issue."
+    },
+    {
+      "id": "boundary",
+      "title": "QA checklist for an unspecified 'new version' due tomorrow",
+      "input": "We're shipping the new version of the app tomorrow morning. Can you give me a QA checklist? It needs to cover everything."
+    }
+  ]
+}

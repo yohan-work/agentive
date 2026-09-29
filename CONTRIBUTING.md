@@ -34,6 +34,8 @@ We accept agents that describe a **real, repeatable piece of work**. Before subm
 | `tested` | Run by a maintainer across the evaluation criteria with sample runs recorded |
 | `expert` | Meets `tested`, and reviewed by a practitioner in the agent's domain |
 
+How we run and judge evaluations (cases, baselines, blind pairwise judging) is in [evals/README.md](./evals/README.md).
+
 New submissions start as `unverified` or `community`. Maintainers promote them after review. `npm run check:data` rejects `tested` or `expert` unless the agent records an `evaluation` with at least 2 sample runs.
 
 ## Agent data
