@@ -1,6 +1,6 @@
 import type { Agent } from "@/types/agent";
 import type { PortableAgentCard } from "@/types/portable-agent";
-import { titleCase } from "./utils";
+import { fenced, titleCase } from "./utils";
 
 function bulletList(items: string[]) {
   if (!items.length) {
@@ -56,7 +56,14 @@ export function toAgentJson(agent: Agent) {
   return JSON.stringify(toPortableAgentCard(agent), null, 2);
 }
 
-export function toAgentMarkdown(agent: Agent) {
+type AgentMarkdownOptions = {
+  /** Leave out the recorded example and sample runs, which can run to tens of KB, so the text stays pasteable into a chat. */
+  compact?: boolean;
+};
+
+const RECORDED_RUNS_NOTE = "Omitted to keep this prompt short. See the agent page or EVALUATION.md for the recorded runs.";
+
+export function toAgentMarkdown(agent: Agent, { compact = false }: AgentMarkdownOptions = {}) {
   const card = toPortableAgentCard(agent);
 
   return `# Agent: ${card.name}
@@ -80,10 +87,10 @@ ${bulletList(card.outputs)}
 ${card.prompt}
 
 ## Example input
-${card.exampleInput ?? "Not provided"}
+${compact ? RECORDED_RUNS_NOTE : card.exampleInput ? fenced(card.exampleInput) : "Not provided"}
 
 ## Example output
-${card.exampleOutput ?? "Not provided"}
+${compact ? RECORDED_RUNS_NOTE : card.exampleOutput ? fenced(card.exampleOutput, "markdown") : "Not provided"}
 
 ## Best practices
 ${bulletList(card.bestPractices)}
@@ -169,16 +176,25 @@ ${bulletList(card.evaluation.knownWeaknesses)}
 ${bulletList(card.evaluation.evaluationCriteria)}
 
 ### Sample runs
-${card.evaluation.sampleRuns
-  .map(
-    (sample) => `#### ${sample.title}
-- Input: ${sample.input}
-- Expected output: ${sample.expectedOutputSummary}
-- Sample output: ${sample.sampleOutput}
-- Review notes:
+${compact
+  ? RECORDED_RUNS_NOTE
+  : card.evaluation.sampleRuns
+      .map(
+        (sample) => `#### ${sample.title}
+Input:
+
+${fenced(sample.input)}
+
+Expected output: ${sample.expectedOutputSummary}
+
+Sample output:
+
+${fenced(sample.sampleOutput, "markdown")}
+
+Review notes:
 ${bulletList(sample.reviewNotes)}`
-  )
-  .join("\n\n")}`
+      )
+      .join("\n\n")}`
   : "Not provided"}
 
 ## Decision guide
@@ -204,7 +220,7 @@ ${item.guidance}${item.alternativeAgentSlug ? `\n\nRelated option: ${item.altern
 }
 
 export function toChatPromptBundle(agent: Agent) {
-  return `${toAgentMarkdown(agent)}
+  return `${toAgentMarkdown(agent, { compact: true })}
 
 ---
 

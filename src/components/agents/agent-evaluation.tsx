@@ -56,7 +56,7 @@ export function AgentEvaluationPanel({
               <dl className="mt-3 space-y-3 text-sm leading-6">
                 <div>
                   <dt className="font-medium text-primary">{labels.sampleInput}</dt>
-                  <dd className="mt-1 whitespace-pre-wrap text-secondary">{sample.input}</dd>
+                  <dd className="mt-1 max-h-96 overflow-auto whitespace-pre-wrap text-secondary">{sample.input}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-primary">{labels.expectedOutput}</dt>
@@ -64,7 +64,7 @@ export function AgentEvaluationPanel({
                 </div>
                 <div>
                   <dt className="font-medium text-primary">{labels.sampleOutput}</dt>
-                  <dd className="mt-1 whitespace-pre-wrap text-secondary">{sample.sampleOutput}</dd>
+                  <dd className="mt-1 max-h-96 overflow-auto whitespace-pre-wrap text-secondary">{sample.sampleOutput}</dd>
                 </div>
               </dl>
               <ul className="mt-3 space-y-2 text-sm text-secondary">

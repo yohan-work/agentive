@@ -2,7 +2,7 @@ import { defaultLocale } from "@/i18n/config";
 import type { Agent } from "@/types/agent";
 import { toPortableAgentCard } from "./agent-export";
 import { siteConfig } from "./site";
-import { titleCase } from "./utils";
+import { fenced, titleCase } from "./utils";
 
 export type InstallKitFile = {
   /** Stable name inside the kit, also the last segment of its URL. */
@@ -259,13 +259,15 @@ ${agent.evaluation.sampleRuns
     (sample) => `### ${sample.title}
 
 Input:
-${sample.input}
+
+${fenced(sample.input)}
 
 Expected output:
 ${sample.expectedOutputSummary}
 
 Sample output:
-${sample.sampleOutput}
+
+${fenced(sample.sampleOutput, "markdown")}
 
 Review notes:
 ${list(sample.reviewNotes)}`
