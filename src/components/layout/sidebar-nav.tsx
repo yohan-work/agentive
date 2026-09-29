@@ -24,15 +24,16 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const groups = [
     {
       title: dictionary.nav.forUsers,
-      links: [dictionary.nav.gettingStarted, dictionary.nav.howToUseAgents, dictionary.nav.promptTemplates, dictionary.nav.workflowPacks]
+      links: [
+        { href: "/install", label: dictionary.nav.gettingStarted },
+        { href: "/cases", label: dictionary.nav.howToUseAgents },
+        { href: "/agents", label: dictionary.nav.promptTemplates },
+        { href: "/workflows", label: dictionary.nav.workflowPacks }
+      ]
     },
     {
       title: dictionary.nav.forCreators,
-      links: [dictionary.nav.submitAgent, dictionary.nav.agentCardFormat, dictionary.nav.bestPractices, dictionary.nav.evaluationGuide]
-    },
-    {
-      title: dictionary.nav.forTeams,
-      links: [dictionary.nav.internalArchive, dictionary.nav.teamKnowledgeBase, dictionary.nav.governance]
+      links: [{ href: "/submit", label: dictionary.nav.submitAgent }]
     }
   ];
 
@@ -98,12 +99,12 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           <div className="space-y-1">
             {group.links.map((link) => (
               <Link
-                key={link}
-                href={link === dictionary.nav.submitAgent ? withLocale("/submit", locale) : withLocale("/about", locale)}
+                key={link.href}
+                href={withLocale(link.href, locale)}
                 onClick={onNavigate}
                 className="block rounded-md px-3 py-1.5 text-sm text-secondary transition hover:bg-elevated/70 hover:text-primary"
               >
-                {link}
+                {link.label}
               </Link>
             ))}
           </div>

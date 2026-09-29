@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { Bot, Github, Menu, Moon, Search, Sparkles, X } from "lucide-react";
-import { Button } from "@/components/common/button";
+import { Bot, Github, Menu, Search, X } from "lucide-react";
 import { getLocaleFromPathname, locales, withLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { SidebarNav } from "./sidebar-nav";
 
@@ -67,25 +67,15 @@ export function TopNav() {
                 </Link>
               ))}
             </div>
-            <Button variant="primary" className="hidden sm:inline-flex">
-              <Sparkles className="h-4 w-4" />
-              {dictionary.nav.askAssistant}
-            </Button>
             <Link
-              href="https://github.com/yohan-work"
+              href={siteConfig.repoUrl}
+              target="_blank"
+              rel="noreferrer"
               className="hidden h-9 items-center gap-2 rounded-md border border-line bg-elevated px-3 text-sm text-secondary transition hover:border-accent/35 hover:text-primary sm:inline-flex"
             >
               <Github className="h-4 w-4" />
-              Star
-              <span className="text-muted">-k</span>
+              GitHub
             </Link>
-            <button
-              type="button"
-              aria-label="Theme toggle"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line bg-elevated text-secondary"
-            >
-              <Moon className="h-4 w-4" />
-            </button>
           </div>
         </div>
       </header>
