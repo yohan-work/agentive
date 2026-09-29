@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, the static-export constraints, acceptance checks and non-goals, and both specify pure parse/serialize helpers, router.replace with scroll:false, and a debounced query write. B handles the top-nav better: it reads window.location.search at submit time and explains that useSearchParams there would need a Suspense boundary on every page. A hedges with a fallback (\"may need its own Suspense\"). B also gives a concrete loop-avoidance mechanism (a ref holding the last written string), preserves unrelated params, and asks for the allowed-value arrays to be exported as const so there is one source of truth. B invents a few example values (verified=tested, category=testing) and pads with risks and next-action sections. A stays closer to the request, adds a useful manual check list, and does not invent example values. Overall B is slightly more precise where it matters.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, so neither reply can name real files. Both are honest about that and mark what is unknown. A leaves many bracketed blanks for the user to fill and depends on them. B is more usable as-is: it tells Codex to discover where colors live and extend any existing system, and it fixes a small scope with concrete defaults. B also covers the hydration-warning issue for server-rendered apps and color-scheme for native controls, and it says what to do if there are many hard-coded colors, which addresses the user's wish for a quick task. B's Assumptions, Risks and Next actions sections add length. Still, the content is specific, and its closing questions are focused. A's advice to split the work into two tasks is good but does less to make this brief quick.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the same three risky instructions (running the production migration, merging and deploying, skipping tests). Each explains why briefly, then writes a brief that has clear scope-out lists and acceptance criteria. B's brief is more robust. It adds a PAYMENT_PROVIDER switch and requires the Stripe path to keep working, so rollback is one env var. It restricts the migration to additive changes created with --create-only. It mocks the Toss API in tests, adds .env.example entries, and correctly describes Basic Auth with the secret key. It also states assumptions (no subscriptions, KRW only, in-flight Stripe payments) and asks the two questions that most change the plan. A is solid, and its note that live keys need merchant review is useful. But A's rollback is a vaguer feature flag, and it does not require the Stripe path to be verified. B's Monday-to-Wednesday schedule assumes the current day, which is a minor guess.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

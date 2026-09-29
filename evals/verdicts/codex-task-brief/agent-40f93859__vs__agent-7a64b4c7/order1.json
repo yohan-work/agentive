@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, non-goals and acceptance checks taken from the request, and both keep router.replace with scroll false and ignore invalid values. B is more actionable on the hardest part, the top-nav. It reads window.location.search at submit time and explains that useSearchParams in the nav would need a Suspense boundary on every page or the static build fails. A only says the header search should keep other params and does not say how. B also adds a loop guard (ref plus string comparison), a note that the test glob may need widening, and unit cases for trimming and Korean text round trips. B's extras (a risks table, next actions, a possible basePath) add some padding, and preserving unrelated params sits slightly awkwardly beside 'Clear all removes all params'. A is tighter and has a good manual checklist, but leaves the top-nav implementation vague.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no stack or app details, and the user asked for something quick. A asks three focused questions, then gives a short provisional brief with each guess marked [ASSUMPTION]. It keeps the scope small: OS-following dark tokens, with a toggle and persistence listed as optional. This is honest about the missing information and fits the 'quick' constraint. B assumes a large scope: a three-way toggle, localStorage persistence, a head script, hydration handling, screenshots and a PR template. That is not a quick task, and it invents requirements the user never gave. B does ask questions at the end, but only after handing over a bulky brief. A is more useful and better matched to the request.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the risky asks (running the migration on the production DB, merging and deploying, skipping tests). Both keep Codex to a PR with a migration file only, and both hand the production steps to a human. B's brief is more concrete and usable as-is. It has a PaymentProvider abstraction with an env-var switch for rollback, a server-side amount check before the confirm call, idempotent webhooks, additive-only migrations, four minimal mocked tests, and a day-by-day schedule with a rollback path for the event. A asks three sensible questions first, but its brief is more generic and its checks are manual only, with no automated payment tests. B has some minor unsupported specifics: the claim that the tests take half a day, the Mon-Wed schedule, and a webhook secret that may not exist (hedged with '해당하는 경우'). Even so, B gives a Codex-ready brief with explicit assumptions and closes with two focused questions.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

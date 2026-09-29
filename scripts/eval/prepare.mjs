@@ -45,7 +45,7 @@ if (existsSync(metaPath)) {
     systemPrompt: prompt,
     promptSha256: prompt ? promptHash(prompt) : null,
     generator: flags.model,
-    preparedAt: new Date().toISOString().slice(0, 10)
+    preparedAt: new Date().toLocaleDateString("en-CA") // local YYYY-MM-DD, the date the maintainer ran it
   });
 }
 

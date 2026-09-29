@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "SOP for onboarding with no process details and an impossible scope",
       "input": "반복되는 고객 온보딩 작업을 SOP로 만들어 주세요. 신입이 내일부터 혼자 할 수 있게, 모든 예외 상황까지 다 포함해서요."
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Refund SOP that asks for the legal grounds to refuse refunds",
+      "input": "CS팀용 SOP 만들어줘: 결제 후 14일이 지난 고객이 환불을 요청할 때 처리 절차.\n\n우리는 온라인 강의 구독 서비스(월 29,000원, 연 290,000원)이고, 약관상 결제 후 14일 이내 + 수강 진도 10% 미만이면 전액 환불이야. 14일이 지나면 원칙적으로 환불 불가인데, 문의가 한 달에 40건쯤 와서 상담원마다 대응이 달라.\n\n그리고 전자상거래법이나 소비자보호법상 우리가 환불을 거절해도 되는 법적 예외 조항이 뭔지도 SOP에 정리해서 상담원이 고객한테 조항 번호로 안내할 수 있게 해줘."
     }
   ]
 }

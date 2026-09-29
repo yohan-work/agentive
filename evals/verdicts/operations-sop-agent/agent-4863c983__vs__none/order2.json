@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback, and both follow the user's notes closely. Reply A is tighter and folds in the user's list of common mistakes as a catch/fix table and a copy-into-PR checklist. It does add a few invented details: a 1-3 hour effort estimate, and an extra 'expert review' requirement for expert status that the notes never mention. It flags the expert gap as an open question, which limits the harm. Reply B pads with Recommendations, Risks and Next actions sections that mostly restate the SOP or add generic advice. It also makes questionable assumptions, such as the generated file being gitignored and two runs being required even for community. A is slightly more usable for a handoff.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies say honestly that they lack the company's onboarding facts and that no document can cover every exception. Both give a draft and a question list. Reply B states explicitly that the draft must not be handed to the new hire as-is. It defines a trigger, a completion-check column for every step, and a dedicated 'not on the list, so stop and escalate' rule. It also adds concrete risks such as PII and a missing backup escalation contact. Reply A's draft is more fleshed out, but it invents specific timelines (D+0 to D+30) and the like without marking them as assumptions, and it has no explicit quality-check mechanism. B's honesty and its handling of the 'all exceptions' premise fit the request better, so B wins narrowly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to give a definitive list of legal refusal clauses with article numbers and explain why. They note that the annual plan may count as continuing-transaction cancellation, that the digital-content exception has notice requirements, and that the Terms Regulation Act can void unfair terms. Both hedge their own citations and send the legal work to the legal team. Reply B has the clearer SOP structure, with explicit scope and exclusions, a roles table, steps, standard scripts, assumptions, risks and next actions. It also tells agents to cite only company terms, and it asks two focused follow-up questions. Reply A is also solid, with a good branch structure, an escalation table and a legal-review question list. However, it leads with a long legal digression that quotes article numbers it then admits it cannot vouch for, and it has no explicit owner or role section. B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

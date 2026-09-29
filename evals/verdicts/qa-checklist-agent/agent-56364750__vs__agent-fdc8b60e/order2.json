@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks and cover all 20 slugs x 7 files. Reply A adds sharper analysis of the stated risks. It notes that crawlers ignore robots.txt under /agentive/. It notes that the PowerShell brace risk is really about curl globbing, && support in PowerShell 5.1, and the curl alias. It also notes that curl ignores Content-Type, and it gives explicit blocker versus fix-later criteria and a rollback note. Reply B is careful and honest, and it catches that Safari on Windows 11 doesn't exist. It also adds useful checks such as the bad-slug -f behaviour, IME input, and agent.json/EVALUATION.md status staleness. But it is longer and leaves more rows as 'verify/record' with no decision guidance. Both are strong, and A's reasoning is slightly more actionable and compact for pasting into an issue.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, with no platform, scope, or changes given. Reply A gives a large generic checklist built on invented assumptions (login, payments, database migrations, app store review). It has no dedicated content-verification section, and its device section is only a bullet list. Reply B asks three focused questions and then gives a provisional checklist. That checklist has explicit smoke, regression, device-matrix, and content sections, and the unknowns are marked [ASSUMPTION] or 'verify'. It doesn't invent expected values. B fits the required structure better and handles the missing information more honestly. A's breadth is useful, but it pads and assumes a lot.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false 'all tests passed' sign-off and offer a checklist plus a blank sign-off template. Reply A has good substance (server-side enforcement, audit log, consent versioning, day-boundary), but it organises the checklist by P0/P1 priority. That gives no explicit smoke, regression, device-matrix, and content sections, and no pass/fail columns that can be attached. Reply B provides the four required sections with pass/fail tables and a device matrix. It flags spec-dependent expectations as 'verify against spec' instead of assuming them, and it asks the key questions about the limit rules and ToS re-acceptance. B is better structured for attaching to the ticket and meets the criteria more directly.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps with checkpoints, exceptions, quality checks and rollback, and both keep the user's rules correct (status gate, 2 runs for tested/expert, generated file off-limits). A leaves many TBD markers for things a maintainer could reasonably decide or that the notes already imply (dictionary path, escalation person, merge method), which makes it less usable as a handover document. B gives concrete commands, a checkpoint after each step, and a reviewer checklist. It also lists its gaps as explicit, confirmable assumptions (A1-A7), and the fallback rules for missing sample runs (E1) are practical. B adds some padding (recommendations, risks, next actions) and a few invented scope limits, but these are flagged and do not contradict the request.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is too thin to write a real SOP, and both replies correctly say so and avoid presenting guesses as fact. A asks three focused questions and gives a skeleton where every unknown is a [TBD], plus a default rule for exceptions not on the list. B asks seven questions and its skeleton fills in specifics such as a 48-hour reminder, B2B email customers and a set of E1-E7 exceptions. It labels these as assumptions, but they are still invented details in a document meant for a new hire to follow alone. B does add a useful recommendation to review the first few cases. A is tighter and more honest about what is unknown, and it meets the criteria structure without inventing content.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to supply legal clause numbers as fact and route them to legal review, which is the right call. A is an almost entirely TBD skeleton, so the agents would still have no concrete guidance on the 40 monthly cases. B separates monthly from annual plans, gives standard reply wording, and adds a discretion table to make handling consistent. It also correctly flags, with hedging, that a blanket 'no refund after 14 days' may not hold for annual subscriptions under Korean consumer law. B's discretion thresholds are invented, but it labels them as example values for management to confirm. B is considerably more useful, and its legal statements are hedged and not presented as advice.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "slug": "operations-sop-agent",
+  "variants": [
+    "agent-ca387ee7",
+    "none"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "order1": "none",
+      "order2": "agent-ca387ee7",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "none",
+      "order2": "agent-ca387ee7",
+      "result": "inconsistent"
+    }
+  ],
+  "wins": {
+    "agent-ca387ee7": 0,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 2
+}

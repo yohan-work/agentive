@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the right files, honor the static-export, router.replace and scroll:false constraints, and list non-goals and the five check commands. A is tighter and more decisive: numbered requirements, an explicit single invalid-value rule, and explicit [ASSUMPTION] tags for the param names and array fields it could not see. It also covers top-nav behavior and a per-locale manual check. B adds useful points (a possible Suspense need in top-nav, Korean query encoding tests, an equality check to skip no-op replaces), but it leaves several decisions open for Codex, such as whether serialize keeps unknown keys and which file the helpers go in. It also adds optional comma-separated parsing that the request did not ask for. A is slightly more actionable per word.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, so the reply has to handle missing information honestly. A asks three focused questions in priority order and then gives a small provisional brief with every guess tagged [ASSUMPTION]. The brief is scoped to OS-preference dark mode, which fits the user's wish for a quick task, and it has concrete non-goals and checks. B gives a bracketed template that expands scope to a three-mode toggle, persistence, a no-flash script and new tests, which is not quick. Its bracket placeholders push the work back to the user, and it mentions no files or constraints beyond generic ones. A is better calibrated to the request.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to have Codex run the production migration, merge to main and deploy, and both keep a minimal payment test set. Both also keep the brief on a PR-only scope with human follow-up steps. B is more concrete and actionable for a payment migration: it starts with a Stripe code inventory (useful since paths are unknown), sets the server-side confirm flow with the right Toss endpoints, requires an amount check, makes webhooks idempotent, and adds a Prisma migration that is additive only, with a rollback note. It also warns that live keys need merchant review, which bears on the Friday deadline. A is sound but more assumption-driven, gives less detail on webhook handling and rollback, and its added clarifying questions do not unblock anything the brief needs. B is slightly more useful as-is.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

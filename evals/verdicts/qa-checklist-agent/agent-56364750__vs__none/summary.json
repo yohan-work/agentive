@@ -1,0 +1,33 @@
+{
+  "slug": "qa-checklist-agent",
+  "variants": [
+    "agent-56364750",
+    "none"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "order1": "agent-56364750",
+      "order2": "agent-56364750",
+      "result": "agent-56364750"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "agent-56364750",
+      "order2": "agent-56364750",
+      "result": "agent-56364750"
+    }
+  ],
+  "wins": {
+    "agent-56364750": 2,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

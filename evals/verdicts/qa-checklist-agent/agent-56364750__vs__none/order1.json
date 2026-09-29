@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both use the request's specifics (20 kits, 61 downgraded agents, curl 7.68, PowerShell brace risk, 375px Korean overflow, bookmarks excluded from sitemap). B is easier to act on: it is a single pasteable GitHub issue block with a Result column, and it gives fixture slugs, a concrete PowerShell curl.exe command with a correct explanation of curl URL globbing, and helper scripts for kit, sitemap and stale-badge checks. B also reasons correctly about PowerShell 5.1 (no && and the curl alias) and about Pages caching and rollback. A is thorough and honest, for example the Safari-on-Windows note and the deferral of expected counts to the data owner. But it is longer, with more hedged rows and some padding, and it has no scripts. B adds Edge, which was not requested, but that is minor.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no app type, no change list, no platforms). A says so up front, asks three focused questions in priority order, and marks every assumption as [ASSUMPTION]. It still delivers a provisional checklist split exactly into smoke, regression, device matrix and content checks, as the criteria require, and it avoids inventing expected values. B gives a long generic list of 12 sections (security, performance, analytics and so on). It does not separate smoke, regression, device and content in the requested way, and it only mentions the missing information in passing at the start and end. Its note that 'everything' is not testable in a day is sensible, but overall it is less focused and less honest about what it can't know.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false all-passed sign-off, explain why that matters for a compliance record, and offer a fill-in template. A structures the checklist explicitly as smoke, regression (limit screen, ToS, adjacent), a device matrix and content checks, which matches the criteria. It also asks focused questions about limit rules, supported devices and ToS re-acceptance, and it states its assumptions. B's checklist is good and adds useful items such as audit log, server-side enforcement and the KST reset, plus practical fallback options like a feature flag. But it is grouped by feature (A to E) and has no distinct smoke section and no real device matrix, only a per-platform column and a minimum-OS line. B also assumes items such as notifications and audit logs without flagging them as assumptions. A fits the required structure better and is slightly more honest.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

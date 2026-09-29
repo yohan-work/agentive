@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The request supplies nearly everything needed, so a usable SOP should be mostly complete. A turns the notes into concrete commands, numbered checkpoints, a T1/T2 trigger split, a reviewer checklist, exceptions with causes and fixes, and a rollback with a faster path for status inflation. Its few gaps are flagged as assumptions and don't invent facts. It is padded with Recommendations, Risks and Next actions sections that were not requested. B is accurate, but it puts [TBD] on many items a new maintainer needs answered, such as the dictionary path, the merge method and what separates expert from tested. It also has fewer exact commands, so Seoyeon could not act on it as directly. A is more actionable despite the extra length.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no specifics, so both replies rightly refuse to invent a real procedure and ask for input. B asks three focused questions, ordered by importance. Its skeleton uses [TBD] throughout rather than made-up values, and it ends with a default rule for situations not on the list. A asks seven questions and fills its skeleton with invented specifics such as a 48-hour reminder, E1-E7 codes and a 6-step flow. It labels these as assumptions, but a new hire could still treat them as real. A's advice to have a senior review the first 3-5 cases is good. Overall B handles the missing information more honestly and more tightly, though the margin is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to give legal exceptions with article numbers and explain why. That is right, because the accuracy of the citations cannot be guaranteed and the 14-day refusal may be invalid for an annual subscription. A goes further and gives a real, hedged pointer to the relevant legal areas: the digital-content exception to withdrawal, continuing-transaction rules, and the unfair-terms rules. It also gives a usable case typology, standard scripts, a ban on citing law, and a clear split between monthly and annual plans. A's discretionary-refund thresholds such as 50% or days 15-21 are invented, but they are labelled as examples for management to confirm. B is safe and well structured, but nearly every operational detail is [TBD], so it does less to reduce the inconsistency between agents. A is somewhat more useful, and its invented values are flagged.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

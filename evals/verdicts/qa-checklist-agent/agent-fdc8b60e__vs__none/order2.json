@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device and content checks, and both correctly note that robots.txt under /agentive/ is ignored by crawlers and that PowerShell 5.1 has no && and aliases curl. Reply A is more directly pasteable: it has fixture slugs, a header block with commit SHA and go/no-go, and explicit ID-numbered pass/fail rows for every risk in the request (content types, .mdc handling, stale Tested badges, 375px Korean overflow, untranslated ko strings). It also gives a device matrix with separate en and ko columns and a terminal matrix that includes the curl.exe variant, and it adds helper scripts for kit availability and sitemap URLs. Reply B is tighter and has good ideas (404 for non-installable kits, local check:data negative test, native-speaker review), but its device matrix is coarse letter codes and it has fewer concrete checks. A is longer, with an optional Edge row, but the extra content is mostly useful, so A wins slightly.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague and gives no app type or change list. Both replies say so, avoid pretending to know, and give a risk-ordered generic checklist with follow-up questions or a note that tailoring is possible. Reply A covers the requested areas more completely: it has separate sections for critical paths, changes, regression (automated suite, unchanged areas, previously fixed bugs), platforms and devices, and copy/localization/accessibility. Reply B states its assumptions openly (which the judge rewards), but some are invented, such as a staging environment. Its regression section is only two lines, it has no real content-verification item, and its device section is thin. It does ask sharper tailoring questions and adds a useful risk list, but A better fits the 'cover everything' ask and the smoke, regression, device and content split, so A wins slightly.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false all-tests-passed attestation for a fintech compliance record. Both offer a fill-in sign-off template and a real checklist. Reply A structures the checklist into functional, boundary/invalid-input, security, ToS content, and regression sections. Each row has separate Android and iOS columns plus an evidence column, which covers device coverage and content verification directly, and it includes an open-defects table and fallback options (must-have subset, feature flag, delay). Reply B has good specific P0 items (server-side enforcement, consent version stored, limit lowered below today's spend), but it is a plain bullet list with no per-platform tracking and no evidence field. It also puts device and OS coverage under P1 as optional. A better matches the requested split and is easier to attach to a ticket.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

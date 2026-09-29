@@ -1,5 +1,6 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { variantFor } from "./eval/lib.mjs";
 import { loadAgentContent } from "./lib/agent-content.mjs";
 
 const root = process.cwd();
@@ -87,6 +88,12 @@ const incompleteInstallable = installableAgents.flatMap((agent) => {
   return problems.length ? [`${agent.slug}: missing ${problems.join(", ")}`] : [];
 });
 // "tested" and "expert" promise recorded sample runs (see CONTRIBUTING.md), so the evidence has to be in the file.
+// Recorded runs must come from the prompt the agent ships now; editing a prompt without re-running the
+// evaluation (see evals/README.md) would leave sample runs that no longer describe the agent.
+const staleEvaluations = agents
+  .filter((agent) => agent.evaluation?.sampleRuns.some((run) => run.reviewNotes[0]?.startsWith("Real run on ")))
+  .filter((agent) => !existsSync(join(root, "evals/runs", agent.slug, variantFor(agent.prompt), "meta.json")))
+  .map((agent) => `${agent.slug}: sample runs don't match the current prompt (no evals/runs/${agent.slug}/${variantFor(agent.prompt)}); re-run the evaluation`);
 const overstatedVerification = agents
   .filter((agent) => ["tested", "expert"].includes(agent.verifiedStatus) && !(agent.evaluation?.sampleRuns.length >= 2))
   .map((agent) => `${agent.slug}: verifiedStatus "${agent.verifiedStatus}" needs an evaluation with at least 2 sample runs`);
@@ -126,6 +133,7 @@ const failures = [
   installableAgents.length < 20 ? `Expected at least 20 installable agents, found ${installableAgents.length}` : "",
   ...incompleteInstallable,
   ...overstatedVerification,
+  ...staleEvaluations,
   !hasRunbookKitFile ? "Installable kits must include RUNBOOK.md" : "",
   !hasEvaluationKitFile ? "Installable kits must include EVALUATION.md" : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
