@@ -2,7 +2,7 @@
 // with directory index.html files and 404.html for missing paths. Run `npm run build` first.
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
-import { extname, join, normalize } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
 
 const root = join(process.cwd(), "out");
 const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
@@ -25,10 +25,17 @@ if (!existsSync(root)) {
 }
 
 createServer((req, res) => {
-  const pathname = decodeURIComponent(new URL(req.url ?? "/", "http://localhost").pathname);
-  const relative = basePath && pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
-  let file = normalize(join(root, relative));
-  if (!file.startsWith(root)) {
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(req.url ?? "/", "http://localhost").pathname);
+  } catch {
+    res.writeHead(400).end();
+    return;
+  }
+  const requested = basePath && pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
+  let file = resolve(root, `.${requested}`);
+  const fromRoot = relative(root, file);
+  if (fromRoot.startsWith("..") || resolve(root, fromRoot) !== file) {
     res.writeHead(403).end();
     return;
   }
