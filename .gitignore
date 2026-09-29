@@ -1,174 +1,48 @@
-### macOS
-# Finder metadata
-.DS_Store
-
-# Thumbnails
-._*
-
-# Custom folder icons
-Icon
-
-# Volume root files
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-### C++
-# Object files
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Static libraries
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Debug files
-*.dSYM/
-*.idb
-*.pdb
-
-### Go
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool
-*.out
-
-# Go workspace file
-go.work.sum
-
-# env file
-.env
-
-### Node
 # Dependencies
 node_modules/
-
-# Logs
-*.log
-
-# Runtime data
-*.pid
-*.pid.lock
-
-# Coverage
-coverage/
-*.lcov
-.nyc_output
-
-# Build output
-dist/
-build/Release
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Framework build output and caches
-.cache
-.parcel-cache
-.next
-out/
-.nuxt
-
-# dotenv environment variable files
-.env
-.env.local
-.env.*.local
-
-# npm cache directory
-.npm
-*.tgz
-
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/install-state.gz
+.pnp
 .pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-### Objective-C
-# Xcode user settings
-xcuserdata/
-
-# Xcode build data
-DerivedData/
-
-# Obj-C/Swift specific
-*.hmap
-
-# App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-# Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-### Python
-# Byte-compiled files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
+# Next.js / build output
+.next/
+out/
 build/
 dist/
-*.egg-info/
-*.egg
+next-env.d.ts
+*.tsbuildinfo
 
-# dotenv environment variable files
+# Testing
+coverage/
+test-results/
+playwright-report/
+.playwright-cli/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Environment
 .env
+.env*.local
 
-# Virtual environments
-.venv
-env/
-venv/
+# Deployment
+.vercel
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.pytest_cache/
+# OS / editor
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
 
-# Type checkers
-.mypy_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-# .python-version
+# Private working notes (kept locally, not published)
+plan/
