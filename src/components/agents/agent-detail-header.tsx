@@ -1,16 +1,23 @@
 import type { Agent } from "@/types/agent";
+import type { Dictionary } from "@/i18n/dictionaries";
 import { Badge, DifficultyBadge, StatusBadge } from "@/components/common/badge";
 import { titleCase } from "@/lib/utils";
 import { BookmarkButton } from "./bookmark-button";
 
-export function AgentDetailHeader({ agent }: { agent: Agent }) {
+export function AgentDetailHeader({ agent, labels }: { agent: Agent; labels: Dictionary["agentDetail"] }) {
   return (
     <header className="border-b border-line pb-8">
       <div className="mb-4 flex flex-wrap gap-2">
         <StatusBadge status={agent.verifiedStatus} />
         <DifficultyBadge difficulty={agent.difficulty} />
-        <Badge tone="accent">Automation {agent.automationLevel}/5</Badge>
-        {agent.evaluation ? <Badge tone="success">Quality {agent.evaluation.qualityScore}/5</Badge> : null}
+        <Badge tone="accent">
+          {labels.automation} {agent.automationLevel}/5
+        </Badge>
+        {agent.evaluation ? (
+          <Badge tone="success">
+            {labels.quality} {agent.evaluation.qualityScore}/5
+          </Badge>
+        ) : null}
       </div>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>

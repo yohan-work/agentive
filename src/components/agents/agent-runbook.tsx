@@ -1,11 +1,12 @@
 import type { AgentRunbook } from "@/types/agent";
 import { Card } from "@/components/common/card";
+import type { Dictionary } from "@/i18n/dictionaries";
 
-export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
+export function AgentRunbookPanel({ runbook, labels }: { runbook?: AgentRunbook; labels: Dictionary["agentRunbook"] }) {
   if (!runbook) {
     return (
       <Card className="p-5">
-        <p className="text-sm text-secondary">A project runbook has not been curated for this agent yet.</p>
+        <p className="text-sm text-secondary">{labels.notCurated}</p>
       </Card>
     );
   }
@@ -13,7 +14,7 @@ export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
   return (
     <div className="space-y-4">
       <Card className="p-5">
-        <h3 className="text-lg font-semibold text-primary">Project context to prepare</h3>
+        <h3 className="text-lg font-semibold text-primary">{labels.projectContext}</h3>
         {runbook.setupContextNotes?.length ? (
           <ul className="mt-4 space-y-2 text-sm text-secondary">
             {runbook.setupContextNotes.map((item) => (
@@ -34,7 +35,7 @@ export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
 
       {runbook.starterInputs?.length ? (
         <Card className="p-5">
-          <h3 className="text-lg font-semibold text-primary">Starter inputs</h3>
+          <h3 className="text-lg font-semibold text-primary">{labels.starterInputs}</h3>
           <div className="mt-4 grid gap-4">
             {runbook.starterInputs.map((starter) => (
               <div key={starter.label} className="rounded-md border border-line bg-elevated p-4">
@@ -50,13 +51,13 @@ export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <ExampleCard title="Good input" value={runbook.goodInputExample} />
-        <ExampleCard title="Weak input" value={runbook.badInputExample} />
+        <ExampleCard title={labels.goodInput} value={runbook.goodInputExample} />
+        <ExampleCard title={labels.weakInput} value={runbook.badInputExample} />
       </div>
 
       {runbook.weakInputFixes?.length ? (
         <Card className="p-5">
-          <h3 className="text-lg font-semibold text-primary">Weak input diagnostics</h3>
+          <h3 className="text-lg font-semibold text-primary">{labels.weakInputFixes}</h3>
           <div className="mt-4 grid gap-4">
             {runbook.weakInputFixes.map((fix) => (
               <div key={fix.weakInput} className="rounded-md border border-line bg-elevated p-4">
@@ -71,10 +72,10 @@ export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
         </Card>
       ) : null}
 
-      {runbook.expectedOutputShape?.length ? <ListCard title="Expected output shape" items={runbook.expectedOutputShape} /> : null}
+      {runbook.expectedOutputShape?.length ? <ListCard title={labels.expectedOutputShape} items={runbook.expectedOutputShape} /> : null}
 
       <Card className="p-5">
-        <h3 className="text-lg font-semibold text-primary">Output checklist</h3>
+        <h3 className="text-lg font-semibold text-primary">{labels.outputChecklist}</h3>
         <ul className="mt-4 space-y-2 text-sm text-secondary">
           {runbook.outputChecklist.map((item) => (
             <li key={item} className="rounded-md border border-line bg-elevated px-3 py-2">
@@ -85,8 +86,8 @@ export function AgentRunbookPanel({ runbook }: { runbook?: AgentRunbook }) {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <ListCard title="Failure modes" items={runbook.failureModes} />
-        <ListCard title="Handoff tips" items={runbook.handoffTips} />
+        <ListCard title={labels.failureModes} items={runbook.failureModes} />
+        <ListCard title={labels.handoffTips} items={runbook.handoffTips} />
       </div>
     </div>
   );
