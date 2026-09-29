@@ -1,12 +1,52 @@
+import { defaultLocale } from "@/i18n/config";
 import type { Agent } from "@/types/agent";
 import { toPortableAgentCard } from "./agent-export";
+import { siteConfig } from "./site";
 import { titleCase } from "./utils";
 
 export type InstallKitFile = {
+  /** Stable name inside the kit, also the last segment of its URL. */
+  name: string;
+  /** Download name, prefixed with the slug so kits for several agents don't collide. */
   filename: string;
   content: string;
   mimeType: string;
 };
+
+const KIT_FILE_NAMES = [
+  "AGENTS.md",
+  "CLAUDE.md",
+  "cursor-rule.mdc",
+  "agent.json",
+  "README.md",
+  "RUNBOOK.md",
+  "EVALUATION.md"
+] as const;
+
+type KitFileName = (typeof KIT_FILE_NAMES)[number];
+
+export function isInstallable(agent: Agent) {
+  return Boolean(agent.installTargets?.length && agent.projectUse);
+}
+
+/** Path (under the base path) where the static export serves a kit file. */
+export function getInstallKitPath(slug: string, name: string) {
+  return `/kits/${slug}/${name}`;
+}
+
+export function getInstallKitUrl(slug: string, name: string) {
+  return `${siteConfig.url}${getInstallKitPath(slug, name)}`;
+}
+
+function getAgentPageUrl(slug: string) {
+  return `${siteConfig.url}/${defaultLocale}/agents/${slug}/`;
+}
+
+/** One curl command that downloads the whole kit into agent-kits/<slug>/ without touching existing project files. */
+export function getInstallKitCommand(slug: string) {
+  const files = `{${KIT_FILE_NAMES.join(",")}}`;
+  return `curl -fsSL --create-dirs --output-dir agent-kits/${slug} --remote-name-all "${getInstallKitUrl(slug, files)}"`;
+}
 
 function list(items: string[]) {
   return items.length ? items.map((item) => `- ${item}`).join("\n") : "- Not specified";
@@ -102,7 +142,18 @@ ${agent.projectUse?.recommendedPlacement ?? "Copy the relevant file into your pr
 ## Install Notes
 ${list(agent.projectUse?.installNotes ?? [])}
 
+## Download
+Fetch every file in this kit into \`agent-kits/${agent.slug}/\`:
+
+\`\`\`sh
+${getInstallKitCommand(agent.slug)}
+\`\`\`
+
+Or fetch a single file:
+${list(KIT_FILE_NAMES.map((name) => getInstallKitUrl(agent.slug, name)))}
+
 ## Agent Metadata
+- Source: ${getAgentPageUrl(agent.slug)}
 - Slug: ${agent.slug}
 - Roles: ${agent.roles.map(titleCase).join(", ")}
 - Categories: ${agent.categories.map(titleCase).join(", ")}
@@ -222,46 +273,25 @@ ${list(sample.reviewNotes)}`
 `;
 }
 
+const KIT_FILES: Record<KitFileName, { render: (agent: Agent) => string; mimeType: string }> = {
+  "AGENTS.md": { render: toCodexAgentFile, mimeType: "text/markdown;charset=utf-8" },
+  "CLAUDE.md": { render: toClaudeProjectFile, mimeType: "text/markdown;charset=utf-8" },
+  "cursor-rule.mdc": { render: toCursorRuleFile, mimeType: "text/markdown;charset=utf-8" },
+  "agent.json": { render: toInstallManifest, mimeType: "application/json;charset=utf-8" },
+  "README.md": { render: toInstallReadme, mimeType: "text/markdown;charset=utf-8" },
+  "RUNBOOK.md": { render: toRunbookFile, mimeType: "text/markdown;charset=utf-8" },
+  "EVALUATION.md": { render: toEvaluationFile, mimeType: "text/markdown;charset=utf-8" }
+};
+
 export function getInstallKitFiles(agent: Agent): InstallKitFile[] {
-  if (!agent.installTargets?.length || !agent.projectUse) {
+  if (!isInstallable(agent)) {
     return [];
   }
 
-  return [
-    {
-      filename: `${agent.slug}-AGENTS.md`,
-      content: toCodexAgentFile(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-CLAUDE.md`,
-      content: toClaudeProjectFile(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-cursor-rule.mdc`,
-      content: toCursorRuleFile(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-agent.json`,
-      content: toInstallManifest(agent),
-      mimeType: "application/json;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-README.md`,
-      content: toInstallReadme(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-RUNBOOK.md`,
-      content: toRunbookFile(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    },
-    {
-      filename: `${agent.slug}-EVALUATION.md`,
-      content: toEvaluationFile(agent),
-      mimeType: "text/markdown;charset=utf-8"
-    }
-  ];
+  return KIT_FILE_NAMES.map((name) => ({
+    name,
+    filename: `${agent.slug}-${name}`,
+    content: KIT_FILES[name].render(agent),
+    mimeType: KIT_FILES[name].mimeType
+  }));
 }

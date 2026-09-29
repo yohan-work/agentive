@@ -5,8 +5,9 @@ import { useMemo, useState } from "react";
 import type { Agent } from "@/types/agent";
 import { Button } from "@/components/common/button";
 import { Card } from "@/components/common/card";
-import { getInstallKitFiles } from "@/lib/agent-install-kit";
+import { getInstallKitCommand, getInstallKitFiles, getInstallKitPath } from "@/lib/agent-install-kit";
 import { toAgentJson, toAgentMarkdown, toChatPromptBundle } from "@/lib/agent-export";
+import { siteConfig } from "@/lib/site";
 
 type ActionState = "idle" | "copied" | "downloaded" | "error";
 
@@ -18,15 +19,10 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
   const installKitFiles = useMemo(() => getInstallKitFiles(agent), [agent]);
   const inputTemplate = agent.runbook?.inputTemplate ?? "";
   const installable = installKitFiles.length > 0;
+  const installCommand = getInstallKitCommand(agent.slug);
 
   async function copyAgent() {
-    try {
-      await navigator.clipboard.writeText(chatBundle);
-      setState("copied");
-      window.setTimeout(() => setState("idle"), 1400);
-    } catch {
-      setState("error");
-    }
+    await copyText(chatBundle);
   }
 
   async function copyInputTemplate() {
@@ -34,8 +30,16 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
       return;
     }
 
+    await copyText(inputTemplate);
+  }
+
+  async function copyInstallCommand() {
+    await copyText(installCommand);
+  }
+
+  async function copyText(value: string) {
     try {
-      await navigator.clipboard.writeText(inputTemplate);
+      await navigator.clipboard.writeText(value);
       setState("copied");
       window.setTimeout(() => setState("idle"), 1400);
     } catch {
@@ -124,6 +128,31 @@ export function AgentExportPanel({ agent }: { agent: Agent }) {
             ? "Downloads AGENTS.md, CLAUDE.md, Cursor rule, agent.json, and README files that can be copied into a project."
             : "This agent can still be copied as a prompt bundle, but project-ready files have not been curated yet."}
         </p>
+        {installable ? (
+          <>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted">Fetch from a terminal</p>
+            <div className="mt-2 flex items-start gap-2">
+              <pre className="min-w-0 flex-1 overflow-x-auto rounded-md border border-line bg-[#08090c] px-3 py-2 font-mono text-xs leading-5 text-secondary">
+                {installCommand}
+              </pre>
+              <Button onClick={copyInstallCommand} variant="secondary" aria-label="Copy install command">
+                <Clipboard className="h-4 w-4" />
+              </Button>
+            </div>
+            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              {installKitFiles.map((file) => (
+                <li key={file.name}>
+                  <a
+                    className="font-mono text-sky-200 hover:underline"
+                    href={`${siteConfig.basePath}${getInstallKitPath(agent.slug, file.name)}`}
+                  >
+                    {file.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
       </div>
       {state === "downloaded" ? (
         <p className="mt-4 rounded-md border border-green-500/25 bg-green-500/10 px-3 py-2 text-sm text-green-200">
