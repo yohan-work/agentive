@@ -35,8 +35,180 @@ outputs:
   - Device matrix
   - Regression cases
 prompt: You are a release QA lead. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical targeted QA checklist with clear sections, assumptions, risks, and next actions.
-exampleInput: A responsive agent archive with bookmarks and copy prompt.
-exampleOutput: Desktop/mobile checks, browser storage checks, and content QA.
+exampleInput: |-
+  I need a release QA checklist for this week's deploy of Agent Archive (https://yohan-work.github.io/agentive/). Static Next.js export on GitHub Pages; there's no staging — we QA the Pages preview of main right after CI passes, then announce.
+
+  Feature scope in this release (merged PRs):
+  - #13 Install kit files served from stable URLs: every project-ready agent (20 of them) now has /kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Agent pages show a curl one-liner: `mkdir -p agent-kits/<slug> && (cd agent-kits/<slug> && curl -fsSL --remote-name-all "https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,...}")`. Changed to avoid `--output-dir` so it works on curl < 7.73.
+  - #14 61 agents lowered from "tested" to "unverified"; check:data now rejects tested/expert without >= 2 sample runs.
+  - #15 and #19 Korean translation of the agent detail page, status/difficulty badges, agent and workflow cards, and the agents search panel (filters, counts, "Clear all").
+  - #16 sitemap.xml and robots.txt with en/ko hreflang alternates; bookmarks page excluded.
+  - #17 unit tests (no user-facing change).
+
+  Affected surfaces: /en and /ko home, /agents (100 cards, search + 7 filter groups + installable-only toggle), /agents/<slug> (detail, Download Kit button, curl command, per-file links, bookmark button), /install, /workflows/<slug>, /bookmarks, /sitemap.xml, /robots.txt, /kits/*.
+
+  Supported devices/browsers: Chrome, Safari, Firefox latest on macOS and Windows 11; iOS Safari 17+ (iPhone 13 mini, 375px); Android Chrome (Pixel 7). Terminals for the curl command: macOS zsh, Ubuntu 20.04 bash (curl 7.68), Windows PowerShell (curl.exe).
+
+  Known risks:
+  - GitHub Pages serves .mdc and .md with odd content types; agent.json might be served as text.
+  - Korean strings may overflow badge/chip widths on 375px.
+  - Some /ko strings may still be English.
+  - Brace expansion in the curl URL may not work in PowerShell.
+  - Status badges must match the new verifiedStatus data (no stale "Tested").
+
+  Please give me a QA checklist split into smoke, regression, device matrix, and content checks, with a pass/fail column I can paste into a GitHub issue.
+exampleOutput: |-
+  You gave me enough to go on, so I won't ask any questions first. My assumptions are listed first. If any of them is wrong, tell me and I'll adjust the checklist.
+
+  ## Assumptions
+
+  - **The "Pages preview of main" is production.** GitHub Pages has one live site per repo, so once CI deploys main, users see it. Your QA window is the gap between deploy and announcement, not a gate before deploy. Rollback means reverting on main and waiting for CI to redeploy (roughly one CI cycle). Time that before you start.
+  - Base URL is `https://yohan-work.github.io/agentive` and every path below is relative to it. `<slug>` means one project-ready agent you pick (write it in the Notes column). Use a different slug on each device so you cover more of them.
+  - There are 100 agents. 20 are project-ready and have kits, so 80 should have no `/kits/<slug>/`.
+  - Bookmarks are stored client-side (localStorage), so they don't carry over between browsers.
+  - Test in a private window, or hard-reload, so you aren't checking a cached copy of the previous build.
+
+  ## Risks I'd add to your list
+
+  | Risk | Why it matters | Where it's checked |
+  |---|---|---|
+  | **robots.txt at `/agentive/robots.txt` is ignored by crawlers** | Crawlers only read `robots.txt` at the host root (`yohan-work.github.io/robots.txt`). The file itself can be valid and still do nothing. Its `Sitemap:` line won't be found either, so you'd have to submit the sitemap in Search Console. | C-10 |
+  | **The PowerShell problem is probably not the braces** | The braces are inside quotes, so the shell doesn't expand them. curl's own URL globbing does, and curl.exe supports that. The more likely failures are elsewhere. Windows PowerShell 5.1 has no `&&`. `mkdir -p` isn't a real flag there. `curl` is an alias for `Invoke-WebRequest` unless you type `curl.exe`. Test PowerShell 5.1 and 7 separately. | S-6, D-T3, D-T4 |
+  | **Content types only matter for the per-file links in a browser** | curl ignores Content-Type. In a browser, `.mdc` may download while `.md` displays inline, and `agent.json` served as `text/plain` still works. Decide whether that's a bug or cosmetic *before* you test. | S-7, R-8 |
+  | **Stale status data from caching or duplicated data** | A badge can read "Tested" if the card, detail page, search index, or `agent.json` in the kit comes from a different source than the one #14 changed. | C-1 to C-4 |
+
+  ---
+
+  ## 1. Smoke (about 15 min, right after deploy, one desktop browser plus one terminal)
+
+  If any smoke check fails, don't announce. Decide whether to roll back.
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | S-1 | Open `/` | Redirects to `/en/` with no loop or 404 | | |
+  | S-2 | Load `/en/` and `/ko/` home | Renders with no console errors and no unstyled flash. `/ko/` shows Korean UI | | |
+  | S-3 | `/en/agents/` | 100 cards shown and the count label says 100 | | |
+  | S-4 | Search a known agent name, then apply one filter, then "Clear all" | Results narrow correctly and Clear all brings back 100 | | |
+  | S-5 | Open `/en/agents/<slug>/` (project-ready) | Detail page loads and shows the Download Kit button, curl command, and 7 per-file links | | |
+  | S-6 | Copy the curl one-liner from the page and run it in macOS zsh | Creates `agent-kits/<slug>/` with exactly 7 non-empty files and exits with code 0 | | |
+  | S-7 | `curl -sI <base>/kits/<slug>/agent.json` plus one `.md` and one `.mdc` | All return 200. Write each Content-Type in Notes | | |
+  | S-8 | `/sitemap.xml` and `/robots.txt` | Both return 200 and valid content, not an HTML 404 page | | |
+  | S-9 | `/en/install/`, one `/en/workflows/<slug>/`, `/en/bookmarks/` | All render with no console errors | | |
+  | S-10 | Status badge on one agent that #14 downgraded | Shows "Unverified" on its card and on its detail page | | |
+
+  ## 2. Regression
+
+  ### Install kits (#13)
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | R-1 | Loop over all 20 slugs × 7 files, printing the HTTP code for each (e.g. `curl -o /dev/null -w "%{http_code} %{url_effective}\n"`) | 140 × 200 | | |
+  | R-2 | Pick 2 agents that are *not* project-ready and request `/kits/<slug>/AGENTS.md` | 404. Their detail pages show no curl command and no Download Kit | | |
+  | R-3 | Check the kit file contents for one slug | Agent name and slug are correct, the files aren't empty or HTML error pages, and `agent.json` passes `jq .` | | |
+  | R-4 | `agent.json` status fields | `verifiedStatus` matches what the site shows (no stale "tested") | | |
+  | R-5 | Curl command text on the page | Uses `--remote-name-all`, has no `--output-dir`, the URL includes the `/agentive/` base path, and the slug is correct | | |
+  | R-6 | Run the command a second time in the same directory | Overwrites files cleanly with no error | | |
+  | R-7 | Copy button (if there is one) | Clipboard holds exactly the command shown, with no extra characters and no line breaks | | |
+  | R-8 | Click each of the 7 per-file links in Chrome and Safari | Every link opens or downloads. Write down which open inline and which download. Nothing 404s | | |
+  | R-9 | Download Kit button | Delivers the files it promises, with sensible filenames | | |
+
+  ### Verification status (#14)
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | R-10 | Status filter on `/agents` | Counts for Tested, Expert, and Unverified add up to 100, and the Unverified count reflects the 61 downgrades | | |
+  | R-11 | Every agent still marked tested or expert | Has at least 2 sample runs visible on its detail page | | |
+  | R-12 | Locally: `npm run check:data` on main, then temporarily set one agent to `tested` with fewer than 2 runs | Passes on main and fails on the edited copy with a clear message (don't commit the edit) | | |
+
+  ### i18n (#15, #19)
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | R-13 | Language switch on the detail page, agents list, workflow, and install pages | Stays on the same page in the other locale, with no redirect to home | | |
+  | R-14 | `/ko/agents/`: filters, filter group labels, counts, "Clear all", empty-results message, installable-only toggle | All Korean. Counts are formatted correctly (e.g. "N개") | | |
+  | R-15 | Search in `/ko` using Korean terms and English agent names | Both work, or the behaviour is documented | | |
+  | R-16 | Filter state across a locale switch | Resets or persists. Either is fine as long as it's deliberate and nothing breaks | | |
+  | R-17 | `/en/` after the i18n PRs | No Korean strings leaking into the English locale | | |
+
+  ### Sitemap, robots, bookmarks, general (#16, #17)
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | R-18 | Sitemap URLs | Absolute URLs with `/agentive/` and trailing slashes that match the canonical URLs. No `/bookmarks`. No kit files | | |
+  | R-19 | Sitemap hreflang | Every entry has `en` and `ko` alternates that point at each other (reciprocal). `x-default` is present if you intend to have one | | |
+  | R-20 | Spot-check 10 random sitemap URLs | All return 200 | | |
+  | R-21 | Sitemap URL count | Roughly (pages + 100 agents + workflows) × 2 locales. No duplicates | | |
+  | R-22 | `/robots.txt` content | No accidental `Disallow: /`. The `Sitemap:` line points at the absolute sitemap URL | | |
+  | R-23 | Bookmark from a card and from a detail page, reload, then open `/bookmarks` in both locales | Bookmark persists, appears on the page in both locales, and can be removed | | |
+  | R-24 | Deep link or hard refresh on a nested route (e.g. `/ko/agents/<slug>/`) | 200, not a 404 page | | |
+  | R-25 | Unknown URL | Custom 404 page with working navigation | | |
+  | R-26 | CI run for main | Unit tests (#17), lint, typecheck, check:data, and build all green on the commit that was deployed | | |
+
+  ## 3. Device matrix
+
+  For each cell, record P or F (or N/A). A = home page. B = `/agents` search and filters. C = detail page, including the badge and curl block. D = per-file links. E = bookmarks. F = `/ko` layout.
+
+  | Platform | A | B | C | D | E | F | Notes |
+  |---|---|---|---|---|---|---|---|
+  | macOS Chrome | | | | | | | |
+  | macOS Safari | | | | | | | |
+  | macOS Firefox | | | | | | | |
+  | Win 11 Chrome | | | | | | | |
+  | Win 11 Firefox | | | | | | | |
+  | iOS Safari 17+, iPhone 13 mini (375px) | | | | | | | |
+  | Android Chrome, Pixel 7 | | | | | | | |
+
+  Mobile-specific checks, especially at 375px:
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | D-M1 | Korean status and difficulty badges and filter chips on `/ko/agents/` | No overflow, clipping, or wrapping mid-word, and no horizontal page scroll | | |
+  | D-M2 | Curl block on the detail page | Scrolls horizontally inside its box or wraps. The page itself never scrolls sideways | | |
+  | D-M3 | Filter panel (7 groups plus the toggle) | Can be opened, scrolled, and closed, and "Clear all" is reachable | | |
+  | D-M4 | Per-file links on iOS | `.md`, `.mdc`, and `.json` open or download without leaving you on a blank page | | |
+  | D-M5 | Bookmarks on iOS in a private tab | Fails gracefully when storage isn't available | | |
+
+  Terminal checks. Run the command exactly as copied from the page.
+
+  | ID | Terminal | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | D-T1 | macOS zsh | 7 files and exit code 0 | | |
+  | D-T2 | Ubuntu 20.04 bash, curl 7.68 | 7 files and exit code 0 (this is the case #13 fixed) | | |
+  | D-T3 | Windows PowerShell 5.1 with the copied command | Record exactly what happens. I expect it to fail on `&&` or `mkdir -p` | | |
+  | D-T4 | PowerShell 7 with the copied command | Record the result. `curl` must resolve to `curl.exe` | | |
+  | D-T5 | If D-T3 or D-T4 fails | Either the page offers a PowerShell version of the command or the docs mark it as bash/zsh only. Decide whether this blocks the release | | |
+
+  ## 4. Content checks
+
+  | ID | Check | Expected | Pass/Fail | Notes |
+  |---|---|---|---|---|
+  | C-1 | Search the built site for leftover "Tested" labels (list and detail pages, both locales) | Only agents with tested status show it. None of the 61 downgraded agents do | | |
+  | C-2 | Spot-check 5 of the 61 downgraded agents | Card, detail page, filter bucket, and `agent.json` all say unverified | | |
+  | C-3 | Korean status label | Uses the translated label, not "Tested" or "Unverified" in English | | |
+  | C-4 | Evaluation or score text on downgraded agents | Doesn't still claim tested results | | |
+  | C-5 | Scan all of `/ko` for English leftovers (detail page, cards, search panel, badges, empty states, aria-labels, page `<title>`, meta description) | Nothing left untranslated apart from agent content and brand names | | |
+  | C-6 | Korean copy review by a native speaker | Consistent terminology (e.g. the same word for "agent" and "workflow" everywhere) and a natural tone | | |
+  | C-7 | `/install` page | Instructions match the command and file list actually used in #13 | | |
+  | C-8 | `<html lang>` attribute | `en` on English pages and `ko` on Korean pages | | |
+  | C-9 | Page `<head>` | Has hreflang alternates or a canonical tag consistent with the sitemap, if implemented | | |
+  | C-10 | Crawl control | Accept that `/agentive/robots.txt` is advisory only. Submit `sitemap.xml` in Search Console. Use a `noindex` meta tag if bookmarks must stay out of the index | | |
+  | C-11 | Announcement draft | Numbers match the live site (20 kits, 100 agents), and it doesn't promise PowerShell support unless D-T3 or D-T4 passed | | |
+
+  ---
+
+  ## Release blockers vs. fix later
+
+  - **Block the announcement:** any S-row fails, R-1 has anything short of 140/140, D-T1 or D-T2 fails, or a downgraded agent still shows "Tested" anywhere (C-1, C-2).
+  - **Fix forward, then announce with a caveat:** PowerShell (D-T3 to D-T5), content types on per-file links (R-8), minor Korean overflow or leftover strings (D-M1, C-5), robots scope (C-10).
+
+  ## Next actions
+
+  1. Before deploying, agree the rollback owner and the revert commit. Note how long CI takes to redeploy.
+  2. Deploy, then run Smoke. One person can do it in about 15 minutes.
+  3. Run R-1 and the terminal checks D-T1 to D-T4 in parallel with the browser regression. The kit checks can be scripted, and the output can go straight into the issue.
+  4. Split the device matrix: one person on desktop, one on the two phones, and a Korean reader on `/ko`.
+  5. Triage failures against the blocker list, then announce or roll back.
+  6. Follow-ups whatever the outcome: a PowerShell version of the command, a CI step that curls all kit URLs after deploy, and a Search Console sitemap submission.
 limitations:
   - Needs target platform details for full coverage.
 bestPractices:
@@ -146,9 +318,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Release and handoff QA for defined features across pages, states, and devices
     - "Teams with the required inputs ready: Feature scope, Affected surfaces, Supported devices"
@@ -158,30 +328,303 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Checklist quality drops when feature scope is provided without risk areas
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - Bakes unstated assumptions into expected results, e.g. strong-run R-10 expects Tested/Expert/Unverified counts to sum to 100 although the data also has a 'community' status.
+    - Some shell claims are asserted more firmly than warranted (says `mkdir -p` 'isn't a real flag' in PowerShell) while missing the more certain issue that `( cd ... )` is not a subshell in PowerShell.
+    - "Output runs long: the strong run has 26 regression rows plus matrix, terminal, and content tables, which is thorough but heavy for a single GitHub issue."
+    - On vague requests it falls back to a generic web/mobile/backend template (payments, migrations, app store review) with no device matrix table or pass/fail column, so it does not produce the agent's promised Device matrix output.
+    - Tailoring questions in the boundary run come last, after about 50 generic items, so the user has to read through material that may not apply before being asked what the app is.
   evaluationCriteria:
     - Splits smoke checks, regression checks, device coverage, and content verification
     - Produces QA checklist in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: QA Checklist Agent strong-context run
-      input: Create QA checks for agent detail exports on desktop and mobile.
-      expectedOutputSummary: A usable QA checklist with project-specific assumptions, risks, and next steps.
-      sampleOutput: "QA checklist: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Release QA for stable kit URLs, sitemap, and Korean UI
+      input: |-
+        I need a release QA checklist for this week's deploy of Agent Archive (https://yohan-work.github.io/agentive/). Static Next.js export on GitHub Pages; there's no staging — we QA the Pages preview of main right after CI passes, then announce.
+
+        Feature scope in this release (merged PRs):
+        - #13 Install kit files served from stable URLs: every project-ready agent (20 of them) now has /kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Agent pages show a curl one-liner: `mkdir -p agent-kits/<slug> && (cd agent-kits/<slug> && curl -fsSL --remote-name-all "https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,...}")`. Changed to avoid `--output-dir` so it works on curl < 7.73.
+        - #14 61 agents lowered from "tested" to "unverified"; check:data now rejects tested/expert without >= 2 sample runs.
+        - #15 and #19 Korean translation of the agent detail page, status/difficulty badges, agent and workflow cards, and the agents search panel (filters, counts, "Clear all").
+        - #16 sitemap.xml and robots.txt with en/ko hreflang alternates; bookmarks page excluded.
+        - #17 unit tests (no user-facing change).
+
+        Affected surfaces: /en and /ko home, /agents (100 cards, search + 7 filter groups + installable-only toggle), /agents/<slug> (detail, Download Kit button, curl command, per-file links, bookmark button), /install, /workflows/<slug>, /bookmarks, /sitemap.xml, /robots.txt, /kits/*.
+
+        Supported devices/browsers: Chrome, Safari, Firefox latest on macOS and Windows 11; iOS Safari 17+ (iPhone 13 mini, 375px); Android Chrome (Pixel 7). Terminals for the curl command: macOS zsh, Ubuntu 20.04 bash (curl 7.68), Windows PowerShell (curl.exe).
+
+        Known risks:
+        - GitHub Pages serves .mdc and .md with odd content types; agent.json might be served as text.
+        - Korean strings may overflow badge/chip widths on 375px.
+        - Some /ko strings may still be English.
+        - Brace expansion in the curl URL may not work in PowerShell.
+        - Status badges must match the new verifiedStatus data (no stale "Tested").
+
+        Please give me a QA checklist split into smoke, regression, device matrix, and content checks, with a pass/fail column I can paste into a GitHub issue.
+      expectedOutputSummary: "A GitHub-issue-pasteable checklist with pass/fail columns split into smoke, regression, device matrix, and content checks. It should cover PRs #13-#19, the 20 kits x 7 files, the curl command on zsh/Ubuntu curl 7.68/PowerShell, the stale-Tested badges from #14, Korean overflow at 375px, and sitemap hreflang/bookmarks exclusion, with assumptions, risks, and next actions kept separate."
+      sampleOutput: |-
+        You gave me enough to go on, so I won't ask any questions first. My assumptions are listed first. If any of them is wrong, tell me and I'll adjust the checklist.
+
+        ## Assumptions
+
+        - **The "Pages preview of main" is production.** GitHub Pages has one live site per repo, so once CI deploys main, users see it. Your QA window is the gap between deploy and announcement, not a gate before deploy. Rollback means reverting on main and waiting for CI to redeploy (roughly one CI cycle). Time that before you start.
+        - Base URL is `https://yohan-work.github.io/agentive` and every path below is relative to it. `<slug>` means one project-ready agent you pick (write it in the Notes column). Use a different slug on each device so you cover more of them.
+        - There are 100 agents. 20 are project-ready and have kits, so 80 should have no `/kits/<slug>/`.
+        - Bookmarks are stored client-side (localStorage), so they don't carry over between browsers.
+        - Test in a private window, or hard-reload, so you aren't checking a cached copy of the previous build.
+
+        ## Risks I'd add to your list
+
+        | Risk | Why it matters | Where it's checked |
+        |---|---|---|
+        | **robots.txt at `/agentive/robots.txt` is ignored by crawlers** | Crawlers only read `robots.txt` at the host root (`yohan-work.github.io/robots.txt`). The file itself can be valid and still do nothing. Its `Sitemap:` line won't be found either, so you'd have to submit the sitemap in Search Console. | C-10 |
+        | **The PowerShell problem is probably not the braces** | The braces are inside quotes, so the shell doesn't expand them. curl's own URL globbing does, and curl.exe supports that. The more likely failures are elsewhere. Windows PowerShell 5.1 has no `&&`. `mkdir -p` isn't a real flag there. `curl` is an alias for `Invoke-WebRequest` unless you type `curl.exe`. Test PowerShell 5.1 and 7 separately. | S-6, D-T3, D-T4 |
+        | **Content types only matter for the per-file links in a browser** | curl ignores Content-Type. In a browser, `.mdc` may download while `.md` displays inline, and `agent.json` served as `text/plain` still works. Decide whether that's a bug or cosmetic *before* you test. | S-7, R-8 |
+        | **Stale status data from caching or duplicated data** | A badge can read "Tested" if the card, detail page, search index, or `agent.json` in the kit comes from a different source than the one #14 changed. | C-1 to C-4 |
+
+        ---
+
+        ## 1. Smoke (about 15 min, right after deploy, one desktop browser plus one terminal)
+
+        If any smoke check fails, don't announce. Decide whether to roll back.
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | S-1 | Open `/` | Redirects to `/en/` with no loop or 404 | | |
+        | S-2 | Load `/en/` and `/ko/` home | Renders with no console errors and no unstyled flash. `/ko/` shows Korean UI | | |
+        | S-3 | `/en/agents/` | 100 cards shown and the count label says 100 | | |
+        | S-4 | Search a known agent name, then apply one filter, then "Clear all" | Results narrow correctly and Clear all brings back 100 | | |
+        | S-5 | Open `/en/agents/<slug>/` (project-ready) | Detail page loads and shows the Download Kit button, curl command, and 7 per-file links | | |
+        | S-6 | Copy the curl one-liner from the page and run it in macOS zsh | Creates `agent-kits/<slug>/` with exactly 7 non-empty files and exits with code 0 | | |
+        | S-7 | `curl -sI <base>/kits/<slug>/agent.json` plus one `.md` and one `.mdc` | All return 200. Write each Content-Type in Notes | | |
+        | S-8 | `/sitemap.xml` and `/robots.txt` | Both return 200 and valid content, not an HTML 404 page | | |
+        | S-9 | `/en/install/`, one `/en/workflows/<slug>/`, `/en/bookmarks/` | All render with no console errors | | |
+        | S-10 | Status badge on one agent that #14 downgraded | Shows "Unverified" on its card and on its detail page | | |
+
+        ## 2. Regression
+
+        ### Install kits (#13)
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | R-1 | Loop over all 20 slugs × 7 files, printing the HTTP code for each (e.g. `curl -o /dev/null -w "%{http_code} %{url_effective}\n"`) | 140 × 200 | | |
+        | R-2 | Pick 2 agents that are *not* project-ready and request `/kits/<slug>/AGENTS.md` | 404. Their detail pages show no curl command and no Download Kit | | |
+        | R-3 | Check the kit file contents for one slug | Agent name and slug are correct, the files aren't empty or HTML error pages, and `agent.json` passes `jq .` | | |
+        | R-4 | `agent.json` status fields | `verifiedStatus` matches what the site shows (no stale "tested") | | |
+        | R-5 | Curl command text on the page | Uses `--remote-name-all`, has no `--output-dir`, the URL includes the `/agentive/` base path, and the slug is correct | | |
+        | R-6 | Run the command a second time in the same directory | Overwrites files cleanly with no error | | |
+        | R-7 | Copy button (if there is one) | Clipboard holds exactly the command shown, with no extra characters and no line breaks | | |
+        | R-8 | Click each of the 7 per-file links in Chrome and Safari | Every link opens or downloads. Write down which open inline and which download. Nothing 404s | | |
+        | R-9 | Download Kit button | Delivers the files it promises, with sensible filenames | | |
+
+        ### Verification status (#14)
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | R-10 | Status filter on `/agents` | Counts for Tested, Expert, and Unverified add up to 100, and the Unverified count reflects the 61 downgrades | | |
+        | R-11 | Every agent still marked tested or expert | Has at least 2 sample runs visible on its detail page | | |
+        | R-12 | Locally: `npm run check:data` on main, then temporarily set one agent to `tested` with fewer than 2 runs | Passes on main and fails on the edited copy with a clear message (don't commit the edit) | | |
+
+        ### i18n (#15, #19)
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | R-13 | Language switch on the detail page, agents list, workflow, and install pages | Stays on the same page in the other locale, with no redirect to home | | |
+        | R-14 | `/ko/agents/`: filters, filter group labels, counts, "Clear all", empty-results message, installable-only toggle | All Korean. Counts are formatted correctly (e.g. "N개") | | |
+        | R-15 | Search in `/ko` using Korean terms and English agent names | Both work, or the behaviour is documented | | |
+        | R-16 | Filter state across a locale switch | Resets or persists. Either is fine as long as it's deliberate and nothing breaks | | |
+        | R-17 | `/en/` after the i18n PRs | No Korean strings leaking into the English locale | | |
+
+        ### Sitemap, robots, bookmarks, general (#16, #17)
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | R-18 | Sitemap URLs | Absolute URLs with `/agentive/` and trailing slashes that match the canonical URLs. No `/bookmarks`. No kit files | | |
+        | R-19 | Sitemap hreflang | Every entry has `en` and `ko` alternates that point at each other (reciprocal). `x-default` is present if you intend to have one | | |
+        | R-20 | Spot-check 10 random sitemap URLs | All return 200 | | |
+        | R-21 | Sitemap URL count | Roughly (pages + 100 agents + workflows) × 2 locales. No duplicates | | |
+        | R-22 | `/robots.txt` content | No accidental `Disallow: /`. The `Sitemap:` line points at the absolute sitemap URL | | |
+        | R-23 | Bookmark from a card and from a detail page, reload, then open `/bookmarks` in both locales | Bookmark persists, appears on the page in both locales, and can be removed | | |
+        | R-24 | Deep link or hard refresh on a nested route (e.g. `/ko/agents/<slug>/`) | 200, not a 404 page | | |
+        | R-25 | Unknown URL | Custom 404 page with working navigation | | |
+        | R-26 | CI run for main | Unit tests (#17), lint, typecheck, check:data, and build all green on the commit that was deployed | | |
+
+        ## 3. Device matrix
+
+        For each cell, record P or F (or N/A). A = home page. B = `/agents` search and filters. C = detail page, including the badge and curl block. D = per-file links. E = bookmarks. F = `/ko` layout.
+
+        | Platform | A | B | C | D | E | F | Notes |
+        |---|---|---|---|---|---|---|---|
+        | macOS Chrome | | | | | | | |
+        | macOS Safari | | | | | | | |
+        | macOS Firefox | | | | | | | |
+        | Win 11 Chrome | | | | | | | |
+        | Win 11 Firefox | | | | | | | |
+        | iOS Safari 17+, iPhone 13 mini (375px) | | | | | | | |
+        | Android Chrome, Pixel 7 | | | | | | | |
+
+        Mobile-specific checks, especially at 375px:
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | D-M1 | Korean status and difficulty badges and filter chips on `/ko/agents/` | No overflow, clipping, or wrapping mid-word, and no horizontal page scroll | | |
+        | D-M2 | Curl block on the detail page | Scrolls horizontally inside its box or wraps. The page itself never scrolls sideways | | |
+        | D-M3 | Filter panel (7 groups plus the toggle) | Can be opened, scrolled, and closed, and "Clear all" is reachable | | |
+        | D-M4 | Per-file links on iOS | `.md`, `.mdc`, and `.json` open or download without leaving you on a blank page | | |
+        | D-M5 | Bookmarks on iOS in a private tab | Fails gracefully when storage isn't available | | |
+
+        Terminal checks. Run the command exactly as copied from the page.
+
+        | ID | Terminal | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | D-T1 | macOS zsh | 7 files and exit code 0 | | |
+        | D-T2 | Ubuntu 20.04 bash, curl 7.68 | 7 files and exit code 0 (this is the case #13 fixed) | | |
+        | D-T3 | Windows PowerShell 5.1 with the copied command | Record exactly what happens. I expect it to fail on `&&` or `mkdir -p` | | |
+        | D-T4 | PowerShell 7 with the copied command | Record the result. `curl` must resolve to `curl.exe` | | |
+        | D-T5 | If D-T3 or D-T4 fails | Either the page offers a PowerShell version of the command or the docs mark it as bash/zsh only. Decide whether this blocks the release | | |
+
+        ## 4. Content checks
+
+        | ID | Check | Expected | Pass/Fail | Notes |
+        |---|---|---|---|---|
+        | C-1 | Search the built site for leftover "Tested" labels (list and detail pages, both locales) | Only agents with tested status show it. None of the 61 downgraded agents do | | |
+        | C-2 | Spot-check 5 of the 61 downgraded agents | Card, detail page, filter bucket, and `agent.json` all say unverified | | |
+        | C-3 | Korean status label | Uses the translated label, not "Tested" or "Unverified" in English | | |
+        | C-4 | Evaluation or score text on downgraded agents | Doesn't still claim tested results | | |
+        | C-5 | Scan all of `/ko` for English leftovers (detail page, cards, search panel, badges, empty states, aria-labels, page `<title>`, meta description) | Nothing left untranslated apart from agent content and brand names | | |
+        | C-6 | Korean copy review by a native speaker | Consistent terminology (e.g. the same word for "agent" and "workflow" everywhere) and a natural tone | | |
+        | C-7 | `/install` page | Instructions match the command and file list actually used in #13 | | |
+        | C-8 | `<html lang>` attribute | `en` on English pages and `ko` on Korean pages | | |
+        | C-9 | Page `<head>` | Has hreflang alternates or a canonical tag consistent with the sitemap, if implemented | | |
+        | C-10 | Crawl control | Accept that `/agentive/robots.txt` is advisory only. Submit `sitemap.xml` in Search Console. Use a `noindex` meta tag if bookmarks must stay out of the index | | |
+        | C-11 | Announcement draft | Numbers match the live site (20 kits, 100 agents), and it doesn't promise PowerShell support unless D-T3 or D-T4 passed | | |
+
+        ---
+
+        ## Release blockers vs. fix later
+
+        - **Block the announcement:** any S-row fails, R-1 has anything short of 140/140, D-T1 or D-T2 fails, or a downgraded agent still shows "Tested" anywhere (C-1, C-2).
+        - **Fix forward, then announce with a caveat:** PowerShell (D-T3 to D-T5), content types on per-file links (R-8), minor Korean overflow or leftover strings (D-M1, C-5), robots scope (C-10).
+
+        ## Next actions
+
+        1. Before deploying, agree the rollback owner and the revert commit. Note how long CI takes to redeploy.
+        2. Deploy, then run Smoke. One person can do it in about 15 minutes.
+        3. Run R-1 and the terminal checks D-T1 to D-T4 in parallel with the browser regression. The kit checks can be scripted, and the output can go straight into the issue.
+        4. Split the device matrix: one person on desktop, one on the two phones, and a Korean reader on `/ko`.
+        5. Triage failures against the blocker list, then announce or roll back.
+        6. Follow-ups whatever the outcome: a PowerShell version of the command, a CI step that curls all kit URLs after deploy, and a Search Console sitemap submission.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: QA Checklist Agent boundary run
-      input: Test an entire product launch with no feature list or supported browser matrix.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Uses the input's specifics throughout: R-1 scripts all 20 slugs x 7 files (140 x 200), R-5 checks for no `--output-dir`, D-T2 targets Ubuntu 20.04 curl 7.68 as 'the case #13 fixed', and C-2 spot-checks 5 of the 61 downgraded agents across card, detail page, filter, and agent.json."
+        - "Strong, correct technical risk corrections: robots.txt at /agentive/robots.txt is ignored because crawlers only read the host root, and the quoted braces are expanded by curl's own globbing rather than the shell, so the real PowerShell failures are `&&` in 5.1 and the curl alias for Invoke-WebRequest."
+        - "Meets all three criteria: separate Smoke/Regression/Device matrix/Content sections, markdown tables with Pass/Fail and Notes columns ready for a GitHub issue, and distinct Assumptions, Risks, Blockers vs fix-later, and Next actions sections."
+        - "Minor defects: R-10 assumes the statuses are only Tested/Expert/Unverified (the repo also has 'community'), the `mkdir -p` claim is shaky, and it misses that the `( cd ... )` subshell grouping does not isolate directory changes in PowerShell."
+        - Long, but the length matches a five-PR release with 7 platforms and 3 terminals. The blocker/fix-forward split and the 15-minute smoke sizing make it usable.
+    - title: QA checklist for an unspecified 'new version' due tomorrow
+      input: We're shipping the new version of the app tomorrow morning. Can you give me a QA checklist? It needs to cover everything.
+      expectedOutputSummary: Should acknowledge that 'the app' and 'everything' are unspecified and state assumptions explicitly. It should still give a usable risk-ordered provisional checklist for a next-morning release and ask a few focused questions (platform, what changed, risk areas, team/time) without inventing app-specific facts.
+      sampleOutput: |-
+        You're shipping tomorrow morning, so I won't hold you up with questions first. Below is a checklist you can start on tonight. It's based on some assumptions, which I've listed. Answer the questions at the end and I'll cut it down to fit your app.
+
+        One thing to be clear about: nobody can fully test "everything" in one evening. The checklist is ordered by risk, so if time runs out, drop items from the bottom of each section and keep the top ones.
+
+        ## Assumptions (correct me if any are wrong)
+        - It's a user-facing app with login, a few core user flows, and a backend or API.
+        - You have a staging environment that closely matches production.
+        - The release is an update to an app already in production, not a first launch.
+        - You have a few people and roughly half a day before release.
+
+        ---
+
+        ## 1. Release blockers (do these first, tonight)
+        - [ ] **Scope freeze:** list every change in this release (tickets, PRs, config changes). Nothing else gets merged.
+        - [ ] **Build:** the release candidate builds cleanly from the release branch or tag. The version number and build number are correct.
+        - [ ] **Automated tests:** unit, integration, and end-to-end tests all pass on the release candidate. Nobody has skipped or muted a failing test to get it green.
+        - [ ] **Deployed to staging:** you're testing the exact build that will ship, not a local build.
+        - [ ] **Known open bugs:** triage them. Each one is marked either "ships with a workaround" or "blocks release."
+
+        ## 2. Smoke test of critical user paths (on staging, then again on production)
+        Pick the 5 to 10 flows that would cause an incident if they broke. Typical ones:
+        - [ ] Sign up, log in, log out, password reset
+        - [ ] The core "job" of the app (e.g., create, edit, and save the main object)
+        - [ ] Payments, checkout, or subscription changes, if you have them
+        - [ ] Notifications (email, push, SMS) send and their links work
+        - [ ] Search and navigation to key screens
+        - [ ] Existing user data displays correctly after the update
+
+        ## 3. New and changed features
+        For each item in the release scope:
+        - [ ] Happy path works as specified
+        - [ ] Edge cases: empty states, very long input, special characters, zero or max values
+        - [ ] Error handling: invalid input, network loss, timeouts, and the error messages a user would actually see
+        - [ ] Permissions: roles that should see the feature can, and roles that shouldn't can't
+        - [ ] Feature flags: behavior is correct with the flag both on and off
+
+        ## 4. Regression in areas next to the changes
+        - [ ] Screens and APIs that share code or data with what changed
+        - [ ] Anything touched by a shared library or dependency upgrade in this release
+
+        ## 5. Data and backend
+        - [ ] **Database migrations:** run on a copy of production-like data. Check how long they take, whether they lock tables, and whether they can be reversed.
+        - [ ] **Backward compatibility:** older clients or mobile app versions still work against the new API.
+        - [ ] **Config and secrets:** environment variables, API keys, and third-party credentials are set in production.
+        - [ ] **Scheduled jobs and queues:** background jobs and queues still run.
+
+        ## 6. Platforms and devices (limit to your supported list)
+        - [ ] Current Chrome, Safari, Firefox, and Edge (web)
+        - [ ] iOS and Android: latest OS plus the oldest one you support, and at least one small screen
+        - [ ] Fresh install and upgrade from the previous version (mobile/desktop)
+
+        ## 7. Non-functional checks (quick passes, not full audits)
+        - [ ] **Performance:** key pages and endpoints aren't noticeably slower than the current version. Load test if traffic is expected to spike.
+        - [ ] **Security:** no secrets in the client bundle or logs. Auth is enforced on new endpoints. Dependency scan is clean of critical issues.
+        - [ ] **Accessibility:** new UI works with keyboard navigation, has labels, and has readable contrast.
+        - [ ] **Analytics and logging:** new events fire correctly. Errors reach your monitoring tool.
+        - [ ] **Localization:** new text is translated or falls back cleanly, if you support more than one language.
+
+        ## 8. Release readiness
+        - [ ] **Rollback plan:** written down and tested. Know how to roll back the app and any migrations, and who makes that call.
+        - [ ] **Deploy window and owner:** agree on who deploys, who verifies, and who is on call for the next 24 hours.
+        - [ ] **Monitoring:** dashboards and alerts are ready (error rate, latency, crash rate, sign-ups or purchases).
+        - [ ] **App store review:** the build is approved or its timing is confirmed (mobile).
+        - [ ] **Communication:** release notes, support team briefing, status page, and any customer messaging are ready.
+        - [ ] **Sign-off:** QA, product, and engineering leads give an explicit go/no-go.
+
+        ## 9. After deploy (first 1 to 2 hours)
+        - [ ] Run the Section 2 smoke test on production.
+        - [ ] Watch error rates, crash reports, and key business metrics against the baseline.
+        - [ ] Watch support channels for new issue patterns.
+        - [ ] Define a threshold that triggers a rollback, e.g., error rate above X% or checkout failures.
+
+        ---
+
+        ## Main risks with a release tomorrow morning
+        - **Too little time for full regression.** Mitigation: focus on critical paths and the areas next to what changed. Consider a staged rollout or feature flags.
+        - **Database migrations that can't be reversed.** These are the most common cause of a rollback that doesn't work. Check them first.
+        - **Last-minute merges.** Every change after the freeze resets your confidence.
+        - **Morning release with no one watching.** Make sure the people who can fix things are online after the deploy.
+
+        ## Next actions (tonight)
+        1. Freeze scope and list the changes (30 min).
+        2. Assign owners to Sections 2, 3, and 5, and start with the blockers.
+        3. Write down the rollback plan and the go/no-go criteria.
+        4. Hold a go/no-go check early tomorrow before deploying.
+
+        ## To tailor this, tell me:
+        1. **Platform:** web, iOS/Android, desktop, or API only?
+        2. **What changed in this release?** A short list of features or fixes is enough.
+        3. **High-risk areas:** payments, database migrations, auth changes, third-party integrations?
+        4. **Team and time:** how many testers, and how many hours before release?
+
+        With those answers I'll turn this into a targeted checklist you can hand out tonight, with owners and time estimates.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Handles the ambiguity well: it states four assumptions up front (login plus backend, staging exists, update not first launch, half a day available) and pushes back on 'everything' by ordering the checklist by risk and saying to drop items from the bottom."
+        - Moves the work forward with a nine-section checkbox checklist, including release blockers, smoke, new features, data/backend, platforms, non-functional, readiness, and post-deploy checks, plus next actions timed for tonight.
+        - Invents no app-specific facts. Items like payments and app store review are marked conditional ('if you have them', '(mobile)').
+        - Only four focused tailoring questions, which is the right number, but they sit at the very end after a long generic list.
+        - Largely generic. It has no device matrix table or pass/fail column, and no separate content-verification section, so it only partly meets the split-sections criterion.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Release and handoff QA for defined features across pages, states, and devices
@@ -194,5 +637,5 @@ decisionGuide:
 relatedAgents:
   - pr-review-agent
   - deployment-checklist-agent
-verifiedStatus: tested
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29

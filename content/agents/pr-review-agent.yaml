@@ -32,8 +32,296 @@ outputs:
   - File references
   - Open questions
 prompt: You are a strict senior code reviewer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical prioritized PR review with clear sections, assumptions, risks, and next actions.
-exampleInput: A PR adding agent search and filtering.
-exampleOutput: Bug findings, test gaps, and merge risk notes.
+exampleInput: |-
+  Please review this PR before I merge it.
+
+  Project: Agent Archive — Next.js 16 App Router + TypeScript + Tailwind, static export (`output: "export"`) to GitHub Pages. Pages live in src/app/[locale]/ and get `locale` ("en" | "ko") from params. UI strings live in src/i18n/dictionaries.ts and every key must exist in both en and ko.
+
+  Requirement (PR #19): "Status and difficulty badges, the agent and workflow cards, and the agents search panel still rendered English on /ko. Translate badges, cards, and the agent search panel into Korean." The PR moves strings into new `agentMeta` and `agentSearch` dictionary groups, passes locale to the badges, types badge props as VerifiedStatus / Difficulty, and removes the unused `formatStatus` helper from src/lib/utils.ts.
+
+  Test output: `npm run check:data` passed, `npm run lint` passed, `npm run typecheck` passed, `npm test` — 20 tests pass, `npm run build` passed.
+
+  Known constraints: no server-side searchParams; client components only read the URL via useSearchParams. Role and category chips intentionally still use titleCase(slug) in this PR (taxonomy translation is a separate issue).
+
+  The full PR touches 9 files (+165/-52): the two pages that render badges, agent-card.tsx, agent-detail-header.tsx, agent-search-panel.tsx, badge.tsx, workflow-card.tsx, dictionaries.ts, utils.ts. Here is the diff for the two files I'm least sure about:
+
+  ```diff
+  diff --git a/src/components/agents/agent-search-panel.tsx b/src/components/agents/agent-search-panel.tsx
+  index b03b238..ff54a00 100644
+  --- a/src/components/agents/agent-search-panel.tsx
+  +++ b/src/components/agents/agent-search-panel.tsx
+  @@ -3,14 +3,15 @@
+   import { type ComponentProps, useMemo, useState } from "react";
+   import { useSearchParams } from "next/navigation";
+   import { Search } from "lucide-react";
+  -import type { Agent } from "@/types/agent";
+  +import type { Agent, Difficulty, VerifiedStatus } from "@/types/agent";
+   import { defaultLocale, type Locale } from "@/i18n/config";
+  +import { getDictionary } from "@/i18n/dictionaries";
+   import { filterAgents, getUniqueTools, searchAgents, type AgentFilters } from "@/lib/search";
+   import { titleCase } from "@/lib/utils";
+   import { AgentGrid } from "./agent-grid";
+   
+  -const difficulties = ["beginner", "intermediate", "advanced"];
+  -const statuses = ["unverified", "tested", "community", "expert"];
+  +const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced"];
+  +const statuses: VerifiedStatus[] = ["unverified", "community", "tested", "expert"];
+   const levels = ["1", "2", "3", "4", "5"];
+   
+   export function AgentSearchPanel({
+  @@ -26,6 +27,11 @@ export function AgentSearchPanel({
+     categories: string[];
+     locale?: Locale;
+   }) {
+  +  const dictionary = getDictionary(locale);
+  +  const labels = dictionary.agentSearch;
+  +  const meta = dictionary.agentMeta;
+  +  const difficultyLabel = (value: string) => meta.difficulty[value as Difficulty];
+  +  const statusLabel = (value: string) => meta.status[value as VerifiedStatus];
+     const [query, setQuery] = useState(initialQuery);
+     // When the URL query changes (e.g. top-nav search), adopt it without resetting the other filters.
+     const [appliedInitialQuery, setAppliedInitialQuery] = useState(initialQuery);
+  @@ -37,14 +43,14 @@ export function AgentSearchPanel({
+     const tools = useMemo(() => getUniqueTools(agents), [agents]);
+     const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
+     const activeFilters = [
+  -    query ? `Search: ${query}` : undefined,
+  -    filters.role ? `Role: ${titleCase(filters.role)}` : undefined,
+  -    filters.category ? `Category: ${titleCase(filters.category)}` : undefined,
+  -    filters.difficulty ? `Difficulty: ${titleCase(filters.difficulty)}` : undefined,
+  -    filters.automationLevel ? `Automation: ${filters.automationLevel}/5` : undefined,
+  -    filters.tool ? `Tool: ${filters.tool}` : undefined,
+  -    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined,
+  -    filters.installableOnly ? "Installable only" : undefined
+  +    query ? `${labels.search}: ${query}` : undefined,
+  +    filters.role ? `${labels.role}: ${titleCase(filters.role)}` : undefined,
+  +    filters.category ? `${labels.category}: ${titleCase(filters.category)}` : undefined,
+  +    filters.difficulty ? `${labels.difficulty}: ${difficultyLabel(filters.difficulty)}` : undefined,
+  +    filters.automationLevel ? `${labels.automation}: ${filters.automationLevel}/5` : undefined,
+  +    filters.tool ? `${labels.tool}: ${filters.tool}` : undefined,
+  +    filters.verifiedStatus ? `${labels.verified}: ${statusLabel(filters.verifiedStatus)}` : undefined,
+  +    filters.installableOnly ? labels.installableOnly : undefined
+     ].filter((item): item is string => Boolean(item));
+   
+     function setFilter(key: keyof AgentFilters, value: string) {
+  @@ -63,7 +69,7 @@ export function AgentSearchPanel({
+           <input
+             value={query}
+             onChange={(event) => setQuery(event.target.value)}
+  -          placeholder="Search by name, role, task, tag, or tool..."
+  +          placeholder={labels.placeholder}
+             className="h-12 w-full rounded-lg border border-line bg-panel pl-10 pr-4 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20"
+           />
+         </label>
+  @@ -76,23 +82,33 @@ export function AgentSearchPanel({
+               onChange={(event) => setFilters((current) => ({ ...current, installableOnly: event.target.checked }))}
+               className="h-4 w-4 accent-sky-400"
+             />
+  -          Installable only
+  +          {labels.installableOnly}
+           </label>
+  -        <FilterRow title="Role" values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+  -        <FilterRow title="Category" values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+  -        <FilterRow title="Difficulty" values={difficulties} active={filters.difficulty} onSelect={(value) => setFilter("difficulty", value)} />
+  -        <FilterRow title="Automation" values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
+  -        <FilterRow title="Tool" values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
+  -        <FilterRow title="Verified" values={statuses} active={filters.verifiedStatus} onSelect={(value) => setFilter("verifiedStatus", value)} />
+  +        <FilterRow title={labels.role} values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+  +        <FilterRow title={labels.category} values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+  +        <FilterRow
+  +          title={labels.difficulty}
+  +          values={difficulties}
+  +          active={filters.difficulty}
+  +          onSelect={(value) => setFilter("difficulty", value)}
+  +          label={difficultyLabel}
+  +        />
+  +        <FilterRow title={labels.automation} values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
+  +        <FilterRow title={labels.tool} values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
+  +        <FilterRow
+  +          title={labels.verified}
+  +          values={statuses}
+  +          active={filters.verifiedStatus}
+  +          onSelect={(value) => setFilter("verifiedStatus", value)}
+  +          label={statusLabel}
+  +        />
+         </div>
+   
+         <div className="rounded-lg border border-line bg-panel/45 p-4">
+           <div className="flex flex-col gap-3 text-sm text-secondary sm:flex-row sm:items-center sm:justify-between">
+  -          <span>
+  -            Showing <span className="font-semibold text-primary">{results.length}</span> of {agents.length} agents
+  -          </span>
+  +          <span>{formatCount(labels.showing, { shown: results.length, total: agents.length })}</span>
+             <button type="button" onClick={clearAll} className="self-start text-sky-200 transition hover:text-primary sm:self-auto">
+  -            Clear all
+  +            {labels.clearAll}
+             </button>
+           </div>
+           {activeFilters.length ? (
+  @@ -104,15 +120,13 @@ export function AgentSearchPanel({
+               ))}
+             </div>
+           ) : null}
+  -        <p className="mt-3 text-xs text-muted">
+  -          Search includes agent metadata, tools, prompt context, and Korean real-use-case scenarios.
+  -        </p>
+  +        <p className="mt-3 text-xs text-muted">{labels.searchScope}</p>
+         </div>
+   
+         <div className="flex items-center justify-between text-sm text-secondary">
+  -        <span>{results.length} agents</span>
+  +        <span>{formatCount(labels.resultCount, { count: results.length })}</span>
+           <button type="button" onClick={() => setFilters({})} className="text-sky-200 transition hover:text-primary">
+  -          Clear filters only
+  +          {labels.clearFilters}
+           </button>
+         </div>
+   
+  @@ -121,6 +135,19 @@ export function AgentSearchPanel({
+     );
+   }
+   
+  +// Fills {name} placeholders in a dictionary string, highlighting the {shown} count as the old markup did.
+  +function formatCount(template: string, values: Record<string, number>) {
+  +  return template.split(/(\{\w+\})/).map((part, index) => {
+  +    const key = part.match(/^\{(\w+)\}$/)?.[1];
+  +    if (!key || !(key in values)) return part;
+  +    return (
+  +      <span key={index} className={key === "shown" ? "font-semibold text-primary" : undefined}>
+  +        {values[key]}
+  +      </span>
+  +    );
+  +  });
+  +}
+  +
+   function FilterRow({
+     title,
+     values,
+  diff --git a/src/components/common/badge.tsx b/src/components/common/badge.tsx
+  index 6ae4c5a..1eeb087 100644
+  --- a/src/components/common/badge.tsx
+  +++ b/src/components/common/badge.tsx
+  @@ -1,4 +1,7 @@
+  -import { cn, formatStatus, titleCase } from "@/lib/utils";
+  +import { defaultLocale, type Locale } from "@/i18n/config";
+  +import { getDictionary } from "@/i18n/dictionaries";
+  +import { cn } from "@/lib/utils";
+  +import type { Difficulty, VerifiedStatus } from "@/types/agent";
+   
+   type BadgeProps = {
+     children: React.ReactNode;
+  @@ -23,12 +26,12 @@ export function Badge({ children, tone = "default", className }: BadgeProps) {
+     );
+   }
+   
+  -export function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  +export function DifficultyBadge({ difficulty, locale = defaultLocale }: { difficulty: Difficulty; locale?: Locale }) {
+     const tone = difficulty === "advanced" ? "warning" : difficulty === "intermediate" ? "accent" : "default";
+  -  return <Badge tone={tone}>{titleCase(difficulty)}</Badge>;
+  +  return <Badge tone={tone}>{getDictionary(locale).agentMeta.difficulty[difficulty]}</Badge>;
+   }
+   
+  -export function StatusBadge({ status }: { status: string }) {
+  +export function StatusBadge({ status, locale = defaultLocale }: { status: VerifiedStatus; locale?: Locale }) {
+     const tone = status === "expert" || status === "tested" ? "success" : status === "community" ? "accent" : "default";
+  -  return <Badge tone={tone}>{formatStatus(status)}</Badge>;
+  +  return <Badge tone={tone}>{getDictionary(locale).agentMeta.status[status]}</Badge>;
+   }
+  ```
+
+  I did not paste dictionaries.ts; assume it adds agentMeta.difficulty, agentMeta.status, and agentSearch.{search, role, category, difficulty, automation, tool, verified, installableOnly, placeholder, showing, clearAll, clearFilters, searchScope, resultCount} for both locales, with `showing` = "Showing {shown} of {total} agents" / "{total}개 중 {shown}개 표시".
+
+  Give me prioritized findings with severity and file references, test gaps, and open questions.
+exampleOutput: |-
+  # PR #19 review: Korean badges, cards, and agent search panel
+
+  ## Verdict
+
+  **Approve once you've checked one thing.** The diff does what the requirement asks, and I found no correctness bug in the code you pasted. The main risk is in the parts I can't see. Both badges and the search panel quietly fall back to English when nobody passes `locale`. Typecheck can't catch a missed call site, and neither can build or the current tests. So the requirement ("no English on /ko") hasn't been proven met yet. Check #1 below before you merge. The rest can go in this PR or a follow-up.
+
+  ## Assumptions
+
+  - `getDictionary` is synchronous and safe to import into a client component. It works that way in `badge.tsx`, and the build passed.
+  - `dictionaries.ts` types `ko` against `en` (or a shared type), so a key missing from one locale fails typecheck.
+  - `agentMeta.difficulty` and `agentMeta.status` are typed as `Record<Difficulty, string>` and `Record<VerifiedStatus, string>`, or something equally strict.
+  - `AgentSearchPanel` destructures `locale = defaultLocale`. That line isn't in the diff, but `defaultLocale` was already imported.
+
+  ## Findings, in priority order
+
+  ### 1. High: the English fallback can hide call sites that never got a locale
+  **Files:** `src/components/common/badge.tsx` (both badges), `src/components/agents/agent-search-panel.tsx` (the `locale?: Locale` prop), and the card render path
+
+  - `DifficultyBadge` and `StatusBadge` both have `locale = defaultLocale`. Any caller that doesn't pass `locale` still compiles and renders English on `/ko`, the exact bug this PR is fixing.
+  - **The specific gap:** `agent-grid.tsx` isn't one of the 9 changed files. `AgentSearchPanel` renders `AgentGrid`, and `AgentGrid` renders `AgentCard`, which now needs a locale to translate its badges. That line is unchanged context between the diff hunks. So the cards in the search results only come out in Korean if `AgentGrid` already accepted a `locale` and passed it on. Confirm that it does. If it doesn't, the cards on `/ko/agents` still show English badges.
+  - The same applies to any grid, list, or other page that renders `WorkflowCard`, `AgentCard`, or the badges and isn't in this PR (for example workflow detail pages, starter packs, or a compare view). You wrote "the two pages that render badges". Confirm with `grep -rn "DifficultyBadge\|StatusBadge\|<AgentCard\|<WorkflowCard\|<AgentGrid" src/`.
+
+  **Fix:** make `locale` **required** on `DifficultyBadge`, `StatusBadge`, `AgentCard`, `WorkflowCard`, `AgentGrid`, and `AgentSearchPanel`. Every page already has `locale` from `params`, so this costs very little. Typecheck will then catch every call site that doesn't pass it. It's the strongest guarantee you can get for this requirement.
+
+  ### 2. Medium: a filter value with no label shows as the text "undefined"
+  **File:** `agent-search-panel.tsx`, the `difficultyLabel` and `statusLabel` helpers
+
+  ```ts
+  const difficultyLabel = (value: string) => meta.difficulty[value as Difficulty];
+  ```
+  The `as` cast gets past the type checker, but at runtime an unknown value returns `undefined`. The active-filter chip would then read `난이도: undefined`. The old `titleCase` path always printed something.
+  - Clicking a filter can't trigger this, because those values come from the typed arrays.
+  - Seeding filters from the URL (`useSearchParams`, e.g. `?difficulty=Beginner` or a stale link), or adding a new status to the type without a dictionary entry, can trigger it.
+
+  **Fix:** `meta.difficulty[value as Difficulty] ?? titleCase(value)`, and the same for status. It's one line each.
+
+  ### 3. Low: the Verified filter chips are now in a different order
+  **File:** `agent-search-panel.tsx`, the `statuses` array
+
+  `["unverified", "tested", "community", "expert"]` became `["unverified", "community", "tested", "expert"]`. The new order may be deliberate (least trust to most). Either way it's a visible UI change that the requirement doesn't mention. Keep it if you meant it and say so in the PR description. Otherwise revert it so this PR only covers the translation.
+
+  ### 4. Low: `formatCount` has no tests and lives inside a component file
+  **File:** `agent-search-panel.tsx`, the `formatCount` function
+
+  The logic is correct:
+  - `split` with a capture group keeps the placeholders in the output.
+  - Only the `<span>` elements need React keys, and they have them.
+  - It still highlights `{shown}` the way the old markup did.
+  - It works for the Korean word order (`{total}개 중 {shown}개 표시`).
+
+  Two gaps:
+  - It has no tests.
+  - An unknown placeholder or a typo in a dictionary string (`{shwon}`) renders the raw text without any error.
+
+  Consider moving it to `src/lib/` (e.g. `format-template.tsx`) and adding 3–4 unit tests: both locale templates, a missing key, and no placeholders.
+
+  ### 5. Nit: plural and singular
+  English `resultCount` / `showing` will read "1 agents". The old strings had the same problem, so this isn't a regression. Korean doesn't need a plural form. If you want the English fixed, add a separate `resultCountOne` key or use `Intl.PluralRules`. Not for this PR.
+
+  ### 6. Nit: both locales' dictionaries are now in the client bundle
+  Importing `getDictionary` into `AgentSearchPanel` (a client component) ships the full `en` and `ko` dictionaries to the browser. That's fine at the current size. If the dictionary grows, pass just the `agentSearch` and `agentMeta` groups as props from the server page instead.
+
+  ## Test gaps
+
+  1. **Nothing checks the rendered /ko output.** Your checks show the code compiles. They don't show that `/ko` is actually in Korean. For a cheap check, after `npm run build`, grep the exported HTML for leftover English:
+     ```bash
+     grep -lE "Installable only|Clear all|Beginner|Intermediate|Advanced|Unverified" out/ko/**/*.html
+     ```
+     Caveat: the search panel uses `useSearchParams`, so it probably sits behind a Suspense boundary and only renders on the client. Its text may not be in the static HTML at all. Check it by hand in `npm run dev` at `/ko/agents`. The grep still covers the badges on cards and detail pages.
+  2. **Label coverage.** Add a unit test that every `Difficulty` and every `VerifiedStatus` value has a non-empty label in both `en` and `ko`. If the dictionary is already typed as a `Record`, typecheck covers most of this. Skip the test only if you've confirmed that typing.
+  3. **`formatCount`** (see finding 4).
+  4. **Badge rendering.** Add a small test that `StatusBadge` with `locale="ko"` renders the Korean label, so a later refactor can't quietly bring back English.
+
+  ## Open questions
+
+  1. Does `AgentGrid` already accept and pass on `locale`? That decides whether finding 1 is a real bug or only a hardening suggestion.
+  2. Are search filters (not just the query) ever seeded from the URL? That decides how urgent finding 2 is.
+  3. Was the reordering of `statuses` intentional?
+  4. Are there other components or pages that render the badges or cards, beyond the two pages in the PR?
+
+  ## Next steps
+
+  | # | Action | Blocks merge? |
+  |---|--------|---------------|
+  | 1 | Confirm that `AgentGrid` and every badge and card caller pass `locale`. Ideally make `locale` required. | **Yes** |
+  | 2 | Add a `?? titleCase(value)` fallback to `difficultyLabel` and `statusLabel` | Should fix |
+  | 3 | Load `/ko/agents` and a `/ko` agent detail page and look for English | Should do |
+  | 4 | Confirm or revert the `statuses` reorder, and note it in the PR description | Small |
+  | 5 | Move `formatCount` to `src/lib/` and test it. Add a test for label coverage in both locales. | Follow-up is OK |
 limitations:
   - Needs the actual diff for precise line-level comments.
 bestPractices:
@@ -144,11 +432,9 @@ runbook:
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 5
+  qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Reviewing concrete diffs for correctness, regression risk, and missing tests
     - "Teams with the required inputs ready: Diff, Requirements, Test output"
@@ -158,30 +444,380 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Line-level precision depends on receiving the actual changed files or patch
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Severity inflation: the top finding is rated High and 'Blocks merge: Yes' even though it is only a hypothesis to confirm. In the merged code AgentGrid already accepts and forwards locale, and every badge, card, and grid call site passes it."
+    - Rates a finding Medium on a code path the input's constraints make unreachable. The difficultyLabel/statusLabel 'undefined' chip needs filters seeded from the URL, but only the query is read via useSearchParams, and filter values come from the typed arrays.
+    - Makes small unverified technical claims in its test advice. It says the search panel 'probably' only renders on the client, but agents/page.tsx uses AgentSearchPanel itself as the Suspense fallback, so its text is in the static HTML. The suggested `out/ko/**/*.html` grep does not recurse in default bash.
+    - Runs long. The strong review carries six findings (two nits), four test gaps, open questions, and a next-steps table for a clean translation PR. The boundary answer is also lengthy.
+    - Boundary verdict is firm ('no, don't merge today') and rests only on the one-line description. It is justified for localStorage sessions, but the review assumes a browser app with no CSP rather than asking about it first.
   evaluationCriteria:
     - Prioritizes actionable findings with severity, file references, and test gaps before summary
     - Produces Findings in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: PR Review Agent strong-context run
-      input: Review a pull request that changes agent search filters and includes lint output.
-      expectedOutputSummary: A usable Findings with project-specific assumptions, risks, and next steps.
-      sampleOutput: "Findings: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: "Review real PR #19 Korean translation of badges and search panel"
+      input: |-
+        Please review this PR before I merge it.
+
+        Project: Agent Archive — Next.js 16 App Router + TypeScript + Tailwind, static export (`output: "export"`) to GitHub Pages. Pages live in src/app/[locale]/ and get `locale` ("en" | "ko") from params. UI strings live in src/i18n/dictionaries.ts and every key must exist in both en and ko.
+
+        Requirement (PR #19): "Status and difficulty badges, the agent and workflow cards, and the agents search panel still rendered English on /ko. Translate badges, cards, and the agent search panel into Korean." The PR moves strings into new `agentMeta` and `agentSearch` dictionary groups, passes locale to the badges, types badge props as VerifiedStatus / Difficulty, and removes the unused `formatStatus` helper from src/lib/utils.ts.
+
+        Test output: `npm run check:data` passed, `npm run lint` passed, `npm run typecheck` passed, `npm test` — 20 tests pass, `npm run build` passed.
+
+        Known constraints: no server-side searchParams; client components only read the URL via useSearchParams. Role and category chips intentionally still use titleCase(slug) in this PR (taxonomy translation is a separate issue).
+
+        The full PR touches 9 files (+165/-52): the two pages that render badges, agent-card.tsx, agent-detail-header.tsx, agent-search-panel.tsx, badge.tsx, workflow-card.tsx, dictionaries.ts, utils.ts. Here is the diff for the two files I'm least sure about:
+
+        ```diff
+        diff --git a/src/components/agents/agent-search-panel.tsx b/src/components/agents/agent-search-panel.tsx
+        index b03b238..ff54a00 100644
+        --- a/src/components/agents/agent-search-panel.tsx
+        +++ b/src/components/agents/agent-search-panel.tsx
+        @@ -3,14 +3,15 @@
+         import { type ComponentProps, useMemo, useState } from "react";
+         import { useSearchParams } from "next/navigation";
+         import { Search } from "lucide-react";
+        -import type { Agent } from "@/types/agent";
+        +import type { Agent, Difficulty, VerifiedStatus } from "@/types/agent";
+         import { defaultLocale, type Locale } from "@/i18n/config";
+        +import { getDictionary } from "@/i18n/dictionaries";
+         import { filterAgents, getUniqueTools, searchAgents, type AgentFilters } from "@/lib/search";
+         import { titleCase } from "@/lib/utils";
+         import { AgentGrid } from "./agent-grid";
+         
+        -const difficulties = ["beginner", "intermediate", "advanced"];
+        -const statuses = ["unverified", "tested", "community", "expert"];
+        +const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced"];
+        +const statuses: VerifiedStatus[] = ["unverified", "community", "tested", "expert"];
+         const levels = ["1", "2", "3", "4", "5"];
+         
+         export function AgentSearchPanel({
+        @@ -26,6 +27,11 @@ export function AgentSearchPanel({
+           categories: string[];
+           locale?: Locale;
+         }) {
+        +  const dictionary = getDictionary(locale);
+        +  const labels = dictionary.agentSearch;
+        +  const meta = dictionary.agentMeta;
+        +  const difficultyLabel = (value: string) => meta.difficulty[value as Difficulty];
+        +  const statusLabel = (value: string) => meta.status[value as VerifiedStatus];
+           const [query, setQuery] = useState(initialQuery);
+           // When the URL query changes (e.g. top-nav search), adopt it without resetting the other filters.
+           const [appliedInitialQuery, setAppliedInitialQuery] = useState(initialQuery);
+        @@ -37,14 +43,14 @@ export function AgentSearchPanel({
+           const tools = useMemo(() => getUniqueTools(agents), [agents]);
+           const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
+           const activeFilters = [
+        -    query ? `Search: ${query}` : undefined,
+        -    filters.role ? `Role: ${titleCase(filters.role)}` : undefined,
+        -    filters.category ? `Category: ${titleCase(filters.category)}` : undefined,
+        -    filters.difficulty ? `Difficulty: ${titleCase(filters.difficulty)}` : undefined,
+        -    filters.automationLevel ? `Automation: ${filters.automationLevel}/5` : undefined,
+        -    filters.tool ? `Tool: ${filters.tool}` : undefined,
+        -    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined,
+        -    filters.installableOnly ? "Installable only" : undefined
+        +    query ? `${labels.search}: ${query}` : undefined,
+        +    filters.role ? `${labels.role}: ${titleCase(filters.role)}` : undefined,
+        +    filters.category ? `${labels.category}: ${titleCase(filters.category)}` : undefined,
+        +    filters.difficulty ? `${labels.difficulty}: ${difficultyLabel(filters.difficulty)}` : undefined,
+        +    filters.automationLevel ? `${labels.automation}: ${filters.automationLevel}/5` : undefined,
+        +    filters.tool ? `${labels.tool}: ${filters.tool}` : undefined,
+        +    filters.verifiedStatus ? `${labels.verified}: ${statusLabel(filters.verifiedStatus)}` : undefined,
+        +    filters.installableOnly ? labels.installableOnly : undefined
+           ].filter((item): item is string => Boolean(item));
+         
+           function setFilter(key: keyof AgentFilters, value: string) {
+        @@ -63,7 +69,7 @@ export function AgentSearchPanel({
+                 <input
+                   value={query}
+                   onChange={(event) => setQuery(event.target.value)}
+        -          placeholder="Search by name, role, task, tag, or tool..."
+        +          placeholder={labels.placeholder}
+                   className="h-12 w-full rounded-lg border border-line bg-panel pl-10 pr-4 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20"
+                 />
+               </label>
+        @@ -76,23 +82,33 @@ export function AgentSearchPanel({
+                     onChange={(event) => setFilters((current) => ({ ...current, installableOnly: event.target.checked }))}
+                     className="h-4 w-4 accent-sky-400"
+                   />
+        -          Installable only
+        +          {labels.installableOnly}
+                 </label>
+        -        <FilterRow title="Role" values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+        -        <FilterRow title="Category" values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+        -        <FilterRow title="Difficulty" values={difficulties} active={filters.difficulty} onSelect={(value) => setFilter("difficulty", value)} />
+        -        <FilterRow title="Automation" values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
+        -        <FilterRow title="Tool" values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
+        -        <FilterRow title="Verified" values={statuses} active={filters.verifiedStatus} onSelect={(value) => setFilter("verifiedStatus", value)} />
+        +        <FilterRow title={labels.role} values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+        +        <FilterRow title={labels.category} values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+        +        <FilterRow
+        +          title={labels.difficulty}
+        +          values={difficulties}
+        +          active={filters.difficulty}
+        +          onSelect={(value) => setFilter("difficulty", value)}
+        +          label={difficultyLabel}
+        +        />
+        +        <FilterRow title={labels.automation} values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
+        +        <FilterRow title={labels.tool} values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
+        +        <FilterRow
+        +          title={labels.verified}
+        +          values={statuses}
+        +          active={filters.verifiedStatus}
+        +          onSelect={(value) => setFilter("verifiedStatus", value)}
+        +          label={statusLabel}
+        +        />
+               </div>
+         
+               <div className="rounded-lg border border-line bg-panel/45 p-4">
+                 <div className="flex flex-col gap-3 text-sm text-secondary sm:flex-row sm:items-center sm:justify-between">
+        -          <span>
+        -            Showing <span className="font-semibold text-primary">{results.length}</span> of {agents.length} agents
+        -          </span>
+        +          <span>{formatCount(labels.showing, { shown: results.length, total: agents.length })}</span>
+                   <button type="button" onClick={clearAll} className="self-start text-sky-200 transition hover:text-primary sm:self-auto">
+        -            Clear all
+        +            {labels.clearAll}
+                   </button>
+                 </div>
+                 {activeFilters.length ? (
+        @@ -104,15 +120,13 @@ export function AgentSearchPanel({
+                     ))}
+                   </div>
+                 ) : null}
+        -        <p className="mt-3 text-xs text-muted">
+        -          Search includes agent metadata, tools, prompt context, and Korean real-use-case scenarios.
+        -        </p>
+        +        <p className="mt-3 text-xs text-muted">{labels.searchScope}</p>
+               </div>
+         
+               <div className="flex items-center justify-between text-sm text-secondary">
+        -        <span>{results.length} agents</span>
+        +        <span>{formatCount(labels.resultCount, { count: results.length })}</span>
+                 <button type="button" onClick={() => setFilters({})} className="text-sky-200 transition hover:text-primary">
+        -          Clear filters only
+        +          {labels.clearFilters}
+                 </button>
+               </div>
+         
+        @@ -121,6 +135,19 @@ export function AgentSearchPanel({
+           );
+         }
+         
+        +// Fills {name} placeholders in a dictionary string, highlighting the {shown} count as the old markup did.
+        +function formatCount(template: string, values: Record<string, number>) {
+        +  return template.split(/(\{\w+\})/).map((part, index) => {
+        +    const key = part.match(/^\{(\w+)\}$/)?.[1];
+        +    if (!key || !(key in values)) return part;
+        +    return (
+        +      <span key={index} className={key === "shown" ? "font-semibold text-primary" : undefined}>
+        +        {values[key]}
+        +      </span>
+        +    );
+        +  });
+        +}
+        +
+         function FilterRow({
+           title,
+           values,
+        diff --git a/src/components/common/badge.tsx b/src/components/common/badge.tsx
+        index 6ae4c5a..1eeb087 100644
+        --- a/src/components/common/badge.tsx
+        +++ b/src/components/common/badge.tsx
+        @@ -1,4 +1,7 @@
+        -import { cn, formatStatus, titleCase } from "@/lib/utils";
+        +import { defaultLocale, type Locale } from "@/i18n/config";
+        +import { getDictionary } from "@/i18n/dictionaries";
+        +import { cn } from "@/lib/utils";
+        +import type { Difficulty, VerifiedStatus } from "@/types/agent";
+         
+         type BadgeProps = {
+           children: React.ReactNode;
+        @@ -23,12 +26,12 @@ export function Badge({ children, tone = "default", className }: BadgeProps) {
+           );
+         }
+         
+        -export function DifficultyBadge({ difficulty }: { difficulty: string }) {
+        +export function DifficultyBadge({ difficulty, locale = defaultLocale }: { difficulty: Difficulty; locale?: Locale }) {
+           const tone = difficulty === "advanced" ? "warning" : difficulty === "intermediate" ? "accent" : "default";
+        -  return <Badge tone={tone}>{titleCase(difficulty)}</Badge>;
+        +  return <Badge tone={tone}>{getDictionary(locale).agentMeta.difficulty[difficulty]}</Badge>;
+         }
+         
+        -export function StatusBadge({ status }: { status: string }) {
+        +export function StatusBadge({ status, locale = defaultLocale }: { status: VerifiedStatus; locale?: Locale }) {
+           const tone = status === "expert" || status === "tested" ? "success" : status === "community" ? "accent" : "default";
+        -  return <Badge tone={tone}>{formatStatus(status)}</Badge>;
+        +  return <Badge tone={tone}>{getDictionary(locale).agentMeta.status[status]}</Badge>;
+         }
+        ```
+
+        I did not paste dictionaries.ts; assume it adds agentMeta.difficulty, agentMeta.status, and agentSearch.{search, role, category, difficulty, automation, tool, verified, installableOnly, placeholder, showing, clearAll, clearFilters, searchScope, resultCount} for both locales, with `showing` = "Showing {shown} of {total} agents" / "{total}개 중 {shown}개 표시".
+
+        Give me prioritized findings with severity and file references, test gaps, and open questions.
+      expectedOutputSummary: A prioritized review of the pasted agent-search-panel.tsx and badge.tsx diff that gets the formatCount and label-lookup logic right, flags the unmentioned statuses reorder, identifies test gaps for /ko rendering and dictionary coverage, and does not present unconfirmed issues as bugs.
+      sampleOutput: |-
+        # PR #19 review: Korean badges, cards, and agent search panel
+
+        ## Verdict
+
+        **Approve once you've checked one thing.** The diff does what the requirement asks, and I found no correctness bug in the code you pasted. The main risk is in the parts I can't see. Both badges and the search panel quietly fall back to English when nobody passes `locale`. Typecheck can't catch a missed call site, and neither can build or the current tests. So the requirement ("no English on /ko") hasn't been proven met yet. Check #1 below before you merge. The rest can go in this PR or a follow-up.
+
+        ## Assumptions
+
+        - `getDictionary` is synchronous and safe to import into a client component. It works that way in `badge.tsx`, and the build passed.
+        - `dictionaries.ts` types `ko` against `en` (or a shared type), so a key missing from one locale fails typecheck.
+        - `agentMeta.difficulty` and `agentMeta.status` are typed as `Record<Difficulty, string>` and `Record<VerifiedStatus, string>`, or something equally strict.
+        - `AgentSearchPanel` destructures `locale = defaultLocale`. That line isn't in the diff, but `defaultLocale` was already imported.
+
+        ## Findings, in priority order
+
+        ### 1. High: the English fallback can hide call sites that never got a locale
+        **Files:** `src/components/common/badge.tsx` (both badges), `src/components/agents/agent-search-panel.tsx` (the `locale?: Locale` prop), and the card render path
+
+        - `DifficultyBadge` and `StatusBadge` both have `locale = defaultLocale`. Any caller that doesn't pass `locale` still compiles and renders English on `/ko`, the exact bug this PR is fixing.
+        - **The specific gap:** `agent-grid.tsx` isn't one of the 9 changed files. `AgentSearchPanel` renders `AgentGrid`, and `AgentGrid` renders `AgentCard`, which now needs a locale to translate its badges. That line is unchanged context between the diff hunks. So the cards in the search results only come out in Korean if `AgentGrid` already accepted a `locale` and passed it on. Confirm that it does. If it doesn't, the cards on `/ko/agents` still show English badges.
+        - The same applies to any grid, list, or other page that renders `WorkflowCard`, `AgentCard`, or the badges and isn't in this PR (for example workflow detail pages, starter packs, or a compare view). You wrote "the two pages that render badges". Confirm with `grep -rn "DifficultyBadge\|StatusBadge\|<AgentCard\|<WorkflowCard\|<AgentGrid" src/`.
+
+        **Fix:** make `locale` **required** on `DifficultyBadge`, `StatusBadge`, `AgentCard`, `WorkflowCard`, `AgentGrid`, and `AgentSearchPanel`. Every page already has `locale` from `params`, so this costs very little. Typecheck will then catch every call site that doesn't pass it. It's the strongest guarantee you can get for this requirement.
+
+        ### 2. Medium: a filter value with no label shows as the text "undefined"
+        **File:** `agent-search-panel.tsx`, the `difficultyLabel` and `statusLabel` helpers
+
+        ```ts
+        const difficultyLabel = (value: string) => meta.difficulty[value as Difficulty];
+        ```
+        The `as` cast gets past the type checker, but at runtime an unknown value returns `undefined`. The active-filter chip would then read `난이도: undefined`. The old `titleCase` path always printed something.
+        - Clicking a filter can't trigger this, because those values come from the typed arrays.
+        - Seeding filters from the URL (`useSearchParams`, e.g. `?difficulty=Beginner` or a stale link), or adding a new status to the type without a dictionary entry, can trigger it.
+
+        **Fix:** `meta.difficulty[value as Difficulty] ?? titleCase(value)`, and the same for status. It's one line each.
+
+        ### 3. Low: the Verified filter chips are now in a different order
+        **File:** `agent-search-panel.tsx`, the `statuses` array
+
+        `["unverified", "tested", "community", "expert"]` became `["unverified", "community", "tested", "expert"]`. The new order may be deliberate (least trust to most). Either way it's a visible UI change that the requirement doesn't mention. Keep it if you meant it and say so in the PR description. Otherwise revert it so this PR only covers the translation.
+
+        ### 4. Low: `formatCount` has no tests and lives inside a component file
+        **File:** `agent-search-panel.tsx`, the `formatCount` function
+
+        The logic is correct:
+        - `split` with a capture group keeps the placeholders in the output.
+        - Only the `<span>` elements need React keys, and they have them.
+        - It still highlights `{shown}` the way the old markup did.
+        - It works for the Korean word order (`{total}개 중 {shown}개 표시`).
+
+        Two gaps:
+        - It has no tests.
+        - An unknown placeholder or a typo in a dictionary string (`{shwon}`) renders the raw text without any error.
+
+        Consider moving it to `src/lib/` (e.g. `format-template.tsx`) and adding 3–4 unit tests: both locale templates, a missing key, and no placeholders.
+
+        ### 5. Nit: plural and singular
+        English `resultCount` / `showing` will read "1 agents". The old strings had the same problem, so this isn't a regression. Korean doesn't need a plural form. If you want the English fixed, add a separate `resultCountOne` key or use `Intl.PluralRules`. Not for this PR.
+
+        ### 6. Nit: both locales' dictionaries are now in the client bundle
+        Importing `getDictionary` into `AgentSearchPanel` (a client component) ships the full `en` and `ko` dictionaries to the browser. That's fine at the current size. If the dictionary grows, pass just the `agentSearch` and `agentMeta` groups as props from the server page instead.
+
+        ## Test gaps
+
+        1. **Nothing checks the rendered /ko output.** Your checks show the code compiles. They don't show that `/ko` is actually in Korean. For a cheap check, after `npm run build`, grep the exported HTML for leftover English:
+           ```bash
+           grep -lE "Installable only|Clear all|Beginner|Intermediate|Advanced|Unverified" out/ko/**/*.html
+           ```
+           Caveat: the search panel uses `useSearchParams`, so it probably sits behind a Suspense boundary and only renders on the client. Its text may not be in the static HTML at all. Check it by hand in `npm run dev` at `/ko/agents`. The grep still covers the badges on cards and detail pages.
+        2. **Label coverage.** Add a unit test that every `Difficulty` and every `VerifiedStatus` value has a non-empty label in both `en` and `ko`. If the dictionary is already typed as a `Record`, typecheck covers most of this. Skip the test only if you've confirmed that typing.
+        3. **`formatCount`** (see finding 4).
+        4. **Badge rendering.** Add a small test that `StatusBadge` with `locale="ko"` renders the Korean label, so a later refactor can't quietly bring back English.
+
+        ## Open questions
+
+        1. Does `AgentGrid` already accept and pass on `locale`? That decides whether finding 1 is a real bug or only a hardening suggestion.
+        2. Are search filters (not just the query) ever seeded from the URL? That decides how urgent finding 2 is.
+        3. Was the reordering of `statuses` intentional?
+        4. Are there other components or pages that render the badges or cards, beyond the two pages in the PR?
+
+        ## Next steps
+
+        | # | Action | Blocks merge? |
+        |---|--------|---------------|
+        | 1 | Confirm that `AgentGrid` and every badge and card caller pass `locale`. Ideally make `locale` required. | **Yes** |
+        | 2 | Add a `?? titleCase(value)` fallback to `difficultyLabel` and `statusLabel` | Should fix |
+        | 3 | Load `/ko/agents` and a `/ko` agent detail page and look for English | Should do |
+        | 4 | Confirm or revert the `statuses` reorder, and note it in the PR description | Small |
+        | 5 | Move `formatCount` to `src/lib/` and test it. Add a test for label coverage in both locales. | Follow-up is OK |
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: PR Review Agent boundary run
-      input: Judge whether a large refactor is safe from a prose summary without seeing the diff.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Accurate on the diff. It correctly spots that `statuses` changed from [unverified, tested, community, expert] to [unverified, community, tested, expert], an unmentioned UI change. Its reading of formatCount is correct: the capture-group split, keys only on spans, the {shown} highlight, and Korean word order."
+        - Finding 1 (High, marked merge-blocking) asks whether AgentGrid forwards locale. It is honestly framed as unconfirmed ('Confirm that it does'), but the merged src/components/agents/agent-grid.tsx already passes locale to AgentCard, and a grep shows every DifficultyBadge/StatusBadge/AgentCard/WorkflowCard/AgentGrid call site passes locale. At best it is a hardening suggestion, so the severity is overstated. The 'make locale required' advice itself is sound.
+        - Finding 2 (Medium) on `meta.difficulty[value as Difficulty]` returning undefined is technically true of the cast. The agent admits clicks can't trigger it, but it still rates the finding Medium on the chance of URL seeding, which the code doesn't do (only `query` is read). It should be Low.
+        - Findings 6 and 5 are correct and properly scoped. getDictionary in a client component ships both locales. The plural issue exists but the agent correctly notes it is not a regression, since the old strings already said '{n} agents'.
+        - "One test-gap caveat is inaccurate. The search panel's text is in the static HTML because the Suspense fallback renders AgentSearchPanel. Otherwise the test gaps are relevant: rendered /ko output, label coverage in both locales, and badge rendering. Assumptions, open questions, and next actions are cleanly separated and can be pasted into a ticket."
+    - title: Review request with only a one-line description and no diff
+      input: Can you review my PR? It refactors the auth middleware and switches session storage from cookies to localStorage. Tests pass. Is it safe to merge today?
+      expectedOutputSummary: Notes that no diff was provided, flags moving sessions from cookies to localStorage as a serious XSS/HttpOnly regression that 'tests pass' does not address, advises against merging today, lists what to check in the middleware refactor, and asks for the diff, framework, and the reason for the switch.
+      sampleOutput: |-
+        I can't see your PR yet. No diff, link, or code came through, so I can't review the actual changes. Your description is enough for a verdict on the design, though.
+
+        ## Short answer: no, don't merge today
+
+        Passing tests don't settle this. Tests check that auth *works*. They almost never check that the session is protected from an attacker. The storage switch is the problem, and it would still be a problem if the refactor itself were perfect.
+
+        ## Blocking issue (P0): session tokens in localStorage
+
+        **Why it's a regression:**
+        - **XSS becomes account takeover.** Any JavaScript running on your origin can read `localStorage`. That includes an injected script, a compromised npm dependency, a third-party analytics tag, or a browser extension. An `HttpOnly` cookie can't be read by JS at all. With localStorage, one XSS bug lets an attacker copy the token and use it from their own machine until it expires.
+        - **You lose cookie protections.** `HttpOnly`, `Secure`, `SameSite`, and cookie scoping by path and domain don't exist for localStorage.
+        - **Server-side control gets weaker.** If the token is a long-lived JWT with no server-side session record, you can't reliably revoke a stolen one.
+        - **New work you now own.** The client has to attach the token by hand, usually in an `Authorization` header. That affects SSR, file downloads, `<img>` and `<a>` requests, and WebSockets. Logout also has to clear state across tabs.
+
+        **What you'd gain:** mostly less CSRF exposure, and some convenience for cross-origin APIs or non-browser clients. Both are solvable without leaving cookies behind. For CSRF, use `SameSite=Lax` or `Strict` plus a CSRF token. For cross-origin APIs, use credentialed CORS or a BFF (backend-for-frontend) pattern.
+
+        **Recommendation:** keep sessions in `HttpOnly; Secure; SameSite=Lax` (or `Strict`) cookies. If there's a hard requirement behind the switch, tell me what it is and I'll suggest the least risky way to meet it, such as short-lived access tokens held in memory with an HttpOnly refresh cookie.
+
+        ## High-risk area (P1): the auth middleware refactor
+
+        Changing middleware plus storage in one PR makes it hard to review and hard to roll back. Once I have the diff, I'll check:
+        1. **Fail-closed behavior.** A missing, malformed, or expired token, or a thrown error, must reject the request, not fall through to `next()`.
+        2. **Route coverage.** Every route that was protected before is still protected. Watch for changes in route order, path matching, trailing slashes, and HTTP method handling (e.g. `OPTIONS`/`HEAD`).
+        3. **Token validation.** Signature check, algorithm allowlist (no `alg: none`), expiry, issuer and audience, and validation that doesn't depend on the client.
+        4. **Authorization vs. authentication.** Role and permission checks still run after identity is confirmed.
+        5. **Session lifecycle.** Rotation on login and privilege change, invalidation on logout, and no session fixation.
+        6. **Error handling and logging.** No tokens or PII in logs, and generic 401/403 responses.
+        7. **Migration.** What happens to users who are logged in with the old cookie when you deploy? Silent logout, a broken state, or a redirect loop?
+
+        ## Tests (P1)
+
+        Useful questions to ask of "tests pass":
+        - Are there **negative** tests (no token, expired, tampered signature, wrong audience, revoked session) or only happy paths?
+        - Is there a test showing that every protected route rejects anonymous requests?
+        - Does anything cover the old-cookie to new-storage transition?
+
+        ## Assumptions
+
+        - This is a browser-based web app, not a native or CLI client. For those, localStorage vs. cookies works differently.
+        - "Session" means a bearer credential that grants account access.
+        - There's no strict CSP and no dependency hardening that would substantially lower XSS risk. Even with those in place, I'd still block the storage change.
+
+        ## Next actions
+
+        1. **Split the PR.** Ship the middleware refactor alone, with cookie storage unchanged, once it passes the review above.
+        2. **Pull or rework the localStorage change.** Write down the requirement driving it, then pick a cookie-based or hybrid design.
+        3. **Add negative auth tests** and a test that covers every route.
+        4. **Plan the rollout.** Use a feature flag or staged deploy, have a rollback path, and decide how existing sessions will be handled.
+        5. **Send me the diff** (or the middleware file plus the session-storage changes) for a line-by-line review.
+
+        To give a final verdict on the middleware, I need:
+        - the diff
+        - the framework you're using (Express, Next.js, Django, etc.)
+        - why you want to move away from cookies
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Opens by stating the missing input: 'No diff, link, or code came through'. It then gives a design-level verdict instead of stalling."
+        - The P0 reasoning is correct and specific. localStorage is readable by any script on the origin, so an XSS bug becomes account takeover. The switch also loses HttpOnly, Secure, and SameSite protection, and it creates new work for SSR, downloads, WebSockets, and cross-tab logout.
+        - "Offers realistic alternatives: SameSite plus a CSRF token, a BFF, or in-memory access tokens with an HttpOnly refresh cookie. It also asks why the team wants the switch."
+        - The middleware checklist (fail-closed, route coverage, alg allowlist, session fixation, migration of existing cookie sessions) and the negative-test questions are concrete next steps. The recommendation to split the PR is practical.
+        - Assumptions are stated explicitly (browser app, bearer session, no strict CSP), but the answer is long for a request with no code. A few of the P1 checks are generic auth-review boilerplate.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Reviewing concrete diffs for correctness, regression risk, and missing tests
@@ -194,5 +830,5 @@ decisionGuide:
 relatedAgents:
   - bug-root-cause-analyst
   - readme-generator
-verifiedStatus: expert
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29

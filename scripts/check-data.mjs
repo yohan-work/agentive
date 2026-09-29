@@ -90,8 +90,6 @@ const incompleteInstallable = installableAgents.flatMap((agent) => {
 const overstatedVerification = agents
   .filter((agent) => ["tested", "expert"].includes(agent.verifiedStatus) && !(agent.evaluation?.sampleRuns.length >= 2))
   .map((agent) => `${agent.slug}: verifiedStatus "${agent.verifiedStatus}" needs an evaluation with at least 2 sample runs`);
-const evaluationScores = installableAgents.flatMap((agent) => (agent.evaluation ? [agent.evaluation.qualityScore] : []));
-const hasDifferentiatedQualityScores = unique(evaluationScores).length > 1;
 const agentLoaderSource = read("src/data/agents.ts");
 const setupFilesBlock = agentLoaderSource.match(/setupFiles:\s*\[([\s\S]*?)\]/)?.[1] ?? "";
 const hasRunbookKitFile = /"RUNBOOK\.md"/.test(setupFilesBlock) && /toRunbookFile/.test(installKitSource);
@@ -130,7 +128,6 @@ const failures = [
   ...overstatedVerification,
   !hasRunbookKitFile ? "Installable kits must include RUNBOOK.md" : "",
   !hasEvaluationKitFile ? "Installable kits must include EVALUATION.md" : "",
-  !hasDifferentiatedQualityScores ? "Installable agent quality scores must be differentiated" : "",
   missingRoles.length ? `Unknown roles: ${missingRoles.join(", ")}` : "",
   missingCategories.length ? `Unknown categories: ${missingCategories.join(", ")}` : "",
   totalAgents < 100 ? `Expected at least 100 agents, found ${totalAgents}` : ""

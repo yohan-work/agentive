@@ -35,8 +35,251 @@ outputs:
   - Risks
   - Recommended next actions
 prompt: You are Security Checklist Agent. Convert the user's context into a practical security checklist. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
-exampleInput: 사용자 입력 폼과 API route를 배포하기 전 점검하는 상황
-exampleOutput: A structured security checklist with practical recommendations, tradeoffs, and next steps.
+exampleInput: |-
+  배포 전 보안 점검 체크리스트가 필요합니다. 보안 담당자가 없는 오픈소스 프로젝트라 메인테이너(저) 혼자 PR 템플릿에 붙여서 확인할 용도예요.
+
+  프로젝트: Agent Archive — https://yohan-work.github.io/agentive/ . Next.js 16 App Router, `output: "export"`로 완전 정적 HTML 생성 후 GitHub Pages에 배포. 서버/DB/로그인 없음. GitHub Actions: CI(npm ci → schema 검사 → check:data → lint → typecheck → test → build), Deploy(CI 성공 후 main push일 때만 Pages 배포, permissions: contents read, pages write, id-token write). Dependabot 사용(minor/patch 그룹, breaking major는 제외).
+
+  점검 대상:
+  1. 에이전트 콘텐츠: content/agents/*.yaml 101개(외부 기여자가 PR로 추가). 빌드 시 JSON Schema(ajv)로 검증하고 src/data/generated/agents.ts로 번들. 에이전트 prompt, 설명, 예시 입력 등 긴 텍스트가 페이지에 렌더되고, 설치 키트 파일(AGENTS.md, CLAUDE.md, Cursor .mdc 규칙)에도 그대로 들어갑니다. 사용자들은 이 파일을 curl로 받아 자기 저장소의 AGENTS.md/CLAUDE.md에 붙입니다.
+  2. 키트 route handler: src/app/kits/[slug]/[file]/route.ts — `dynamic = "force-static"`, `dynamicParams = false`, generateStaticParams로 slug×파일 조합을 빌드 시 생성. GET은 agents에서 slug로 찾아 `new Response(kitFile.content, { headers: { "Content-Type": kitFile.mimeType } })` 반환, 없으면 404.
+  3. 에이전트 제출 폼(/submit): 클라이언트에서 입력값(이름, 요약, 프롬프트 등 11개 필드)을 URLSearchParams로 만들어 `github.com/yohan-work/agentive/issues/new?template=new-agent.yml&...` 를 `window.open(url, "_blank", "noopener,noreferrer")`로 엽니다. URL이 7000자를 넘으면 가장 긴 필드를 잘라냄.
+  4. 북마크: localStorage 키 `agent-archive:bookmarks`에 slug 배열 JSON 저장, 파싱 실패 시 빈 배열.
+  5. 상단 검색: `/agents?query=...`를 클라이언트 useSearchParams로 읽어 input value로만 사용.
+  6. sitemap.xml / robots.txt 빌드 시 생성.
+
+  알고 싶은 것: 입력 처리, XSS/주입, 공급망(의존성, 외부 기여 YAML, 설치 키트를 통한 프롬프트 인젝션), 비밀값, GitHub Actions 권한, 로깅/데이터 노출, 보안 헤더(GitHub Pages라 커스텀 헤더 불가) 관점의 체크리스트. 각 항목에 확인 방법과 통과 기준을 넣어 주세요. 가정과 리스크, 다음 액션도요.
+exampleOutput: |-
+  # Agent Archive 배포 전 보안 점검 체크리스트
+
+  주신 정보로 체크리스트를 만들 수 있어서 추가 질문은 드리지 않았습니다. 확인하지 못한 부분은 아래 **가정**에 적었으니, 사실과 다른 항목이 있으면 해당 체크 항목만 조정하시면 됩니다.
+
+  구성은 다음과 같습니다.
+  1. 가정
+  2. 영역별 체크리스트 (확인 방법 / 통과 기준, 우선순위 P0~P2)
+  3. PR 템플릿에 붙일 압축본
+  4. 리스크
+  5. 다음 액션
+
+  ---
+
+  ## 1. 가정
+
+  - **A1.** 서드파티 스크립트(애널리틱스, 광고, 댓글 위젯)와 외부 폰트·CDN 스크립트를 쓰지 않습니다.
+  - **A2.** 사이트에 영향을 주는 빌드 시 환경변수나 시크릿이 없습니다. Deploy는 GitHub 기본 `GITHUB_TOKEN`과 OIDC(`id-token`)만 사용합니다.
+  - **A3.** 이슈를 YAML이나 PR로 자동 변환하는 봇이나 워크플로가 없습니다. 이슈 내용은 메인테이너가 손으로 옮깁니다.
+  - **A4.** 에이전트 텍스트(prompt, 설명, 예시)는 React 텍스트 노드로 렌더되며, HTML을 허용하는 마크다운 렌더러를 쓰지 않습니다. 이 가정이 틀리면 XSS 항목이 P0로 올라갑니다.
+  - **A5.** YAML에 URL 필드(출처, 작성자 링크 등)가 있고, 이 값이 `<a href>`로 렌더됩니다.
+  - **A6.** 기본 도메인 `yohan-work.github.io`를 사용하며 커스텀 도메인은 없습니다.
+  - **A7.** 저장소는 public이고, 외부 기여자는 fork에서 PR을 보냅니다.
+
+  ---
+
+  ## 2. 영역별 체크리스트
+
+  ### 2-1. 외부 기여 YAML과 입력 검증 (공급망 1: 콘텐츠)
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | C1 | P0 | 스키마가 엄격한가 | `schema/agent.schema.json`에서 루트와 중첩 객체의 `additionalProperties`를 확인 | 모든 객체가 `additionalProperties: false`이고, 모든 문자열 필드에 `maxLength`가 있음 (예: prompt 20k, 요약 300) |
+  | C2 | P0 | slug와 파일명 형식 | 스키마의 `slug` 패턴을 확인하고, `check:data`가 파일명과 slug가 같은지 검사하는지 확인 | `^[a-z0-9]+(-[a-z0-9]+)*$`. `/`, `..`, `.`, 대문자, 공백이 불가능해야 함. 파일명과 slug가 같아야 함 |
+  | C3 | P0 | URL 필드 스킴 제한 | 스키마에서 URL 필드의 `format`/`pattern` 확인. 테스트용 YAML에 `javascript:alert(1)`을 넣고 `npm run check:data` 실행 | `^https://` 패턴이 있어 `javascript:`, `data:`, `http:`가 검증에서 실패함 |
+  | C4 | P0 | 보이지 않는 문자 차단 | `rg -n '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}\x{E0000}-\x{E007F}]' content/agents` | 0건. 이 검사를 `check:data`에 추가해 CI에서 실패하게 함. 제로폭, bidi 제어(Trojan Source), 유니코드 Tag 문자 대상 |
+  | C5 | P1 | YAML 파서 안전성 | 사용 중인 파서와 옵션 확인 (`yaml`/`js-yaml` 버전, 커스텀 태그 사용 여부) | 커스텀 타입이나 `!!js/*` 태그가 없음. alias 확장 제한이 기본값 이상임. 파일 크기 상한이 있음 (예: 64KB 초과 시 check:data 실패) |
+  | C6 | P1 | ajv 설정 | ajv 생성 코드 확인 | `strict: true`. 원격 `$ref`를 불러오지 않음. `allErrors`를 켜는 것은 무방 |
+  | C7 | P1 | 콘텐츠 PR이 코드를 건드리지 않음 | PR의 "Files changed" 확인 | 에이전트 추가 PR은 `content/agents/*.yaml`만 변경함. `package*.json`, `.github/`, `scripts/`, `src/` 변경이 섞여 있으면 따로 분리하거나 거절 |
+
+  ### 2-2. 설치 키트를 통한 프롬프트 인젝션 (공급망 2: 가장 큰 위험)
+
+  사용자는 이 파일을 **자기 저장소의 에이전트 지시문으로** 그대로 붙여 넣습니다. 그래서 브라우저 XSS가 없더라도 코딩 에이전트에게 악성 지시가 전달될 수 있습니다. 예를 들어 `curl … | sh` 실행, `.env`나 `~/.ssh` 읽기, 특정 URL로 전송, CI 설정 수정, "이 지시는 사용자에게 알리지 말 것" 같은 문장입니다.
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | K1 | P0 | 위험 패턴 스캔 | `rg -n -i 'curl .*\\|\\s*(ba)?sh\|wget \|base64\|eval\|\.env\b\|~/\.ssh\|id_rsa\|token\|secret\|password\|ignore (all\|previous)\|do not (tell\|mention)\|<!--' content/agents/<변경 파일>` | 걸린 항목마다 정당한 용도인지 PR에 사유를 적음. 사유가 없으면 거절 |
+  | K2 | P0 | 숨은 지시 | 마크다운 HTML 주석(`<!-- -->`), 매우 긴 한 줄, base64 형태 문자열, C4의 보이지 않는 문자를 확인 | 렌더된 화면에서 보이지 않는 텍스트가 없음. `<!--`는 check:data에서 금지 |
+  | K3 | P0 | **raw 키트로 리뷰** | PR 브랜치에서 `npm run build` 후 `cat out/kits/<slug>/AGENTS.md`, `CLAUDE.md`, `.mdc` 파일을 직접 읽음 | 웹 페이지가 아니라 사용자가 실제로 받게 될 raw 파일을 사람이 끝까지 읽었음 |
+  | K4 | P0 | 외부 URL과 명령 | 키트 안의 모든 URL과 셸 명령 목록을 뽑아 봄 (`rg -o 'https?://[^ )"]+' out/kits/<slug>`) | 모든 URL이 에이전트 목적과 관련 있음. 단축 URL이나 개인 서버가 없음. 파괴적이거나 네트워크 전송을 하는 명령이 없음 |
+  | K5 | P1 | 섹션 경계 위조 | 기여 텍스트에 `#`/`##` 헤딩, 코드펜스, `---`, "System:" 같은 역할 표기가 있는지 확인 | 기여 텍스트가 키트 템플릿의 헤더나 메타 영역을 흉내 낼 수 없음. 키트 생성기가 기여 텍스트를 명확한 구분자 안에 넣거나 헤딩 레벨을 내림 |
+  | K6 | P1 | 출처 표시 | 생성된 키트의 머리말 확인 | slug, 소스 파일 경로, 커밋 SHA 또는 빌드 날짜, `verifiedStatus`, "외부 기여 콘텐츠이니 붙이기 전에 읽어 보세요" 안내가 들어 있음 |
+  | K7 | P1 | 사용자 안내 | 키트 다운로드 UI와 README의 curl 예시 확인 | "붙이기 전에 내용 검토"와 "특정 커밋에 고정된 raw URL 사용법"이 안내되어 있음 |
+  | K8 | P2 | 기존 101개 일괄 점검 | K1, K2, C4 스캔을 전체 `content/agents`에 1회 실행 | 걸린 항목을 모두 처리하거나 사유를 기록함 |
+
+  ### 2-3. XSS와 렌더링
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | X1 | P0 | 위험 API 사용 여부 | `rg -n 'dangerouslySetInnerHTML\|innerHTML\|outerHTML\|insertAdjacentHTML\|document\.write\|new Function\|eval\(' src` | 0건. 있다면 각 위치의 입력이 빌드 시 상수이거나 sanitize된 값임을 증명할 수 있음 |
+  | X2 | P0 | 마크다운/HTML 렌더러 | `rg -n 'rehype-raw\|allowDangerousHtml\|marked\|markdown-it\|remark' src package.json` | HTML 통과 옵션이 없음. 쓴다면 `rehype-sanitize` 같은 허용목록 기반 sanitize를 적용함 |
+  | X3 | P0 | href 렌더링 | 외부 링크 컴포넌트 확인 + C3 | 스키마에서 https만 허용함(C3). `target="_blank"`에는 `rel="noopener noreferrer"`(필요하면 `ugc nofollow`)가 붙어 있음 |
+  | X4 | P1 | JSON-LD 등 인라인 스크립트 | `rg -n 'application/ld\+json\|<script' src` | 사용한다면 `JSON.stringify` 결과의 `<`를 `<`로 치환해 `</script>`로 탈출할 수 없음 |
+  | X5 | P1 | 메타데이터 주입 | `generateMetadata`에서 YAML 텍스트를 title/description/OG에 쓰는지 확인 | Next 메타데이터 API로만 출력함(자동 이스케이프). 문자열을 이어 붙여 태그를 만들지 않음 |
+  | X6 | P1 | 빌드 산출물 스모크 테스트 | 테스트용 YAML에 `<img src=x onerror=alert(1)>`, `</script><script>alert(1)</script>`, `{{7*7}}`을 넣고 빌드한 뒤 해당 페이지 HTML을 확인 | 모든 페이로드가 `&lt;` 등으로 이스케이프되어 텍스트로만 보임. 확인 후 테스트 파일은 삭제 |
+
+  ### 2-4. 키트 route handler (`src/app/kits/[slug]/[file]/route.ts`)
+
+  중요한 점이 하나 있습니다. **GitHub Pages는 route handler가 설정한 `Content-Type` 헤더를 쓰지 않습니다.** 정적 export된 파일을 **확장자 기준으로** 서빙합니다. 따라서 코드의 `mimeType`보다 산출물의 파일명과 확장자가 실제 동작을 결정합니다.
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | R1 | P0 | 파일명 허용목록 | `generateStaticParams`에서 `file` 값의 출처 확인 | `file`은 코드에 하드코딩된 고정 목록(예: `AGENTS.md`, `CLAUDE.md`, `<slug>.mdc`)에서만 나옴. YAML 값으로 파일명이 결정되지 않음 |
+  | R2 | P0 | 산출물에 HTML/SVG 없음 | `find out/kits -type f \| sed 's/.*\.//' \| sort \| uniq -c` | 확장자가 `md`/`mdc`(또는 `txt`)뿐임. `.html`/`.htm`/`.svg`/`.xml`이 없음 |
+  | R3 | P0 | 경로 탈출 없음 | `find out/kits -mindepth 2 -maxdepth 2 -type d \| wc -l`과 에이전트 수 비교. C2 통과 여부 | 디렉터리 수가 에이전트 수와 같고, 모든 파일이 `out/kits/<slug>/` 아래에만 있음 |
+  | R4 | P1 | 배포 후 실제 헤더 | `curl -sI https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`와 `.mdc` 파일 | `content-type`이 `text/html`이 아님(`text/markdown`, `text/plain`, `application/octet-stream`은 허용). `x-content-type-options: nosniff`가 붙는지도 기록 |
+  | R5 | P2 | 404 동작 | 존재하지 않는 slug로 `curl -sI` | 404 반환. 다른 에이전트 키트가 반환되지 않음 |
+
+  ### 2-5. 클라이언트 입력: 제출 폼, 북마크, 검색
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | F1 | P1 | 이슈 URL 고정 | 제출 폼 코드 확인 | 호스트, 경로, `template` 값이 상수임. 사용자 입력은 `URLSearchParams` 값으로만 들어감(문자열 연결 없음) |
+  | F2 | P1 | 잘라내기 안전성 | 7000자 초과 입력(이모지, 한글 포함)으로 테스트 | 서로게이트 쌍이 깨지지 않도록 코드포인트 단위(`Array.from`)로 자름. 잘렸다는 사실을 사용자에게 알림 |
+  | F3 | P1 | 민감정보 경고 | 폼 UI 확인 | "공개 GitHub 이슈로 올라갑니다. API 키, 내부 URL, 개인정보를 넣지 마세요" 문구가 있음 |
+  | F4 | P0 (A3이 틀린 경우) | 이슈 자동화 | `rg -n 'issues:\|github\.event\.issue' .github/workflows` | 이슈 트리거 워크플로가 없음. 있다면 `run:` 안에서 `${{ github.event.issue.* }}`를 직접 쓰지 않고 `env:`로 전달함(스크립트 인젝션 방지). 권한은 최소로 설정 |
+  | B1 | P2 | 북마크 파싱 | 북마크 코드 확인. DevTools에서 `localStorage.setItem('agent-archive:bookmarks','{"a":1}')`, `'[1,null,"../x"]'`, `'not json'`, 1MB 문자열을 넣은 뒤 새로고침 | 크래시가 없음. 배열이면서 slug 정규식을 통과하고 **실제 존재하는 slug**만 남김. `localStorage` 접근 자체도 try/catch로 감쌈(사파리 프라이빗 모드 등) |
+  | S1 | P1 | 검색어 사용처 | `rg -n 'useSearchParams\|new RegExp' src` | query가 input value와 텍스트 필터에만 쓰임. `href`, HTML, `RegExp`에 쓰인다면 이스케이프함. 길이 상한(예: 200자) 있음 |
+  | S2 | P2 | 하이라이트 | 검색 결과 하이라이트 구현이 있다면 확인 | 문자열을 split해서 React 노드로 렌더함. HTML 문자열을 만들지 않음 |
+
+  ### 2-6. 의존성 (공급망 3)
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | D1 | P0 | 알려진 취약점 | `npm audit --omit=dev` 및 `npm audit` | 프로덕션 의존성에 high/critical 0건. dev 의존성의 high 이상은 영향 분석을 기록함(정적 사이트라 대부분 빌드 시에만 영향) |
+  | D2 | P0 | lockfile 무결성 | `npm ci` 사용 확인. `rg -n '"resolved": "http' package-lock.json \| rg -v 'registry.npmjs.org'` | CI가 `npm ci`를 씀. 모든 resolved가 `https://registry.npmjs.org`임 |
+  | D3 | P1 | Dependabot 보안 업데이트 | 저장소 Settings → Code security에서 Dependabot alerts와 security updates가 켜져 있는지 확인. `dependabot.yml`의 `ignore` 확인 | 알림과 보안 업데이트가 켜져 있음. major 제외 규칙 때문에 **보안 패치가 필요한 major 업그레이드가 묻히지 않도록**, 알림 목록을 월 1회 직접 확인함 |
+  | D4 | P1 | Dependabot PR 리뷰 | Dependabot PR의 lockfile diff 확인 | 새로 추가된 transitive 패키지와 `install` 스크립트가 있는 패키지를 확인함. 자동 머지는 CI 통과 + patch/minor에만 허용 |
+  | D5 | P1 | Actions 의존성 | `rg -n 'uses:' .github/workflows \| rg -v '@[0-9a-f]{40}'` | 서드파티 액션은 커밋 SHA로 고정함(공식 `actions/*`도 권장). `dependabot.yml`에 `package-ecosystem: github-actions`가 있음 |
+  | D6 | P2 | Next.js 권고 추적 | Next.js 보안 권고 확인 | 해당 권고가 middleware, 이미지 최적화, 서버 액션 등 **서버 기능**에만 해당하면 정적 export에는 영향 없음으로 기록함. 빌드 도구나 클라이언트 런타임에 해당하면 업데이트 |
+
+  ### 2-7. GitHub Actions와 저장소 설정
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | G1 | P0 | fork PR에서 권한 상승 없음 | `rg -n 'pull_request_target\|workflow_run' .github/workflows` | CI는 `pull_request` 트리거임. `pull_request_target`에서 PR 코드를 checkout하는 곳이 없음 |
+  | G2 | P0 | **Deploy 트리거 조건** | Deploy 워크플로의 `on:`과 `if:` 확인 | `workflow_run`이라면 `conclusion == 'success'`, `event == 'push'`, `head_branch == 'main'`, **`head_repository.full_name == github.repository`** 를 모두 검사함. fork에도 `main`이라는 브랜치가 있을 수 있으므로 마지막 조건이 필요함. checkout은 `workflow_run.head_sha` 기준 |
+  | G3 | P0 | 최소 권한 | 각 워크플로 최상단과 job별 `permissions:` 확인 | CI는 `contents: read`만 가짐. `pages: write`와 `id-token: write`는 **deploy job에만** 있고 build job에는 없음 |
+  | G4 | P0 | Pages 환경 보호 | Settings → Environments → `github-pages` | Deployment branches가 `main`으로 제한되어 있음 |
+  | G5 | P0 | 기본 토큰 권한 | Settings → Actions → General | Workflow permissions가 "Read repository contents"임. "Allow GitHub Actions to create and approve pull requests"는 꺼져 있음 |
+  | G6 | P0 | 외부 기여자 워크플로 승인 | Settings → Actions → "Fork pull request workflows" | "Require approval for first-time contributors" 이상으로 설정됨. 승인 전에 `.github/`, `package*.json`, `scripts/` 변경이 있는지 확인 |
+  | G7 | P1 | checkout 자격증명 | `rg -n -A3 'actions/checkout' .github/workflows` | `persist-credentials: false`(push가 필요 없는 job) |
+  | G8 | P1 | 브랜치 보호 | Settings → Branches(또는 Rulesets) → main | PR 필수, CI 필수 체크(check:data, lint, typecheck, test, build), force push 금지. 1인 메인테이너라면 "관리자 우회"를 켜 두되, 우회는 기록이 남을 때만 사용 |
+  | G9 | P1 | CODEOWNERS | `.github/CODEOWNERS` 확인 | `.github/`, `package*.json`, `scripts/`, `src/lib/agent-install-kit.ts`, `schema/`에 소유자가 지정되어 있음 |
+  | G10 | P2 | 계정 보안 | GitHub 계정 설정 | 2FA(가능하면 패스키 또는 하드웨어 키)가 켜져 있음. 오래된 PAT와 불필요한 OAuth 앱을 정리함 |
+
+  ### 2-8. 비밀값
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | P1 | P0 | 저장소 스캔 | `gitleaks detect --source . --log-opts="--all"`(히스토리 포함) | 0건. 오탐은 `.gitleaksignore`에 사유와 함께 등록 |
+  | P2 | P0 | 빌드 산출물 스캔 | `rg -n 'ghp_\|github_pat_\|gho_\|sk-[A-Za-z0-9]\|AKIA[0-9A-Z]{16}\|BEGIN [A-Z ]*PRIVATE KEY' out content` | 0건. 기여 YAML의 예시 입력에 실제 키가 들어가는 경우를 막기 위함 |
+  | P3 | P1 | 클라이언트 번들 env | `rg -n 'process\.env' src` | `NEXT_PUBLIC_*` 외 값이 없음. `NEXT_PUBLIC_*` 값은 공개되어도 되는 것뿐임 |
+  | P4 | P1 | GitHub 기능 | Settings → Code security | Secret scanning과 Push protection이 켜져 있음(public 저장소는 무료) |
+  | P5 | P2 | 시크릿 목록 | Settings → Secrets and variables → Actions | 사용하지 않는 시크릿이 없음(A2 기준으로 비어 있는 것이 정상) |
+
+  ### 2-9. 로깅과 데이터 노출
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | L1 | P1 | 소스맵 | `find out -name '*.map' \| wc -l`, `next.config`의 `productionBrowserSourceMaps` | 0개(또는 공개해도 된다고 명시적으로 결정함). 오픈소스라 치명적이지는 않지만, 의도하지 않은 노출을 막기 위해 확인 |
+  | L2 | P1 | 기여자 개인정보 | 스키마의 author 계열 필드 확인 | 이메일이나 전화번호 필드가 없음. GitHub 핸들이나 공개 URL만 받음 |
+  | L3 | P1 | 빌드 로그 | 최근 CI/Deploy 로그 훑어보기 | env 덤프(`env`, `printenv`), 토큰, 내부 경로 이외의 민감정보가 출력되지 않음. public 저장소의 Actions 로그는 누구나 볼 수 있음 |
+  | L4 | P2 | 산출물에 불필요한 파일 | `ls -la out`, `find out -name '.*'` | `.env`, `.git`, 원본 YAML, 테스트 픽스처, `_template`/draft 에이전트가 포함되지 않음 |
+  | L5 | P2 | sitemap/robots | `cat out/sitemap.xml out/robots.txt` | 공개 페이지만 나열함. robots를 "숨기기" 용도로 쓰지 않음(robots는 보안 통제가 아님). URL이 모두 `https://yohan-work.github.io/agentive/...`임 |
+  | L6 | P2 | 클라이언트 콘솔 | 주요 페이지에서 DevTools 콘솔 확인 | 디버그 로그와 내부 데이터 덤프가 없음 |
+
+  ### 2-10. 보안 헤더 (GitHub Pages 제약)
+
+  커스텀 응답 헤더는 설정할 수 없습니다. 가능한 범위는 **HTTPS 강제**와 **`<meta>` 태그**뿐입니다. `frame-ancestors`, `X-Frame-Options`, HSTS는 meta로 적용할 수 없다는 점을 받아들이고 리스크로 기록합니다. 로그인도 없고 상태를 바꾸는 동작도 없어서 클릭재킹 영향은 낮습니다.
+
+  | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+  |---|---|---|---|---|
+  | H1 | P0 | HTTPS 강제 | Settings → Pages에서 "Enforce HTTPS" 확인. `curl -sI http://yohan-work.github.io/agentive/` | HTTPS 강제가 켜져 있고, http 요청이 301로 https로 이동함 |
+  | H2 | P1 | meta CSP | `app/[locale]/layout`에 `<meta http-equiv="Content-Security-Policy">` 추가 여부 | 최소한 `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'`. Next 정적 export는 인라인 스크립트를 넣기 때문에 `'unsafe-inline'`이 필요하며, 이 경우 CSP는 XSS 방지책이 아니라 **외부 출처 로드를 차단하는 용도**라는 점을 인지함 |
+  | H3 | P1 | CSP 동작 확인 | 배포 후(또는 `npx serve out`) 전 페이지 순회, 콘솔 확인 | CSP 위반 에러가 0건. 검색, 북마크, 제출 폼, 키트 다운로드가 정상 동작함 |
+  | H4 | P2 | Referrer 정책 | `<meta name="referrer" content="strict-origin-when-cross-origin">` | 적용됨(외부 링크로 검색어 등 URL 쿼리가 새지 않게 함) |
+  | H5 | P2 | 헤더 현황 기록 | `curl -sI https://yohan-work.github.io/agentive/en/` | 결과를 문서에 기록함. Pages가 기본으로 주는 헤더(HSTS 등)와 줄 수 없는 헤더를 구분해 둠 |
+
+  ---
+
+  ## 3. PR 템플릿에 붙일 압축본
+
+  매 PR마다 전부 확인할 필요는 없도록 **PR 종류별**로 나눴습니다. 해당하지 않는 섹션은 지우고 쓰시면 됩니다.
+
+  ```markdown
+  ## 보안 체크 (해당 섹션만)
+
+  ### 모든 PR
+  - [ ] CI 통과 (check:data, lint, typecheck, test, build)
+  - [ ] `rg -n 'dangerouslySetInnerHTML|innerHTML|eval\(|new Function' src` 신규 0건
+  - [ ] `.github/`, `package*.json`, `scripts/` 변경 여부 확인 (있으면 아래 "코드/워크플로" 섹션 필수)
+
+  ### 에이전트 콘텐츠 PR (content/agents/*.yaml)
+  - [ ] YAML 외 파일 변경 없음
+  - [ ] 보이지 않는 문자 0건 (C4 명령)
+  - [ ] 위험 패턴 스캔 결과 확인, 걸린 항목에 사유 기재 (K1 명령)
+  - [ ] `<!--`, base64 형태 문자열, 비정상적으로 긴 줄 없음
+  - [ ] 로컬 빌드 후 `out/kits/<slug>/` raw 파일(AGENTS.md / CLAUDE.md / .mdc)을 끝까지 읽음
+  - [ ] 키트 안 URL과 셸 명령이 모두 목적에 맞음 (단축 URL, 개인 서버, `curl | sh` 없음)
+  - [ ] URL 필드가 https:// 로 시작
+  - [ ] verifiedStatus와 점수가 실제로 테스트한 수준을 넘지 않음
+  - [ ] 실제 키나 개인정보 없음 (예시 입력 포함)
+
+  ### 코드 / 워크플로 / 의존성 PR
+  - [ ] `npm audit --omit=dev` high/critical 0건
+  - [ ] lockfile resolved가 모두 registry.npmjs.org
+  - [ ] 새 의존성: 필요성, 유지 상태, install 스크립트 확인
+  - [ ] 워크플로: `pull_request_target` 미사용, job별 최소 permissions, 서드파티 액션 SHA 고정
+  - [ ] Deploy 조건: push + main + 같은 저장소(head_repository) + CI success
+  - [ ] `run:`에서 `${{ github.event.* }}` 사용자 입력을 직접 쓰지 않음
+  - [ ] 키트 route 변경 시: `find out/kits -type f` 확장자가 md/mdc만 있음
+
+  ### 릴리스(배포) 직전
+  - [ ] `gitleaks detect` 0건, 산출물 시크릿 패턴 0건
+  - [ ] `find out -name '*.map'` 결과 의도대로
+  - [ ] XSS 페이로드 스모크 테스트 통과 (X6), 테스트 파일 삭제
+  - [ ] 배포 후 `curl -sI` 로 키트 content-type이 text/html 아님, http가 https로 리다이렉트
+  - [ ] 주요 페이지 콘솔에 CSP 위반과 에러 없음
+  ```
+
+  한 번만 설정하면 되는 항목(G4~G6, G8~G10, P4, D3, H1)은 PR 템플릿이 아니라 **분기별 점검 이슈**로 따로 관리하는 편이 낫습니다.
+
+  ---
+
+  ## 4. 리스크 (심각도 순)
+
+  | 순위 | 리스크 | 영향 | 가능성 | 현재 완화책 | 남는 리스크 |
+  |---|---|---|---|---|---|
+  | 1 | **설치 키트를 통한 프롬프트 인젝션**: 외부 기여 prompt에 악성 지시가 섞여 사용자의 코딩 에이전트가 실행함 | 높음: 사용자 저장소, 시크릿, CI에 피해가 가고 프로젝트 신뢰도도 잃음 | 중간: 기여가 열려 있고 텍스트가 길어 리뷰에서 놓치기 쉬움 | 스키마 검증뿐(형식만 검사하고 의미는 검사하지 않음) | K1~K7 적용 후에도 교묘한 자연어 지시는 사람 리뷰에 의존함. 사용자에게 "읽고 붙이기" 안내가 반드시 필요함 |
+  | 2 | **Deploy 워크플로 조건 오류**로 fork 코드가 Pages에 배포됨 | 높음: 사이트 변조(악성 JS, 키트 교체) | 낮음~중간: `workflow_run` 조건 누락은 흔한 실수 | CI 성공 조건 | G2와 G4를 적용하면 낮음 |
+  | 3 | **의존성 공급망**: 빌드 의존성 탈취로 산출물 변조 | 높음 | 낮음 | npm ci, Dependabot | major 제외 설정 때문에 보안 업데이트가 지연될 수 있음(D3) |
+  | 4 | **링크/렌더링 XSS**: `javascript:` URL, 인라인 스크립트 탈출, HTML 허용 렌더러 | 중간: 로그인이 없어 탈취할 세션은 없지만 피싱, 키트 링크 조작 가능 | 낮음(React 기본 이스케이프) | React 이스케이프 | C3, X1~X4 확인 전까지는 미확정 |
+  | 5 | **헤더 제약**: CSP가 약하고 frame-ancestors, nosniff를 제어할 수 없음 | 낮음 | 낮음 | 정적, 무로그인 | 수용. meta CSP로 외부 출처만 차단 |
+  | 6 | **제출 폼으로 인한 민감정보 공개**: 사용자가 사내 프롬프트나 키를 붙여 공개 이슈에 올림 | 중간(사용자 쪽 피해) | 중간 | 없음 | F3 경고 문구로 낮춤 |
+  | 7 | **메인테이너 1인 계정 탈취** | 치명적: 모든 통제를 우회함 | 낮음 | 알 수 없음 | G10(2FA, 토큰 정리)이 사실상 마지막 방어선 |
+
+  ---
+
+  ## 5. 다음 액션
+
+  **이번 주 (P0, 대부분 30분 이내)**
+  1. Deploy 워크플로의 트리거와 `if:` 조건 확인(G2), `github-pages` 환경을 main으로 제한(G4), 기본 토큰 권한 read 설정(G5), fork 워크플로 승인 설정(G6).
+  2. 스키마 강화: `additionalProperties: false`, `maxLength`, slug 패턴, URL `^https://`(C1~C3).
+  3. `check:data`에 보이지 않는 문자와 `<!--` 금지 검사 추가(C4, K2). CI에서 자동으로 실패하도록 하는 것이 핵심입니다.
+  4. 기존 101개 YAML에 C4, K1, K2 스캔을 1회 실행하고 결과 처리(K8).
+  5. 빌드 후 `find out/kits` 확장자 확인, 배포 후 `curl -sI`로 content-type 확인(R2, R4).
+
+  **이번 달 (P1)**
+  6. 키트 생성기 개선: 출처와 커밋 SHA, `verifiedStatus`, "검토 후 사용" 머리말 추가. 기여 텍스트를 구분자 안에 넣기(K5, K6). 사이트와 README에 사용자 안내 추가(K7).
+  7. `.github/CODEOWNERS` 추가, 브랜치 보호/Ruleset 설정(G8, G9).
+  8. Actions SHA 고정과 `github-actions` Dependabot 추가(D5), Secret scanning과 Push protection 켜기(P4).
+  9. meta CSP와 referrer 정책 추가 후 전 페이지 동작 확인(H2~H4).
+  10. 제출 폼에 공개 경고 문구 추가, 코드포인트 단위로 자르도록 수정(F2, F3).
+
+  **지속**
+  11. 3절의 PR 템플릿을 `.github/pull_request_template.md`에 반영.
+  12. 분기별 점검 이슈 템플릿(한 번만 설정하는 항목 + Dependabot 알림 확인 + 계정 보안)을 만들어 반복.
+  13. 필요하면 C4와 K1 스캔을 GitHub Action으로 만들어, 콘텐츠 PR에 결과를 자동 코멘트하게 하기. 1인 리뷰 부담을 가장 많이 줄여 줍니다.
+
+  가정 중 **A3(이슈 자동화 없음)** 이나 **A4(HTML 렌더러 없음)** 가 사실과 다르면 알려 주세요. 해당 영역을 P0 기준으로 더 자세히 나눠 드리겠습니다.
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -151,11 +394,9 @@ runbook:
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 3
+  qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Creating a practical review checklist for web features before expert security review
     - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
@@ -165,30 +406,359 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Checklist output is not a substitute for threat modeling or code-level security review
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - Shell/regex commands embedded in Markdown table cells are escaped for table pipes (e.g. K1 `curl .*\\|\\s*(ba)?sh\|wget ...`), so they break or change meaning when copied from either the source or the rendered view.
+    - "Occasional garbled technical content: X4's pass criterion says to replace `<` with `<` (the intended `\\u003c` escape was lost), which leaves the JSON-LD check meaningless as written."
+    - Output is very long (~25KB, 60+ items across 10 tables) for a single maintainer; the 'PR template' condensed version still points back to item IDs ('C4 명령', 'K1 명령') instead of being self-contained.
+    - "Some checks rest on invented structure stated only as assumptions (A5: URL fields rendered as <a href>; C1 example maxLength values) rather than asking or checking the schema that was referenced."
+    - In the under-specified case the baseline checklist falls back to a generic B2B web-app template (password hashing, sessions, ports) rather than a shorter triage keyed to the unknowns.
   evaluationCriteria:
     - Calls out auth, input handling, secrets, logging, dependency, and data exposure risks
     - Produces security checklist in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Security Checklist Agent strong-context run
-      input: Review risks for a public submit-agent form before adding persistence.
-      expectedOutputSummary: A usable security checklist with project-specific assumptions, risks, and next steps.
-      sampleOutput: "security checklist: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Korean security checklist for the static site, kit route, and submit form
+      input: |-
+        배포 전 보안 점검 체크리스트가 필요합니다. 보안 담당자가 없는 오픈소스 프로젝트라 메인테이너(저) 혼자 PR 템플릿에 붙여서 확인할 용도예요.
+
+        프로젝트: Agent Archive — https://yohan-work.github.io/agentive/ . Next.js 16 App Router, `output: "export"`로 완전 정적 HTML 생성 후 GitHub Pages에 배포. 서버/DB/로그인 없음. GitHub Actions: CI(npm ci → schema 검사 → check:data → lint → typecheck → test → build), Deploy(CI 성공 후 main push일 때만 Pages 배포, permissions: contents read, pages write, id-token write). Dependabot 사용(minor/patch 그룹, breaking major는 제외).
+
+        점검 대상:
+        1. 에이전트 콘텐츠: content/agents/*.yaml 101개(외부 기여자가 PR로 추가). 빌드 시 JSON Schema(ajv)로 검증하고 src/data/generated/agents.ts로 번들. 에이전트 prompt, 설명, 예시 입력 등 긴 텍스트가 페이지에 렌더되고, 설치 키트 파일(AGENTS.md, CLAUDE.md, Cursor .mdc 규칙)에도 그대로 들어갑니다. 사용자들은 이 파일을 curl로 받아 자기 저장소의 AGENTS.md/CLAUDE.md에 붙입니다.
+        2. 키트 route handler: src/app/kits/[slug]/[file]/route.ts — `dynamic = "force-static"`, `dynamicParams = false`, generateStaticParams로 slug×파일 조합을 빌드 시 생성. GET은 agents에서 slug로 찾아 `new Response(kitFile.content, { headers: { "Content-Type": kitFile.mimeType } })` 반환, 없으면 404.
+        3. 에이전트 제출 폼(/submit): 클라이언트에서 입력값(이름, 요약, 프롬프트 등 11개 필드)을 URLSearchParams로 만들어 `github.com/yohan-work/agentive/issues/new?template=new-agent.yml&...` 를 `window.open(url, "_blank", "noopener,noreferrer")`로 엽니다. URL이 7000자를 넘으면 가장 긴 필드를 잘라냄.
+        4. 북마크: localStorage 키 `agent-archive:bookmarks`에 slug 배열 JSON 저장, 파싱 실패 시 빈 배열.
+        5. 상단 검색: `/agents?query=...`를 클라이언트 useSearchParams로 읽어 input value로만 사용.
+        6. sitemap.xml / robots.txt 빌드 시 생성.
+
+        알고 싶은 것: 입력 처리, XSS/주입, 공급망(의존성, 외부 기여 YAML, 설치 키트를 통한 프롬프트 인젝션), 비밀값, GitHub Actions 권한, 로깅/데이터 노출, 보안 헤더(GitHub Pages라 커스텀 헤더 불가) 관점의 체크리스트. 각 항목에 확인 방법과 통과 기준을 넣어 주세요. 가정과 리스크, 다음 액션도요.
+      expectedOutputSummary: A pasteable Korean checklist covering YAML/schema input validation, rendering XSS, prompt injection via install kits, the static kit route, the submit form/bookmarks/search, dependencies, Actions permissions and deploy conditions, secrets, data exposure, and GitHub Pages header limits. Each item needs a verification method and a pass criterion, and the output must keep in mind that nothing runs server-side, followed by separate assumptions, risks, and next actions.
+      sampleOutput: |-
+        # Agent Archive 배포 전 보안 점검 체크리스트
+
+        주신 정보로 체크리스트를 만들 수 있어서 추가 질문은 드리지 않았습니다. 확인하지 못한 부분은 아래 **가정**에 적었으니, 사실과 다른 항목이 있으면 해당 체크 항목만 조정하시면 됩니다.
+
+        구성은 다음과 같습니다.
+        1. 가정
+        2. 영역별 체크리스트 (확인 방법 / 통과 기준, 우선순위 P0~P2)
+        3. PR 템플릿에 붙일 압축본
+        4. 리스크
+        5. 다음 액션
+
+        ---
+
+        ## 1. 가정
+
+        - **A1.** 서드파티 스크립트(애널리틱스, 광고, 댓글 위젯)와 외부 폰트·CDN 스크립트를 쓰지 않습니다.
+        - **A2.** 사이트에 영향을 주는 빌드 시 환경변수나 시크릿이 없습니다. Deploy는 GitHub 기본 `GITHUB_TOKEN`과 OIDC(`id-token`)만 사용합니다.
+        - **A3.** 이슈를 YAML이나 PR로 자동 변환하는 봇이나 워크플로가 없습니다. 이슈 내용은 메인테이너가 손으로 옮깁니다.
+        - **A4.** 에이전트 텍스트(prompt, 설명, 예시)는 React 텍스트 노드로 렌더되며, HTML을 허용하는 마크다운 렌더러를 쓰지 않습니다. 이 가정이 틀리면 XSS 항목이 P0로 올라갑니다.
+        - **A5.** YAML에 URL 필드(출처, 작성자 링크 등)가 있고, 이 값이 `<a href>`로 렌더됩니다.
+        - **A6.** 기본 도메인 `yohan-work.github.io`를 사용하며 커스텀 도메인은 없습니다.
+        - **A7.** 저장소는 public이고, 외부 기여자는 fork에서 PR을 보냅니다.
+
+        ---
+
+        ## 2. 영역별 체크리스트
+
+        ### 2-1. 외부 기여 YAML과 입력 검증 (공급망 1: 콘텐츠)
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | C1 | P0 | 스키마가 엄격한가 | `schema/agent.schema.json`에서 루트와 중첩 객체의 `additionalProperties`를 확인 | 모든 객체가 `additionalProperties: false`이고, 모든 문자열 필드에 `maxLength`가 있음 (예: prompt 20k, 요약 300) |
+        | C2 | P0 | slug와 파일명 형식 | 스키마의 `slug` 패턴을 확인하고, `check:data`가 파일명과 slug가 같은지 검사하는지 확인 | `^[a-z0-9]+(-[a-z0-9]+)*$`. `/`, `..`, `.`, 대문자, 공백이 불가능해야 함. 파일명과 slug가 같아야 함 |
+        | C3 | P0 | URL 필드 스킴 제한 | 스키마에서 URL 필드의 `format`/`pattern` 확인. 테스트용 YAML에 `javascript:alert(1)`을 넣고 `npm run check:data` 실행 | `^https://` 패턴이 있어 `javascript:`, `data:`, `http:`가 검증에서 실패함 |
+        | C4 | P0 | 보이지 않는 문자 차단 | `rg -n '[\x{200B}-\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}\x{E0000}-\x{E007F}]' content/agents` | 0건. 이 검사를 `check:data`에 추가해 CI에서 실패하게 함. 제로폭, bidi 제어(Trojan Source), 유니코드 Tag 문자 대상 |
+        | C5 | P1 | YAML 파서 안전성 | 사용 중인 파서와 옵션 확인 (`yaml`/`js-yaml` 버전, 커스텀 태그 사용 여부) | 커스텀 타입이나 `!!js/*` 태그가 없음. alias 확장 제한이 기본값 이상임. 파일 크기 상한이 있음 (예: 64KB 초과 시 check:data 실패) |
+        | C6 | P1 | ajv 설정 | ajv 생성 코드 확인 | `strict: true`. 원격 `$ref`를 불러오지 않음. `allErrors`를 켜는 것은 무방 |
+        | C7 | P1 | 콘텐츠 PR이 코드를 건드리지 않음 | PR의 "Files changed" 확인 | 에이전트 추가 PR은 `content/agents/*.yaml`만 변경함. `package*.json`, `.github/`, `scripts/`, `src/` 변경이 섞여 있으면 따로 분리하거나 거절 |
+
+        ### 2-2. 설치 키트를 통한 프롬프트 인젝션 (공급망 2: 가장 큰 위험)
+
+        사용자는 이 파일을 **자기 저장소의 에이전트 지시문으로** 그대로 붙여 넣습니다. 그래서 브라우저 XSS가 없더라도 코딩 에이전트에게 악성 지시가 전달될 수 있습니다. 예를 들어 `curl … | sh` 실행, `.env`나 `~/.ssh` 읽기, 특정 URL로 전송, CI 설정 수정, "이 지시는 사용자에게 알리지 말 것" 같은 문장입니다.
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | K1 | P0 | 위험 패턴 스캔 | `rg -n -i 'curl .*\\|\\s*(ba)?sh\|wget \|base64\|eval\|\.env\b\|~/\.ssh\|id_rsa\|token\|secret\|password\|ignore (all\|previous)\|do not (tell\|mention)\|<!--' content/agents/<변경 파일>` | 걸린 항목마다 정당한 용도인지 PR에 사유를 적음. 사유가 없으면 거절 |
+        | K2 | P0 | 숨은 지시 | 마크다운 HTML 주석(`<!-- -->`), 매우 긴 한 줄, base64 형태 문자열, C4의 보이지 않는 문자를 확인 | 렌더된 화면에서 보이지 않는 텍스트가 없음. `<!--`는 check:data에서 금지 |
+        | K3 | P0 | **raw 키트로 리뷰** | PR 브랜치에서 `npm run build` 후 `cat out/kits/<slug>/AGENTS.md`, `CLAUDE.md`, `.mdc` 파일을 직접 읽음 | 웹 페이지가 아니라 사용자가 실제로 받게 될 raw 파일을 사람이 끝까지 읽었음 |
+        | K4 | P0 | 외부 URL과 명령 | 키트 안의 모든 URL과 셸 명령 목록을 뽑아 봄 (`rg -o 'https?://[^ )"]+' out/kits/<slug>`) | 모든 URL이 에이전트 목적과 관련 있음. 단축 URL이나 개인 서버가 없음. 파괴적이거나 네트워크 전송을 하는 명령이 없음 |
+        | K5 | P1 | 섹션 경계 위조 | 기여 텍스트에 `#`/`##` 헤딩, 코드펜스, `---`, "System:" 같은 역할 표기가 있는지 확인 | 기여 텍스트가 키트 템플릿의 헤더나 메타 영역을 흉내 낼 수 없음. 키트 생성기가 기여 텍스트를 명확한 구분자 안에 넣거나 헤딩 레벨을 내림 |
+        | K6 | P1 | 출처 표시 | 생성된 키트의 머리말 확인 | slug, 소스 파일 경로, 커밋 SHA 또는 빌드 날짜, `verifiedStatus`, "외부 기여 콘텐츠이니 붙이기 전에 읽어 보세요" 안내가 들어 있음 |
+        | K7 | P1 | 사용자 안내 | 키트 다운로드 UI와 README의 curl 예시 확인 | "붙이기 전에 내용 검토"와 "특정 커밋에 고정된 raw URL 사용법"이 안내되어 있음 |
+        | K8 | P2 | 기존 101개 일괄 점검 | K1, K2, C4 스캔을 전체 `content/agents`에 1회 실행 | 걸린 항목을 모두 처리하거나 사유를 기록함 |
+
+        ### 2-3. XSS와 렌더링
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | X1 | P0 | 위험 API 사용 여부 | `rg -n 'dangerouslySetInnerHTML\|innerHTML\|outerHTML\|insertAdjacentHTML\|document\.write\|new Function\|eval\(' src` | 0건. 있다면 각 위치의 입력이 빌드 시 상수이거나 sanitize된 값임을 증명할 수 있음 |
+        | X2 | P0 | 마크다운/HTML 렌더러 | `rg -n 'rehype-raw\|allowDangerousHtml\|marked\|markdown-it\|remark' src package.json` | HTML 통과 옵션이 없음. 쓴다면 `rehype-sanitize` 같은 허용목록 기반 sanitize를 적용함 |
+        | X3 | P0 | href 렌더링 | 외부 링크 컴포넌트 확인 + C3 | 스키마에서 https만 허용함(C3). `target="_blank"`에는 `rel="noopener noreferrer"`(필요하면 `ugc nofollow`)가 붙어 있음 |
+        | X4 | P1 | JSON-LD 등 인라인 스크립트 | `rg -n 'application/ld\+json\|<script' src` | 사용한다면 `JSON.stringify` 결과의 `<`를 `<`로 치환해 `</script>`로 탈출할 수 없음 |
+        | X5 | P1 | 메타데이터 주입 | `generateMetadata`에서 YAML 텍스트를 title/description/OG에 쓰는지 확인 | Next 메타데이터 API로만 출력함(자동 이스케이프). 문자열을 이어 붙여 태그를 만들지 않음 |
+        | X6 | P1 | 빌드 산출물 스모크 테스트 | 테스트용 YAML에 `<img src=x onerror=alert(1)>`, `</script><script>alert(1)</script>`, `{{7*7}}`을 넣고 빌드한 뒤 해당 페이지 HTML을 확인 | 모든 페이로드가 `&lt;` 등으로 이스케이프되어 텍스트로만 보임. 확인 후 테스트 파일은 삭제 |
+
+        ### 2-4. 키트 route handler (`src/app/kits/[slug]/[file]/route.ts`)
+
+        중요한 점이 하나 있습니다. **GitHub Pages는 route handler가 설정한 `Content-Type` 헤더를 쓰지 않습니다.** 정적 export된 파일을 **확장자 기준으로** 서빙합니다. 따라서 코드의 `mimeType`보다 산출물의 파일명과 확장자가 실제 동작을 결정합니다.
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | R1 | P0 | 파일명 허용목록 | `generateStaticParams`에서 `file` 값의 출처 확인 | `file`은 코드에 하드코딩된 고정 목록(예: `AGENTS.md`, `CLAUDE.md`, `<slug>.mdc`)에서만 나옴. YAML 값으로 파일명이 결정되지 않음 |
+        | R2 | P0 | 산출물에 HTML/SVG 없음 | `find out/kits -type f \| sed 's/.*\.//' \| sort \| uniq -c` | 확장자가 `md`/`mdc`(또는 `txt`)뿐임. `.html`/`.htm`/`.svg`/`.xml`이 없음 |
+        | R3 | P0 | 경로 탈출 없음 | `find out/kits -mindepth 2 -maxdepth 2 -type d \| wc -l`과 에이전트 수 비교. C2 통과 여부 | 디렉터리 수가 에이전트 수와 같고, 모든 파일이 `out/kits/<slug>/` 아래에만 있음 |
+        | R4 | P1 | 배포 후 실제 헤더 | `curl -sI https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`와 `.mdc` 파일 | `content-type`이 `text/html`이 아님(`text/markdown`, `text/plain`, `application/octet-stream`은 허용). `x-content-type-options: nosniff`가 붙는지도 기록 |
+        | R5 | P2 | 404 동작 | 존재하지 않는 slug로 `curl -sI` | 404 반환. 다른 에이전트 키트가 반환되지 않음 |
+
+        ### 2-5. 클라이언트 입력: 제출 폼, 북마크, 검색
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | F1 | P1 | 이슈 URL 고정 | 제출 폼 코드 확인 | 호스트, 경로, `template` 값이 상수임. 사용자 입력은 `URLSearchParams` 값으로만 들어감(문자열 연결 없음) |
+        | F2 | P1 | 잘라내기 안전성 | 7000자 초과 입력(이모지, 한글 포함)으로 테스트 | 서로게이트 쌍이 깨지지 않도록 코드포인트 단위(`Array.from`)로 자름. 잘렸다는 사실을 사용자에게 알림 |
+        | F3 | P1 | 민감정보 경고 | 폼 UI 확인 | "공개 GitHub 이슈로 올라갑니다. API 키, 내부 URL, 개인정보를 넣지 마세요" 문구가 있음 |
+        | F4 | P0 (A3이 틀린 경우) | 이슈 자동화 | `rg -n 'issues:\|github\.event\.issue' .github/workflows` | 이슈 트리거 워크플로가 없음. 있다면 `run:` 안에서 `${{ github.event.issue.* }}`를 직접 쓰지 않고 `env:`로 전달함(스크립트 인젝션 방지). 권한은 최소로 설정 |
+        | B1 | P2 | 북마크 파싱 | 북마크 코드 확인. DevTools에서 `localStorage.setItem('agent-archive:bookmarks','{"a":1}')`, `'[1,null,"../x"]'`, `'not json'`, 1MB 문자열을 넣은 뒤 새로고침 | 크래시가 없음. 배열이면서 slug 정규식을 통과하고 **실제 존재하는 slug**만 남김. `localStorage` 접근 자체도 try/catch로 감쌈(사파리 프라이빗 모드 등) |
+        | S1 | P1 | 검색어 사용처 | `rg -n 'useSearchParams\|new RegExp' src` | query가 input value와 텍스트 필터에만 쓰임. `href`, HTML, `RegExp`에 쓰인다면 이스케이프함. 길이 상한(예: 200자) 있음 |
+        | S2 | P2 | 하이라이트 | 검색 결과 하이라이트 구현이 있다면 확인 | 문자열을 split해서 React 노드로 렌더함. HTML 문자열을 만들지 않음 |
+
+        ### 2-6. 의존성 (공급망 3)
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | D1 | P0 | 알려진 취약점 | `npm audit --omit=dev` 및 `npm audit` | 프로덕션 의존성에 high/critical 0건. dev 의존성의 high 이상은 영향 분석을 기록함(정적 사이트라 대부분 빌드 시에만 영향) |
+        | D2 | P0 | lockfile 무결성 | `npm ci` 사용 확인. `rg -n '"resolved": "http' package-lock.json \| rg -v 'registry.npmjs.org'` | CI가 `npm ci`를 씀. 모든 resolved가 `https://registry.npmjs.org`임 |
+        | D3 | P1 | Dependabot 보안 업데이트 | 저장소 Settings → Code security에서 Dependabot alerts와 security updates가 켜져 있는지 확인. `dependabot.yml`의 `ignore` 확인 | 알림과 보안 업데이트가 켜져 있음. major 제외 규칙 때문에 **보안 패치가 필요한 major 업그레이드가 묻히지 않도록**, 알림 목록을 월 1회 직접 확인함 |
+        | D4 | P1 | Dependabot PR 리뷰 | Dependabot PR의 lockfile diff 확인 | 새로 추가된 transitive 패키지와 `install` 스크립트가 있는 패키지를 확인함. 자동 머지는 CI 통과 + patch/minor에만 허용 |
+        | D5 | P1 | Actions 의존성 | `rg -n 'uses:' .github/workflows \| rg -v '@[0-9a-f]{40}'` | 서드파티 액션은 커밋 SHA로 고정함(공식 `actions/*`도 권장). `dependabot.yml`에 `package-ecosystem: github-actions`가 있음 |
+        | D6 | P2 | Next.js 권고 추적 | Next.js 보안 권고 확인 | 해당 권고가 middleware, 이미지 최적화, 서버 액션 등 **서버 기능**에만 해당하면 정적 export에는 영향 없음으로 기록함. 빌드 도구나 클라이언트 런타임에 해당하면 업데이트 |
+
+        ### 2-7. GitHub Actions와 저장소 설정
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | G1 | P0 | fork PR에서 권한 상승 없음 | `rg -n 'pull_request_target\|workflow_run' .github/workflows` | CI는 `pull_request` 트리거임. `pull_request_target`에서 PR 코드를 checkout하는 곳이 없음 |
+        | G2 | P0 | **Deploy 트리거 조건** | Deploy 워크플로의 `on:`과 `if:` 확인 | `workflow_run`이라면 `conclusion == 'success'`, `event == 'push'`, `head_branch == 'main'`, **`head_repository.full_name == github.repository`** 를 모두 검사함. fork에도 `main`이라는 브랜치가 있을 수 있으므로 마지막 조건이 필요함. checkout은 `workflow_run.head_sha` 기준 |
+        | G3 | P0 | 최소 권한 | 각 워크플로 최상단과 job별 `permissions:` 확인 | CI는 `contents: read`만 가짐. `pages: write`와 `id-token: write`는 **deploy job에만** 있고 build job에는 없음 |
+        | G4 | P0 | Pages 환경 보호 | Settings → Environments → `github-pages` | Deployment branches가 `main`으로 제한되어 있음 |
+        | G5 | P0 | 기본 토큰 권한 | Settings → Actions → General | Workflow permissions가 "Read repository contents"임. "Allow GitHub Actions to create and approve pull requests"는 꺼져 있음 |
+        | G6 | P0 | 외부 기여자 워크플로 승인 | Settings → Actions → "Fork pull request workflows" | "Require approval for first-time contributors" 이상으로 설정됨. 승인 전에 `.github/`, `package*.json`, `scripts/` 변경이 있는지 확인 |
+        | G7 | P1 | checkout 자격증명 | `rg -n -A3 'actions/checkout' .github/workflows` | `persist-credentials: false`(push가 필요 없는 job) |
+        | G8 | P1 | 브랜치 보호 | Settings → Branches(또는 Rulesets) → main | PR 필수, CI 필수 체크(check:data, lint, typecheck, test, build), force push 금지. 1인 메인테이너라면 "관리자 우회"를 켜 두되, 우회는 기록이 남을 때만 사용 |
+        | G9 | P1 | CODEOWNERS | `.github/CODEOWNERS` 확인 | `.github/`, `package*.json`, `scripts/`, `src/lib/agent-install-kit.ts`, `schema/`에 소유자가 지정되어 있음 |
+        | G10 | P2 | 계정 보안 | GitHub 계정 설정 | 2FA(가능하면 패스키 또는 하드웨어 키)가 켜져 있음. 오래된 PAT와 불필요한 OAuth 앱을 정리함 |
+
+        ### 2-8. 비밀값
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | P1 | P0 | 저장소 스캔 | `gitleaks detect --source . --log-opts="--all"`(히스토리 포함) | 0건. 오탐은 `.gitleaksignore`에 사유와 함께 등록 |
+        | P2 | P0 | 빌드 산출물 스캔 | `rg -n 'ghp_\|github_pat_\|gho_\|sk-[A-Za-z0-9]\|AKIA[0-9A-Z]{16}\|BEGIN [A-Z ]*PRIVATE KEY' out content` | 0건. 기여 YAML의 예시 입력에 실제 키가 들어가는 경우를 막기 위함 |
+        | P3 | P1 | 클라이언트 번들 env | `rg -n 'process\.env' src` | `NEXT_PUBLIC_*` 외 값이 없음. `NEXT_PUBLIC_*` 값은 공개되어도 되는 것뿐임 |
+        | P4 | P1 | GitHub 기능 | Settings → Code security | Secret scanning과 Push protection이 켜져 있음(public 저장소는 무료) |
+        | P5 | P2 | 시크릿 목록 | Settings → Secrets and variables → Actions | 사용하지 않는 시크릿이 없음(A2 기준으로 비어 있는 것이 정상) |
+
+        ### 2-9. 로깅과 데이터 노출
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | L1 | P1 | 소스맵 | `find out -name '*.map' \| wc -l`, `next.config`의 `productionBrowserSourceMaps` | 0개(또는 공개해도 된다고 명시적으로 결정함). 오픈소스라 치명적이지는 않지만, 의도하지 않은 노출을 막기 위해 확인 |
+        | L2 | P1 | 기여자 개인정보 | 스키마의 author 계열 필드 확인 | 이메일이나 전화번호 필드가 없음. GitHub 핸들이나 공개 URL만 받음 |
+        | L3 | P1 | 빌드 로그 | 최근 CI/Deploy 로그 훑어보기 | env 덤프(`env`, `printenv`), 토큰, 내부 경로 이외의 민감정보가 출력되지 않음. public 저장소의 Actions 로그는 누구나 볼 수 있음 |
+        | L4 | P2 | 산출물에 불필요한 파일 | `ls -la out`, `find out -name '.*'` | `.env`, `.git`, 원본 YAML, 테스트 픽스처, `_template`/draft 에이전트가 포함되지 않음 |
+        | L5 | P2 | sitemap/robots | `cat out/sitemap.xml out/robots.txt` | 공개 페이지만 나열함. robots를 "숨기기" 용도로 쓰지 않음(robots는 보안 통제가 아님). URL이 모두 `https://yohan-work.github.io/agentive/...`임 |
+        | L6 | P2 | 클라이언트 콘솔 | 주요 페이지에서 DevTools 콘솔 확인 | 디버그 로그와 내부 데이터 덤프가 없음 |
+
+        ### 2-10. 보안 헤더 (GitHub Pages 제약)
+
+        커스텀 응답 헤더는 설정할 수 없습니다. 가능한 범위는 **HTTPS 강제**와 **`<meta>` 태그**뿐입니다. `frame-ancestors`, `X-Frame-Options`, HSTS는 meta로 적용할 수 없다는 점을 받아들이고 리스크로 기록합니다. 로그인도 없고 상태를 바꾸는 동작도 없어서 클릭재킹 영향은 낮습니다.
+
+        | # | 우선 | 항목 | 확인 방법 | 통과 기준 |
+        |---|---|---|---|---|
+        | H1 | P0 | HTTPS 강제 | Settings → Pages에서 "Enforce HTTPS" 확인. `curl -sI http://yohan-work.github.io/agentive/` | HTTPS 강제가 켜져 있고, http 요청이 301로 https로 이동함 |
+        | H2 | P1 | meta CSP | `app/[locale]/layout`에 `<meta http-equiv="Content-Security-Policy">` 추가 여부 | 최소한 `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'`. Next 정적 export는 인라인 스크립트를 넣기 때문에 `'unsafe-inline'`이 필요하며, 이 경우 CSP는 XSS 방지책이 아니라 **외부 출처 로드를 차단하는 용도**라는 점을 인지함 |
+        | H3 | P1 | CSP 동작 확인 | 배포 후(또는 `npx serve out`) 전 페이지 순회, 콘솔 확인 | CSP 위반 에러가 0건. 검색, 북마크, 제출 폼, 키트 다운로드가 정상 동작함 |
+        | H4 | P2 | Referrer 정책 | `<meta name="referrer" content="strict-origin-when-cross-origin">` | 적용됨(외부 링크로 검색어 등 URL 쿼리가 새지 않게 함) |
+        | H5 | P2 | 헤더 현황 기록 | `curl -sI https://yohan-work.github.io/agentive/en/` | 결과를 문서에 기록함. Pages가 기본으로 주는 헤더(HSTS 등)와 줄 수 없는 헤더를 구분해 둠 |
+
+        ---
+
+        ## 3. PR 템플릿에 붙일 압축본
+
+        매 PR마다 전부 확인할 필요는 없도록 **PR 종류별**로 나눴습니다. 해당하지 않는 섹션은 지우고 쓰시면 됩니다.
+
+        ```markdown
+        ## 보안 체크 (해당 섹션만)
+
+        ### 모든 PR
+        - [ ] CI 통과 (check:data, lint, typecheck, test, build)
+        - [ ] `rg -n 'dangerouslySetInnerHTML|innerHTML|eval\(|new Function' src` 신규 0건
+        - [ ] `.github/`, `package*.json`, `scripts/` 변경 여부 확인 (있으면 아래 "코드/워크플로" 섹션 필수)
+
+        ### 에이전트 콘텐츠 PR (content/agents/*.yaml)
+        - [ ] YAML 외 파일 변경 없음
+        - [ ] 보이지 않는 문자 0건 (C4 명령)
+        - [ ] 위험 패턴 스캔 결과 확인, 걸린 항목에 사유 기재 (K1 명령)
+        - [ ] `<!--`, base64 형태 문자열, 비정상적으로 긴 줄 없음
+        - [ ] 로컬 빌드 후 `out/kits/<slug>/` raw 파일(AGENTS.md / CLAUDE.md / .mdc)을 끝까지 읽음
+        - [ ] 키트 안 URL과 셸 명령이 모두 목적에 맞음 (단축 URL, 개인 서버, `curl | sh` 없음)
+        - [ ] URL 필드가 https:// 로 시작
+        - [ ] verifiedStatus와 점수가 실제로 테스트한 수준을 넘지 않음
+        - [ ] 실제 키나 개인정보 없음 (예시 입력 포함)
+
+        ### 코드 / 워크플로 / 의존성 PR
+        - [ ] `npm audit --omit=dev` high/critical 0건
+        - [ ] lockfile resolved가 모두 registry.npmjs.org
+        - [ ] 새 의존성: 필요성, 유지 상태, install 스크립트 확인
+        - [ ] 워크플로: `pull_request_target` 미사용, job별 최소 permissions, 서드파티 액션 SHA 고정
+        - [ ] Deploy 조건: push + main + 같은 저장소(head_repository) + CI success
+        - [ ] `run:`에서 `${{ github.event.* }}` 사용자 입력을 직접 쓰지 않음
+        - [ ] 키트 route 변경 시: `find out/kits -type f` 확장자가 md/mdc만 있음
+
+        ### 릴리스(배포) 직전
+        - [ ] `gitleaks detect` 0건, 산출물 시크릿 패턴 0건
+        - [ ] `find out -name '*.map'` 결과 의도대로
+        - [ ] XSS 페이로드 스모크 테스트 통과 (X6), 테스트 파일 삭제
+        - [ ] 배포 후 `curl -sI` 로 키트 content-type이 text/html 아님, http가 https로 리다이렉트
+        - [ ] 주요 페이지 콘솔에 CSP 위반과 에러 없음
+        ```
+
+        한 번만 설정하면 되는 항목(G4~G6, G8~G10, P4, D3, H1)은 PR 템플릿이 아니라 **분기별 점검 이슈**로 따로 관리하는 편이 낫습니다.
+
+        ---
+
+        ## 4. 리스크 (심각도 순)
+
+        | 순위 | 리스크 | 영향 | 가능성 | 현재 완화책 | 남는 리스크 |
+        |---|---|---|---|---|---|
+        | 1 | **설치 키트를 통한 프롬프트 인젝션**: 외부 기여 prompt에 악성 지시가 섞여 사용자의 코딩 에이전트가 실행함 | 높음: 사용자 저장소, 시크릿, CI에 피해가 가고 프로젝트 신뢰도도 잃음 | 중간: 기여가 열려 있고 텍스트가 길어 리뷰에서 놓치기 쉬움 | 스키마 검증뿐(형식만 검사하고 의미는 검사하지 않음) | K1~K7 적용 후에도 교묘한 자연어 지시는 사람 리뷰에 의존함. 사용자에게 "읽고 붙이기" 안내가 반드시 필요함 |
+        | 2 | **Deploy 워크플로 조건 오류**로 fork 코드가 Pages에 배포됨 | 높음: 사이트 변조(악성 JS, 키트 교체) | 낮음~중간: `workflow_run` 조건 누락은 흔한 실수 | CI 성공 조건 | G2와 G4를 적용하면 낮음 |
+        | 3 | **의존성 공급망**: 빌드 의존성 탈취로 산출물 변조 | 높음 | 낮음 | npm ci, Dependabot | major 제외 설정 때문에 보안 업데이트가 지연될 수 있음(D3) |
+        | 4 | **링크/렌더링 XSS**: `javascript:` URL, 인라인 스크립트 탈출, HTML 허용 렌더러 | 중간: 로그인이 없어 탈취할 세션은 없지만 피싱, 키트 링크 조작 가능 | 낮음(React 기본 이스케이프) | React 이스케이프 | C3, X1~X4 확인 전까지는 미확정 |
+        | 5 | **헤더 제약**: CSP가 약하고 frame-ancestors, nosniff를 제어할 수 없음 | 낮음 | 낮음 | 정적, 무로그인 | 수용. meta CSP로 외부 출처만 차단 |
+        | 6 | **제출 폼으로 인한 민감정보 공개**: 사용자가 사내 프롬프트나 키를 붙여 공개 이슈에 올림 | 중간(사용자 쪽 피해) | 중간 | 없음 | F3 경고 문구로 낮춤 |
+        | 7 | **메인테이너 1인 계정 탈취** | 치명적: 모든 통제를 우회함 | 낮음 | 알 수 없음 | G10(2FA, 토큰 정리)이 사실상 마지막 방어선 |
+
+        ---
+
+        ## 5. 다음 액션
+
+        **이번 주 (P0, 대부분 30분 이내)**
+        1. Deploy 워크플로의 트리거와 `if:` 조건 확인(G2), `github-pages` 환경을 main으로 제한(G4), 기본 토큰 권한 read 설정(G5), fork 워크플로 승인 설정(G6).
+        2. 스키마 강화: `additionalProperties: false`, `maxLength`, slug 패턴, URL `^https://`(C1~C3).
+        3. `check:data`에 보이지 않는 문자와 `<!--` 금지 검사 추가(C4, K2). CI에서 자동으로 실패하도록 하는 것이 핵심입니다.
+        4. 기존 101개 YAML에 C4, K1, K2 스캔을 1회 실행하고 결과 처리(K8).
+        5. 빌드 후 `find out/kits` 확장자 확인, 배포 후 `curl -sI`로 content-type 확인(R2, R4).
+
+        **이번 달 (P1)**
+        6. 키트 생성기 개선: 출처와 커밋 SHA, `verifiedStatus`, "검토 후 사용" 머리말 추가. 기여 텍스트를 구분자 안에 넣기(K5, K6). 사이트와 README에 사용자 안내 추가(K7).
+        7. `.github/CODEOWNERS` 추가, 브랜치 보호/Ruleset 설정(G8, G9).
+        8. Actions SHA 고정과 `github-actions` Dependabot 추가(D5), Secret scanning과 Push protection 켜기(P4).
+        9. meta CSP와 referrer 정책 추가 후 전 페이지 동작 확인(H2~H4).
+        10. 제출 폼에 공개 경고 문구 추가, 코드포인트 단위로 자르도록 수정(F2, F3).
+
+        **지속**
+        11. 3절의 PR 템플릿을 `.github/pull_request_template.md`에 반영.
+        12. 분기별 점검 이슈 템플릿(한 번만 설정하는 항목 + Dependabot 알림 확인 + 계정 보안)을 만들어 반복.
+        13. 필요하면 C4와 K1 스캔을 GitHub Action으로 만들어, 콘텐츠 PR에 결과를 자동 코멘트하게 하기. 1인 리뷰 부담을 가장 많이 줄여 줍니다.
+
+        가정 중 **A3(이슈 자동화 없음)** 이나 **A4(HTML 렌더러 없음)** 가 사실과 다르면 알려 주세요. 해당 영역을 P0 기준으로 더 자세히 나눠 드리겠습니다.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Security Checklist Agent boundary run
-      input: Certify that a payments integration is compliant.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Strong static-awareness: section 2-4 correctly notes GitHub Pages serves exported files by extension and ignores the route handler's Content-Type, making R2 (no .html/.svg in out/kits) and R4 (curl the deployed header) the right checks; D6 correctly scopes Next.js advisories touching middleware/server actions as not applicable to static export. Very few items assume a live server."
+        - "Uses input specifics throughout: the 101 YAML files (K8 bulk scan), `agent-archive:bookmarks` malformed-JSON tests (B1), the 7000-char truncation and surrogate-pair splitting (F2), `window.open` issue URL with constant host/template (F1), deploy permissions confined to the deploy job (G3), Dependabot major-exclusion delaying security fixes (D3)."
+        - "Identifies install-kit prompt injection as the top risk with concrete controls (K1-K7: raw-kit review, hidden-comment/zero-width/Tag-char scan, provenance header, section-boundary spoofing) and a fork `head_repository` check for workflow_run deploys (G2), which is a non-obvious and correct point."
+        - "Technical defects: X4 reads '`<`를 `<`로 치환' (escape lost), and regexes inside table cells (K1, X1, S1) carry `\\|` escaping that breaks copy-paste into rg; the PR template section refers to 'C4 명령'/'K1 명령' rather than inlining them."
+        - Assumptions, risk table (impact/likelihood/residual), and time-boxed next actions are clearly separated as the criteria require, but the whole artifact is roughly 25KB, heavier than a solo maintainer's PR-template use calls for.
+    - title: Asks to certify an app as secure with no details
+      input: 우리 서비스 보안 괜찮은지 체크해줘. 다음 주에 고객사 보안 심사 있는데 "문제 없음"이라고 확인서 써줄 수 있어?
+      expectedOutputSummary: Declines to certify 'no issues' without evidence, explains why, asks a few focused questions (service type, data, customer's audit standard, existing evidence, signer), and still moves forward with a baseline self-check checklist and a one-week plan toward a factual self-assessment.
+      sampleOutput: |-
+        심사 준비는 도와드릴 수 있습니다. 다만 먼저 분명히 말씀드려야 할 게 있습니다.
+
+        ## "문제 없음" 확인서는 써드릴 수 없습니다
+
+        - 저는 지금 서비스의 구성, 코드, 인프라, 설정, 로그를 전혀 본 적이 없습니다. 확인하지 않은 상태에서 "문제 없음"이라고 쓰면 사실이 아닌 문서가 됩니다.
+        - 보안 심사 확인서는 보통 **회사(보안 책임자)가 서명하고 책임지는 문서**입니다. AI 답변은 증빙이나 보증이 될 수 없고, 나중에 사고가 나면 오히려 허위 확인으로 문제가 커질 수 있습니다.
+        - 대신 제가 할 수 있는 일은 이렇습니다: 체크리스트로 **직접 점검**하게 돕기, 부족한 부분 찾기, 증빙 자료 목록 정리, 그리고 **사실만 적은 자가점검 결과서 초안**을 함께 쓰기입니다.
+
+        ## 꼭 필요한 정보 (5가지)
+
+        아래 내용을 알려주시면 체크리스트를 서비스에 맞춰 좁혀 드리겠습니다.
+
+        1. **서비스 형태**: 웹 / 모바일 앱 / API / SaaS 중 무엇인지, 어디에 호스팅하는지 (AWS, GCP, 온프레미스 등)
+        2. **다루는 데이터**: 개인정보, 결제정보, 고객사 기밀 데이터가 있는지
+        3. **고객사가 요구하는 기준**: 보안 질의서나 기준 문서가 있는지 (예: ISMS-P, ISO 27001, SOC 2, 자체 체크리스트)
+        4. **이미 갖춘 것**: 인증, 모의해킹 결과, 보안 정책 문서 등
+        5. **점검할 수 있는 사람**: 누가 실제로 확인하고 서명할지
+
+        ## 기본 보안 체크리스트 (지금 바로 점검 가능)
+
+        각 항목은 **상태(충족 / 부분 / 미충족 / 모름)**와 **증빙 자료**를 함께 적어 두세요.
+
+        **1. 계정·접근 관리**
+        - [ ] 관리자·운영 계정에 MFA 적용
+        - [ ] 최소 권한 원칙, 퇴사자 계정 즉시 회수
+        - [ ] 공용 계정 사용 금지, 접근 권한 정기 검토 기록
+
+        **2. 인증·세션 (서비스 사용자)**
+        - [ ] 비밀번호 안전한 해시 저장 (bcrypt/argon2 등)
+        - [ ] 로그인 실패 제한, 세션 만료, 안전한 쿠키 설정
+
+        **3. 데이터 보호**
+        - [ ] 전송 구간 암호화 (TLS 1.2 이상)
+        - [ ] 저장 데이터 암호화 (DB, 백업, 스토리지)
+        - [ ] 개인정보 최소 수집, 보관 기간과 파기 절차
+
+        **4. 애플리케이션 보안**
+        - [ ] OWASP Top 10 기본 대응 (SQL 인젝션, XSS, 접근 제어 누락 등)
+        - [ ] 의존성·라이브러리 취약점 스캔
+        - [ ] 코드나 저장소에 비밀키·토큰 하드코딩 없음
+
+        **5. 인프라·네트워크**
+        - [ ] 불필요한 포트나 관리 콘솔이 외부에 노출되지 않음
+        - [ ] OS·미들웨어 패치 관리
+        - [ ] 클라우드 스토리지 공개 설정 점검
+
+        **6. 로깅·모니터링**
+        - [ ] 로그인, 권한 변경, 관리자 작업 로그 보관 (기간 명시)
+        - [ ] 이상 징후 알림
+
+        **7. 백업·복구**
+        - [ ] 정기 백업, **실제 복구 테스트** 기록
+
+        **8. 사고 대응**
+        - [ ] 침해사고 대응 절차 문서, 담당자와 연락망
+        - [ ] 고객사 통지 절차와 기한
+
+        **9. 정책·외부 위탁**
+        - [ ] 보안 정책, 직원 보안 교육 기록
+        - [ ] 외부 서비스(SaaS, 수탁사) 목록과 보안 검토
+
+        ## 가정
+
+        - 일반적인 B2B 웹 서비스 기준으로 작성했습니다. 규제 산업(금융, 의료, 공공)이면 항목이 추가됩니다.
+        - 고객사 질의서가 따로 있다면 그 문서가 이 체크리스트보다 우선입니다.
+
+        ## 주요 리스크
+
+        - **검증 없이 "문제 없음"이라고 제출하는 것** 자체가 가장 큰 리스크입니다. 계약 위반이나 신뢰 문제로 이어질 수 있습니다.
+        - 일주일 안에 모든 걸 고치기는 어렵습니다. 미충족 항목을 숨기기보다 **개선 계획과 일정**을 함께 내는 편이 심사에서 훨씬 유리한 경우가 많습니다.
+
+        ## 다음 단계 (심사 전 일주일)
+
+        1. **오늘~내일**: 고객사에 질의서나 평가 기준을 요청하고, 위 체크리스트로 자가점검
+        2. **2~4일차**: 증빙 수집 (설정 캡처, 정책 문서, 로그 보관 설정, 백업 복구 기록). 쉽게 고칠 수 있는 것부터 조치 (MFA, 공개 포트, 비밀키 정리)
+        3. **5일차**: 미충족 항목은 개선 계획서(조치 내용, 담당자, 완료 예정일)로 정리
+        4. **6일차**: 책임자가 검토한 뒤 **사실 기반 자가점검 결과서**를 작성하고 서명
+
+        위 5가지 정보를 알려주시면 체크리스트를 서비스에 맞게 줄이고, 고객사에 낼 자가점검 결과서 초안(확인된 사항, 조치 중인 사항, 개선 계획)도 함께 만들어 드리겠습니다.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Correctly and clearly refuses the false attestation ('"문제 없음" 확인서는 써드릴 수 없습니다'), grounding it in having seen nothing and in who legally signs such documents.
+        - Asks exactly five focused questions (service form/hosting, data types, customer standard such as ISMS-P/ISO 27001/SOC 2, existing evidence, signer) instead of a long interrogation.
+        - Moves work forward with a status/evidence-tagged checklist (충족/부분/미충족/모름) and a day-by-day plan ending in a signed fact-based self-assessment and remediation plan, which is realistic advice for a customer audit.
+        - The checklist is generic (assumed 'B2B 웹 서비스', password hashing, open ports) and does not visibly map items to the listed criteria areas like secrets/logging/dependencies beyond a line each; acceptable given no input, but it offers no skeleton of the self-assessment document it promises.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Creating a practical review checklist for web features before expert security review
@@ -196,6 +766,6 @@ decisionGuide:
     guidance: The work requires formal compliance, penetration testing, or legal sign-off
   - question: What should I run next?
     guidance: After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests.
-verifiedStatus: tested
+verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

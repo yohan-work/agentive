@@ -36,8 +36,188 @@ outputs:
   - Reproduction plan
   - Fix direction
 prompt: You are a pragmatic debugging lead. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical root-cause analysis report with clear sections, assumptions, risks, and next actions.
-exampleInput: Users cannot bookmark after refreshing; localStorage key exists.
-exampleOutput: Likely hydration/state mismatch, repro steps, and files to inspect.
+exampleInput: |-
+  Need a root-cause analysis for a CI failure that's blocking a PR.
+
+  Project: Agent Archive, Next.js 16 + TypeScript, open-source repo on GitHub. CI is GitHub Actions on ubuntu-latest: actions/setup-node@v7 with `node-version-file: .nvmrc` (.nvmrc contains `22`) and `cache: npm`, then `npm ci`, then schema check, check:data, lint, typecheck, test, build.
+
+  Symptom: On the PR branch, the "npm ci" step fails in about 6 seconds. Every step after it is skipped. The same branch installs and runs all checks fine on my laptop. main is green.
+
+  CI log (trimmed):
+  ```
+  Run npm ci
+  npm error code EUSAGE
+  npm error
+  npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+  npm error
+  npm error Missing: @emnapi/runtime@1.11.3 from lock file
+  npm error Missing: @emnapi/core@1.11.3 from lock file
+  npm error
+  npm error Clean install a project from your package.json & package-lock.json only. Remove node_modules to regenerate lock file.
+  npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-09-29T05_12_44_101Z-debug-0.log
+  Error: Process completed with exit code 1.
+  ```
+
+  Local environment: macOS 15 on Apple Silicon, Node v24.9.0, npm 11.6.2. `rm -rf node_modules && npm ci` succeeds locally with no warnings.
+
+  Steps to reproduce: push the branch / open the PR; CI fails at npm ci every time (3 re-runs, same error, also with the Actions cache cleared).
+
+  Recent changes on the branch (the only dependency change):
+  - Ran `npm install -D tsx` to add a test runner (`"test": "node --import tsx --test tests/*.test.ts"`).
+  - package.json diff: `+ "tsx": "^4.23.15"` in devDependencies.
+  - package-lock.json diff: +61 / -38 lines. tsx and esbuild entries added; I didn't hand-edit it. I noticed a few `"optional": true` / `"peer": true` flags moved around under node_modules/@img/... and node_modules/@napi-rs/... but I don't know if that matters.
+  - Nobody touched .nvmrc or the workflow file.
+
+  Neither I nor the project uses @emnapi directly; `npm ls @emnapi/runtime` locally prints `(empty)`.
+
+  Please give hypotheses ranked by likelihood, an evidence map, a reproduction plan, and a fix direction I can act on today.
+exampleOutput: |-
+  # RCA: `npm ci` fails with EUSAGE on PR branch (Agent Archive)
+
+  ## TL;DR
+
+  This is almost certainly **not** a tsx problem and **not** a cache problem. Your laptop wrote the lockfile, and the npm in CI reads it differently. Locally you run **Node 24 / npm 11.6.2**. CI runs **Node 22** (from `.nvmrc`), which bundles **npm 10.x**. When you ran `npm install -D tsx`, npm 11 re-resolved the platform-specific optional parts of the tree (`@img/*` from sharp via Next, `@napi-rs/*`). That is the `optional`/`peer` flag churn you noticed. npm 10's `ci` consistency check then decides that `@emnapi/runtime` and `@emnapi/core` (dependencies of the WASM fallback packages) should be in the lockfile, and they aren't.
+
+  **Fix today:** regenerate the lockfile change with the same Node/npm that CI uses, then verify with `npm ci` in a Linux Node 22 container before you push. Details are in "Fix direction" below.
+
+  ---
+
+  ## Facts from your report
+
+  | Observation | What it tells us |
+  |---|---|
+  | Fails in ~6s at `npm ci` with `EUSAGE` "not in sync" | The pre-install lockfile validation fails. Nothing was downloaded, so network, registry, and cache are ruled out. |
+  | Missing `@emnapi/runtime@1.11.3`, `@emnapi/core@1.11.3` | These are transitive deps of WASM fallback packages (e.g. `@img/sharp-wasm32`, `@napi-rs/wasm-runtime`). They are optional and platform-conditional, and nobody depends on them directly. |
+  | `npm ls @emnapi/runtime` is `(empty)` locally | Expected on darwin-arm64: the WASM fallback isn't installed there. Your machine never needs these packages, so it never notices they're missing. |
+  | Lockfile diff shows `optional`/`peer` flags moving under `@img/...` and `@napi-rs/...` | tsx/esbuild don't touch those packages. The churn comes from the npm version that re-wrote the lockfile, not from the dependency you added. |
+  | Local: Node 24.9 / npm 11.6.2. CI: Node 22 (bundled npm 10.x) | Different npm majors on each side of the lockfile. |
+  | Fails after clearing the Actions cache and on 3 re-runs | Deterministic, so not a flaky cache or registry issue. |
+  | `main` is green | `main`'s lockfile is valid for npm 10. The branch's lockfile change introduced the problem. |
+
+  ---
+
+  ## Hypotheses (ranked)
+
+  ### H1: npm 11 vs npm 10 lockfile disagreement (most likely, ~70%)
+  npm 11 wrote a lockfile whose optional/peer metadata for the `@img` / `@napi-rs` subtree differs from what npm 10 computes as the ideal tree. npm 10's `ci` then finds edges to `@emnapi/*` with no matching `node_modules/@emnapi/*` entry and refuses to install.
+  - **For:** the flag churn in unrelated packages, the local/CI npm major mismatch, `main` green, deterministic failure.
+  - **Against / unknown:** I haven't seen the lockfile. Confirm with the repro below.
+
+  ### H2: Cross-platform optional-dependency pruning (~15%, often co-occurs with H1)
+  npm has a long-standing class of bugs where a lockfile generated on one OS/arch omits transitive deps of optional packages for *other* platforms. The WASM fallbacks and their `@emnapi/*` deps are the classic example. Regenerating on macOS dropped entries that Linux validation needs.
+  - **Distinguish from H1:** run CI's npm version on Linux, and then your npm version on Linux (repro steps 2 and 3).
+
+  ### H3: PR merge-commit drift (~10%)
+  `pull_request` workflows check out `refs/pull/N/merge`, which is your branch merged into current `main`, not your branch tip. If `main` changed `package-lock.json` after you branched (a Next/sharp bump, for example), the merged lockfile can be internally inconsistent even though both sides are fine alone. That would also explain "works on my laptop on the branch".
+  - **Check:** `git log --oneline <merge-base>..origin/main -- package.json package-lock.json`. Any output makes this plausible.
+
+  ### H4: Anything cache-, registry-, or tsx-specific (<5%)
+  Ruled out by: failure before any download, cache clear had no effect, and `npm ci` validates only against the lockfile, so newly published versions don't matter. tsx 4.x has no `@emnapi` dependency.
+
+  ---
+
+  ## Assumptions
+  - `actions/setup-node` with `node-version-file: .nvmrc` uses Node 22's **bundled** npm (10.x). No step upgrades npm. Confirm by adding `node -v && npm -v` before `npm ci`.
+  - Your lockfile change came only from `npm install -D tsx` under Node 24 / npm 11.6.2, with no manual edits.
+  - The workflow triggers on `pull_request` (relevant to H3).
+
+  ---
+
+  ## Reproduction plan (~20 minutes)
+
+  Run these from the repo root, on the PR branch, with Docker available.
+
+  1. **Confirm CI versions.** Temporarily add a step `run: node -v && npm -v` before `npm ci`, or check the setup-node log output. You should see npm 10.x.
+
+  2. **Reproduce CI exactly (Linux + Node 22 + npm 10):**
+     ```bash
+     docker run --rm -v "$PWD":/app -w /app node:22 bash -c 'npm -v && npm ci --ignore-scripts'
+     ```
+     - Fails with the same `Missing: @emnapi/...` error: reproduced. Continue to step 3.
+     - Passes: go to step 4 (H3).
+
+  3. **Isolate npm version vs platform:**
+     ```bash
+     docker run --rm -v "$PWD":/app -w /app node:22 bash -c 'npm i -g npm@11.6.2 && npm ci --ignore-scripts'
+     ```
+     - Passes: **H1 confirmed.** npm major mismatch is the cause.
+     - Still fails: **H2.** The macOS-generated lockfile is missing Linux-relevant entries regardless of npm version.
+
+     Also try the reverse on your Mac: `npx -y npm@10 ci`. If this fails locally too, that's strong H1 evidence without Docker.
+
+  4. **Test the merge commit (H3):**
+     ```bash
+     git fetch origin
+     git switch -c rca-merge-test
+     git merge --no-edit origin/main
+     docker run --rm -v "$PWD":/app -w /app node:22 npm ci --ignore-scripts
+     ```
+
+  5. **Inspect the lockfile evidence:**
+     ```bash
+     grep -n '"node_modules/@emnapi' package-lock.json        # entries present?
+     grep -n '"@emnapi/runtime"' package-lock.json            # who depends on it?
+     git diff origin/main -- package-lock.json | grep -nE 'emnapi|wasm|"optional"|"peer"'
+     ```
+     Expected under H1/H2: dependents such as `@img/sharp-wasm32` or `@napi-rs/wasm-runtime` list `@emnapi/*`, but there is no `node_modules/@emnapi/...` entry on the branch. `main` has one.
+
+  (Scripts are disabled with `--ignore-scripts` because only the validation step matters here, and it keeps the mounted `node_modules` from getting Linux binaries. Delete `node_modules` afterwards anyway.)
+
+  ---
+
+  ## Fix direction (act today)
+
+  ### Recommended: regenerate the lockfile change with CI's toolchain
+  Start from `main`'s known-good lockfile and re-apply only the tsx addition using Node 22 / npm 10:
+
+  ```bash
+  git checkout origin/main -- package-lock.json
+  docker run --rm -v "$PWD":/app -w /app node:22 \
+    npm install --package-lock-only --ignore-scripts
+  # package.json already contains "tsx": "^4.23.15"; this adds only what's needed
+  docker run --rm -v "$PWD":/app -w /app node:22 npm ci --ignore-scripts   # must pass
+  rm -rf node_modules && npm ci   # sanity check locally too
+  git add package-lock.json && git commit -m "fix: regenerate lockfile with npm 10 to match CI"
+  ```
+
+  Without Docker, you can use `nvm use` (which respects `.nvmrc` → Node 22) and then do the same steps without the container.
+
+  **Check the diff before you push.** It should be roughly tsx + esbuild (+ its platform packages), with **no** flag churn under `@img/*` / `@napi-rs/*` and `@emnapi/*` entries intact. If you see unrelated version bumps, stop and restore `main`'s lockfile again.
+
+  If step 3 pointed to **H2** (the failure is platform-specific, not version-specific), generating inside the Linux container as above still fixes it, because the lockfile then gets written on the platform that validates it.
+
+  If step 4 pointed to **H3**, rebase onto `origin/main` first, then do the regeneration above.
+
+  ### Prevent recurrence (small follow-up PR)
+  - **Align local with `.nvmrc`.** Your laptop runs Node 24, but the project declares 22. Use `nvm use` / `fnm use` / `volta` so contributors write lockfiles with the same npm major as CI.
+  - **Pin npm explicitly** so it doesn't drift with the Node patch version. Either add `npm i -g npm@<version>` in the workflow before `npm ci` and document the same version for contributors, or declare it in `package.json` via `devEngines` / `engines.npm` (with `engine-strict`) so a mismatch fails loudly.
+  - **Print versions in CI** (`node -v && npm -v`) so the next mismatch is obvious from the log.
+  - Optionally, **add a lockfile check** in CI or pre-commit that runs `npm ci --dry-run` or `npm install --package-lock-only` with a clean git diff check.
+
+  ### Don't do these
+  - **Don't switch CI to `npm install`.** It hides the problem and makes builds non-reproducible.
+  - **Don't delete and regenerate the whole lockfile.** That silently bumps every transitive dep inside a "add test runner" PR.
+  - **Don't hand-add `@emnapi` entries.** Integrity hashes and resolution metadata are easy to get wrong.
+
+  ---
+
+  ## Risks
+  - **Other Node 22 vs 24 differences.** Once `npm ci` passes, `test`/`build` run on Node 22 for the first time on this branch. You've only validated them on Node 24. `node --import tsx --test` is fine on 22, but watch for other runtime differences.
+  - **npm 11 locally may re-churn the lockfile.** The next time you run `npm install` on Node 24, the flags could move back and reintroduce the problem. The prevention step (aligning versions) is what actually closes this.
+  - **Unrelated changes in the regenerated lockfile.** If it changes more than expected, reviewers may push back. Keep the diff minimal and mention the regeneration in the PR description.
+
+  ---
+
+  ## Next actions
+
+  | # | Action | Owner | Time |
+  |---|---|---|---|
+  | 1 | Run repro steps 2 and 3 to confirm H1 vs H2 | You | 10 min |
+  | 2 | Regenerate the lockfile from `main` using Node 22 / npm 10; verify `npm ci` in `node:22` | You | 10 min |
+  | 3 | Push, confirm CI is green through build | You | ~CI time |
+  | 4 | Follow-up PR: print versions in CI, pin npm, document `nvm use` in CONTRIBUTING | You / maintainers | 30 min |
+
+  If step 2 of the repro **passes** in `node:22` on your branch and step 4 also passes, send me the `npm -v` line from the CI log and the output of the lockfile `grep` commands. That would mean CI's environment differs from stock `node:22`, and I'd want to see exactly how.
 limitations:
   - Cannot prove a cause without code or runtime evidence.
 bestPractices:
@@ -151,9 +331,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Triage where symptoms, logs, reproduction notes, and recent changes are available
     - "Teams with the required inputs ready: Bug symptoms, Steps to reproduce, Logs"
@@ -163,30 +341,283 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - May over-rank plausible causes when logs are partial or reproduction is missing
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - Attaches invented likelihood percentages to hypotheses (e.g. H1 ~70%, H2 ~15%, H3 ~10%) that are not grounded in any measured data.
+    - The strong-case H1 and H2 overlap heavily (npm-version pruning vs cross-platform optional-dep pruning), so part of the repro plan goes to separating causes that lead to the same fix.
+    - Outputs are long. The strong run adds a Next actions table, a Risks section, and a Don't-do list on top of a fix section that already covers the same ground.
+    - In the boundary case it defaults to a client + backend database + multi-device model and never considers a purely client-side store such as localStorage, the most likely storage for a static site.
+    - It does not consistently use the declared output section names. The boundary run has no explicit 'Evidence map' or 'Reproduction plan' heading and folds them into a hypothesis table and next actions.
   evaluationCriteria:
     - Separates evidence, hypotheses, reproduction plan, and fix direction
     - Produces Hypotheses in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Bug Root Cause Analyst strong-context run
-      input: Analyze why bookmarks disappear after refresh using browser logs and the storage helper.
-      expectedOutputSummary: A usable Hypotheses with project-specific assumptions, risks, and next steps.
-      sampleOutput: "Hypotheses: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: CI npm ci fails with missing @emnapi packages after adding tsx
+      input: |-
+        Need a root-cause analysis for a CI failure that's blocking a PR.
+
+        Project: Agent Archive, Next.js 16 + TypeScript, open-source repo on GitHub. CI is GitHub Actions on ubuntu-latest: actions/setup-node@v7 with `node-version-file: .nvmrc` (.nvmrc contains `22`) and `cache: npm`, then `npm ci`, then schema check, check:data, lint, typecheck, test, build.
+
+        Symptom: On the PR branch, the "npm ci" step fails in about 6 seconds. Every step after it is skipped. The same branch installs and runs all checks fine on my laptop. main is green.
+
+        CI log (trimmed):
+        ```
+        Run npm ci
+        npm error code EUSAGE
+        npm error
+        npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+        npm error
+        npm error Missing: @emnapi/runtime@1.11.3 from lock file
+        npm error Missing: @emnapi/core@1.11.3 from lock file
+        npm error
+        npm error Clean install a project from your package.json & package-lock.json only. Remove node_modules to regenerate lock file.
+        npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-09-29T05_12_44_101Z-debug-0.log
+        Error: Process completed with exit code 1.
+        ```
+
+        Local environment: macOS 15 on Apple Silicon, Node v24.9.0, npm 11.6.2. `rm -rf node_modules && npm ci` succeeds locally with no warnings.
+
+        Steps to reproduce: push the branch / open the PR; CI fails at npm ci every time (3 re-runs, same error, also with the Actions cache cleared).
+
+        Recent changes on the branch (the only dependency change):
+        - Ran `npm install -D tsx` to add a test runner (`"test": "node --import tsx --test tests/*.test.ts"`).
+        - package.json diff: `+ "tsx": "^4.23.15"` in devDependencies.
+        - package-lock.json diff: +61 / -38 lines. tsx and esbuild entries added; I didn't hand-edit it. I noticed a few `"optional": true` / `"peer": true` flags moved around under node_modules/@img/... and node_modules/@napi-rs/... but I don't know if that matters.
+        - Nobody touched .nvmrc or the workflow file.
+
+        Neither I nor the project uses @emnapi directly; `npm ls @emnapi/runtime` locally prints `(empty)`.
+
+        Please give hypotheses ranked by likelihood, an evidence map, a reproduction plan, and a fix direction I can act on today.
+      expectedOutputSummary: A ranked RCA naming the Node 24/npm 11 (local) vs Node 22/npm 10 (CI) lockfile mismatch over the optional @emnapi/core and @emnapi/runtime entries as the lead hypothesis, backed by the log and the flag churn, with a Linux/Node 22 repro and a fix that regenerates the lockfile from main's version using npm 10 and keeps the diff minimal.
+      sampleOutput: |-
+        # RCA: `npm ci` fails with EUSAGE on PR branch (Agent Archive)
+
+        ## TL;DR
+
+        This is almost certainly **not** a tsx problem and **not** a cache problem. Your laptop wrote the lockfile, and the npm in CI reads it differently. Locally you run **Node 24 / npm 11.6.2**. CI runs **Node 22** (from `.nvmrc`), which bundles **npm 10.x**. When you ran `npm install -D tsx`, npm 11 re-resolved the platform-specific optional parts of the tree (`@img/*` from sharp via Next, `@napi-rs/*`). That is the `optional`/`peer` flag churn you noticed. npm 10's `ci` consistency check then decides that `@emnapi/runtime` and `@emnapi/core` (dependencies of the WASM fallback packages) should be in the lockfile, and they aren't.
+
+        **Fix today:** regenerate the lockfile change with the same Node/npm that CI uses, then verify with `npm ci` in a Linux Node 22 container before you push. Details are in "Fix direction" below.
+
+        ---
+
+        ## Facts from your report
+
+        | Observation | What it tells us |
+        |---|---|
+        | Fails in ~6s at `npm ci` with `EUSAGE` "not in sync" | The pre-install lockfile validation fails. Nothing was downloaded, so network, registry, and cache are ruled out. |
+        | Missing `@emnapi/runtime@1.11.3`, `@emnapi/core@1.11.3` | These are transitive deps of WASM fallback packages (e.g. `@img/sharp-wasm32`, `@napi-rs/wasm-runtime`). They are optional and platform-conditional, and nobody depends on them directly. |
+        | `npm ls @emnapi/runtime` is `(empty)` locally | Expected on darwin-arm64: the WASM fallback isn't installed there. Your machine never needs these packages, so it never notices they're missing. |
+        | Lockfile diff shows `optional`/`peer` flags moving under `@img/...` and `@napi-rs/...` | tsx/esbuild don't touch those packages. The churn comes from the npm version that re-wrote the lockfile, not from the dependency you added. |
+        | Local: Node 24.9 / npm 11.6.2. CI: Node 22 (bundled npm 10.x) | Different npm majors on each side of the lockfile. |
+        | Fails after clearing the Actions cache and on 3 re-runs | Deterministic, so not a flaky cache or registry issue. |
+        | `main` is green | `main`'s lockfile is valid for npm 10. The branch's lockfile change introduced the problem. |
+
+        ---
+
+        ## Hypotheses (ranked)
+
+        ### H1: npm 11 vs npm 10 lockfile disagreement (most likely, ~70%)
+        npm 11 wrote a lockfile whose optional/peer metadata for the `@img` / `@napi-rs` subtree differs from what npm 10 computes as the ideal tree. npm 10's `ci` then finds edges to `@emnapi/*` with no matching `node_modules/@emnapi/*` entry and refuses to install.
+        - **For:** the flag churn in unrelated packages, the local/CI npm major mismatch, `main` green, deterministic failure.
+        - **Against / unknown:** I haven't seen the lockfile. Confirm with the repro below.
+
+        ### H2: Cross-platform optional-dependency pruning (~15%, often co-occurs with H1)
+        npm has a long-standing class of bugs where a lockfile generated on one OS/arch omits transitive deps of optional packages for *other* platforms. The WASM fallbacks and their `@emnapi/*` deps are the classic example. Regenerating on macOS dropped entries that Linux validation needs.
+        - **Distinguish from H1:** run CI's npm version on Linux, and then your npm version on Linux (repro steps 2 and 3).
+
+        ### H3: PR merge-commit drift (~10%)
+        `pull_request` workflows check out `refs/pull/N/merge`, which is your branch merged into current `main`, not your branch tip. If `main` changed `package-lock.json` after you branched (a Next/sharp bump, for example), the merged lockfile can be internally inconsistent even though both sides are fine alone. That would also explain "works on my laptop on the branch".
+        - **Check:** `git log --oneline <merge-base>..origin/main -- package.json package-lock.json`. Any output makes this plausible.
+
+        ### H4: Anything cache-, registry-, or tsx-specific (<5%)
+        Ruled out by: failure before any download, cache clear had no effect, and `npm ci` validates only against the lockfile, so newly published versions don't matter. tsx 4.x has no `@emnapi` dependency.
+
+        ---
+
+        ## Assumptions
+        - `actions/setup-node` with `node-version-file: .nvmrc` uses Node 22's **bundled** npm (10.x). No step upgrades npm. Confirm by adding `node -v && npm -v` before `npm ci`.
+        - Your lockfile change came only from `npm install -D tsx` under Node 24 / npm 11.6.2, with no manual edits.
+        - The workflow triggers on `pull_request` (relevant to H3).
+
+        ---
+
+        ## Reproduction plan (~20 minutes)
+
+        Run these from the repo root, on the PR branch, with Docker available.
+
+        1. **Confirm CI versions.** Temporarily add a step `run: node -v && npm -v` before `npm ci`, or check the setup-node log output. You should see npm 10.x.
+
+        2. **Reproduce CI exactly (Linux + Node 22 + npm 10):**
+           ```bash
+           docker run --rm -v "$PWD":/app -w /app node:22 bash -c 'npm -v && npm ci --ignore-scripts'
+           ```
+           - Fails with the same `Missing: @emnapi/...` error: reproduced. Continue to step 3.
+           - Passes: go to step 4 (H3).
+
+        3. **Isolate npm version vs platform:**
+           ```bash
+           docker run --rm -v "$PWD":/app -w /app node:22 bash -c 'npm i -g npm@11.6.2 && npm ci --ignore-scripts'
+           ```
+           - Passes: **H1 confirmed.** npm major mismatch is the cause.
+           - Still fails: **H2.** The macOS-generated lockfile is missing Linux-relevant entries regardless of npm version.
+
+           Also try the reverse on your Mac: `npx -y npm@10 ci`. If this fails locally too, that's strong H1 evidence without Docker.
+
+        4. **Test the merge commit (H3):**
+           ```bash
+           git fetch origin
+           git switch -c rca-merge-test
+           git merge --no-edit origin/main
+           docker run --rm -v "$PWD":/app -w /app node:22 npm ci --ignore-scripts
+           ```
+
+        5. **Inspect the lockfile evidence:**
+           ```bash
+           grep -n '"node_modules/@emnapi' package-lock.json        # entries present?
+           grep -n '"@emnapi/runtime"' package-lock.json            # who depends on it?
+           git diff origin/main -- package-lock.json | grep -nE 'emnapi|wasm|"optional"|"peer"'
+           ```
+           Expected under H1/H2: dependents such as `@img/sharp-wasm32` or `@napi-rs/wasm-runtime` list `@emnapi/*`, but there is no `node_modules/@emnapi/...` entry on the branch. `main` has one.
+
+        (Scripts are disabled with `--ignore-scripts` because only the validation step matters here, and it keeps the mounted `node_modules` from getting Linux binaries. Delete `node_modules` afterwards anyway.)
+
+        ---
+
+        ## Fix direction (act today)
+
+        ### Recommended: regenerate the lockfile change with CI's toolchain
+        Start from `main`'s known-good lockfile and re-apply only the tsx addition using Node 22 / npm 10:
+
+        ```bash
+        git checkout origin/main -- package-lock.json
+        docker run --rm -v "$PWD":/app -w /app node:22 \
+          npm install --package-lock-only --ignore-scripts
+        # package.json already contains "tsx": "^4.23.15"; this adds only what's needed
+        docker run --rm -v "$PWD":/app -w /app node:22 npm ci --ignore-scripts   # must pass
+        rm -rf node_modules && npm ci   # sanity check locally too
+        git add package-lock.json && git commit -m "fix: regenerate lockfile with npm 10 to match CI"
+        ```
+
+        Without Docker, you can use `nvm use` (which respects `.nvmrc` → Node 22) and then do the same steps without the container.
+
+        **Check the diff before you push.** It should be roughly tsx + esbuild (+ its platform packages), with **no** flag churn under `@img/*` / `@napi-rs/*` and `@emnapi/*` entries intact. If you see unrelated version bumps, stop and restore `main`'s lockfile again.
+
+        If step 3 pointed to **H2** (the failure is platform-specific, not version-specific), generating inside the Linux container as above still fixes it, because the lockfile then gets written on the platform that validates it.
+
+        If step 4 pointed to **H3**, rebase onto `origin/main` first, then do the regeneration above.
+
+        ### Prevent recurrence (small follow-up PR)
+        - **Align local with `.nvmrc`.** Your laptop runs Node 24, but the project declares 22. Use `nvm use` / `fnm use` / `volta` so contributors write lockfiles with the same npm major as CI.
+        - **Pin npm explicitly** so it doesn't drift with the Node patch version. Either add `npm i -g npm@<version>` in the workflow before `npm ci` and document the same version for contributors, or declare it in `package.json` via `devEngines` / `engines.npm` (with `engine-strict`) so a mismatch fails loudly.
+        - **Print versions in CI** (`node -v && npm -v`) so the next mismatch is obvious from the log.
+        - Optionally, **add a lockfile check** in CI or pre-commit that runs `npm ci --dry-run` or `npm install --package-lock-only` with a clean git diff check.
+
+        ### Don't do these
+        - **Don't switch CI to `npm install`.** It hides the problem and makes builds non-reproducible.
+        - **Don't delete and regenerate the whole lockfile.** That silently bumps every transitive dep inside a "add test runner" PR.
+        - **Don't hand-add `@emnapi` entries.** Integrity hashes and resolution metadata are easy to get wrong.
+
+        ---
+
+        ## Risks
+        - **Other Node 22 vs 24 differences.** Once `npm ci` passes, `test`/`build` run on Node 22 for the first time on this branch. You've only validated them on Node 24. `node --import tsx --test` is fine on 22, but watch for other runtime differences.
+        - **npm 11 locally may re-churn the lockfile.** The next time you run `npm install` on Node 24, the flags could move back and reintroduce the problem. The prevention step (aligning versions) is what actually closes this.
+        - **Unrelated changes in the regenerated lockfile.** If it changes more than expected, reviewers may push back. Keep the diff minimal and mention the regeneration in the PR description.
+
+        ---
+
+        ## Next actions
+
+        | # | Action | Owner | Time |
+        |---|---|---|---|
+        | 1 | Run repro steps 2 and 3 to confirm H1 vs H2 | You | 10 min |
+        | 2 | Regenerate the lockfile from `main` using Node 22 / npm 10; verify `npm ci` in `node:22` | You | 10 min |
+        | 3 | Push, confirm CI is green through build | You | ~CI time |
+        | 4 | Follow-up PR: print versions in CI, pin npm, document `nvm use` in CONTRIBUTING | You / maintainers | 30 min |
+
+        If step 2 of the repro **passes** in `node:22` on your branch and step 4 also passes, send me the `npm -v` line from the CI log and the output of the lockfile `grep` commands. That would mean CI's environment differs from stock `node:22`, and I'd want to see exactly how.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Bug Root Cause Analyst boundary run
-      input: Explain a production outage from a screenshot of an error toast only.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "H1 ('npm 11 vs npm 10 lockfile disagreement') matches the real root cause. It ties together the user's specific facts: Node v24.9.0/npm 11.6.2 locally, `.nvmrc` 22 in CI, the `optional`/`peer` flag churn under `@img/...` and `@napi-rs/...`, main being green, and the failure persisting after the cache was cleared."
+        - "The fix direction is the fix that actually worked: `git checkout origin/main -- package-lock.json`, then `npm install --package-lock-only` under node:22, then verify with `npm ci`. It also correctly warns against switching to `npm install`, fully regenerating the lockfile, or hand-adding @emnapi entries."
+        - The technical claims hold up against the input. EUSAGE comes from the pre-install sync check, so network, cache, and registry are ruled out. `npm ls @emnapi/runtime` being empty on darwin-arm64 is expected because the WASM fallbacks are platform-conditional. Tracing @emnapi to the sharp-wasm32 and napi-rs wasm-runtime packages is plausible.
+        - The repro plan cleanly separates the npm version from the platform (node:22 stock vs node:22 with npm@11.6.2, plus `npx npm@10 ci` on the Mac). H3 (the PR merge ref) is a sensible extra check. The likelihood percentages are made up, though, and H2 largely overlaps H1.
+        - Assumptions, Risks (first Node 22 run of test/build, npm 11 re-churning the lockfile), and Next actions are separate sections that could be pasted into a ticket. The length is on the high side, with some repetition between Fix direction, Prevent recurrence, and Next actions.
+    - title: Intermittent bookmark loss with almost no evidence
+      input: Users say their bookmarks disappear "sometimes". Can't reproduce it. What's the root cause?
+      expectedOutputSummary: An honest refusal to name a single root cause, with labeled assumptions, a short ranked list of candidate causes and the evidence that would confirm each, a first discriminating check (data gone vs hidden), and a few focused questions, without inventing facts about the system.
+      sampleOutput: |-
+        I can't name the root cause from what's here, and nobody honestly could. "Bookmarks disappear sometimes" fits at least half a dozen different failure modes. What I can do is narrow it to the likely culprits and tell you what evidence would confirm or rule out each one. I'll frame it as a working RCA you can fill in.
+
+        ## 1. Problem statement (as known)
+
+        - **Symptom:** Users report that bookmarks they saved later go missing.
+        - **Frequency:** Intermittent ("sometimes"), and not reproduced internally.
+        - **Unknown:** platform(s), whether the loss is permanent or temporary, how many users, when it started, and whether anything changed around then.
+
+        ## 2. Assumptions
+
+        Change any of these and the ranking below changes too.
+
+        - Bookmarks are saved from a client (web and/or mobile) to a backend with a database, possibly with local caching or offline support.
+        - Users can be logged in on more than one device or tab.
+        - No one has confirmed whether the data is actually gone from the database or just not showing up.
+
+        ## 3. Candidate root causes, ranked by how often they cause *intermittent, hard-to-reproduce* data loss
+
+        | # | Hypothesis | Why it fits "sometimes" | Evidence that would confirm it |
+        |---|---|---|---|
+        | 1 | **Last-write-wins sync conflict.** Two devices or tabs each hold a stale full list and overwrite the server copy. | Only happens with multi-device use and specific timing. Single-device QA never sees it. | Deletes or overwrites in server logs where the client's "base version" is older than the current one. Affected users have more than one active session. |
+        | 2 | **Save never actually persisted.** Optimistic UI shows the bookmark, then the request fails, times out, or gets dropped silently (no retry, error swallowed). | Depends on network quality and app backgrounding. | Client error telemetry on the save endpoint. The bookmark ID never appears in server write logs. |
+        | 3 | **Local cache/offline store gets cleared or wins over the server.** Examples: app update migration, storage eviction (iOS/Safari ITP, low disk), or cache hydrated before the fetch finishes. | Tied to OS behavior, app updates, or cold starts. | Server still has the rows (it's a display problem, not data loss). Reports cluster after releases or on certain OS/browser versions. |
+        | 4 | **Session/account mix-up.** Token expiry, re-login into a different or anonymous account, or guest-to-account merge that doesn't carry bookmarks over. | Only after session expiry or a logout. | Bookmarks exist under a different user ID or a guest ID. Reports correlate with auth refresh failures. |
+        | 5 | **Backend race or bug in bulk/replace endpoints.** For example, the "update list" endpoint does a delete-all-then-insert without a transaction, or a background job or cleanup TTL removes rows. | Timing- or load-dependent, or scheduled. | Deletes in the DB audit log with no matching user action. Losses cluster at specific times (cron windows, deploys, peak load). |
+        | 6 | **Pagination/query/filter hides items.** Examples: limit caps, sort instability, soft-deleted flag misapplied, eventual-consistency read replica lag. | Depends on count or which replica served the read. | Rows exist and are "active," but the API response omits them. Happens for users with many bookmarks, or right after writes. |
+
+        My priors lean toward **#1 or #2**, since those are the most common causes of this exact report shape. That's a prior, not a finding.
+
+        ## 4. First step: is the data gone or just hidden?
+
+        This single question splits the tree in half. Take 2–3 affected users and query the database directly for their bookmarks, including soft-deleted rows and any other user IDs they may have had.
+
+        - **Rows present:** look at #3, #4, and #6 (client/display/identity).
+        - **Rows deleted or never written:** look at #1, #2, and #5 (write path/sync/backend).
+
+        ## 5. Next actions (in order)
+
+        1. **Get specifics from 3–5 affected users:** platform and version, number of devices, approximate time of loss, whether the missing bookmarks were recent or old, and whether they come back after a refresh or re-login.
+        2. **Run the DB check above** for those users.
+        3. **Add instrumentation now** so the next occurrence gets caught:
+           - Log every bookmark create/delete/replace server-side with user ID, session/device ID, client version, and the source endpoint.
+           - Report client-side save failures instead of swallowing them.
+           - If you have a sync or bulk endpoint, log the client's base version against the server's current version.
+        4. **Review the code paths** for any "replace the whole list" write, any delete-then-insert without a transaction, and any cache that renders before the server fetch resolves.
+        5. **Try targeted repros** instead of random clicking: two devices editing simultaneously, saving while throttled or offline and then killing the app, saving right before token expiry, and upgrading from the previous app version with bookmarks cached.
+
+        ## 6. Risks
+
+        - **Ongoing silent data loss** erodes trust. If #1 or #5 turns out to be the cause, the damage is permanent for affected users unless you have backups or an audit log.
+        - **Fixing the wrong layer:** patching the UI when the server is deleting rows, or the reverse. Don't ship a fix before step 2.
+        - **Recovery:** if rows are hard-deleted, check whether DB backups or point-in-time recovery could restore them for affected users.
+
+        ## 7. Short-term mitigations (while investigating)
+
+        - Switch deletes to soft deletes, if they aren't already, so any future loss can be recovered.
+        - Show a visible error and retry when a save fails, instead of an optimistic success.
+
+        To sharpen this into an actual diagnosis, send me:
+
+        1. The platforms involved (web, iOS, Android) and whether you have offline/local caching.
+        2. Whether the bookmarks are missing from the database or only from the UI.
+        3. How bookmarks are written. Is each one its own create/delete call, or does the client send the whole list?
+
+        With those three answers I can probably cut this list down to one or two causes and suggest a concrete fix.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Opens by saying the root cause can't be named from this input, and marks its ranking as 'a prior, not a finding'. It invents no facts.
+        - The 'data gone or just hidden?' DB check is a strong first step that splits the six hypotheses into write-path and read/display groups, which moves the work forward concretely.
+        - The hypothesis table has 'Why it fits sometimes' and 'Evidence that would confirm it' columns. That works as a lightweight evidence map, but there is no explicitly labeled Evidence map or Reproduction plan section; the targeted repros are buried in Next actions step 5.
+        - The assumptions (a backend database, multiple devices or tabs) are stated, but they steer the whole list toward server-side causes. Browser localStorage or other client-only storage as the store of record is never considered, even though that is a common setup for this kind of feature.
+        - It ends with three focused questions (platforms, DB vs UI, per-item vs whole-list writes) rather than a long questionnaire, which is good. The Risks and mitigations sections (soft deletes, visible save errors) are useful but add length.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Triage where symptoms, logs, reproduction notes, and recent changes are available
@@ -200,4 +631,4 @@ relatedAgents:
   - pr-review-agent
   - qa-checklist-agent
 verifiedStatus: community
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

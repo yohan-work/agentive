@@ -36,8 +36,219 @@ outputs:
   - Risks
   - Recommended next actions
 prompt: You are Product Roadmap Prioritizer. Convert the user's context into a practical prioritized roadmap. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
-exampleInput: 스타트업이 다음 분기 기능 후보 20개를 줄여야 하는 상황
-exampleOutput: A structured prioritized roadmap with practical recommendations, tradeoffs, and next steps.
+exampleInput: |-
+  다음 분기(2026 Q4, 10/6~12/26, 12주) 로드맵 우선순위를 정리해 주세요. 금요일 경영진 리뷰에 그대로 붙일 수 있는 형태면 좋겠습니다.
+
+  회사/제품: "밀키트노트" — 소규모 식당·카페(직원 3~15명)용 재고·발주 관리 SaaS. 웹 + 모바일 앱. 유료 매장 1,240곳, MRR 약 8,700만 원, 월 로고 이탈률 3.1%(목표 2.0%).
+
+  목표(우선순위 순):
+  1. 이탈률 3.1% → 2.3%로 낮추기
+  2. 신규 유료 전환율(14일 체험 → 유료) 18% → 22%
+  3. 12월 연말 성수기 전에 장애 없이 안정화
+
+  팀 capacity: 백엔드 3명, 프론트 2명, 모바일 1명, 디자이너 1명, PM 1명(나). 12주 × 7명 개발 = 대략 80 person-week인데 운영/버그 대응으로 25% 빠짐 → 가용 약 60 person-week.
+
+  제약:
+  - 10월 말 POS 연동 파트너(포스플러스) API가 v2로 바뀜. v1은 12/31 종료 확정. 현재 매장의 41%가 이 연동을 씀.
+  - 11월에 디자이너 2주 휴가.
+  - 모바일 앱 스토어 심사 기간 평균 3일.
+
+  후보 목록 (추정 공수는 팀장 추정, 영향은 데이터 근거 표시):
+  1. 포스플러스 API v2 마이그레이션 — 8pw. 안 하면 41% 매장 연동 중단.
+  2. 발주 추천(지난 4주 소진량 기반) — 10pw. 인터뷰 12곳 중 9곳 요청. 이탈 사유 1위 "발주 여전히 수작업"(해지 설문 32%).
+  3. 재고 실사 모바일 바코드 스캔 — 6pw. 체험 사용자 세션 녹화에서 실사 화면 이탈 58%.
+  4. 온보딩 체크리스트 개편 — 3pw. 체험 1일차에 품목 20개 이상 등록한 매장의 전환율 31% vs 미만 9%.
+  5. 엑셀 품목 일괄 업로드 개선(오류 행 표시) — 2pw. CS 문의 월 140건 중 38건.
+  6. 다지점 대시보드 — 9pw. 다지점 고객 23곳(매출 비중 14%), 그중 4곳이 "없으면 해지" 언급.
+  7. 카카오 알림톡으로 재고 부족 알림 — 3pw. 요청 많음(정확한 수치 없음).
+  8. 다크 모드 — 2pw. 요청 11건.
+  9. 결제 실패 재시도/더닝 메일 — 2pw. 비자발적 이탈이 전체 이탈의 약 0.6%p로 추정.
+  10. 원가 리포트(메뉴별 원가율) — 7pw. 영업팀이 신규 계약 필수라고 주장, 근거는 영업 파이프라인 6건.
+  11. 권한 관리(직원별 메뉴 접근 제한) — 4pw. 보안 문의 월 5건.
+  12. 앱 성능 개선(품목 2,000개 이상 매장에서 목록 로딩 6~9초) — 4pw. 해당 매장 87곳, NPS -12.
+  13. 영문 UI — 5pw. 해외 문의 월 2~3건.
+  14. 거래처(공급업체) 포털 — 12pw. 전략적이라고 CEO가 언급, 검증 데이터 없음.
+  15. 알림 설정 세분화 — 1pw.
+  16. 공휴일/임시휴무 캘린더 — 1pw. 발주 추천(2번)의 정확도에 필요.
+  17. 모니터링/알림 체계 정비(현재 장애 감지 평균 47분) — 3pw.
+  18. 리퍼럴 프로그램 — 4pw. 기존 고객 NPS 41.
+
+  이해관계자: CEO(14번 선호), 영업총괄(10번 강하게 요구), CS팀장(5번, 7번).
+
+  원하는 결과: 점수 기준과 가정이 보이는 우선순위 표, 이번 분기에 넣을 것/뺄 것, 순서와 의존성, 이해관계자별로 왜 빠졌는지 설명할 근거, 리스크, 다음 액션.
+exampleOutput: |-
+  # 밀키트노트 2026 Q4 로드맵 우선순위 (10/6~12/26, 12주)
+
+  ## 0. 한 줄 요약
+
+  **가용 60pw 중 39pw를 확정 과제 9개에, 9pw를 W6 게이트 조건부 과제에, 12pw를 버퍼로 배정합니다.** 반드시 해야 하는 일은 포스플러스 v2 전환과 모니터링이고, 이탈 방어는 더닝, 성능 개선, 발주 추천으로, 전환율은 온보딩, 엑셀 업로드, 바코드 스캔으로 공략합니다. 대형 변경은 11/28까지 끝내고 12/8부터 변경을 동결합니다. 공급업체 포털(14)과 원가 리포트(10)는 이번 분기 개발에서 빼고 검증(discovery) 과제로 돌립니다.
+
+  > **경영진 기대치 조정이 필요합니다.** 발주 추천은 11월 말 GA 예정이라 이탈 개선 효과가 12월 수치에는 거의 반영되지 않습니다. 이번 분기 현실적인 이탈률 목표는 **12월 기준 2.6~2.7%**이고, 2.3%는 **2027년 2월 기준**으로 잡는 것을 제안합니다(근거는 5장).
+
+  ---
+
+  ## 1. 점수 기준
+
+  | 항목 | 정의 |
+  |---|---|
+  | 목표 기여 (0~3) | G1 이탈 ×3, G2 체험→유료 전환 ×2, G3 연말 안정화 ×2. 가중치는 말씀하신 목표 우선순위를 반영 |
+  | 영향 합 | Σ(기여 × 가중치), 최대 21 |
+  | 신뢰도 | 1.0 = 직접 측정한 정량 데이터 / 0.7 = 설문·인터뷰·상관관계·추정치 / 0.4 = 주장·일화, 수치 없음 |
+  | 점수 | 영향 합 × 신뢰도 ÷ 공수(pw) → **1pw당 기대 가치** |
+  | 게이트 | 기한이 정해졌거나 사업 연속성이 걸린 과제는 점수와 상관없이 **필수**로 분류 |
+
+  점수는 공수로 나누기 때문에 큰 과제가 불리하게 나옵니다. 그래서 **영향 합(절대 크기)**도 같이 보고 판단했습니다. 발주 추천(2)은 이 기준 때문에 점수는 중간이지만 포함했습니다.
+
+  ## 2. 우선순위 표
+
+  | 순위 | # | 과제 | G1 | G2 | G3 | 영향 합 | 신뢰도 | 공수 | 점수 | 판정 |
+  |---|---|---|---|---|---|---|---|---|---|---|
+  | 필수 | 1 | 포스플러스 API v2 마이그레이션 | 3 | 0 | 3 | 15 | 1.0 | 8 | 1.88 | **확정 (기한 12/31)** |
+  | 1 | 9 | 결제 실패 재시도/더닝 | 3 | 0 | 0 | 9 | 0.7 | 2 | 3.15 | **확정** |
+  | 2 | 17 | 모니터링/알림 체계 정비 | 1 | 0 | 3 | 9 | 1.0 | 3 | 3.00 | **확정 (필수 성격)** |
+  | 3 | 5 | 엑셀 일괄 업로드 개선 | 1 | 2 | 0 | 7 | 0.7 | 2 | 2.45 | **확정** |
+  | 4 | 4 | 온보딩 체크리스트 개편 | 1 | 3 | 0 | 9 | 0.7 | 3 | 2.10 | **확정** |
+  | 5 | 12 | 대용량 매장 성능 개선 | 2 | 0 | 1 | 8 | 1.0 | 4 | 2.00 | **확정** |
+  | 6 | 15 | 알림 설정 세분화 | 1 | 0 | 0 | 3 | 0.4 | 1 | 1.20 | 조건부 (7과 묶음) |
+  | 7 | 3 | 재고 실사 바코드 스캔 | 1 | 2 | 0 | 7 | 0.7 | 6 | 0.82 | **확정** |
+  | 8 | 2+16 | 발주 추천 + 공휴일 캘린더 | 3 | 1 | 0 | 11 | 0.7 | 11 | 0.70 | **확정 (영향 최대)** |
+  | 9 | 6 | 다지점 대시보드 | 2 | 0 | 0 | 6 | 0.7 | 9 | 0.47 | 조건부, **범위 축소 MVP 약 5pw** |
+  | 10 | 7 | 카카오 알림톡 재고 부족 알림 | 1 | 0 | 0 | 3 | 0.4 | 3 | 0.40 | 조건부 |
+  | 11 | 11 | 권한 관리 | 1 | 0 | 0 | 3 | 0.4 | 4 | 0.30 | 제외 (Q1 후보) |
+  | 12 | 10 | 원가 리포트 | 0 | 1 | 0 | 2 | 0.4 | 7 | 0.11 | 제외, **검증 과제로 전환** |
+  | – | 14 | 거래처 포털 | 0 | 0 | 0 | 0 | 0.4 | 12 | 0 | 제외, **검증 과제로 전환** |
+  | – | 18 | 리퍼럴 프로그램 | 0 | 0 | 0 | 0 | 0.7 | 4 | 0 | 제외 (획득은 이번 분기 목표 밖) |
+  | – | 13 | 영문 UI | 0 | 0 | 0 | 0 | 0.4 | 5 | 0 | 제외 |
+  | – | 8 | 다크 모드 | 0 | 0 | 0 | 0 | 0.4 | 2 | 0 | 제외 |
+
+  ## 3. 이번 분기 포함 / 제외
+
+  ### 확정 (39pw, 가용의 65%)
+  | 과제 | pw | 목표 | 넣는 이유 |
+  |---|---|---|---|
+  | 1 포스플러스 v2 | 8 | G1·G3 | 안 하면 매장 41%(약 508곳)의 연동이 12/31에 중단됩니다. 선택 사항이 아닙니다 |
+  | 17 모니터링 | 3 | G3 | 현재 장애 감지에 평균 47분이 걸립니다. 성수기 전 안정화의 전제 조건입니다 |
+  | 9 더닝 | 2 | G1 | 비자발적 이탈이 약 0.6%p이고, 목표 감소폭(0.8%p)의 상당 부분이 여기서 나옵니다. 2pw로 가장 싸게 줄일 수 있는 이탈입니다 |
+  | 5 엑셀 업로드 | 2 | G2 | CS 문의의 27%(월 38건)를 차지합니다. 품목 20개 등록을 앞당기는 효과도 있습니다 |
+  | 4 온보딩 | 3 | G2 | 1일차 품목 20개 이상 등록 매장의 전환율이 31%, 미만은 9%입니다 |
+  | 12 성능 | 4 | G1 | 87개 매장에서 로딩이 6~9초, NPS -12입니다. 품목이 많은 대형(고가치) 매장일 가능성이 높습니다 |
+  | 3 바코드 스캔 | 6 | G2 | 체험 사용자의 58%가 실사 화면에서 이탈합니다 |
+  | 2 발주 추천 + 16 캘린더 | 11 | G1 | 해지 사유 1위(32%)이고, 인터뷰 12곳 중 9곳이 요청했습니다. 16은 2의 정확도에 필요한 선행 과제입니다 |
+
+  ### 조건부 (9pw, W6 게이트 11/13에 결정)
+  | 과제 | pw | 조건 |
+  |---|---|---|
+  | 6 다지점 대시보드 **MVP** | 약 5 | 범위를 "지점 통합 재고·발주 현황 조회(읽기 전용)"로 좁힙니다. 조건: ① W6에 포스 v2 일정이 정상일 것 ② 해지를 언급한 4곳에 인터뷰해 MVP 범위로 해지를 막을 수 있다고 확인될 것 |
+  | 7 알림톡 + 15 알림 설정 | 4 | CS팀이 4주간 관련 요청 건수를 태깅해 수치가 확인될 것. 발주 추천의 "재고 부족 → 추천 발주" 알림과 묶으면 가치가 커집니다 |
+
+  ### 버퍼 (12pw, 20%)
+  포스 v2 스펙이 아직 공개되지 않았고, 발주 추천은 추정 불확실성이 큽니다. 공수는 팀장 1차 추정치라서 운영 25%와 별도로 버퍼를 둡니다. W6에 버퍼가 남으면 조건부 과제에 씁니다.
+
+  ### 제외
+  10 원가 리포트, 14 거래처 포털, 11 권한 관리, 18 리퍼럴, 13 영문 UI, 8 다크 모드
+
+  ### 직군별 용량 점검 (가정: 과제별 직군 배분은 PM 추정)
+  | 직군 | 가용 | 확정 배정 | 여유 |
+  |---|---|---|---|
+  | 백엔드 3 | 27 | 약 21 (v2 7, 발주추천 5, 모니터링 3, 성능 2, 기타 4) | 약 6 |
+  | 프론트 2 | 18 | 약 8.5 | 약 9.5 → 다지점 MVP 흡수 가능 |
+  | 모바일 1 | 9 | 약 7 (바코드 5, 성능 1, 발주추천 1) | 약 2 (**단일 인력 리스크**) |
+  | 디자이너 1 | 약 7.5 (휴가 2주 반영) | 약 3.5 | 여유 있음. 단, **10월에 몰아서 작업** |
+
+  프론트에 여유가 있어서 다지점 MVP를 조건부로 넣을 수 있습니다. 모바일은 거의 꽉 찼으므로 모바일이 필요한 과제는 더 추가하지 않습니다.
+
+  ## 4. 순서와 의존성
+
+  | 주차 | 기간 | 주요 작업 |
+  |---|---|---|
+  | W1–W2 | 10/6–10/17 | 9 더닝 출시 · 17 모니터링 착수 · 5 엑셀 업로드 · 16 캘린더 · 포스 v2 사전 분석(어댑터 계층 분리) · **디자인: 온보딩/발주추천/바코드 선행 완료** |
+  | W3–W4 | 10/20–10/31 | 4 온보딩 출시(10/31) · 17 완료 · 12 성능 착수 · 2 발주 추천 개발 · 3 바코드 개발 |
+  | W5–W6 | 11/3–11/14 | **1 포스 v2 본개발**(10월 말 v2 공개 후) · 12 성능 출시 · **W6 게이트(11/13)**: 조건부 과제 go/no-go |
+  | W7–W8 | 11/17–11/28 | 포스 v2 **단계 전환 10% → 50% → 100%**(v1 폴백 유지) · 2 발주 추천 베타(11/17) → GA(11/28) · 3 바코드 **스토어 제출 11/20 이전** · 조건부 과제 |
+  | W9 | 12/1–12/5 | 마지막 소규모 릴리스 · 모바일 최종 제출 12/2 이전 · 조건부 과제 마감 |
+  | W10–W12 | 12/8–12/26 | **변경 동결**(핫픽스와 기능 플래그 단계 확대만) · 성수기 모니터링 · Q1 검증 과제 정리 · 회고 |
+
+  **핵심 의존성**
+  - 16 캘린더 → 2 발주 추천 (정확도)
+  - 17 모니터링 → 1 포스 v2 단계 전환 (전환 중 이상을 감지할 수 있어야 함)
+  - 5 엑셀 업로드 → 4 온보딩 (체크리스트의 "품목 20개 등록" 단계가 엑셀 업로드에 의존)
+  - 포스플러스 v2 공개(10월 말) → 1 본개발. 그 전에는 어댑터 계층과 테스트 하네스만 준비
+  - 모바일 릴리스는 심사 3일에 재심사 여유를 더해 **출시 희망일 7일 전**에 제출
+  - 디자이너 휴가(11월 2주) → 디자인이 필요한 과제는 모두 10월 안에 시안 확정
+
+  ## 5. 가정과 기대 효과
+
+  | 가정 | 내용 |
+  |---|---|
+  | A1 | 가용 60pw는 7명 전원이 12주 동안 근무한다고 보고 운영 25%를 뺀 값입니다. 공휴일은 따로 반영하지 않았습니다 |
+  | A2 | 포스플러스 v2는 10월 말에 공개되고, 12/31까지 v1과 병행 운영할 수 있습니다 |
+  | A3 | 디자이너 휴가는 11월 중순 2주입니다(날짜 확인 필요) |
+  | A4 | 온보딩 지표(31% vs 9%)는 상관관계입니다. 원래 의지가 높은 매장이 많이 등록했을 수 있으므로 효과를 보수적으로 잡았습니다 |
+  | A5 | 더닝으로 비자발적 이탈의 40~50%를 회수합니다(업계 일반 수준, 우리 데이터로는 미검증) |
+
+  **이탈 목표 산식** (월 이탈 3.1% ≈ 38곳/월, 목표 2.3%까지 −0.8%p ≈ 10곳/월)
+  - 9 더닝: −0.25~0.3%p. 10월 말부터 반영됩니다
+  - 12 성능: −0.05~0.1%p (87곳 한정)
+  - 2 발주 추천: 사유 1위(이탈의 32%, 약 1.0%p) 중 1/3을 해소한다고 보면 −0.3%p. **효과는 GA 이후 1~2개월 뒤에 나타납니다**
+  - 1 포스 v2: 수치를 줄이는 과제가 아니라 **대량 이탈을 막는 과제**입니다
+  - → 12월 **2.6~2.7%**, 2027년 2월 **2.3% 근접**
+
+  **전환 목표**: 온보딩, 엑셀, 바코드는 11월 체험 코호트부터 반영됩니다. 12월 코호트 기준 **20~21%**를 예상하고, 22%는 Q1에 달성할 것으로 봅니다.
+
+  ## 6. 이해관계자별 설명 근거
+
+  ### CEO: 14 거래처 포털 (제외, 검증으로 전환)
+  - 12pw는 가용 용량의 20%입니다. 이번 분기 세 가지 목표 중 어디에도 직접 기여하지 않고, 검증 데이터도 아직 없습니다.
+  - 12주 안에 끝나지 않아 12월 동결 기간에 걸립니다. 반쯤 만든 채로 분기를 넘기게 됩니다.
+  - **대안**: 이번 분기에 PM이 검증을 진행합니다(매장 10곳과 공급업체 5곳 인터뷰, 지불 의향과 사용 빈도 확인). 결과는 12월 중순에 보고하고 Q1 착수 여부를 결정합니다.
+  - **전략 연결**: 발주 추천(2)에서 쌓이는 "매장 → 발주 데이터"가 공급업체 포털의 기반입니다. 이번 분기 작업이 포털로 가는 첫 단계라고 설명할 수 있습니다.
+
+  ### 영업총괄: 10 원가 리포트 (제외, 조건부 재검토)
+  - 근거는 파이프라인 6건인데, 딜 규모와 단계, 원가 리포트가 실제 결정 요인인지가 확인되지 않았습니다.
+  - 이번 분기 전환 목표(G2)는 체험 → 유료 셀프서브 전환이라서 영업 딜과는 경로가 다릅니다.
+  - 7pw는 발주 추천의 70%에 해당하는 규모입니다.
+  - **요청**: 10/23까지 6건의 예상 MRR, 단계, "원가 리포트가 없으면 계약하지 않는다"는 고객 발언 근거를 공유해 주시면 W6 게이트에서 다시 보겠습니다. 급한 딜은 엑셀 내보내기와 템플릿으로 임시 대응하는 방안을 검토합니다.
+
+  ### CS팀장: 5 엑셀 업로드 (포함), 7 알림톡 (조건부)
+  - 5는 **W1–W2에 출시**합니다. CS 문의 월 38건이 줄어드는 효과를 11월에 측정해 공유하겠습니다.
+  - 7은 "요청 많음"이라는 정성 근거뿐이라 조건부로 두었습니다. **4주간 요청 건수를 태깅**해 주시면 W6 게이트에서 알림 설정(15)과 묶어 결정합니다.
+
+  ### (참고) 다지점 고객 4곳
+  - 다지점 고객은 매출의 14%를 차지하고, 4곳이 해지를 언급했습니다. 로고 수로는 작지만 매출 위험은 큽니다.
+  - 조건부 MVP와 별도로, **CS/영업이 10월 중 4곳을 전담 관리**하고 로드맵을 공유합니다.
+
+  ## 7. 리스크
+
+  | 리스크 | 영향 | 가능성 | 대응 |
+  |---|---|---|---|
+  | 포스플러스 v2 공개 지연이나 스펙 변경 | 높음 | 중간 | 10월 중 샌드박스 확보 요청, 어댑터 계층 선분리, 공개가 11/7을 넘기면 조건부 과제 전부 취소하고 버퍼 투입. v1 폴백 유지 |
+  | 포스 v2 전환이 12월 성수기에 걸림 | 높음 | 중간 | 단계 전환을 11/28까지 끝내는 것이 목표. 늦어지면 12월에는 신규 매장만 v2로 전환하고 기존 매장은 v1 종료 직전 야간에 전환 |
+  | 발주 추천이 부정확해 신뢰 하락 | 중간 | 중간 | 옵트인 베타, 추천 근거 표시, 최소 4주 데이터가 있는 매장에만 노출 |
+  | 모바일 개발자 1명 (단일 장애점) | 높음 | 낮음~중간 | 바코드 과제의 핵심 로직 문서화, 프론트 1명이 코드 리뷰에 참여, 스토어 제출 일정을 여유 있게 |
+  | 공수 과소 추정 | 중간 | 중간 | 버퍼 20%, W6 게이트에서 재추정 |
+  | 온보딩 효과가 상관관계에 불과할 가능성 | 중간 | 중간 | 신규 체험 매장 50%에만 적용하는 A/B 출시 |
+  | 이탈 목표 2.3%를 Q4 안에 달성하지 못함 | 중간 | 높음 | 이번 리뷰에서 목표 시점을 재합의(5장) |
+
+  ## 8. 다음 액션
+
+  | # | 액션 | 담당 | 기한 |
+  |---|---|---|---|
+  | 1 | 금요일 리뷰에서 결정 받기: ① 확정·조건부 범위 ② 12/8 변경 동결 ③ 이탈 목표 시점 조정 ④ 14·10을 검증 과제로 전환 | PM | 10/2(금) |
+  | 2 | 포스플러스에 v2 공개일, 샌드박스 제공일, v1/v2 병행 가능 여부 공식 확인 | PM + 백엔드 리드 | 10/7 |
+  | 3 | 디자이너 휴가 날짜 확정, 10월 디자인 일정 고정 | PM + 디자이너 | 10/6 |
+  | 4 | 팀장들과 직군별 공수 배분 재확인 (특히 발주 추천 10pw) | PM + 각 리드 | 10/8 |
+  | 5 | 더닝과 온보딩의 측정 지표 정의 (회수율, 1일차 20품목 달성률), A/B 설정 | PM + 백엔드 | 10/10 |
+  | 6 | 영업총괄에게 원가 리포트 딜 데이터 요청 | PM | 10/23 회신 |
+  | 7 | CS팀 알림톡 요청 태깅 시작 | CS팀장 | 10/6부터 4주 |
+  | 8 | 다지점 해지 언급 4곳 인터뷰 (MVP 범위 검증) | PM + CS | 10/31 |
+  | 9 | 거래처 포털 검증 계획 수립과 인터뷰 착수 | PM | 10/16 착수 → 12/15 보고 |
+  | 10 | W6 게이트 리뷰 (조건부 과제 go/no-go, 버퍼 재배분) | PM + 리드 | 11/13 |
+
+  ---
+
+  **확인 요청 (답에 따라 일정만 조정되고 우선순위는 바뀌지 않습니다)**
+  1. 디자이너 휴가가 11월 중 정확히 어느 2주인가요?
+  2. 포스플러스 v2 샌드박스를 10월 말 이전에 받을 수 있나요? v1과 v2를 12/31까지 병행할 수 있나요?
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -154,9 +365,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Ranking candidate roadmap items when impact, confidence, effort, and timing inputs exist
     - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
@@ -166,30 +375,315 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Scoring can look objective even when the inputs are subjective guesses
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - Impact sub-scores (0-3 per goal) are assigned by judgment without per-item justification, e.g. monitoring (#17) gets G1=1 and performance (#12) gets G3=1 with no stated reason, so the 'objective' score depends on unexplained inputs
+    - "The rank column mixes scores and verdicts: alert settings (#15, conditional) is ranked 6th, above the committed barcode (#3) and order-recommendation (#2) items, which makes the table confusing to paste as-is"
+    - "The strong-run plan is optimistic in places: an 11pw order-recommendation GA on 11/28 leaves one week before the 12/8 freeze, and the fallback of cutting stores over from v1 overnight in late December conflicts with the freeze and the peak season it was meant to protect"
+    - When product type and goals are missing, it defaults to a generic B2B SaaS frame and ranks items on plausible-sounding but unsupported rationales (e.g. payment methods 'reduce payment failures/churn', admin roles 'enterprise deal blocker')
+    - Outputs run long; the strong run adds a separate per-role capacity table and a KPI forecast on top of the main table, which is useful but heavy for a single exec review page
   evaluationCriteria:
     - Shows scoring assumptions, tradeoffs, confidence, dependencies, and sequencing rationale
     - Produces prioritized roadmap in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Product Roadmap Prioritizer strong-context run
-      input: Rank 20 feature candidates for the next quarter with effort estimates.
-      expectedOutputSummary: A usable prioritized roadmap with project-specific assumptions, risks, and next steps.
-      sampleOutput: "prioritized roadmap: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Korean B2B SaaS cutting 18 Q4 candidates to a roadmap
+      input: |-
+        다음 분기(2026 Q4, 10/6~12/26, 12주) 로드맵 우선순위를 정리해 주세요. 금요일 경영진 리뷰에 그대로 붙일 수 있는 형태면 좋겠습니다.
+
+        회사/제품: "밀키트노트" — 소규모 식당·카페(직원 3~15명)용 재고·발주 관리 SaaS. 웹 + 모바일 앱. 유료 매장 1,240곳, MRR 약 8,700만 원, 월 로고 이탈률 3.1%(목표 2.0%).
+
+        목표(우선순위 순):
+        1. 이탈률 3.1% → 2.3%로 낮추기
+        2. 신규 유료 전환율(14일 체험 → 유료) 18% → 22%
+        3. 12월 연말 성수기 전에 장애 없이 안정화
+
+        팀 capacity: 백엔드 3명, 프론트 2명, 모바일 1명, 디자이너 1명, PM 1명(나). 12주 × 7명 개발 = 대략 80 person-week인데 운영/버그 대응으로 25% 빠짐 → 가용 약 60 person-week.
+
+        제약:
+        - 10월 말 POS 연동 파트너(포스플러스) API가 v2로 바뀜. v1은 12/31 종료 확정. 현재 매장의 41%가 이 연동을 씀.
+        - 11월에 디자이너 2주 휴가.
+        - 모바일 앱 스토어 심사 기간 평균 3일.
+
+        후보 목록 (추정 공수는 팀장 추정, 영향은 데이터 근거 표시):
+        1. 포스플러스 API v2 마이그레이션 — 8pw. 안 하면 41% 매장 연동 중단.
+        2. 발주 추천(지난 4주 소진량 기반) — 10pw. 인터뷰 12곳 중 9곳 요청. 이탈 사유 1위 "발주 여전히 수작업"(해지 설문 32%).
+        3. 재고 실사 모바일 바코드 스캔 — 6pw. 체험 사용자 세션 녹화에서 실사 화면 이탈 58%.
+        4. 온보딩 체크리스트 개편 — 3pw. 체험 1일차에 품목 20개 이상 등록한 매장의 전환율 31% vs 미만 9%.
+        5. 엑셀 품목 일괄 업로드 개선(오류 행 표시) — 2pw. CS 문의 월 140건 중 38건.
+        6. 다지점 대시보드 — 9pw. 다지점 고객 23곳(매출 비중 14%), 그중 4곳이 "없으면 해지" 언급.
+        7. 카카오 알림톡으로 재고 부족 알림 — 3pw. 요청 많음(정확한 수치 없음).
+        8. 다크 모드 — 2pw. 요청 11건.
+        9. 결제 실패 재시도/더닝 메일 — 2pw. 비자발적 이탈이 전체 이탈의 약 0.6%p로 추정.
+        10. 원가 리포트(메뉴별 원가율) — 7pw. 영업팀이 신규 계약 필수라고 주장, 근거는 영업 파이프라인 6건.
+        11. 권한 관리(직원별 메뉴 접근 제한) — 4pw. 보안 문의 월 5건.
+        12. 앱 성능 개선(품목 2,000개 이상 매장에서 목록 로딩 6~9초) — 4pw. 해당 매장 87곳, NPS -12.
+        13. 영문 UI — 5pw. 해외 문의 월 2~3건.
+        14. 거래처(공급업체) 포털 — 12pw. 전략적이라고 CEO가 언급, 검증 데이터 없음.
+        15. 알림 설정 세분화 — 1pw.
+        16. 공휴일/임시휴무 캘린더 — 1pw. 발주 추천(2번)의 정확도에 필요.
+        17. 모니터링/알림 체계 정비(현재 장애 감지 평균 47분) — 3pw.
+        18. 리퍼럴 프로그램 — 4pw. 기존 고객 NPS 41.
+
+        이해관계자: CEO(14번 선호), 영업총괄(10번 강하게 요구), CS팀장(5번, 7번).
+
+        원하는 결과: 점수 기준과 가정이 보이는 우선순위 표, 이번 분기에 넣을 것/뺄 것, 순서와 의존성, 이해관계자별로 왜 빠졌는지 설명할 근거, 리스크, 다음 액션.
+      expectedOutputSummary: "A 60pw-bounded Q4 roadmap that makes the POS v2 migration mandatory, ranks the other 17 items with visible scoring and confidence tied to the given data (32% churn reason, 31% vs 9% conversion, 87 stores, 47-min detection), sequences around the designer vacation, app-store review, and the December freeze, gives each stakeholder (CEO #14, Sales #10, CS #5/#7) a data-backed reason, and lists risks and dated next actions."
+      sampleOutput: |-
+        # 밀키트노트 2026 Q4 로드맵 우선순위 (10/6~12/26, 12주)
+
+        ## 0. 한 줄 요약
+
+        **가용 60pw 중 39pw를 확정 과제 9개에, 9pw를 W6 게이트 조건부 과제에, 12pw를 버퍼로 배정합니다.** 반드시 해야 하는 일은 포스플러스 v2 전환과 모니터링이고, 이탈 방어는 더닝, 성능 개선, 발주 추천으로, 전환율은 온보딩, 엑셀 업로드, 바코드 스캔으로 공략합니다. 대형 변경은 11/28까지 끝내고 12/8부터 변경을 동결합니다. 공급업체 포털(14)과 원가 리포트(10)는 이번 분기 개발에서 빼고 검증(discovery) 과제로 돌립니다.
+
+        > **경영진 기대치 조정이 필요합니다.** 발주 추천은 11월 말 GA 예정이라 이탈 개선 효과가 12월 수치에는 거의 반영되지 않습니다. 이번 분기 현실적인 이탈률 목표는 **12월 기준 2.6~2.7%**이고, 2.3%는 **2027년 2월 기준**으로 잡는 것을 제안합니다(근거는 5장).
+
+        ---
+
+        ## 1. 점수 기준
+
+        | 항목 | 정의 |
+        |---|---|
+        | 목표 기여 (0~3) | G1 이탈 ×3, G2 체험→유료 전환 ×2, G3 연말 안정화 ×2. 가중치는 말씀하신 목표 우선순위를 반영 |
+        | 영향 합 | Σ(기여 × 가중치), 최대 21 |
+        | 신뢰도 | 1.0 = 직접 측정한 정량 데이터 / 0.7 = 설문·인터뷰·상관관계·추정치 / 0.4 = 주장·일화, 수치 없음 |
+        | 점수 | 영향 합 × 신뢰도 ÷ 공수(pw) → **1pw당 기대 가치** |
+        | 게이트 | 기한이 정해졌거나 사업 연속성이 걸린 과제는 점수와 상관없이 **필수**로 분류 |
+
+        점수는 공수로 나누기 때문에 큰 과제가 불리하게 나옵니다. 그래서 **영향 합(절대 크기)**도 같이 보고 판단했습니다. 발주 추천(2)은 이 기준 때문에 점수는 중간이지만 포함했습니다.
+
+        ## 2. 우선순위 표
+
+        | 순위 | # | 과제 | G1 | G2 | G3 | 영향 합 | 신뢰도 | 공수 | 점수 | 판정 |
+        |---|---|---|---|---|---|---|---|---|---|---|
+        | 필수 | 1 | 포스플러스 API v2 마이그레이션 | 3 | 0 | 3 | 15 | 1.0 | 8 | 1.88 | **확정 (기한 12/31)** |
+        | 1 | 9 | 결제 실패 재시도/더닝 | 3 | 0 | 0 | 9 | 0.7 | 2 | 3.15 | **확정** |
+        | 2 | 17 | 모니터링/알림 체계 정비 | 1 | 0 | 3 | 9 | 1.0 | 3 | 3.00 | **확정 (필수 성격)** |
+        | 3 | 5 | 엑셀 일괄 업로드 개선 | 1 | 2 | 0 | 7 | 0.7 | 2 | 2.45 | **확정** |
+        | 4 | 4 | 온보딩 체크리스트 개편 | 1 | 3 | 0 | 9 | 0.7 | 3 | 2.10 | **확정** |
+        | 5 | 12 | 대용량 매장 성능 개선 | 2 | 0 | 1 | 8 | 1.0 | 4 | 2.00 | **확정** |
+        | 6 | 15 | 알림 설정 세분화 | 1 | 0 | 0 | 3 | 0.4 | 1 | 1.20 | 조건부 (7과 묶음) |
+        | 7 | 3 | 재고 실사 바코드 스캔 | 1 | 2 | 0 | 7 | 0.7 | 6 | 0.82 | **확정** |
+        | 8 | 2+16 | 발주 추천 + 공휴일 캘린더 | 3 | 1 | 0 | 11 | 0.7 | 11 | 0.70 | **확정 (영향 최대)** |
+        | 9 | 6 | 다지점 대시보드 | 2 | 0 | 0 | 6 | 0.7 | 9 | 0.47 | 조건부, **범위 축소 MVP 약 5pw** |
+        | 10 | 7 | 카카오 알림톡 재고 부족 알림 | 1 | 0 | 0 | 3 | 0.4 | 3 | 0.40 | 조건부 |
+        | 11 | 11 | 권한 관리 | 1 | 0 | 0 | 3 | 0.4 | 4 | 0.30 | 제외 (Q1 후보) |
+        | 12 | 10 | 원가 리포트 | 0 | 1 | 0 | 2 | 0.4 | 7 | 0.11 | 제외, **검증 과제로 전환** |
+        | – | 14 | 거래처 포털 | 0 | 0 | 0 | 0 | 0.4 | 12 | 0 | 제외, **검증 과제로 전환** |
+        | – | 18 | 리퍼럴 프로그램 | 0 | 0 | 0 | 0 | 0.7 | 4 | 0 | 제외 (획득은 이번 분기 목표 밖) |
+        | – | 13 | 영문 UI | 0 | 0 | 0 | 0 | 0.4 | 5 | 0 | 제외 |
+        | – | 8 | 다크 모드 | 0 | 0 | 0 | 0 | 0.4 | 2 | 0 | 제외 |
+
+        ## 3. 이번 분기 포함 / 제외
+
+        ### 확정 (39pw, 가용의 65%)
+        | 과제 | pw | 목표 | 넣는 이유 |
+        |---|---|---|---|
+        | 1 포스플러스 v2 | 8 | G1·G3 | 안 하면 매장 41%(약 508곳)의 연동이 12/31에 중단됩니다. 선택 사항이 아닙니다 |
+        | 17 모니터링 | 3 | G3 | 현재 장애 감지에 평균 47분이 걸립니다. 성수기 전 안정화의 전제 조건입니다 |
+        | 9 더닝 | 2 | G1 | 비자발적 이탈이 약 0.6%p이고, 목표 감소폭(0.8%p)의 상당 부분이 여기서 나옵니다. 2pw로 가장 싸게 줄일 수 있는 이탈입니다 |
+        | 5 엑셀 업로드 | 2 | G2 | CS 문의의 27%(월 38건)를 차지합니다. 품목 20개 등록을 앞당기는 효과도 있습니다 |
+        | 4 온보딩 | 3 | G2 | 1일차 품목 20개 이상 등록 매장의 전환율이 31%, 미만은 9%입니다 |
+        | 12 성능 | 4 | G1 | 87개 매장에서 로딩이 6~9초, NPS -12입니다. 품목이 많은 대형(고가치) 매장일 가능성이 높습니다 |
+        | 3 바코드 스캔 | 6 | G2 | 체험 사용자의 58%가 실사 화면에서 이탈합니다 |
+        | 2 발주 추천 + 16 캘린더 | 11 | G1 | 해지 사유 1위(32%)이고, 인터뷰 12곳 중 9곳이 요청했습니다. 16은 2의 정확도에 필요한 선행 과제입니다 |
+
+        ### 조건부 (9pw, W6 게이트 11/13에 결정)
+        | 과제 | pw | 조건 |
+        |---|---|---|
+        | 6 다지점 대시보드 **MVP** | 약 5 | 범위를 "지점 통합 재고·발주 현황 조회(읽기 전용)"로 좁힙니다. 조건: ① W6에 포스 v2 일정이 정상일 것 ② 해지를 언급한 4곳에 인터뷰해 MVP 범위로 해지를 막을 수 있다고 확인될 것 |
+        | 7 알림톡 + 15 알림 설정 | 4 | CS팀이 4주간 관련 요청 건수를 태깅해 수치가 확인될 것. 발주 추천의 "재고 부족 → 추천 발주" 알림과 묶으면 가치가 커집니다 |
+
+        ### 버퍼 (12pw, 20%)
+        포스 v2 스펙이 아직 공개되지 않았고, 발주 추천은 추정 불확실성이 큽니다. 공수는 팀장 1차 추정치라서 운영 25%와 별도로 버퍼를 둡니다. W6에 버퍼가 남으면 조건부 과제에 씁니다.
+
+        ### 제외
+        10 원가 리포트, 14 거래처 포털, 11 권한 관리, 18 리퍼럴, 13 영문 UI, 8 다크 모드
+
+        ### 직군별 용량 점검 (가정: 과제별 직군 배분은 PM 추정)
+        | 직군 | 가용 | 확정 배정 | 여유 |
+        |---|---|---|---|
+        | 백엔드 3 | 27 | 약 21 (v2 7, 발주추천 5, 모니터링 3, 성능 2, 기타 4) | 약 6 |
+        | 프론트 2 | 18 | 약 8.5 | 약 9.5 → 다지점 MVP 흡수 가능 |
+        | 모바일 1 | 9 | 약 7 (바코드 5, 성능 1, 발주추천 1) | 약 2 (**단일 인력 리스크**) |
+        | 디자이너 1 | 약 7.5 (휴가 2주 반영) | 약 3.5 | 여유 있음. 단, **10월에 몰아서 작업** |
+
+        프론트에 여유가 있어서 다지점 MVP를 조건부로 넣을 수 있습니다. 모바일은 거의 꽉 찼으므로 모바일이 필요한 과제는 더 추가하지 않습니다.
+
+        ## 4. 순서와 의존성
+
+        | 주차 | 기간 | 주요 작업 |
+        |---|---|---|
+        | W1–W2 | 10/6–10/17 | 9 더닝 출시 · 17 모니터링 착수 · 5 엑셀 업로드 · 16 캘린더 · 포스 v2 사전 분석(어댑터 계층 분리) · **디자인: 온보딩/발주추천/바코드 선행 완료** |
+        | W3–W4 | 10/20–10/31 | 4 온보딩 출시(10/31) · 17 완료 · 12 성능 착수 · 2 발주 추천 개발 · 3 바코드 개발 |
+        | W5–W6 | 11/3–11/14 | **1 포스 v2 본개발**(10월 말 v2 공개 후) · 12 성능 출시 · **W6 게이트(11/13)**: 조건부 과제 go/no-go |
+        | W7–W8 | 11/17–11/28 | 포스 v2 **단계 전환 10% → 50% → 100%**(v1 폴백 유지) · 2 발주 추천 베타(11/17) → GA(11/28) · 3 바코드 **스토어 제출 11/20 이전** · 조건부 과제 |
+        | W9 | 12/1–12/5 | 마지막 소규모 릴리스 · 모바일 최종 제출 12/2 이전 · 조건부 과제 마감 |
+        | W10–W12 | 12/8–12/26 | **변경 동결**(핫픽스와 기능 플래그 단계 확대만) · 성수기 모니터링 · Q1 검증 과제 정리 · 회고 |
+
+        **핵심 의존성**
+        - 16 캘린더 → 2 발주 추천 (정확도)
+        - 17 모니터링 → 1 포스 v2 단계 전환 (전환 중 이상을 감지할 수 있어야 함)
+        - 5 엑셀 업로드 → 4 온보딩 (체크리스트의 "품목 20개 등록" 단계가 엑셀 업로드에 의존)
+        - 포스플러스 v2 공개(10월 말) → 1 본개발. 그 전에는 어댑터 계층과 테스트 하네스만 준비
+        - 모바일 릴리스는 심사 3일에 재심사 여유를 더해 **출시 희망일 7일 전**에 제출
+        - 디자이너 휴가(11월 2주) → 디자인이 필요한 과제는 모두 10월 안에 시안 확정
+
+        ## 5. 가정과 기대 효과
+
+        | 가정 | 내용 |
+        |---|---|
+        | A1 | 가용 60pw는 7명 전원이 12주 동안 근무한다고 보고 운영 25%를 뺀 값입니다. 공휴일은 따로 반영하지 않았습니다 |
+        | A2 | 포스플러스 v2는 10월 말에 공개되고, 12/31까지 v1과 병행 운영할 수 있습니다 |
+        | A3 | 디자이너 휴가는 11월 중순 2주입니다(날짜 확인 필요) |
+        | A4 | 온보딩 지표(31% vs 9%)는 상관관계입니다. 원래 의지가 높은 매장이 많이 등록했을 수 있으므로 효과를 보수적으로 잡았습니다 |
+        | A5 | 더닝으로 비자발적 이탈의 40~50%를 회수합니다(업계 일반 수준, 우리 데이터로는 미검증) |
+
+        **이탈 목표 산식** (월 이탈 3.1% ≈ 38곳/월, 목표 2.3%까지 −0.8%p ≈ 10곳/월)
+        - 9 더닝: −0.25~0.3%p. 10월 말부터 반영됩니다
+        - 12 성능: −0.05~0.1%p (87곳 한정)
+        - 2 발주 추천: 사유 1위(이탈의 32%, 약 1.0%p) 중 1/3을 해소한다고 보면 −0.3%p. **효과는 GA 이후 1~2개월 뒤에 나타납니다**
+        - 1 포스 v2: 수치를 줄이는 과제가 아니라 **대량 이탈을 막는 과제**입니다
+        - → 12월 **2.6~2.7%**, 2027년 2월 **2.3% 근접**
+
+        **전환 목표**: 온보딩, 엑셀, 바코드는 11월 체험 코호트부터 반영됩니다. 12월 코호트 기준 **20~21%**를 예상하고, 22%는 Q1에 달성할 것으로 봅니다.
+
+        ## 6. 이해관계자별 설명 근거
+
+        ### CEO: 14 거래처 포털 (제외, 검증으로 전환)
+        - 12pw는 가용 용량의 20%입니다. 이번 분기 세 가지 목표 중 어디에도 직접 기여하지 않고, 검증 데이터도 아직 없습니다.
+        - 12주 안에 끝나지 않아 12월 동결 기간에 걸립니다. 반쯤 만든 채로 분기를 넘기게 됩니다.
+        - **대안**: 이번 분기에 PM이 검증을 진행합니다(매장 10곳과 공급업체 5곳 인터뷰, 지불 의향과 사용 빈도 확인). 결과는 12월 중순에 보고하고 Q1 착수 여부를 결정합니다.
+        - **전략 연결**: 발주 추천(2)에서 쌓이는 "매장 → 발주 데이터"가 공급업체 포털의 기반입니다. 이번 분기 작업이 포털로 가는 첫 단계라고 설명할 수 있습니다.
+
+        ### 영업총괄: 10 원가 리포트 (제외, 조건부 재검토)
+        - 근거는 파이프라인 6건인데, 딜 규모와 단계, 원가 리포트가 실제 결정 요인인지가 확인되지 않았습니다.
+        - 이번 분기 전환 목표(G2)는 체험 → 유료 셀프서브 전환이라서 영업 딜과는 경로가 다릅니다.
+        - 7pw는 발주 추천의 70%에 해당하는 규모입니다.
+        - **요청**: 10/23까지 6건의 예상 MRR, 단계, "원가 리포트가 없으면 계약하지 않는다"는 고객 발언 근거를 공유해 주시면 W6 게이트에서 다시 보겠습니다. 급한 딜은 엑셀 내보내기와 템플릿으로 임시 대응하는 방안을 검토합니다.
+
+        ### CS팀장: 5 엑셀 업로드 (포함), 7 알림톡 (조건부)
+        - 5는 **W1–W2에 출시**합니다. CS 문의 월 38건이 줄어드는 효과를 11월에 측정해 공유하겠습니다.
+        - 7은 "요청 많음"이라는 정성 근거뿐이라 조건부로 두었습니다. **4주간 요청 건수를 태깅**해 주시면 W6 게이트에서 알림 설정(15)과 묶어 결정합니다.
+
+        ### (참고) 다지점 고객 4곳
+        - 다지점 고객은 매출의 14%를 차지하고, 4곳이 해지를 언급했습니다. 로고 수로는 작지만 매출 위험은 큽니다.
+        - 조건부 MVP와 별도로, **CS/영업이 10월 중 4곳을 전담 관리**하고 로드맵을 공유합니다.
+
+        ## 7. 리스크
+
+        | 리스크 | 영향 | 가능성 | 대응 |
+        |---|---|---|---|
+        | 포스플러스 v2 공개 지연이나 스펙 변경 | 높음 | 중간 | 10월 중 샌드박스 확보 요청, 어댑터 계층 선분리, 공개가 11/7을 넘기면 조건부 과제 전부 취소하고 버퍼 투입. v1 폴백 유지 |
+        | 포스 v2 전환이 12월 성수기에 걸림 | 높음 | 중간 | 단계 전환을 11/28까지 끝내는 것이 목표. 늦어지면 12월에는 신규 매장만 v2로 전환하고 기존 매장은 v1 종료 직전 야간에 전환 |
+        | 발주 추천이 부정확해 신뢰 하락 | 중간 | 중간 | 옵트인 베타, 추천 근거 표시, 최소 4주 데이터가 있는 매장에만 노출 |
+        | 모바일 개발자 1명 (단일 장애점) | 높음 | 낮음~중간 | 바코드 과제의 핵심 로직 문서화, 프론트 1명이 코드 리뷰에 참여, 스토어 제출 일정을 여유 있게 |
+        | 공수 과소 추정 | 중간 | 중간 | 버퍼 20%, W6 게이트에서 재추정 |
+        | 온보딩 효과가 상관관계에 불과할 가능성 | 중간 | 중간 | 신규 체험 매장 50%에만 적용하는 A/B 출시 |
+        | 이탈 목표 2.3%를 Q4 안에 달성하지 못함 | 중간 | 높음 | 이번 리뷰에서 목표 시점을 재합의(5장) |
+
+        ## 8. 다음 액션
+
+        | # | 액션 | 담당 | 기한 |
+        |---|---|---|---|
+        | 1 | 금요일 리뷰에서 결정 받기: ① 확정·조건부 범위 ② 12/8 변경 동결 ③ 이탈 목표 시점 조정 ④ 14·10을 검증 과제로 전환 | PM | 10/2(금) |
+        | 2 | 포스플러스에 v2 공개일, 샌드박스 제공일, v1/v2 병행 가능 여부 공식 확인 | PM + 백엔드 리드 | 10/7 |
+        | 3 | 디자이너 휴가 날짜 확정, 10월 디자인 일정 고정 | PM + 디자이너 | 10/6 |
+        | 4 | 팀장들과 직군별 공수 배분 재확인 (특히 발주 추천 10pw) | PM + 각 리드 | 10/8 |
+        | 5 | 더닝과 온보딩의 측정 지표 정의 (회수율, 1일차 20품목 달성률), A/B 설정 | PM + 백엔드 | 10/10 |
+        | 6 | 영업총괄에게 원가 리포트 딜 데이터 요청 | PM | 10/23 회신 |
+        | 7 | CS팀 알림톡 요청 태깅 시작 | CS팀장 | 10/6부터 4주 |
+        | 8 | 다지점 해지 언급 4곳 인터뷰 (MVP 범위 검증) | PM + CS | 10/31 |
+        | 9 | 거래처 포털 검증 계획 수립과 인터뷰 착수 | PM | 10/16 착수 → 12/15 보고 |
+        | 10 | W6 게이트 리뷰 (조건부 과제 go/no-go, 버퍼 재배분) | PM + 리드 | 11/13 |
+
+        ---
+
+        **확인 요청 (답에 따라 일정만 조정되고 우선순위는 바뀌지 않습니다)**
+        1. 디자이너 휴가가 11월 중 정확히 어느 2주인가요?
+        2. 포스플러스 v2 샌드박스를 10월 말 이전에 받을 수 있나요? v1과 v2를 12/31까지 병행할 수 있나요?
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Product Roadmap Prioritizer boundary run
-      input: Choose the company strategy from a brainstorm list.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "The arithmetic checks out throughout: impact sums and scores (e.g. #9 9x0.7/2=3.15, #3 7x0.7/6=0.82), committed 39 + conditional 9 + buffer 12 = 60pw, 41% of 1,240 = ~508 stores, 38/140 = 27% of CS tickets, per-role capacity (backend 27, frontend 18, mobile 9, designer 7.5 after 2-week leave)"
+        - "It uses the input facts precisely and builds real dependencies from them: holiday calendar #16 before order recommendation #2, monitoring #17 before the staged POS v2 cutover, Excel upload #5 feeding the onboarding '20 items' step, mobile submissions 7 days before release given the 3-day review, and all design finalized in October before the November vacation"
+        - "It pushes back usefully: it flags that 2.3% churn is unreachable within Q4 and shows the math (dunning -0.25~0.3%p, performance -0.05~0.1%p, order recommendation lagging after GA), proposing 2.6~2.7% for December and treats the 31% vs 9% onboarding gap as correlation with an A/B rollout"
+        - "The stakeholder section has concrete, fair reasoning and asks: CEO #14 = 20% of capacity, no validated data, cannot finish in 12 weeks -> discovery with 10 stores + 5 suppliers; Sales #10 = request MRR/stage/quotes for the 6 deals by 10/23 for the W6 gate"
+        - "Minor defects: the rank column puts conditional #15 above committed items, the sub-scores are not individually justified, and the late-December v1-overnight fallback sits awkwardly against the 12/8 freeze"
+    - title: Prioritize a list of features with no goal, sizes, or data
+      input: |-
+        이 기능들 우선순위 좀 정해줘. 다음 분기에 다 할 수는 없을 것 같아.
+
+        - 소셜 로그인
+        - 알림 센터
+        - 대시보드 리뉴얼
+        - AI 요약 기능
+        - 결제 수단 추가
+        - 관리자 권한 세분화
+        - 다국어 지원
+      expectedOutputSummary: Point out that goals, team capacity, sizes, and product context are missing, ask a few focused questions, and still give a clearly labeled provisional Now/Next/Later ranking with its stated assumptions, criteria, and how the ranking would change under different goals.
+      sampleOutput: |-
+        지금 주신 건 기능 목록뿐이라 제품 유형, 다음 분기 목표, 팀 규모를 아직 모릅니다. 그래서 일반적인 B2B SaaS를 가정하고 **잠정안**부터 드립니다. 아래 질문 3개에 답해 주시면 그에 맞춰 순서를 다시 조정하겠습니다.
+
+        ## 먼저 확인이 필요한 것 (우선순위를 바꿀 수 있는 정보)
+
+        1. **다음 분기의 핵심 목표는 무엇인가요?** (예: 신규 가입 증가 / 매출·전환 / 기존 고객 유지 / 엔터프라이즈 계약)
+        2. **팀 규모와 분기 가용 인력은 어느 정도인가요?** (예: 개발자 4명 × 12주)
+        3. **이미 약속됐거나 막혀 있는 항목이 있나요?** (예: 특정 고객이 계약 조건으로 요구한 기능, 해외 출시 일정, 결제 수단 관련 매출 손실)
+
+        ## 가정
+
+        - B2B SaaS이고, 목표는 "매출과 유지율 개선"입니다.
+        - 개발 인력은 4~5명 정도라서 한 분기에 **큰 기능 2개 + 작은 기능 1~2개**가 현실적인 한도입니다.
+        - 특정 고객에게 약속한 기능이나 해외 출시 일정은 없습니다.
+
+        ## 평가 기준
+
+        각 기능을 **영향도**(목표 기여), **긴급도**(지연될 때 드는 비용), **노력**(규모), **의존성**의 네 가지로 거칠게 평가했습니다.
+
+        | 기능 | 영향도 | 긴급도 | 노력 | 비고 |
+        |---|---|---|---|---|
+        | 결제 수단 추가 | 높음 | 높음 | 중간 | 매출에 직접 연결되고, 결제 실패나 이탈을 줄일 수 있음 |
+        | 관리자 권한 세분화 | 높음 | 중간~높음 | 중간 | 규모가 큰 고객이나 엔터프라이즈 계약에 자주 걸리는 조건 |
+        | 소셜 로그인 | 중간 | 중간 | 낮음 | 가입 전환을 개선하고 구현도 빠른 편 |
+        | 알림 센터 | 중간 | 낮음 | 중간 | 유지율 개선용. AI 요약과 연결할 수 있음 |
+        | AI 요약 기능 | 중간~높음(불확실) | 낮음 | 중간~높음 | 차별화 요소지만 비용·품질 검증이 필요 |
+        | 대시보드 리뉴얼 | 중간 | 낮음 | 높음 | 범위가 쉽게 커짐. 사용자 불만 데이터가 없으면 미룰 것 |
+        | 다국어 지원 | 목표에 따라 다름 | 낮음 | 높음 | 해외 진출 계획이 없으면 효과가 적음. 시간이 지날수록 비용이 커짐 |
+
+        ## 추천 우선순위 (잠정)
+
+        **다음 분기에 할 것 (Now)**
+        1. **결제 수단 추가**: 매출에 가장 직접적으로 연결되고 범위도 명확합니다.
+        2. **관리자 권한 세분화**: 큰 고객의 도입과 유지를 막는 요소를 제거합니다. 나중에 알림, AI 등 다른 기능도 권한 모델 위에 올라가므로 먼저 해두는 게 유리합니다.
+        3. **소셜 로그인**: 노력이 적어서 남는 인력으로 끼워 넣기 좋습니다. 가입 전환 개선을 빠르게 확인할 수 있습니다.
+
+        **그다음 분기 (Next)**
+        4. **알림 센터**
+        5. **AI 요약 기능**: 이번 분기에는 **1~2주 규모의 프로토타입이나 사용자 검증만** 진행하고, 본 개발은 다음 분기에 하는 것을 권합니다.
+
+        **보류 (Later)**
+        6. **대시보드 리뉴얼**: 구체적인 사용성 문제 데이터가 모일 때까지 보류합니다. 그전까지는 불편이 큰 화면만 부분적으로 개선합니다.
+        7. **다국어 지원**: 해외 출시 계획이 정해지면 우선순위를 올립니다. 대신 이번 분기부터 **새 코드에 문자열을 하드코딩하지 않는 규칙(i18n 준비)**만 적용해 두면 나중에 드는 비용이 크게 줄어듭니다.
+
+        ## 리스크
+
+        - **권한 세분화의 범위 확장**: 역할과 권한 매트릭스를 먼저 확정하지 않으면 일정이 쉽게 늘어납니다. 첫 버전은 3~4개 역할로 제한하세요.
+        - **결제 수단의 외부 의존성**: PG사 계약, 심사, 정산 테스트 기간이 개발 일정보다 길어질 수 있습니다. 계약 절차를 지금 바로 시작하는 게 좋습니다.
+        - **AI 요약의 불확실성**: 품질, 비용(토큰), 개인정보 처리 이슈가 있습니다. 검증 없이 로드맵에 확정하면 위험합니다.
+        - **가정이 틀렸을 경우**: 목표가 "해외 확장"이면 다국어 지원이, "신규 가입"이면 소셜 로그인이 1순위로 올라갈 수 있습니다.
+
+        ## 다음 액션
+
+        1. 위 질문 3개에 답해 주세요. 답을 받으면 순서와 분기 배치를 확정하겠습니다.
+        2. 각 기능의 대략적인 규모(S/M/L 또는 인·주)를 개발 리드와 추정해 보세요.
+        3. 결제 수단 추가를 진행한다면 PG사 계약과 심사 절차를 바로 시작하세요.
+        4. 권한 세분화용으로 주요 고객 3~5곳에 필요한 역할을 확인해 보세요.
+        5. AI 요약은 검증할 가설 하나(예: "요약이 있으면 주간 재방문이 늘어난다")를 정하고 짧은 프로토타입 범위를 잡아 두세요.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "It gets the balance right: exactly 3 focused questions (quarterly goal, team capacity, committed/blocked items) plus a provisional ranking instead of stalling or asking a long list"
+        - Assumptions are explicit and separated (B2B SaaS, revenue+retention goal, 4-5 devs, no committed features), and the Risks section states how the order flips under other goals (i18n first for expansion, social login for sign-ups)
+        - "The impact/effort ratings are invented without data (payment methods 'high/high', social login 'low effort'); they are labeled rough, but the rationale for ranking payment methods #1 ('reduce payment failures/churn') is speculative for an unknown product"
+        - "Practical hedges add value: an AI-summary prototype of 1-2 weeks only, capping the first version of admin roles at 3-4, starting PG contracting early, and adopting an i18n no-hardcoded-strings rule now"
+        - It lacks any sizing scaffold beyond asking the user to estimate S/M/L, so the Now bucket ('2 large + 1-2 small') cannot be checked against capacity yet
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Ranking candidate roadmap items when impact, confidence, effort, and timing inputs exist
@@ -199,4 +693,4 @@ decisionGuide:
     guidance: After this agent produces a draft, use a planning, documentation, or QA agent to turn it into a team-ready handoff.
 verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

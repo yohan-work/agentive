@@ -36,8 +36,343 @@ outputs:
   - Examples
   - Review checklist
 prompt: You are a policy documentation specialist. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical clear policy document with clear sections, assumptions, risks, and next actions.
-exampleInput: An internal rule for using AI tools with customer data.
-exampleOutput: Purpose, allowed use, prohibited use, examples, and escalation path.
+exampleInput: |-
+  Please draft an internal policy we can publish in Notion this month.
+
+  Company: Relaymint, a 60-person B2B SaaS (appointment scheduling for dental clinics in Korea and Japan). Teams: Engineering (22), Customer Support (14), Sales (9), Marketing (6), Ops/Finance/HR (9).
+
+  Policy topic: Using generative AI tools (ChatGPT, Claude, Gemini, GitHub Copilot, Cursor, Notion AI) at work when customer data may be involved.
+
+  Audience: all employees and contractors. Must be readable by non-engineers; support agents are the most frequent users.
+
+  Rules we've already agreed on with Legal and the CTO:
+  1. Approved tools: Claude Team plan and ChatGPT Enterprise (both under signed DPAs, training opt-out confirmed), GitHub Copilot Business, Cursor Business with privacy mode on. Everything else (free/personal accounts, browser extensions, Gemini consumer) is not approved for any company data.
+  2. Patient data (names, phone numbers, appointment reasons, treatment notes) from clinic accounts must NEVER be pasted into any AI tool, approved or not. This is PHI-adjacent and covered by our contracts with clinics and Korea's PIPA.
+  3. Clinic business data (clinic name, staff emails, billing plan, ticket text with patient details removed) may be used in approved tools only.
+  4. Production credentials, API keys, and database dumps may never be pasted into any AI tool.
+  5. AI-generated customer-facing replies must be reviewed by a human before sending.
+  6. Code from Copilot/Cursor follows normal PR review; no special rule.
+
+  Exceptions: Security lead (Minji Park) can approve time-boxed exceptions for a specific tool + dataset, in writing via the #security-requests Slack channel, max 90 days.
+
+  Escalation: suspected leaks go to security@relaymint.io within 24 hours; the security lead decides whether it's a reportable incident.
+
+  Enforcement: first violation = retraining; repeated or willful = HR process.
+
+  Please include definitions, concrete examples of allowed vs. not allowed (use support-ticket and sales-email examples), and a review checklist for the policy owner.
+exampleOutput: |-
+  Here's a draft you can paste straight into Notion. I've built it on the six rules you agreed with Legal and the CTO. Where I had to assume something, it's marked **[Assumption]** and listed in Section 11, so Legal can confirm those points before you publish.
+
+  There's one gap to settle first: your topic list names **Notion AI** and **Gemini**, but the approved list doesn't include them. The draft treats both as **not approved**. That matters because the policy will live in Notion, where people will see the Notion AI button right next to it.
+
+  ---
+
+  # Generative AI Use Policy (Customer Data)
+
+  | | |
+  |---|---|
+  | **Policy owner** | Minji Park, Security Lead **[Assumption]** |
+  | **Approved by** | Legal, CTO |
+  | **Applies to** | All Relaymint employees and contractors |
+  | **Effective date** | [YYYY-MM-DD] |
+  | **Next review** | [Effective date + 6 months] |
+  | **Version** | 1.0 |
+
+  ---
+
+  ## 1. Summary
+
+  - ✅ **Use only approved AI tools** for work: Claude (Team), ChatGPT (Enterprise), GitHub Copilot (Business), and Cursor (Business, privacy mode on).
+  - ❌ **Never put patient data into any AI tool.** That includes names, phone numbers, appointment reasons, and treatment notes. It applies even to approved tools.
+  - ❌ **Never paste passwords, API keys, production credentials, or database dumps** into any AI tool.
+  - ✅ **Clinic business data is OK in approved tools only.** Examples: clinic name, staff emails, billing plan, and ticket text with patient details removed.
+  - 👀 **A human must review every AI-written message before it reaches a customer.**
+  - 🚨 **Think something leaked? Email security@relaymint.io within 24 hours.** Don't wait until you're sure.
+
+  If you're unsure, remove the data or ask in #security-requests before you paste.
+
+  ---
+
+  ## 2. Why this policy exists
+
+  Our customers are dental clinics, and their data includes information about **their patients**. Our contracts with clinics and Korea's Personal Information Protection Act (PIPA) require us to protect that data carefully. A single paste into the wrong tool can:
+
+  - send patient information to a company we have no contract with,
+  - let that data be stored or used to train AI models,
+  - break our contracts with clinics and expose Relaymint to regulatory penalties.
+
+  We want people to use AI. It makes support, sales, and engineering faster. This policy explains how to use it safely.
+
+  ---
+
+  ## 3. Scope
+
+  **This policy covers:**
+  - All employees and contractors, in every team and in both Korea and Japan.
+  - Any generative AI tool: chatbots, coding assistants, writing assistants, AI features built into other apps (for example Notion AI, Gmail/Google Docs AI, Slack AI, Zoom AI summaries), browser extensions, and mobile apps.
+  - Any way data gets into a tool: typing, pasting, uploading files, screenshots, voice, or connecting the tool to another app (for example "connect to Google Drive").
+
+  **This policy does not cover:**
+  - AI features that Relaymint builds into our own product. Those follow the product security review process.
+  - Personal use of AI on personal matters that involves no company data.
+
+  ---
+
+  ## 4. Definitions
+
+  | Term | What it means | Examples |
+  |---|---|---|
+  | **AI tool** | Any software that generates text, code, images, or summaries using AI. | ChatGPT, Claude, Gemini, Copilot, Cursor, Notion AI, AI browser extensions |
+  | **Approved AI tool** | An AI tool Relaymint has a signed contract with, where training on our data is turned off, **used through your company account**. | See Section 5 |
+  | **Patient data** | Any information about a clinic's patients, or information that could identify one. | Patient name, phone number, appointment reason, treatment notes, patient ID, appointment time tied to a person, screenshots showing any of these |
+  | **Clinic business data** | Information about the clinic as our customer, with no patient information. | Clinic name, clinic staff names and emails, billing plan, contract terms, ticket text **with patient details removed** |
+  | **Secrets** | Anything that gives access to our systems or data. | Production passwords, API keys, tokens, `.env` files, SSH keys, database connection strings, database dumps or exports |
+  | **Redact / remove patient details** | Replace every piece of patient data with a neutral placeholder **before** pasting. | "Kim Soo-jin, 010-1234-5678" → "[Patient], [phone]" |
+  | **Customer-facing output** | Anything a clinic, prospect, or partner will read. | Support replies, sales emails, help-center articles, proposals |
+
+  ---
+
+  ## 5. Approved tools
+
+  | Tool | Approved version | Typical users | Notes |
+  |---|---|---|---|
+  | **Claude** | Claude Team plan (company account) | Everyone | Signed DPA, no training on our data |
+  | **ChatGPT** | ChatGPT Enterprise (company account) | Everyone | Signed DPA, no training on our data |
+  | **GitHub Copilot** | Copilot Business (company org) | Engineering | Normal PR review applies |
+  | **Cursor** | Cursor Business, **privacy mode ON** | Engineering | Check privacy mode before you start working |
+
+  **Not approved for any company data:**
+  - Free or personal accounts of **any** tool, including a personal ChatGPT Plus or Claude Pro account.
+  - Gemini (consumer version).
+  - AI browser extensions (for example summarizers, writing helpers, "chat with this page" extensions).
+  - **Notion AI** and other built-in AI features that aren't listed above, until they are added to this table **[Assumption: not yet approved]**.
+  - Any tool not in the table above.
+
+  **How to tell if you're on an approved account:** you signed in with your **@relaymint.io** account through company SSO, and the workspace shows "Relaymint". If you're not sure, ask in #security-requests.
+
+  To request a new tool, post in #security-requests with the tool name, what you want to use it for, and what data it would touch.
+
+  ---
+
+  ## 6. The rules
+
+  ### Rule 1: Use only approved tools for company data
+  Any company data, including clinic business data, internal documents, and code, may go only into the approved tools listed in Section 5.
+
+  ### Rule 2: Never put patient data into any AI tool
+  This applies to **every** tool, approved or not. Before you paste a ticket, email, log, or screenshot, remove all patient details. If you can't remove them cleanly (for example in a screenshot of the scheduling calendar), **don't use AI for that task.**
+
+  ### Rule 3: Clinic business data goes into approved tools only
+  Clinic names, staff emails, billing plans, and patient-free ticket text are fine in approved tools, and not allowed anywhere else.
+
+  ### Rule 4: Never put secrets into any AI tool
+  This applies to **every** tool, approved or not: no production credentials, API keys, tokens, or database dumps. Engineers: make sure `.env` files and other secret files are excluded from AI context (see Section 7.3).
+
+  ### Rule 5: A human reviews every customer-facing AI output
+  Before any AI-written reply, email, or article reaches a customer, a person must read it fully and check that:
+  - the facts are correct (features, prices, policies, dates),
+  - there are no invented promises, discounts, or commitments,
+  - no internal or other-customer information slipped in,
+  - the tone and language are right for the clinic (Korean or Japanese business style).
+
+  The person who sends it is responsible for its content, whether or not AI drafted it.
+
+  ### Rule 6: AI-generated code follows normal review
+  Code from Copilot or Cursor goes through the normal pull request review. No extra rule applies, but Rules 2 and 4 still cover what you feed into the tool.
+
+  ---
+
+  ## 7. Examples: allowed vs. not allowed
+
+  ### 7.1 Customer Support (support tickets)
+
+  **Scenario:** A clinic writes in: *"Hi, this is Tanaka from Sakura Dental. Patient Sato Yuki (090-1111-2222) booked a root canal for Tuesday 10:00 but got an SMS for Wednesday. Can you check?"*
+
+  | | Example |
+  |---|---|
+  | ❌ **Not allowed** | Pasting the whole ticket into **any** AI tool, including Claude Team or ChatGPT Enterprise. It contains a patient name, phone number, and treatment reason. |
+  | ❌ **Not allowed** | Pasting a screenshot of the clinic's appointment calendar showing patient names. |
+  | ❌ **Not allowed** | Using a free ChatGPT account or a browser extension to "quickly translate" the ticket into Korean. |
+  | ✅ **Allowed** (approved tool) | *"A clinic (Sakura Dental, contact: Tanaka) reports that a patient booked an appointment for Tuesday 10:00 but received an SMS reminder for Wednesday. Draft a polite Japanese reply asking for the booking ID and confirming we're investigating."* |
+  | ✅ **Allowed** (approved tool) | Asking Claude or ChatGPT to summarize a long ticket thread **after** you've replaced patient details with [Patient], [phone], [treatment]. |
+  | ✅ **Allowed**, with human review | Using the AI draft as a starting point, then checking facts and tone before sending (Rule 5). |
+
+  **Tip:** Look up the patient-specific details yourself in the admin console. Use AI only for the wording.
+
+  ### 7.2 Sales (sales emails)
+
+  | | Example |
+  |---|---|
+  | ✅ **Allowed** (approved tool) | *"Write a follow-up email to Dr. Lee at Seoul Smile Dental Clinic. They're on the Starter plan with 3 staff and asked about upgrading to Pro for multi-location support."* |
+  | ✅ **Allowed** (approved tool) | Pasting a prospect's email (clinic name, staff name, their questions) and asking for a reply draft. |
+  | ❌ **Not allowed** | Using a personal ChatGPT or free Gemini account to write the same email. Clinic business data belongs in approved tools only. |
+  | ❌ **Not allowed** | Pasting an email where the clinic forwarded a patient complaint with the patient's name and details, unless you remove those details first. |
+  | ❌ **Not allowed** | Uploading a full CRM export or customer list to an AI tool to "find upsell targets" without an approved exception (Section 8). |
+  | ⚠️ **Check before sending** | AI suggests "We can offer 20% off if you sign this week." Only send it if that discount is actually approved (Rule 5). |
+
+  ### 7.3 Engineering (quick reference)
+
+  | | Example |
+  |---|---|
+  | ✅ **Allowed** | Using Copilot or Cursor (privacy mode on) on the Relaymint codebase. |
+  | ✅ **Allowed** | Asking Claude to explain an error using a stack trace **with patient data and tokens removed**. |
+  | ❌ **Not allowed** | Pasting production logs, database rows, or query results that contain patient data. |
+  | ❌ **Not allowed** | Opening a production DB dump, `.env` file, or a real-data seed or fixture file while Cursor or Copilot can read it as context. |
+  | ❌ **Not allowed** | Pasting an API key into a chat to "check why auth fails". |
+
+  ### 7.4 Everyone else (Marketing, Ops/Finance/HR)
+
+  | | Example |
+  |---|---|
+  | ✅ **Allowed** | Drafting a blog post or campaign copy in Claude Team or ChatGPT Enterprise. |
+  | ✅ **Allowed** | Summarizing an internal meeting note that contains no patient data. |
+  | ❌ **Not allowed** | Using a clinic's real patient story or testimonial containing patient details as AI input. |
+  | ❌ **Not allowed** | Uploading employee HR records or payroll files to an AI tool **[Assumption: employee personal data is out of scope for this version; see Section 11]**. |
+
+  ---
+
+  ## 8. Exceptions
+
+  If you have a real business need that this policy blocks (for example analyzing a large set of anonymized tickets):
+
+  1. Post a request in **#security-requests** with:
+     - the tool (must be specific, for example "ChatGPT Enterprise"),
+     - the dataset (for example "Q3 support tickets, patient fields stripped by script"),
+     - the purpose,
+     - the duration you need (**maximum 90 days**),
+     - who will have access.
+  2. **Minji Park (Security Lead)** reviews it and approves or declines **in writing in that channel**. A verbal OK or a DM doesn't count.
+  3. An exception covers **only that tool + dataset + time period**. When it expires, you stop, or you submit a new request.
+
+  **What exceptions can't do:** override Rule 2 (patient data) or Rule 4 (secrets) **[Assumption: confirm with Legal; see Section 11]**.
+
+  ---
+
+  ## 9. What to do if something goes wrong
+
+  If you **pasted something you shouldn't have**, or you **think data may have leaked** through an AI tool:
+
+  1. **Stop.** Don't keep using that conversation. Don't delete it until Security says so (it may be needed for the investigation).
+  2. **Email security@relaymint.io within 24 hours.** Include:
+     - what tool and account,
+     - what data (roughly; don't paste the data again in the email),
+     - when it happened,
+     - which clinic, if you know.
+  3. **The Security Lead decides** whether it's a reportable incident and what happens next.
+
+  Reporting quickly is always the right choice. People who report their own mistakes promptly are treated as having acted in good faith.
+
+  ---
+
+  ## 10. Enforcement
+
+  | Situation | Outcome |
+  |---|---|
+  | First violation | Required retraining on this policy |
+  | Repeated violation | HR process |
+  | Willful violation (knowingly breaking the rules, or hiding a leak) | HR process, which may include termination or ending a contractor agreement |
+
+  For contractors, violations are handled through their contract and their agency or manager **[Assumption]**.
+
+  ---
+
+  ## 11. Assumptions and open questions (resolve before publishing)
+
+  | # | Assumption / question | Why it matters | Suggested owner |
+  |---|---|---|---|
+  | A1 | **Policy owner is Minji Park.** | Someone needs to own reviews and updates. | CTO |
+  | A2 | **Notion AI is not approved.** | The policy will live in Notion, where people will see and use Notion AI. If Relaymint's Notion plan has a DPA and training opt-out, consider approving it explicitly, or disable Notion AI at the workspace level. | Security + Legal |
+  | A3 | **Gemini inside Google Workspace** (if you use Workspace) is treated like consumer Gemini, i.e. not approved. | People may assume it's covered by the company Google contract. | Security |
+  | A4 | **Japan:** the agreed rules cite Korea's PIPA. Japanese clinic data also falls under Japan's APPI. | The rules probably already satisfy both, but the "why" section should be legally accurate. | Legal |
+  | A5 | **Exceptions can't override the patient-data and secrets bans.** | Rules 2 and 4 say "never", but the exception process doesn't say whether it can override them. | Legal + Security Lead |
+  | A6 | **Employee personal data (HR, payroll)** isn't covered by the agreed rules. | Ops/HR may put it into AI tools. Either add a rule or state it's out of scope. | HR + Legal |
+  | A7 | **Contractors** get company accounts for approved tools. | Contractors without accounts might use personal ones, which breaks Rule 1. | Ops |
+  | A8 | **AI meeting recorders/transcribers** (Zoom AI, Otter, etc.) on calls with clinics. | Clinics may mention patients on calls. Not addressed by the current rules. | Security |
+
+  ---
+
+  ## 12. Risks this policy doesn't fully solve
+
+  - **Redaction mistakes.** Support agents remove patient details by hand, and it's easy to miss one (a name in a signature, a phone number in an attachment). *Mitigation:* train with real examples, and consider a redaction helper or a ticket view with patient fields masked.
+  - **Shadow AI.** Personal accounts and extensions are easy to use and hard to detect. *Mitigation:* SSO-only access to approved tools, a browser extension allowlist on company devices, and making approved tools easy to get.
+  - **Built-in AI features that appear without notice.** SaaS vendors keep adding AI features (Notion, Slack, Zoom, Google). *Mitigation:* a quarterly check of the tools we use, with features disabled at the admin level until reviewed.
+  - **Coding assistants reading sensitive files.** Copilot and Cursor can take local files as context. *Mitigation:* `.cursorignore` / content exclusion for secrets and data files; keep real patient data off developer machines.
+  - **Wrong or overconfident AI answers sent to customers.** *Mitigation:* Rule 5, and support leads spot-checking AI-assisted replies.
+
+  ---
+
+  ## 13. Rollout plan (this month)
+
+  | Step | Owner | When |
+  |---|---|---|
+  | Resolve open questions A1–A8 with Legal and CTO | Security Lead | Week 1 |
+  | Final review with Legal; publish in Notion | Security Lead | Week 2 |
+  | Announce in #general; add a pinned link in #security-requests | Security Lead | Week 2 |
+  | 20-minute walkthrough for Customer Support (most frequent users), using the ticket examples | Support Lead + Security Lead | Week 2–3 |
+  | Short sessions for Sales, Marketing, Ops/Finance/HR; engineering covered in the eng sync | Team leads | Week 3 |
+  | Every employee and contractor confirms they've read the policy (Notion checkbox or form) | Ops/HR | By end of month |
+  | Admin-level: disable unapproved built-in AI features; set Cursor privacy mode enforcement; Copilot content exclusions | IT/Engineering | Week 3–4 |
+  | Add policy to onboarding for new hires and contractors | Ops/HR | End of month |
+
+  ---
+
+  ## 14. Policy owner review checklist
+
+  Use this at each review (every 6 months) and whenever a tool, contract, or regulation changes.
+
+  **Tools and contracts**
+  - [ ] Each approved tool still has a signed DPA and training opt-out confirmed (check renewal dates).
+  - [ ] Plan tiers haven't changed (for example Team → a lower plan without the same terms).
+  - [ ] Cursor privacy mode is enforced at the org level, not just per user.
+  - [ ] Copilot / Cursor content exclusions still cover secrets and data files.
+  - [ ] New built-in AI features in our SaaS tools (Notion, Slack, Google, Zoom, CRM, helpdesk) have been reviewed, then approved or disabled.
+  - [ ] The approved and not-approved lists in Section 5 are current.
+
+  **Data and legal**
+  - [ ] Definitions of patient data and clinic business data still match our clinic contracts.
+  - [ ] Legal has confirmed no changes to PIPA (Korea) or APPI (Japan) that affect this policy.
+  - [ ] Any new data types (for example new product features collecting patient info) are covered.
+
+  **Exceptions and incidents**
+  - [ ] All exceptions in #security-requests are logged, and none has gone past 90 days.
+  - [ ] Expired exceptions have actually stopped.
+  - [ ] Incidents reported to security@relaymint.io since the last review have been examined for patterns (for example repeated redaction misses in Support).
+  - [ ] Any policy gaps found in incidents have been fixed in this document.
+
+  **People and awareness**
+  - [ ] All current employees and contractors have acknowledged the latest version.
+  - [ ] New hires and contractors get the policy during onboarding.
+  - [ ] The Support team's examples still reflect real ticket types.
+  - [ ] Retraining for first-time violations has been completed.
+
+  **Document hygiene**
+  - [ ] Version number, effective date, and next review date are updated.
+  - [ ] Changes are summarized in a changelog at the bottom of the page.
+  - [ ] Korean and Japanese translations (if published) match the English version **[Assumption: translations may be needed for Support staff]**.
+
+  ---
+
+  ## 15. Questions?
+
+  - General questions: **#security-requests**
+  - Suspected leak or mistake: **security@relaymint.io** (within 24 hours)
+  - Policy owner: **Minji Park, Security Lead**
+
+  ---
+
+  ### Changelog
+  | Version | Date | Change | Author |
+  |---|---|---|---|
+  | 1.0 | [YYYY-MM-DD] | First version | [Name] |
+
+  ---
+
+  **Next steps for you:**
+  1. Settle **A2 (Notion AI)** and **A5 (whether exceptions can override Rules 2 and 4)** first. Those two most affect how people will read the policy.
+  2. Have Legal confirm the APPI wording (A4) and whether employee data is in scope (A6).
+  3. Decide whether Support needs Korean and Japanese versions. If your support agents work mainly in those languages, a translated one-page summary of Sections 1 and 7.1 will work better than the full document.
+
+  If you want, I can also write a one-page quick-reference card for support agents or a Korean translation of the summary.
 limitations:
   - Not legal advice.
 bestPractices:
@@ -149,11 +484,9 @@ runbook:
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 3
+  qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Drafting internal policy language from approved rules and examples
     - "Teams with the required inputs ready: Policy topic, Audience, Rules"
@@ -163,30 +496,436 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Can make policy wording sound final when decisions are still provisional
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Runs long: the strong-case output adds a rollout plan, risks section, changelog, and 15 sections, which is more than a Notion policy page needs and pushes the core rules down the page."
+    - Adds policy commitments the user never gave without marking them as assumptions, e.g. 'People who report their own mistakes promptly are treated as having acted in good faith' (strong) and 'Reporting it quickly won't get you in trouble' (boundary).
+    - States some operational details as fact without labeling them, such as the '@relaymint.io account through company SSO' check for approved accounts and 'may include termination' in the enforcement table.
+    - In the under-specified case the one-page draft leaves out an explicit exceptions process and a definitions section, both of which its own criteria require, and it fills in a 24-hour reporting window without marking it as a placeholder.
   evaluationCriteria:
     - Labels scope, definitions, allowed use, prohibited use, exceptions, and escalation path
     - Produces Policy draft in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Policy Doc Writer strong-context run
-      input: Draft an internal AI tool usage policy from team-approved rules.
-      expectedOutputSummary: A usable Policy draft with project-specific assumptions, risks, and next steps.
-      sampleOutput: "Policy draft: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: AI tools with customer data policy for a 60-person SaaS
+      input: |-
+        Please draft an internal policy we can publish in Notion this month.
+
+        Company: Relaymint, a 60-person B2B SaaS (appointment scheduling for dental clinics in Korea and Japan). Teams: Engineering (22), Customer Support (14), Sales (9), Marketing (6), Ops/Finance/HR (9).
+
+        Policy topic: Using generative AI tools (ChatGPT, Claude, Gemini, GitHub Copilot, Cursor, Notion AI) at work when customer data may be involved.
+
+        Audience: all employees and contractors. Must be readable by non-engineers; support agents are the most frequent users.
+
+        Rules we've already agreed on with Legal and the CTO:
+        1. Approved tools: Claude Team plan and ChatGPT Enterprise (both under signed DPAs, training opt-out confirmed), GitHub Copilot Business, Cursor Business with privacy mode on. Everything else (free/personal accounts, browser extensions, Gemini consumer) is not approved for any company data.
+        2. Patient data (names, phone numbers, appointment reasons, treatment notes) from clinic accounts must NEVER be pasted into any AI tool, approved or not. This is PHI-adjacent and covered by our contracts with clinics and Korea's PIPA.
+        3. Clinic business data (clinic name, staff emails, billing plan, ticket text with patient details removed) may be used in approved tools only.
+        4. Production credentials, API keys, and database dumps may never be pasted into any AI tool.
+        5. AI-generated customer-facing replies must be reviewed by a human before sending.
+        6. Code from Copilot/Cursor follows normal PR review; no special rule.
+
+        Exceptions: Security lead (Minji Park) can approve time-boxed exceptions for a specific tool + dataset, in writing via the #security-requests Slack channel, max 90 days.
+
+        Escalation: suspected leaks go to security@relaymint.io within 24 hours; the security lead decides whether it's a reportable incident.
+
+        Enforcement: first violation = retraining; repeated or willful = HR process.
+
+        Please include definitions, concrete examples of allowed vs. not allowed (use support-ticket and sales-email examples), and a review checklist for the policy owner.
+      expectedOutputSummary: "A Notion-ready Relaymint AI policy that encodes all six agreed rules, the approved-tool list, the Minji Park 90-day exception process via #security-requests, 24-hour escalation to security@relaymint.io, and the retraining/HR enforcement ladder, and that includes definitions, support-ticket and sales-email allowed/not-allowed examples, and a policy-owner review checklist."
+      sampleOutput: |-
+        Here's a draft you can paste straight into Notion. I've built it on the six rules you agreed with Legal and the CTO. Where I had to assume something, it's marked **[Assumption]** and listed in Section 11, so Legal can confirm those points before you publish.
+
+        There's one gap to settle first: your topic list names **Notion AI** and **Gemini**, but the approved list doesn't include them. The draft treats both as **not approved**. That matters because the policy will live in Notion, where people will see the Notion AI button right next to it.
+
+        ---
+
+        # Generative AI Use Policy (Customer Data)
+
+        | | |
+        |---|---|
+        | **Policy owner** | Minji Park, Security Lead **[Assumption]** |
+        | **Approved by** | Legal, CTO |
+        | **Applies to** | All Relaymint employees and contractors |
+        | **Effective date** | [YYYY-MM-DD] |
+        | **Next review** | [Effective date + 6 months] |
+        | **Version** | 1.0 |
+
+        ---
+
+        ## 1. Summary
+
+        - ✅ **Use only approved AI tools** for work: Claude (Team), ChatGPT (Enterprise), GitHub Copilot (Business), and Cursor (Business, privacy mode on).
+        - ❌ **Never put patient data into any AI tool.** That includes names, phone numbers, appointment reasons, and treatment notes. It applies even to approved tools.
+        - ❌ **Never paste passwords, API keys, production credentials, or database dumps** into any AI tool.
+        - ✅ **Clinic business data is OK in approved tools only.** Examples: clinic name, staff emails, billing plan, and ticket text with patient details removed.
+        - 👀 **A human must review every AI-written message before it reaches a customer.**
+        - 🚨 **Think something leaked? Email security@relaymint.io within 24 hours.** Don't wait until you're sure.
+
+        If you're unsure, remove the data or ask in #security-requests before you paste.
+
+        ---
+
+        ## 2. Why this policy exists
+
+        Our customers are dental clinics, and their data includes information about **their patients**. Our contracts with clinics and Korea's Personal Information Protection Act (PIPA) require us to protect that data carefully. A single paste into the wrong tool can:
+
+        - send patient information to a company we have no contract with,
+        - let that data be stored or used to train AI models,
+        - break our contracts with clinics and expose Relaymint to regulatory penalties.
+
+        We want people to use AI. It makes support, sales, and engineering faster. This policy explains how to use it safely.
+
+        ---
+
+        ## 3. Scope
+
+        **This policy covers:**
+        - All employees and contractors, in every team and in both Korea and Japan.
+        - Any generative AI tool: chatbots, coding assistants, writing assistants, AI features built into other apps (for example Notion AI, Gmail/Google Docs AI, Slack AI, Zoom AI summaries), browser extensions, and mobile apps.
+        - Any way data gets into a tool: typing, pasting, uploading files, screenshots, voice, or connecting the tool to another app (for example "connect to Google Drive").
+
+        **This policy does not cover:**
+        - AI features that Relaymint builds into our own product. Those follow the product security review process.
+        - Personal use of AI on personal matters that involves no company data.
+
+        ---
+
+        ## 4. Definitions
+
+        | Term | What it means | Examples |
+        |---|---|---|
+        | **AI tool** | Any software that generates text, code, images, or summaries using AI. | ChatGPT, Claude, Gemini, Copilot, Cursor, Notion AI, AI browser extensions |
+        | **Approved AI tool** | An AI tool Relaymint has a signed contract with, where training on our data is turned off, **used through your company account**. | See Section 5 |
+        | **Patient data** | Any information about a clinic's patients, or information that could identify one. | Patient name, phone number, appointment reason, treatment notes, patient ID, appointment time tied to a person, screenshots showing any of these |
+        | **Clinic business data** | Information about the clinic as our customer, with no patient information. | Clinic name, clinic staff names and emails, billing plan, contract terms, ticket text **with patient details removed** |
+        | **Secrets** | Anything that gives access to our systems or data. | Production passwords, API keys, tokens, `.env` files, SSH keys, database connection strings, database dumps or exports |
+        | **Redact / remove patient details** | Replace every piece of patient data with a neutral placeholder **before** pasting. | "Kim Soo-jin, 010-1234-5678" → "[Patient], [phone]" |
+        | **Customer-facing output** | Anything a clinic, prospect, or partner will read. | Support replies, sales emails, help-center articles, proposals |
+
+        ---
+
+        ## 5. Approved tools
+
+        | Tool | Approved version | Typical users | Notes |
+        |---|---|---|---|
+        | **Claude** | Claude Team plan (company account) | Everyone | Signed DPA, no training on our data |
+        | **ChatGPT** | ChatGPT Enterprise (company account) | Everyone | Signed DPA, no training on our data |
+        | **GitHub Copilot** | Copilot Business (company org) | Engineering | Normal PR review applies |
+        | **Cursor** | Cursor Business, **privacy mode ON** | Engineering | Check privacy mode before you start working |
+
+        **Not approved for any company data:**
+        - Free or personal accounts of **any** tool, including a personal ChatGPT Plus or Claude Pro account.
+        - Gemini (consumer version).
+        - AI browser extensions (for example summarizers, writing helpers, "chat with this page" extensions).
+        - **Notion AI** and other built-in AI features that aren't listed above, until they are added to this table **[Assumption: not yet approved]**.
+        - Any tool not in the table above.
+
+        **How to tell if you're on an approved account:** you signed in with your **@relaymint.io** account through company SSO, and the workspace shows "Relaymint". If you're not sure, ask in #security-requests.
+
+        To request a new tool, post in #security-requests with the tool name, what you want to use it for, and what data it would touch.
+
+        ---
+
+        ## 6. The rules
+
+        ### Rule 1: Use only approved tools for company data
+        Any company data, including clinic business data, internal documents, and code, may go only into the approved tools listed in Section 5.
+
+        ### Rule 2: Never put patient data into any AI tool
+        This applies to **every** tool, approved or not. Before you paste a ticket, email, log, or screenshot, remove all patient details. If you can't remove them cleanly (for example in a screenshot of the scheduling calendar), **don't use AI for that task.**
+
+        ### Rule 3: Clinic business data goes into approved tools only
+        Clinic names, staff emails, billing plans, and patient-free ticket text are fine in approved tools, and not allowed anywhere else.
+
+        ### Rule 4: Never put secrets into any AI tool
+        This applies to **every** tool, approved or not: no production credentials, API keys, tokens, or database dumps. Engineers: make sure `.env` files and other secret files are excluded from AI context (see Section 7.3).
+
+        ### Rule 5: A human reviews every customer-facing AI output
+        Before any AI-written reply, email, or article reaches a customer, a person must read it fully and check that:
+        - the facts are correct (features, prices, policies, dates),
+        - there are no invented promises, discounts, or commitments,
+        - no internal or other-customer information slipped in,
+        - the tone and language are right for the clinic (Korean or Japanese business style).
+
+        The person who sends it is responsible for its content, whether or not AI drafted it.
+
+        ### Rule 6: AI-generated code follows normal review
+        Code from Copilot or Cursor goes through the normal pull request review. No extra rule applies, but Rules 2 and 4 still cover what you feed into the tool.
+
+        ---
+
+        ## 7. Examples: allowed vs. not allowed
+
+        ### 7.1 Customer Support (support tickets)
+
+        **Scenario:** A clinic writes in: *"Hi, this is Tanaka from Sakura Dental. Patient Sato Yuki (090-1111-2222) booked a root canal for Tuesday 10:00 but got an SMS for Wednesday. Can you check?"*
+
+        | | Example |
+        |---|---|
+        | ❌ **Not allowed** | Pasting the whole ticket into **any** AI tool, including Claude Team or ChatGPT Enterprise. It contains a patient name, phone number, and treatment reason. |
+        | ❌ **Not allowed** | Pasting a screenshot of the clinic's appointment calendar showing patient names. |
+        | ❌ **Not allowed** | Using a free ChatGPT account or a browser extension to "quickly translate" the ticket into Korean. |
+        | ✅ **Allowed** (approved tool) | *"A clinic (Sakura Dental, contact: Tanaka) reports that a patient booked an appointment for Tuesday 10:00 but received an SMS reminder for Wednesday. Draft a polite Japanese reply asking for the booking ID and confirming we're investigating."* |
+        | ✅ **Allowed** (approved tool) | Asking Claude or ChatGPT to summarize a long ticket thread **after** you've replaced patient details with [Patient], [phone], [treatment]. |
+        | ✅ **Allowed**, with human review | Using the AI draft as a starting point, then checking facts and tone before sending (Rule 5). |
+
+        **Tip:** Look up the patient-specific details yourself in the admin console. Use AI only for the wording.
+
+        ### 7.2 Sales (sales emails)
+
+        | | Example |
+        |---|---|
+        | ✅ **Allowed** (approved tool) | *"Write a follow-up email to Dr. Lee at Seoul Smile Dental Clinic. They're on the Starter plan with 3 staff and asked about upgrading to Pro for multi-location support."* |
+        | ✅ **Allowed** (approved tool) | Pasting a prospect's email (clinic name, staff name, their questions) and asking for a reply draft. |
+        | ❌ **Not allowed** | Using a personal ChatGPT or free Gemini account to write the same email. Clinic business data belongs in approved tools only. |
+        | ❌ **Not allowed** | Pasting an email where the clinic forwarded a patient complaint with the patient's name and details, unless you remove those details first. |
+        | ❌ **Not allowed** | Uploading a full CRM export or customer list to an AI tool to "find upsell targets" without an approved exception (Section 8). |
+        | ⚠️ **Check before sending** | AI suggests "We can offer 20% off if you sign this week." Only send it if that discount is actually approved (Rule 5). |
+
+        ### 7.3 Engineering (quick reference)
+
+        | | Example |
+        |---|---|
+        | ✅ **Allowed** | Using Copilot or Cursor (privacy mode on) on the Relaymint codebase. |
+        | ✅ **Allowed** | Asking Claude to explain an error using a stack trace **with patient data and tokens removed**. |
+        | ❌ **Not allowed** | Pasting production logs, database rows, or query results that contain patient data. |
+        | ❌ **Not allowed** | Opening a production DB dump, `.env` file, or a real-data seed or fixture file while Cursor or Copilot can read it as context. |
+        | ❌ **Not allowed** | Pasting an API key into a chat to "check why auth fails". |
+
+        ### 7.4 Everyone else (Marketing, Ops/Finance/HR)
+
+        | | Example |
+        |---|---|
+        | ✅ **Allowed** | Drafting a blog post or campaign copy in Claude Team or ChatGPT Enterprise. |
+        | ✅ **Allowed** | Summarizing an internal meeting note that contains no patient data. |
+        | ❌ **Not allowed** | Using a clinic's real patient story or testimonial containing patient details as AI input. |
+        | ❌ **Not allowed** | Uploading employee HR records or payroll files to an AI tool **[Assumption: employee personal data is out of scope for this version; see Section 11]**. |
+
+        ---
+
+        ## 8. Exceptions
+
+        If you have a real business need that this policy blocks (for example analyzing a large set of anonymized tickets):
+
+        1. Post a request in **#security-requests** with:
+           - the tool (must be specific, for example "ChatGPT Enterprise"),
+           - the dataset (for example "Q3 support tickets, patient fields stripped by script"),
+           - the purpose,
+           - the duration you need (**maximum 90 days**),
+           - who will have access.
+        2. **Minji Park (Security Lead)** reviews it and approves or declines **in writing in that channel**. A verbal OK or a DM doesn't count.
+        3. An exception covers **only that tool + dataset + time period**. When it expires, you stop, or you submit a new request.
+
+        **What exceptions can't do:** override Rule 2 (patient data) or Rule 4 (secrets) **[Assumption: confirm with Legal; see Section 11]**.
+
+        ---
+
+        ## 9. What to do if something goes wrong
+
+        If you **pasted something you shouldn't have**, or you **think data may have leaked** through an AI tool:
+
+        1. **Stop.** Don't keep using that conversation. Don't delete it until Security says so (it may be needed for the investigation).
+        2. **Email security@relaymint.io within 24 hours.** Include:
+           - what tool and account,
+           - what data (roughly; don't paste the data again in the email),
+           - when it happened,
+           - which clinic, if you know.
+        3. **The Security Lead decides** whether it's a reportable incident and what happens next.
+
+        Reporting quickly is always the right choice. People who report their own mistakes promptly are treated as having acted in good faith.
+
+        ---
+
+        ## 10. Enforcement
+
+        | Situation | Outcome |
+        |---|---|
+        | First violation | Required retraining on this policy |
+        | Repeated violation | HR process |
+        | Willful violation (knowingly breaking the rules, or hiding a leak) | HR process, which may include termination or ending a contractor agreement |
+
+        For contractors, violations are handled through their contract and their agency or manager **[Assumption]**.
+
+        ---
+
+        ## 11. Assumptions and open questions (resolve before publishing)
+
+        | # | Assumption / question | Why it matters | Suggested owner |
+        |---|---|---|---|
+        | A1 | **Policy owner is Minji Park.** | Someone needs to own reviews and updates. | CTO |
+        | A2 | **Notion AI is not approved.** | The policy will live in Notion, where people will see and use Notion AI. If Relaymint's Notion plan has a DPA and training opt-out, consider approving it explicitly, or disable Notion AI at the workspace level. | Security + Legal |
+        | A3 | **Gemini inside Google Workspace** (if you use Workspace) is treated like consumer Gemini, i.e. not approved. | People may assume it's covered by the company Google contract. | Security |
+        | A4 | **Japan:** the agreed rules cite Korea's PIPA. Japanese clinic data also falls under Japan's APPI. | The rules probably already satisfy both, but the "why" section should be legally accurate. | Legal |
+        | A5 | **Exceptions can't override the patient-data and secrets bans.** | Rules 2 and 4 say "never", but the exception process doesn't say whether it can override them. | Legal + Security Lead |
+        | A6 | **Employee personal data (HR, payroll)** isn't covered by the agreed rules. | Ops/HR may put it into AI tools. Either add a rule or state it's out of scope. | HR + Legal |
+        | A7 | **Contractors** get company accounts for approved tools. | Contractors without accounts might use personal ones, which breaks Rule 1. | Ops |
+        | A8 | **AI meeting recorders/transcribers** (Zoom AI, Otter, etc.) on calls with clinics. | Clinics may mention patients on calls. Not addressed by the current rules. | Security |
+
+        ---
+
+        ## 12. Risks this policy doesn't fully solve
+
+        - **Redaction mistakes.** Support agents remove patient details by hand, and it's easy to miss one (a name in a signature, a phone number in an attachment). *Mitigation:* train with real examples, and consider a redaction helper or a ticket view with patient fields masked.
+        - **Shadow AI.** Personal accounts and extensions are easy to use and hard to detect. *Mitigation:* SSO-only access to approved tools, a browser extension allowlist on company devices, and making approved tools easy to get.
+        - **Built-in AI features that appear without notice.** SaaS vendors keep adding AI features (Notion, Slack, Zoom, Google). *Mitigation:* a quarterly check of the tools we use, with features disabled at the admin level until reviewed.
+        - **Coding assistants reading sensitive files.** Copilot and Cursor can take local files as context. *Mitigation:* `.cursorignore` / content exclusion for secrets and data files; keep real patient data off developer machines.
+        - **Wrong or overconfident AI answers sent to customers.** *Mitigation:* Rule 5, and support leads spot-checking AI-assisted replies.
+
+        ---
+
+        ## 13. Rollout plan (this month)
+
+        | Step | Owner | When |
+        |---|---|---|
+        | Resolve open questions A1–A8 with Legal and CTO | Security Lead | Week 1 |
+        | Final review with Legal; publish in Notion | Security Lead | Week 2 |
+        | Announce in #general; add a pinned link in #security-requests | Security Lead | Week 2 |
+        | 20-minute walkthrough for Customer Support (most frequent users), using the ticket examples | Support Lead + Security Lead | Week 2–3 |
+        | Short sessions for Sales, Marketing, Ops/Finance/HR; engineering covered in the eng sync | Team leads | Week 3 |
+        | Every employee and contractor confirms they've read the policy (Notion checkbox or form) | Ops/HR | By end of month |
+        | Admin-level: disable unapproved built-in AI features; set Cursor privacy mode enforcement; Copilot content exclusions | IT/Engineering | Week 3–4 |
+        | Add policy to onboarding for new hires and contractors | Ops/HR | End of month |
+
+        ---
+
+        ## 14. Policy owner review checklist
+
+        Use this at each review (every 6 months) and whenever a tool, contract, or regulation changes.
+
+        **Tools and contracts**
+        - [ ] Each approved tool still has a signed DPA and training opt-out confirmed (check renewal dates).
+        - [ ] Plan tiers haven't changed (for example Team → a lower plan without the same terms).
+        - [ ] Cursor privacy mode is enforced at the org level, not just per user.
+        - [ ] Copilot / Cursor content exclusions still cover secrets and data files.
+        - [ ] New built-in AI features in our SaaS tools (Notion, Slack, Google, Zoom, CRM, helpdesk) have been reviewed, then approved or disabled.
+        - [ ] The approved and not-approved lists in Section 5 are current.
+
+        **Data and legal**
+        - [ ] Definitions of patient data and clinic business data still match our clinic contracts.
+        - [ ] Legal has confirmed no changes to PIPA (Korea) or APPI (Japan) that affect this policy.
+        - [ ] Any new data types (for example new product features collecting patient info) are covered.
+
+        **Exceptions and incidents**
+        - [ ] All exceptions in #security-requests are logged, and none has gone past 90 days.
+        - [ ] Expired exceptions have actually stopped.
+        - [ ] Incidents reported to security@relaymint.io since the last review have been examined for patterns (for example repeated redaction misses in Support).
+        - [ ] Any policy gaps found in incidents have been fixed in this document.
+
+        **People and awareness**
+        - [ ] All current employees and contractors have acknowledged the latest version.
+        - [ ] New hires and contractors get the policy during onboarding.
+        - [ ] The Support team's examples still reflect real ticket types.
+        - [ ] Retraining for first-time violations has been completed.
+
+        **Document hygiene**
+        - [ ] Version number, effective date, and next review date are updated.
+        - [ ] Changes are summarized in a changelog at the bottom of the page.
+        - [ ] Korean and Japanese translations (if published) match the English version **[Assumption: translations may be needed for Support staff]**.
+
+        ---
+
+        ## 15. Questions?
+
+        - General questions: **#security-requests**
+        - Suspected leak or mistake: **security@relaymint.io** (within 24 hours)
+        - Policy owner: **Minji Park, Security Lead**
+
+        ---
+
+        ### Changelog
+        | Version | Date | Change | Author |
+        |---|---|---|---|
+        | 1.0 | [YYYY-MM-DD] | First version | [Name] |
+
+        ---
+
+        **Next steps for you:**
+        1. Settle **A2 (Notion AI)** and **A5 (whether exceptions can override Rules 2 and 4)** first. Those two most affect how people will read the policy.
+        2. Have Legal confirm the APPI wording (A4) and whether employee data is in scope (A6).
+        3. Decide whether Support needs Korean and Japanese versions. If your support agents work mainly in those languages, a translated one-page summary of Sections 1 and 7.1 will work better than the full document.
+
+        If you want, I can also write a one-page quick-reference card for support agents or a Korean translation of the summary.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Policy Doc Writer boundary run
-      input: Create legally binding customer terms without counsel review.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Faithful to the input: all six rules appear verbatim in intent (Section 6), the approved-tool table matches exactly (Claude Team, ChatGPT Enterprise, Copilot Business, Cursor Business with privacy mode), and exception/escalation/enforcement match the given details (Sections 8-10)."
+        - "It flags a real gap up front: Notion AI and Gemini appear in the topic list but not on the approved list, and it notes that the policy will live in Notion. This comes back as A2/A3 in a clean assumptions table (Section 11) along with good catches like Japan's APPI vs. PIPA (A4) and whether exceptions can override Rules 2/4 (A5)."
+        - "The examples are concrete and on-domain: the Sakura Dental ticket with 'Patient Sato Yuki (090-1111-2222)' root-canal SMS mix-up shows exactly what to redact, and the sales table includes a forwarded patient complaint and an unapproved '20% off' AI suggestion."
+        - "The review checklist (Section 14) is specific and usable: DPA renewals, Cursor org-level privacy enforcement, exceptions not past 90 days, and acknowledgment tracking."
+        - "Defects: the document is long, and the rollout plan and changelog go beyond what was asked. Several statements are added without an [Assumption] tag: the SSO/@relaymint.io account check, the good-faith self-reporting promise, and 'may include termination' for willful violations."
+    - title: Policy request with no rules and a contradictory goal
+      input: Write our AI usage policy. We want people to use AI as much as possible to be faster, but also nothing confidential should ever leave the company. Make it short, one page max, and cover everything.
+      expectedOutputSummary: A response that names the tension between 'use AI as much as possible' and 'nothing confidential ever leaves', resolves it provisionally (for example with approved enterprise tools), delivers a short one-page draft with placeholders instead of invented specifics, and asks a few focused questions about tools and regulatory context.
+      sampleOutput: |-
+        Here's a one-page draft you can use now. I made a few assumptions to keep it short, and they're listed below the policy. There's one point you need to decide before this goes out. "Use AI as much as possible" and "nothing confidential ever leaves" only work together if you give people **approved tools** that are allowed to handle confidential data. Without them, the only way to keep the second promise is to restrict AI to public information, and that works against the first goal.
+
+        ---
+
+        # AI Usage Policy
+
+        **Owner:** [Name/Role] · **Effective:** [Date] · **Review:** Every 6 months
+
+        **1. Purpose**
+        We want everyone to use AI tools every day to work faster and better. This policy explains how to do that without exposing confidential information.
+
+        **2. Scope**
+        This covers all employees, contractors, and interns, and any AI tool used for company work. That includes chatbots, coding assistants, meeting transcribers, browser extensions, and AI features built into other software.
+
+        **3. Approved vs. unapproved tools**
+        - **Approved tools** ([list, e.g. Company ChatGPT Enterprise / Claude for Work / Copilot Business]) are under company contracts. Those contracts bar vendors from training on our data and let us control retention. **Confidential data is allowed in approved tools only.**
+        - **Everything else** (free or personal accounts, new apps, browser plug-ins) counts as outside the company. **Only use public information in these tools.**
+        - The current list is at [link]. To request a new tool, contact [IT/Security]. Use of unlisted tools isn't allowed until they're approved.
+
+        **4. What never goes into an unapproved tool**
+        - Customer, employee, or personal data
+        - Source code, credentials, API keys, and security details
+        - Financials, pricing, contracts, and unreleased product or strategy information
+        - Anything labeled Confidential or Internal, or covered by an NDA
+
+        If you're not sure, treat it as confidential.
+
+        **5. Using AI output**
+        - **You own the result.** Check facts, numbers, code, and citations before you rely on them or share them.
+        - Get human review before AI-generated content goes to customers or the public, or is used in legal, HR, or financial decisions.
+        - Don't use AI to make final decisions about people (hiring, performance, termination).
+        - Follow copyright and licensing rules, and don't present AI output as someone else's work.
+
+        **6. Meetings and recordings**
+        Only use approved AI note-takers, and tell participants when one is running. Don't use them in calls with external parties unless those parties agree.
+
+        **7. Incidents**
+        If confidential information goes into an unapproved tool, report it to [Security contact] **within 24 hours**. Reporting it quickly won't get you in trouble. Hiding it will.
+
+        **8. Enforcement**
+        Violations may lead to disciplinary action. We'll update this policy as tools and laws change.
+
+        ---
+
+        **Assumptions I made**
+        - You have (or will get) at least one enterprise AI tool with no-training and data-retention terms. If you don't, section 3 collapses to "public information only," and most of the productivity benefit goes with it.
+        - You already have a data classification scheme (Confidential/Internal/Public). If not, section 4 is your working definition.
+        - No industry-specific rules apply (e.g., HIPAA, financial services, government contracts). If they do, you'll need a short addendum.
+
+        **Risks to be aware of**
+        - **"Never" isn't fully enforceable through policy alone.** People will still paste things into free tools. You can reduce that with technical controls such as SSO-only access, blocking unapproved AI sites, and DLP. Written rules won't prevent it on their own.
+        - **Approved doesn't mean data never leaves.** Data sent to an enterprise vendor still goes to that vendor. You're relying on the contract, so have Legal/Security check the retention, training, and sub-processor terms.
+        - **"One page, covers everything" is a trade-off.** This page covers the rules. Detailed items like the tool list, the request process, and regulatory specifics should live in linked documents.
+
+        **Next actions**
+        1. Decide which tools are approved and fill in the list (IT/Security + Legal).
+        2. Name the policy owner and the incident contact.
+        3. Turn on supporting controls (SSO, blocklist, DLP) where possible.
+        4. Run a 15-minute team briefing and get acknowledgment.
+        5. Review in 6 months, or sooner if tools change.
+
+        **Two quick questions would let me tighten this:**
+        1. Which AI tools do you already pay for, or plan to approve?
+        2. Are you in a regulated industry, or do you handle customer data under specific contracts?
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "It names the contradiction in the first paragraph and resolves it sensibly: confidential data is allowed only in approved, contracted tools. It also admits in Risks that 'Approved doesn't mean data never leaves', which is honest about the user's absolute wording."
+        - "It moves the work forward: an 8-section policy of roughly one page, with bracketed placeholders for the tool list, owner, and security contact instead of invented names."
+        - Assumptions, risks, next actions, and exactly two focused questions (tools already paid for; regulated industry or customer-data contracts) are kept separate, which meets the third criterion.
+        - "Gaps against criterion 1: there is no exceptions path and no definitions section. 'Confidential' is defined only implicitly through the list in section 4."
+        - "It invents specifics without marking them: a 24-hour reporting window and 'Reporting it quickly won't get you in trouble' are policy commitments the user never made, presented as final text rather than placeholders."
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Drafting internal policy language from approved rules and examples
@@ -199,5 +938,5 @@ decisionGuide:
 relatedAgents:
   - internal-ai-policy-agent
   - operations-sop-agent
-verifiedStatus: tested
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29

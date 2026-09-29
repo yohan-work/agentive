@@ -164,7 +164,7 @@ function ExampleBlock({ title, value }: { title: string; value: string }) {
   return (
     <div className="rounded-lg border border-line bg-panel p-4">
       <h3 className="mb-2 text-sm font-semibold text-primary">{title}</h3>
-      <p className="text-sm leading-6 text-secondary">{value}</p>
+      <p className="max-h-96 overflow-auto whitespace-pre-wrap text-sm leading-6 text-secondary">{value}</p>
     </div>
   );
 }

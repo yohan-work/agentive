@@ -36,8 +36,207 @@ outputs:
   - Edge cases
   - Out of scope
 prompt: You are a product requirements analyst. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical implementation-ready feature spec with clear sections, assumptions, risks, and next actions.
-exampleInput: Add bookmark support to an agent archive without login.
-exampleOutput: Requirements for localStorage bookmarks, page states, acceptance tests, and limitations.
+exampleInput: |-
+  I need an implementation-ready feature spec I can paste into a GitHub issue.
+
+  Product: Agent Archive (https://yohan-work.github.io/agentive/) — an open-source library of 100 AI agent prompts. Static Next.js 16 site exported to GitHub Pages, no backend, no accounts. English (/en) and Korean (/ko) UI. 20 of the agents are "project-ready" and have downloadable install kits (AGENTS.md, CLAUDE.md, Cursor .mdc rule, agent.json, README, RUNBOOK, EVALUATION).
+
+  Feature goal: On /install, add a "Pick your role" step at the top. The visitor picks one of four roles — Developer, PM, Designer, Operations — and sees a recommended starter pack of 3–5 project-ready agents for that role, with a single "Download all kits for this role" action.
+
+  User story: As a developer landing on /install for the first time, I want to pick my role and get a small, trusted set of agents to drop into my repo, so I don't have to read 20 agent pages to decide.
+
+  Existing behavior today:
+  - /install lists 4 static starter packs (engineering, product planning, design QA, operations) defined in src/data/starter-packs.ts, then a grid of all 20 project-ready agents using the existing AgentCard component.
+  - Each project-ready agent page has a "Download Kit" button that downloads 7 files for that one agent, and a curl one-liner that fetches /kits/<slug>/<file>.
+  - Bookmarks are stored in localStorage; nothing else is persisted.
+  - Agents have verifiedStatus (unverified / community / tested / expert). 15 of the 20 project-ready agents are "tested" or "expert"; the other 5 are "community".
+
+  Constraints:
+  - Static data only; no server, no analytics SDK, no login.
+  - Reuse the existing AgentCard and starter-pack data; don't invent a new agent schema field unless it's justified.
+  - Every new UI string must exist in both en and ko dictionaries.
+  - Must work at 375px wide.
+  - "Download all" can't use a server-side zip; GitHub Pages only serves static files.
+
+  Success criteria: a first-time visitor can go from /install to having kit files for their role in under 60 seconds; role packs should only include agents whose verifiedStatus is "tested" or "expert".
+
+  Please give me requirements, acceptance criteria, edge cases, and out-of-scope notes.
+exampleOutput: |-
+  You gave me enough to write the full spec, so I haven't asked any questions up front. Where I had to guess, I wrote the guess down under **Assumptions**, and the few decisions only you can make are under **Open questions** at the end. Everything below the line can be pasted straight into a GitHub issue.
+
+  ---
+
+  # feat(install): "Pick your role" step with role starter packs and a download-all action
+
+  ## Summary
+
+  Add a role picker at the top of `/install`. The roles are **Developer, PM, Designer, Operations**. After a visitor picks a role, they see a recommended pack of 3–5 project-ready agents rated `tested`/`expert`, plus one **"Download all kits for this role"** action that returns every kit file for that pack as a single `.zip`. The site stays fully static: no server, no analytics, no login.
+
+  ## Why
+
+  First-time visitors currently have to compare 20 agent cards (or 4 unranked starter packs) before they install anything. The role step cuts this down to one click that produces a small set of trusted agents, and a second click that downloads them.
+
+  **Success criteria**
+  1. A first-time visitor can go from landing on `/install` to having kit files for their role on disk in **under 60 seconds**. With no analytics, this is checked by a manual timed walkthrough on desktop and on a 375px mobile viewport.
+  2. Every agent in a role pack has `verifiedStatus` of `tested` or `expert`. The build enforces this, so reviewers don't have to remember it.
+
+  ## Assumptions
+
+  Please correct any of these that are wrong.
+
+  - **A1.** The 4 existing starter packs in `src/data/starter-packs.ts` map 1:1 onto the roles:
+    - engineering → Developer
+    - product planning → PM
+    - design QA → Designer
+    - operations → Operations
+  - **A2.** Kit files already exist as static files at `/kits/<slug>/<file>` for all 20 project-ready agents. The curl one-liner already depends on them.
+  - **A3.** A role's pack is the matching starter pack's agents, filtered to project-ready agents rated `tested`/`expert`, kept in pack order, and capped at 5. No new field on the agent schema is needed.
+  - **A4.** The role picker's state lives in the URL (`/install?role=developer`) and not in `localStorage`. This keeps the rule that only bookmarks are persisted, and it makes a role's pack shareable as a link.
+
+  ## Requirements
+
+  ### Data
+
+  - **R1.** Add a `role` field to the starter-pack type with the values `'developer' | 'pm' | 'designer' | 'operations'`. Set it on each of the 4 existing packs.
+    - The field goes on starter packs, not agents. Roles group packs, so agent YAML files and `schema/agent.schema.json` stay as they are.
+  - **R2.** Add a pure helper `getRolePack(role)` in `src/data/` or `src/lib/`. It returns the pack's agents after these rules are applied, in this order:
+    1. Keep only agents that are project-ready.
+    2. Keep only agents whose `verifiedStatus` is `tested` or `expert`.
+    3. Preserve the order the pack defines.
+    4. Return at most 5 agents.
+  - **R3.** Extend `scripts/check-data.mjs` so it **fails** in these cases:
+    - Any role is not covered by exactly one starter pack.
+    - `getRolePack(role)` returns **fewer than 3** agents for any role.
+    - Any agent slug in a pack does not resolve to an existing agent.
+    - Any agent in a role pack is missing one of its 7 kit files under `public/kits/<slug>/`, if kits are static files there (see A2).
+  - **R4.** Add unit tests for `getRolePack` next to the existing tests. Cover:
+    - The status filter.
+    - The cap at 5.
+    - Order preservation.
+    - A pack where a `community` agent sits between eligible agents.
+
+  ### UI (`/install`)
+
+  - **R5.** The role step renders **above** the existing content on `/install`. It shows:
+    - A heading and a one-line prompt, e.g. "Pick your role" / "Get a small, verified set of agents for your repo".
+    - Four role options, each with a short label and a one-line description.
+  - **R6.** The role options are a single-select **radio group**. Use `role="radiogroup"` and `role="radio"` with `aria-checked`, or native radios with styled labels. They must work by keyboard: arrow keys move the selection and the focus ring is visible.
+  - **R7.** No role is selected by default, and no pack is shown until the visitor picks one. The exception is when `?role=` is present and valid; then that role is preselected.
+  - **R8.** Selecting a role does three things:
+    - Updates the URL with `router.replace`, so the choice doesn't add history entries.
+    - Renders that role's pack using the existing **`AgentCard`** component.
+    - Shows the **Download all** button and a curl alternative (R12).
+  - **R9.** Read the query string on the client with `useSearchParams`, wrapped in `<Suspense>` as the static export requires. Do not use server-side `searchParams`, middleware, or `headers()`.
+  - **R10.** Keep the existing starter-pack section and the grid of all 20 agents below the role step, unchanged. The role step adds a shortcut and replaces nothing.
+  - **R11.** At 375px wide:
+    - The role options are a 2×2 grid, or a vertical stack if the labels wrap badly in Korean.
+    - Agent cards are a single column.
+    - The Download all button is full width with a touch target of at least 44px.
+    - Nothing scrolls horizontally.
+    - The curl block scrolls inside its own container, not the page.
+
+  ### Download all
+
+  - **R12.** Download all produces **one `.zip` file**, named for example `agent-archive-developer-kits.zip`, with one folder per agent:
+
+    ```
+    agent-archive-developer-kits/
+      <slug-a>/AGENTS.md, CLAUDE.md, <slug-a>.mdc, agent.json, README.md, RUNBOOK.md, EVALUATION.md
+      <slug-b>/...
+      README.md   ← short index: role, agents included, how to install, link back to the site
+    ```
+
+    **Recommended: build the zips at build time.** A build step writes `public/kits/roles/<role>.zip` from the same kit sources, and the button is a plain `<a href download>`. A pre-built zip is an ordinary static file, so it fits the "no server-side zip" constraint and GitHub Pages serves it like any other asset. This approach:
+    - adds no client JS dependency,
+    - works reliably on iOS Safari,
+    - downloads in one click with no in-browser processing, which is best for the 60-second goal.
+
+    **Fallback if you'd rather not add a build step:** zip in the browser with `fflate` (about 8 kB gzipped). The browser fetches `/kits/<slug>/<file>` for each agent, builds the zip in memory, and triggers the download from a Blob URL. The lazy-loaded dependency is the only cost.
+
+    Do **not** fire 7 × N separate downloads. Browsers block or prompt on multiple automatic downloads, and on mobile this breaks.
+  - **R13.** Show a **copyable curl/shell one-liner** for the role next to the button, e.g. `curl -LO https://yohan-work.github.io/agentive/kits/roles/developer.zip && unzip developer.zip`. Terminal users, which is most developers, can then skip the browser entirely.
+  - **R14.** The button has these states:
+    - **Idle:** "Download all kits (N agents)".
+    - **Preparing:** only with the fallback approach; the button is disabled and shows a spinner.
+    - **Done:** a short confirmation.
+    - **Error:** a message plus links to each agent's page so the visitor can download the kits one by one.
+  - **R15.** The per-agent "Download Kit" button and curl one-liner on agent pages stay exactly as they are.
+
+  ### i18n
+
+  - **R16.** Add every new string to **both** `en` and `ko` in `src/i18n/dictionaries.ts`. The expected new keys (names are illustrative):
+    - `install.role.heading`, `install.role.prompt`
+    - `install.role.developer.label` / `.description`, and the same for `pm`, `designer`, and `operations`
+    - `install.role.packHeading` (with a `{role}` placeholder)
+    - `install.role.downloadAll` (with an `{count}` placeholder), `install.role.preparing`, `install.role.downloaded`, `install.role.error`
+    - `install.role.curlLabel`, `install.role.copy`, `install.role.copied`
+    - `install.role.verifiedNote`, e.g. "Only agents rated Tested or Expert are included."
+  - **R17.** File names, folder names, and the index `README.md` inside the zip stay English and ASCII in both locales. Only the UI is translated.
+
+  ## Acceptance criteria
+
+  - [ ] **AC1.** On `/en/install` and `/ko/install`, the role step is the first content section. It shows 4 role options, and none is selected on first load.
+  - [ ] **AC2.** Selecting a role shows 3–5 `AgentCard`s. The URL updates to `?role=<role>`, and the back button does not step through each role change.
+  - [ ] **AC3.** Every card in every role pack shows `tested` or `expert`. `npm run check:data` fails if a `community`/`unverified` agent is the only thing keeping a pack at 3 or more, or if any pack falls below 3.
+  - [ ] **AC4.** Loading `/en/install?role=designer` directly preselects Designer and shows its pack. An invalid value such as `?role=ceo` is ignored: nothing is selected and nothing breaks.
+  - [ ] **AC5.** Clicking Download all produces one `.zip` with the structure in R12. That means 7 files per agent, all non-empty, and file contents identical to the per-agent kit downloads.
+  - [ ] **AC6.** The curl one-liner in R13 works as written from a clean directory against the deployed site.
+  - [ ] **AC7.** Timed walkthrough: land on `/install`, pick a role, download, unzip. This takes under 60 s in current Chrome desktop, Safari iOS, and Chrome Android at 375px.
+  - [ ] **AC8.** At 375px there is no horizontal page scroll and every interactive element is at least 44px tall. This holds in both locales.
+  - [ ] **AC9.** The role picker works by keyboard alone, and a screen reader announces it as a radio group with the selected state.
+  - [ ] **AC10.** Every new UI string exists in both `en` and `ko`, and switching locale keeps the `?role=` selection.
+  - [ ] **AC11.** The existing starter packs, the 20-agent grid, and the per-agent downloads behave as they do today.
+  - [ ] **AC12.** `check:data`, `lint`, `typecheck`, `build`, and the unit tests all pass, and `next build` still produces a fully static export.
+
+  ## Edge cases
+
+  | Case | Expected behavior |
+  |---|---|
+  | An agent in a pack is later downgraded to `community` | It disappears from the role pack automatically. If the pack drops below 3, `check:data` fails the build instead of shipping a thin pack. |
+  | A pack has more than 5 eligible agents | The first 5 in pack order are shown. The zip contains exactly the agents shown. |
+  | A pack lists an agent that isn't project-ready (no kit) | That agent is excluded from the role pack, and `check:data` warns. |
+  | An agent appears in two role packs | Allowed. It appears in both zips. |
+  | A kit file is missing at build time | The build fails (R3). The site never ships a zip with missing files. |
+  | JS is disabled | The role step can't be interactive. Show a `<noscript>` note with links to the static starter packs below. With pre-built zips, you can optionally render 4 plain download links. |
+  | The fallback download fails because one fetch fails | Abort, show the error state, and list per-agent links. Never download a partial zip silently. |
+  | iOS Safari and Blob downloads (fallback only) | Test explicitly. If Blob download is unreliable, open the file in a new tab. This risk is the main reason pre-built zips are recommended. |
+  | Double-clicking Download all | The button is disabled while preparing, so it doesn't trigger duplicate downloads. |
+  | `?role=` combined with other query params or a hash | Preserve the other params when updating `role`. |
+  | Korean labels are longer or wrap | The layout still holds at 375px (AC8). The grid may switch to a vertical stack. |
+  | Bookmarks | Unaffected. Role packs do not read or write `localStorage`. |
+
+  ## Out of scope
+
+  - Persisting the chosen role across visits (`localStorage`/cookies). The role lives in the URL only.
+  - Analytics, events, or any funnel tracking. The 60-second goal is checked manually.
+  - Roles beyond the four, multiple roles at once, or a "custom pack" builder.
+  - Adding `role` or any other new field to the agent schema or YAML files.
+  - Changing which agents are `tested`/`expert`, or promoting `community` agents to fill a pack.
+  - Redesigning the existing starter-pack section, `AgentCard`, or agent detail pages.
+  - Server-side or on-demand zipping, and CLI/npm installers.
+  - A role step on any page other than `/install`.
+
+  ## Risks
+
+  - **Thin packs.** Only 15 of the 20 project-ready agents are `tested`/`expert`, and they may not spread evenly across 4 roles. A role such as Designer could end up with fewer than 3. *Mitigation:* run `getRolePack` against current data **before** building the UI. If a role falls short, rebalance which agents the packs contain; do not relax the status rule.
+  - **Drift between the zip and the per-agent kits.** If role zips are generated separately from `/kits/<slug>/`, their contents can diverge. *Mitigation:* build zips from the same generated kit files, and cover this with AC5 in a test.
+  - **Repo and deploy size.** 4 zips of up to 35 small text files each is negligible, but generate them at build time rather than committing them.
+  - **Mobile download behavior** (fallback approach only). See the edge-case table.
+
+  ## Next actions
+
+  1. **Check pack coverage** (about 15 min). Run a one-off script to count the `tested`/`expert` project-ready agents in each current starter pack. If any role has fewer than 3, decide on rebalancing first.
+  2. **Decide the zip approach:** build-time (recommended) or client-side with `fflate`.
+  3. Implement the data layer: R1–R4, including the `check:data` rules and unit tests.
+  4. Implement the build-time zip generation (or the fallback) and the curl one-liner: R12–R14.
+  5. Implement the UI: R5–R11 and R16. Check it at 375px in both locales.
+  6. Run AC1–AC12, including the timed walkthrough on 3 browsers. Attach the timings to the PR.
+
+  ## Open questions
+
+  1. Does the 1:1 mapping from the 4 existing starter packs to the 4 roles (A1) hold, or do the role packs need different agents from the current packs?
+  2. Once the role step ships, should the existing starter-pack section stay as it is, be collapsed, or be removed? This spec assumes it **stays** (R10).
+  3. Is a new build step that writes `public/kits/roles/*.zip` acceptable? If not, the client-side `fflate` fallback applies.
 limitations:
   - Requires current product behavior for accurate edge cases.
 bestPractices:
@@ -148,11 +347,9 @@ runbook:
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 5
+  qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Converting a known feature goal into acceptance criteria and implementation boundaries
     - "Teams with the required inputs ready: Feature goal, User story, Constraints"
@@ -162,30 +359,377 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Can create excessive edge cases if release size and target platform are omitted
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Internal inconsistencies across sections: in the strong run the role zip is named 'agent-archive-developer-kits.zip' in R12 but 'public/kits/roles/<role>.zip' / 'developer.zip' in the curl one-liner, and a non-project-ready agent in a pack makes check:data 'warn' in the edge-case table while R3 says the build fails."
+    - Some acceptance criteria are logically muddled, e.g. AC3 says check:data fails 'if a community/unverified agent is the only thing keeping a pack at 3 or more', although getRolePack already filters those agents out.
+    - On an under-specified request it still writes a full-length spec full of invented tuning parameters (event weights 1/3/3, 14-day half-life, 50-event cap, 90-day expiry, max 2 per category, '3-4 dev days'); they are presented as proposals, but a reader could mistake them for decisions.
+    - Output runs long (roughly 12 sections in the boundary run), so a ticket reader has to trim it before use.
+    - It relies on repo artifacts it hasn't verified, such as a site privacy/about page and agent 'tools/platforms' metadata, and states them as available inputs for the design.
   evaluationCriteria:
     - Produces testable acceptance criteria, edge cases, dependencies, and out-of-scope notes
     - Produces Requirements in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Feature Requirements Analyst strong-context run
-      input: Define requirements for installable-only filtering and quality score badges.
-      expectedOutputSummary: A usable Requirements with project-specific assumptions, risks, and next steps.
-      sampleOutput: "Requirements: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Role-based starter-pack picker on the install page
+      input: |-
+        I need an implementation-ready feature spec I can paste into a GitHub issue.
+
+        Product: Agent Archive (https://yohan-work.github.io/agentive/) — an open-source library of 100 AI agent prompts. Static Next.js 16 site exported to GitHub Pages, no backend, no accounts. English (/en) and Korean (/ko) UI. 20 of the agents are "project-ready" and have downloadable install kits (AGENTS.md, CLAUDE.md, Cursor .mdc rule, agent.json, README, RUNBOOK, EVALUATION).
+
+        Feature goal: On /install, add a "Pick your role" step at the top. The visitor picks one of four roles — Developer, PM, Designer, Operations — and sees a recommended starter pack of 3–5 project-ready agents for that role, with a single "Download all kits for this role" action.
+
+        User story: As a developer landing on /install for the first time, I want to pick my role and get a small, trusted set of agents to drop into my repo, so I don't have to read 20 agent pages to decide.
+
+        Existing behavior today:
+        - /install lists 4 static starter packs (engineering, product planning, design QA, operations) defined in src/data/starter-packs.ts, then a grid of all 20 project-ready agents using the existing AgentCard component.
+        - Each project-ready agent page has a "Download Kit" button that downloads 7 files for that one agent, and a curl one-liner that fetches /kits/<slug>/<file>.
+        - Bookmarks are stored in localStorage; nothing else is persisted.
+        - Agents have verifiedStatus (unverified / community / tested / expert). 15 of the 20 project-ready agents are "tested" or "expert"; the other 5 are "community".
+
+        Constraints:
+        - Static data only; no server, no analytics SDK, no login.
+        - Reuse the existing AgentCard and starter-pack data; don't invent a new agent schema field unless it's justified.
+        - Every new UI string must exist in both en and ko dictionaries.
+        - Must work at 375px wide.
+        - "Download all" can't use a server-side zip; GitHub Pages only serves static files.
+
+        Success criteria: a first-time visitor can go from /install to having kit files for their role in under 60 seconds; role packs should only include agents whose verifiedStatus is "tested" or "expert".
+
+        Please give me requirements, acceptance criteria, edge cases, and out-of-scope notes.
+      expectedOutputSummary: A GitHub-issue-ready spec for the /install role picker that reuses starter-packs.ts and AgentCard, enforces the tested/expert filter, solves 'download all' without a server-side zip, covers en/ko strings and the 375px layout, and gives testable ACs, edge cases (e.g. thin packs with only 15 eligible agents), and out-of-scope notes.
+      sampleOutput: |-
+        You gave me enough to write the full spec, so I haven't asked any questions up front. Where I had to guess, I wrote the guess down under **Assumptions**, and the few decisions only you can make are under **Open questions** at the end. Everything below the line can be pasted straight into a GitHub issue.
+
+        ---
+
+        # feat(install): "Pick your role" step with role starter packs and a download-all action
+
+        ## Summary
+
+        Add a role picker at the top of `/install`. The roles are **Developer, PM, Designer, Operations**. After a visitor picks a role, they see a recommended pack of 3–5 project-ready agents rated `tested`/`expert`, plus one **"Download all kits for this role"** action that returns every kit file for that pack as a single `.zip`. The site stays fully static: no server, no analytics, no login.
+
+        ## Why
+
+        First-time visitors currently have to compare 20 agent cards (or 4 unranked starter packs) before they install anything. The role step cuts this down to one click that produces a small set of trusted agents, and a second click that downloads them.
+
+        **Success criteria**
+        1. A first-time visitor can go from landing on `/install` to having kit files for their role on disk in **under 60 seconds**. With no analytics, this is checked by a manual timed walkthrough on desktop and on a 375px mobile viewport.
+        2. Every agent in a role pack has `verifiedStatus` of `tested` or `expert`. The build enforces this, so reviewers don't have to remember it.
+
+        ## Assumptions
+
+        Please correct any of these that are wrong.
+
+        - **A1.** The 4 existing starter packs in `src/data/starter-packs.ts` map 1:1 onto the roles:
+          - engineering → Developer
+          - product planning → PM
+          - design QA → Designer
+          - operations → Operations
+        - **A2.** Kit files already exist as static files at `/kits/<slug>/<file>` for all 20 project-ready agents. The curl one-liner already depends on them.
+        - **A3.** A role's pack is the matching starter pack's agents, filtered to project-ready agents rated `tested`/`expert`, kept in pack order, and capped at 5. No new field on the agent schema is needed.
+        - **A4.** The role picker's state lives in the URL (`/install?role=developer`) and not in `localStorage`. This keeps the rule that only bookmarks are persisted, and it makes a role's pack shareable as a link.
+
+        ## Requirements
+
+        ### Data
+
+        - **R1.** Add a `role` field to the starter-pack type with the values `'developer' | 'pm' | 'designer' | 'operations'`. Set it on each of the 4 existing packs.
+          - The field goes on starter packs, not agents. Roles group packs, so agent YAML files and `schema/agent.schema.json` stay as they are.
+        - **R2.** Add a pure helper `getRolePack(role)` in `src/data/` or `src/lib/`. It returns the pack's agents after these rules are applied, in this order:
+          1. Keep only agents that are project-ready.
+          2. Keep only agents whose `verifiedStatus` is `tested` or `expert`.
+          3. Preserve the order the pack defines.
+          4. Return at most 5 agents.
+        - **R3.** Extend `scripts/check-data.mjs` so it **fails** in these cases:
+          - Any role is not covered by exactly one starter pack.
+          - `getRolePack(role)` returns **fewer than 3** agents for any role.
+          - Any agent slug in a pack does not resolve to an existing agent.
+          - Any agent in a role pack is missing one of its 7 kit files under `public/kits/<slug>/`, if kits are static files there (see A2).
+        - **R4.** Add unit tests for `getRolePack` next to the existing tests. Cover:
+          - The status filter.
+          - The cap at 5.
+          - Order preservation.
+          - A pack where a `community` agent sits between eligible agents.
+
+        ### UI (`/install`)
+
+        - **R5.** The role step renders **above** the existing content on `/install`. It shows:
+          - A heading and a one-line prompt, e.g. "Pick your role" / "Get a small, verified set of agents for your repo".
+          - Four role options, each with a short label and a one-line description.
+        - **R6.** The role options are a single-select **radio group**. Use `role="radiogroup"` and `role="radio"` with `aria-checked`, or native radios with styled labels. They must work by keyboard: arrow keys move the selection and the focus ring is visible.
+        - **R7.** No role is selected by default, and no pack is shown until the visitor picks one. The exception is when `?role=` is present and valid; then that role is preselected.
+        - **R8.** Selecting a role does three things:
+          - Updates the URL with `router.replace`, so the choice doesn't add history entries.
+          - Renders that role's pack using the existing **`AgentCard`** component.
+          - Shows the **Download all** button and a curl alternative (R12).
+        - **R9.** Read the query string on the client with `useSearchParams`, wrapped in `<Suspense>` as the static export requires. Do not use server-side `searchParams`, middleware, or `headers()`.
+        - **R10.** Keep the existing starter-pack section and the grid of all 20 agents below the role step, unchanged. The role step adds a shortcut and replaces nothing.
+        - **R11.** At 375px wide:
+          - The role options are a 2×2 grid, or a vertical stack if the labels wrap badly in Korean.
+          - Agent cards are a single column.
+          - The Download all button is full width with a touch target of at least 44px.
+          - Nothing scrolls horizontally.
+          - The curl block scrolls inside its own container, not the page.
+
+        ### Download all
+
+        - **R12.** Download all produces **one `.zip` file**, named for example `agent-archive-developer-kits.zip`, with one folder per agent:
+
+          ```
+          agent-archive-developer-kits/
+            <slug-a>/AGENTS.md, CLAUDE.md, <slug-a>.mdc, agent.json, README.md, RUNBOOK.md, EVALUATION.md
+            <slug-b>/...
+            README.md   ← short index: role, agents included, how to install, link back to the site
+          ```
+
+          **Recommended: build the zips at build time.** A build step writes `public/kits/roles/<role>.zip` from the same kit sources, and the button is a plain `<a href download>`. A pre-built zip is an ordinary static file, so it fits the "no server-side zip" constraint and GitHub Pages serves it like any other asset. This approach:
+          - adds no client JS dependency,
+          - works reliably on iOS Safari,
+          - downloads in one click with no in-browser processing, which is best for the 60-second goal.
+
+          **Fallback if you'd rather not add a build step:** zip in the browser with `fflate` (about 8 kB gzipped). The browser fetches `/kits/<slug>/<file>` for each agent, builds the zip in memory, and triggers the download from a Blob URL. The lazy-loaded dependency is the only cost.
+
+          Do **not** fire 7 × N separate downloads. Browsers block or prompt on multiple automatic downloads, and on mobile this breaks.
+        - **R13.** Show a **copyable curl/shell one-liner** for the role next to the button, e.g. `curl -LO https://yohan-work.github.io/agentive/kits/roles/developer.zip && unzip developer.zip`. Terminal users, which is most developers, can then skip the browser entirely.
+        - **R14.** The button has these states:
+          - **Idle:** "Download all kits (N agents)".
+          - **Preparing:** only with the fallback approach; the button is disabled and shows a spinner.
+          - **Done:** a short confirmation.
+          - **Error:** a message plus links to each agent's page so the visitor can download the kits one by one.
+        - **R15.** The per-agent "Download Kit" button and curl one-liner on agent pages stay exactly as they are.
+
+        ### i18n
+
+        - **R16.** Add every new string to **both** `en` and `ko` in `src/i18n/dictionaries.ts`. The expected new keys (names are illustrative):
+          - `install.role.heading`, `install.role.prompt`
+          - `install.role.developer.label` / `.description`, and the same for `pm`, `designer`, and `operations`
+          - `install.role.packHeading` (with a `{role}` placeholder)
+          - `install.role.downloadAll` (with an `{count}` placeholder), `install.role.preparing`, `install.role.downloaded`, `install.role.error`
+          - `install.role.curlLabel`, `install.role.copy`, `install.role.copied`
+          - `install.role.verifiedNote`, e.g. "Only agents rated Tested or Expert are included."
+        - **R17.** File names, folder names, and the index `README.md` inside the zip stay English and ASCII in both locales. Only the UI is translated.
+
+        ## Acceptance criteria
+
+        - [ ] **AC1.** On `/en/install` and `/ko/install`, the role step is the first content section. It shows 4 role options, and none is selected on first load.
+        - [ ] **AC2.** Selecting a role shows 3–5 `AgentCard`s. The URL updates to `?role=<role>`, and the back button does not step through each role change.
+        - [ ] **AC3.** Every card in every role pack shows `tested` or `expert`. `npm run check:data` fails if a `community`/`unverified` agent is the only thing keeping a pack at 3 or more, or if any pack falls below 3.
+        - [ ] **AC4.** Loading `/en/install?role=designer` directly preselects Designer and shows its pack. An invalid value such as `?role=ceo` is ignored: nothing is selected and nothing breaks.
+        - [ ] **AC5.** Clicking Download all produces one `.zip` with the structure in R12. That means 7 files per agent, all non-empty, and file contents identical to the per-agent kit downloads.
+        - [ ] **AC6.** The curl one-liner in R13 works as written from a clean directory against the deployed site.
+        - [ ] **AC7.** Timed walkthrough: land on `/install`, pick a role, download, unzip. This takes under 60 s in current Chrome desktop, Safari iOS, and Chrome Android at 375px.
+        - [ ] **AC8.** At 375px there is no horizontal page scroll and every interactive element is at least 44px tall. This holds in both locales.
+        - [ ] **AC9.** The role picker works by keyboard alone, and a screen reader announces it as a radio group with the selected state.
+        - [ ] **AC10.** Every new UI string exists in both `en` and `ko`, and switching locale keeps the `?role=` selection.
+        - [ ] **AC11.** The existing starter packs, the 20-agent grid, and the per-agent downloads behave as they do today.
+        - [ ] **AC12.** `check:data`, `lint`, `typecheck`, `build`, and the unit tests all pass, and `next build` still produces a fully static export.
+
+        ## Edge cases
+
+        | Case | Expected behavior |
+        |---|---|
+        | An agent in a pack is later downgraded to `community` | It disappears from the role pack automatically. If the pack drops below 3, `check:data` fails the build instead of shipping a thin pack. |
+        | A pack has more than 5 eligible agents | The first 5 in pack order are shown. The zip contains exactly the agents shown. |
+        | A pack lists an agent that isn't project-ready (no kit) | That agent is excluded from the role pack, and `check:data` warns. |
+        | An agent appears in two role packs | Allowed. It appears in both zips. |
+        | A kit file is missing at build time | The build fails (R3). The site never ships a zip with missing files. |
+        | JS is disabled | The role step can't be interactive. Show a `<noscript>` note with links to the static starter packs below. With pre-built zips, you can optionally render 4 plain download links. |
+        | The fallback download fails because one fetch fails | Abort, show the error state, and list per-agent links. Never download a partial zip silently. |
+        | iOS Safari and Blob downloads (fallback only) | Test explicitly. If Blob download is unreliable, open the file in a new tab. This risk is the main reason pre-built zips are recommended. |
+        | Double-clicking Download all | The button is disabled while preparing, so it doesn't trigger duplicate downloads. |
+        | `?role=` combined with other query params or a hash | Preserve the other params when updating `role`. |
+        | Korean labels are longer or wrap | The layout still holds at 375px (AC8). The grid may switch to a vertical stack. |
+        | Bookmarks | Unaffected. Role packs do not read or write `localStorage`. |
+
+        ## Out of scope
+
+        - Persisting the chosen role across visits (`localStorage`/cookies). The role lives in the URL only.
+        - Analytics, events, or any funnel tracking. The 60-second goal is checked manually.
+        - Roles beyond the four, multiple roles at once, or a "custom pack" builder.
+        - Adding `role` or any other new field to the agent schema or YAML files.
+        - Changing which agents are `tested`/`expert`, or promoting `community` agents to fill a pack.
+        - Redesigning the existing starter-pack section, `AgentCard`, or agent detail pages.
+        - Server-side or on-demand zipping, and CLI/npm installers.
+        - A role step on any page other than `/install`.
+
+        ## Risks
+
+        - **Thin packs.** Only 15 of the 20 project-ready agents are `tested`/`expert`, and they may not spread evenly across 4 roles. A role such as Designer could end up with fewer than 3. *Mitigation:* run `getRolePack` against current data **before** building the UI. If a role falls short, rebalance which agents the packs contain; do not relax the status rule.
+        - **Drift between the zip and the per-agent kits.** If role zips are generated separately from `/kits/<slug>/`, their contents can diverge. *Mitigation:* build zips from the same generated kit files, and cover this with AC5 in a test.
+        - **Repo and deploy size.** 4 zips of up to 35 small text files each is negligible, but generate them at build time rather than committing them.
+        - **Mobile download behavior** (fallback approach only). See the edge-case table.
+
+        ## Next actions
+
+        1. **Check pack coverage** (about 15 min). Run a one-off script to count the `tested`/`expert` project-ready agents in each current starter pack. If any role has fewer than 3, decide on rebalancing first.
+        2. **Decide the zip approach:** build-time (recommended) or client-side with `fflate`.
+        3. Implement the data layer: R1–R4, including the `check:data` rules and unit tests.
+        4. Implement the build-time zip generation (or the fallback) and the curl one-liner: R12–R14.
+        5. Implement the UI: R5–R11 and R16. Check it at 375px in both locales.
+        6. Run AC1–AC12, including the timed walkthrough on 3 browsers. Attach the timings to the PR.
+
+        ## Open questions
+
+        1. Does the 1:1 mapping from the 4 existing starter packs to the 4 roles (A1) hold, or do the role packs need different agents from the current packs?
+        2. Once the role step ships, should the existing starter-pack section stay as it is, be collapsed, or be removed? This spec assumes it **stays** (R10).
+        3. Is a new build step that writes `public/kits/roles/*.zip` acceptable? If not, the client-side `fflate` fallback applies.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Feature Requirements Analyst boundary run
-      input: Write requirements for an undefined AI platform pivot.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Uses the input's specific facts well. It maps the 4 existing starter packs to the roles (flagged as assumption A1), filters on verifiedStatus tested/expert, reuses AgentCard, adds en/ko dictionary keys (R16), and covers 375px with a 44px touch target (R11/AC8).
+        - "Handles the static-zip constraint well: it recommends build-time zips under public/kits/roles as ordinary static files, offers a client-side fflate fallback, and warns against firing 7xN separate downloads. It also respects the static-export rules by using useSearchParams inside Suspense instead of server searchParams (R9)."
+        - "Catches the key data risk the input implies: only 15 of the 20 agents are eligible, so a role pack could fall below 3. Next action 1 is to check pack coverage before building the UI, and R3 makes check:data enforce the minimum."
+        - Has minor inconsistencies to fix before pasting. The zip filename differs between R12 and R13, the edge-case table says check:data 'warns' for a non-project-ready agent while R3 implies failure, and AC3's wording is confused.
+        - Assumptions, risks, next actions, and open questions are separate sections, as the criteria require, and the acceptance criteria are checkbox-formatted and testable (including a timed walkthrough on 3 browsers for the 60-second goal).
+    - title: Vague 'personalized recommendations' request with conflicting constraints
+      input: We want personalized agent recommendations on the Agent Archive home page, like "recommended for you", based on what each user has used before. Keep it fully static (GitHub Pages, no backend) and we don't want to store anything about users. PM wants it in next week's release. Can you write the spec?
+      expectedOutputSummary: It should flag that 'based on what each user used before' conflicts with 'store nothing about users' on a static site, ask a focused question (e.g. whether on-device localStorage is acceptable), and give a provisional scoped spec with a stateless fallback and a realistic cut for next week.
+      sampleOutput: |-
+        Before the spec, there's one conflict that has to be settled, because it decides what "personalized" can mean here.
+
+        **"Based on what each user has used before" and "don't store anything about users" can't both be fully true.** A recommendation based on past behavior has to remember that behavior somewhere. With no backend, the only place left is the user's own browser (localStorage). So the real decision is:
+
+        - **Option A – On-device history (recommended):** Store a short list of agent slugs the visitor viewed, copied, or downloaded, in their browser only. Nothing is sent anywhere, there are no cookies, no IDs, and no analytics. The user can see and clear it. This gives you real "recommended for you". It *is* still storage, though, just on the user's device and not yours. Legal/privacy should confirm that counts as "not storing anything about users."
+        - **Option B – No memory at all:** Recommendations are based only on what the user does in the current visit, or on a quick "What are you working on?" picker (role, task, tools). This is fully stateless, but it's contextual, not "based on what you used before," and it resets every visit.
+
+        Also note that "used" can only mean *actions on this site* (views, copying install commands, downloading kits). A static site can't see whether someone actually installed or ran an agent.
+
+        **My question: is on-device storage (Option A) acceptable?** The spec below assumes **yes** and includes Option B as the fallback. If the answer is no, drop §4.1 and ship §4.2 alone. The rest of the spec still holds.
+
+        ---
+
+        # Feature Spec: "Recommended for you" on the Home Page
+
+        ## 1. Summary
+        Add a "Recommended for you" section to the Agent Archive home page. It ranks agents by how similar they are to the agents this visitor has engaged with before. Everything runs client-side on the static site, and no user data leaves the browser.
+
+        ## 2. Goals / Non-goals
+        **Goals**
+        - Returning visitors see relevant agents without searching.
+        - Zero backend, zero server-side user data, zero third-party tracking.
+        - Ship a scoped v1 in next week's release.
+
+        **Non-goals (v1)**
+        - Cross-device sync, accounts, or login.
+        - Collaborative filtering ("people like you also used…"). This needs aggregate data from many users, which we won't have.
+        - Tracking real-world installs or usage outside the site.
+        - Measuring the feature with per-user analytics.
+
+        ## 3. Users & Scenarios
+        - **Returning visitor:** viewed 3 coding agents last week and lands on home. Sees related coding and review agents.
+        - **First-time visitor / cleared storage:** no history. Sees the fallback (curated/popular or the picker). Never an empty or broken section.
+        - **Privacy-conscious visitor:** can turn it off and clear history with one click.
+
+        ## 4. Functional Requirements
+
+        ### 4.1 On-device interaction history (Option A)
+        - **Signals recorded** (on this device only):
+          | Event | Weight |
+          |---|---|
+          | Viewed agent detail page | 1 |
+          | Copied install command / config | 3 |
+          | Downloaded install kit / export | 3 |
+        - **Storage:** one localStorage key, e.g. `aa:recs:v1`, holding `[{ slug, event, ts }]`.
+          - Store slugs and timestamps only. No free text, search queries, or identifiers.
+          - Cap at the 50 most recent events, and drop anything older than 90 days on read.
+          - Version the key so the format can change later.
+        - **Controls:**
+          - A "Why these?" / "Clear history" link in the section, which wipes the key immediately.
+          - A "Turn off recommendations" toggle, stored as a single boolean flag. When off, nothing is recorded.
+        - **Resilience:** wrap every storage call in try/catch. If storage is unavailable (private mode, blocked), fall back silently to §4.3.
+
+        ### 4.2 Contextual picker (Option B; optional in v1, required if A is rejected)
+        - An inline chip picker: "I'm working on: Coding · Writing · Research · Data · Ops…", using existing taxonomy categories/tags.
+        - Selecting chips re-ranks recommendations for this page view only. Nothing is persisted, or at most sessionStorage if you approve that.
+
+        ### 4.3 Fallback (always required)
+        - No history or picker selection: show a curated/"popular" list. Use an editor-maintained list in the data files or verified agents sorted by `updatedAt`.
+        - The section heading changes to "Popular agents" so it never claims to be personalized when it isn't.
+
+        ### 4.4 Ranking (client-side, deterministic)
+        - Build a feature vector for each agent at build time from existing metadata: category, tags, tools/platforms, and workflow/starter-pack membership.
+        - User profile = the sum of feature vectors of engaged agents × event weight × recency decay (for example, half-life of 14 days).
+        - Score every candidate by overlap (cosine or weighted Jaccard) with the profile.
+        - **Exclude** agents the user has already copied or downloaded. Keep viewed-only agents, but rank them lower.
+        - **Diversity:** max 2 agents per category in the top 6.
+        - **Boost** verified agents slightly. Never surface agents below a minimum verification level, if one exists.
+        - Show 6 cards. Ties are broken by verification status, then `updatedAt`.
+
+        ### 4.5 UI
+        - Placement: on the home page, below the hero and above the main catalog.
+        - Reuse the existing agent card component.
+        - Each card can show a small reason, e.g. "Because you viewed *X*" (the top contributing agent). Keep it simple for v1.
+        - The first render must not flash wrong content. Because the page is static, render a skeleton or the fallback on the server, then hydrate to personalized results on the client.
+        - Localize all new strings in every supported locale.
+
+        ## 5. Technical Approach
+        - **Build time:** emit a compact `recs-index` JSON (slug, feature tags, verification, updatedAt) alongside existing generated data. Keep it small, with no descriptions.
+        - **Client:** one hook (e.g. `useRecommendations()`) reads storage, computes scores, and returns the list. One small `recordAgentEvent(slug, type)` helper is called from the detail page, the copy button, and the download handler.
+        - **No network calls** are added. No cookies. No third-party scripts.
+        - **Performance:** scoring a few hundred agents in the browser is trivial. Target < 5 ms and no measurable change in page weight beyond the index.
+
+        ## 6. Privacy Requirements
+        - All data stays in the user's browser. The site never transmits it.
+        - Add a short note to the site's privacy/about text: what is stored, where, for how long, and how to clear it.
+        - No fingerprinting, no IDs, no cross-site storage.
+        - If legal decides that on-device storage still counts as "storing user data" (e.g. under ePrivacy/cookie-consent rules in some regions), ship Option B only, or make A opt-in.
+
+        ## 7. Acceptance Criteria
+        1. A first-time visitor sees a "Popular agents" section with 6 cards, and it has no console errors.
+        2. After viewing 3 agents in the same category and returning to home, at least 3 of 6 recommendations share tags/category with them, and none of the 3 viewed agents take a top slot.
+        3. A copied or downloaded agent never appears in recommendations.
+        4. "Clear history" empties storage and immediately reverts to the fallback.
+        5. With recommendations turned off, no events are written (verified in devtools).
+        6. With localStorage blocked, the page renders the fallback without errors.
+        7. The network tab shows no new requests caused by the feature.
+        8. The static export builds and deploys to GitHub Pages unchanged. All locales render translated strings.
+
+        ## 8. Success Measurement
+        Without per-user tracking, you can't measure personal CTR directly. Options:
+        - Qualitative: user feedback, a GitHub issue/discussion prompt.
+        - Aggregate, privacy-safe analytics, **only if** such analytics already exist and are approved. Count clicks on the section as a whole with no user identifiers.
+        - Otherwise, accept that v1 success is judged qualitatively.
+
+        ## 9. Assumptions
+        - Option A (on-device localStorage) is acceptable. **Needs confirmation.**
+        - Existing agent metadata (category, tags, tools) is rich and consistent enough to compute similarity.
+        - The home page can host a client component, so client-side hydration is fine on a static export.
+        - "Used before" means on-site engagement, not real installs.
+
+        ## 10. Risks
+        | Risk | Impact | Mitigation |
+        |---|---|---|
+        | Privacy stance rejects on-device storage | Feature can't be "based on history" | Ship Option B + fallback. Retitle the section. |
+        | Sparse/inconsistent tags → weak recs | Irrelevant suggestions | Audit tags before release. Diversity cap. Fallback blend. |
+        | Cold start (most visitors are new) | Most people never see personalization | Good fallback. Picker as a lightweight alternative. |
+        | Hydration flicker on static page | Janky first paint | Skeleton/fallback server render, then swap. Reserve fixed height. |
+        | Timeline (next week) | Rushed quality | Cut scope per §11. |
+        | History is per-browser | Doesn't follow users across devices | Document it as expected behavior. Out of scope. |
+
+        ## 11. Scope for Next Week's Release
+        **Must ship (≈3–4 dev days + review):**
+        - Event recording (view/copy/download), storage with caps/expiry.
+        - Build-time recs index + client-side ranking.
+        - Home section with fallback, "Clear history", i18n strings.
+        - Acceptance criteria 1–8.
+
+        **Cut to follow-up if time is short:**
+        - The "Because you viewed X" reason text.
+        - The on/off toggle (keep "Clear history").
+        - The contextual picker (§4.2), unless Option A is rejected, in which case it becomes the must-ship feature.
+
+        ## 12. Next Actions
+        1. **PM + legal/privacy (today):** decide between Option A and Option B-only. This blocks the start.
+        2. **Content owner:** quick audit of agent tags/categories for consistency (1 day, can run in parallel).
+        3. **Eng:** build the recs index + ranking hook behind the fallback first, so something shippable exists by mid-week.
+        4. **Design:** confirm the section placement, card reuse, and "Why these? / Clear history" affordance.
+        5. **QA:** test plan against §7, including blocked-storage and private-window cases.
+        6. **Release note:** one line explaining that recommendations are computed on your device and nothing is sent to us.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Opens by naming the core contradiction and poses one focused decision: Option A, on-device localStorage, versus Option B, stateless picker or session-only. It also correctly notes that a static site can only see on-site actions, not real installs."
+        - Moves the work forward without blocking. The spec assumes Option A, and it explicitly says to 'drop §4.1 and ship §4.2 alone' if Option A is rejected. It includes an always-on fallback that retitles the section 'Popular agents' so the page never falsely claims personalization.
+        - Section 11 cuts scope sensibly for the one-week deadline, with separate must-ship and follow-up lists, and next action 1 makes the PM/legal decision a blocker.
+        - It invents many specific parameters (weights 1/3/3, 14-day half-life, cosine or weighted Jaccard, a '3-4 dev days' estimate) for a vague request. They are framed as examples, but they make the draft heavier than the input justifies.
+        - The acceptance criteria are testable (a devtools check that nothing is written when the feature is off, blocked-storage rendering, no new network requests), but the document is long for an under-specified ask.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Converting a known feature goal into acceptance criteria and implementation boundaries
@@ -198,5 +742,5 @@ decisionGuide:
 relatedAgents:
   - codex-task-brief
   - qa-checklist-agent
-verifiedStatus: expert
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29
