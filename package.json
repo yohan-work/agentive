@@ -24,24 +24,24 @@
     "content": "node scripts/build-content.mjs",
     "schema": "node scripts/generate-schema.mjs",
     "prebuild": "npm run content",
-    "pretypecheck": "npm run content"
+    "pretypecheck": "npm run content",
+    "postbuild": "node scripts/write-404.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
-    "next": "^15.5.26",
+    "next": "^16.3.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.7",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "ajv": "^8.20.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.16.0",
-    "eslint-config-next": "^15.5.26",
+    "eslint-config-next": "^16.3.6",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "ts-json-schema-generator": "^2.9.0",

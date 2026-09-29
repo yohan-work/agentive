@@ -9,11 +9,12 @@
 [![CI](https://github.com/yohan-work/agentive/actions/workflows/ci.yml/badge.svg)](https://github.com/yohan-work/agentive/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](./LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey.svg)](./LICENSE-CONTENT.md)
-[![Next.js 15](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![Live site](https://img.shields.io/badge/live-yohan--work.github.io%2Fagentive-60a5fa)](https://yohan-work.github.io/agentive/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#기여하기)
 
-[주요 기능](#주요-기능) · [빠른 시작](#빠른-시작) · [설치 키트](#설치-키트) · [기여하기](#기여하기) · [English](./README.md)
+**[사이트 바로가기](https://yohan-work.github.io/agentive/)** · [주요 기능](#주요-기능) · [빠른 시작](#빠른-시작) · [설치 키트](#설치-키트) · [기여하기](#기여하기) · [English](./README.md)
 
 <img src="docs/assets/screenshot-home.png" alt="Agent Archive 홈 화면" width="900" />
 
@@ -90,7 +91,7 @@ pr-review-agent-EVALUATION.md     # 품질 점수, 알려진 약점, 샘플 실�
 
 ## 구조
 
-Agent Archive는 데이터베이스나 백엔드 없이 **정적 데이터를 기준으로 하는** Next.js 앱입니다. **에이전트 하나는 `content/agents/`의 YAML 파일 하나**이고 JSON Schema로 검증합니다. 워크플로우와 분류 정보는 `src/data`에 타입이 지정된 데이터로 둡니다.
+Agent Archive는 데이터베이스나 백엔드 없이 **정적 데이터를 기준으로 하는** Next.js 앱입니다. 정적 HTML로 내보내고, `main`에 푸시할 때마다 GitHub Pages에 배포합니다. **에이전트 하나는 `content/agents/`의 YAML 파일 하나**이고 JSON Schema로 검증합니다. 워크플로우와 분류 정보는 `src/data`에 타입이 지정된 데이터로 둡니다.
 
 ```text
 content/
@@ -98,7 +99,7 @@ content/
 schema/
 └── agent.schema.json # src/types/agent.ts에서 생성한 JSON Schema
 src/
-├── app/              # Next.js App Router 페이지 (로케일 경로: /en, /ko)
+├── app/[locale]/     # Next.js App Router 페이지 (/en, /ko), 정적 export
 ├── components/       # UI: 에이전트, 워크플로우, 레이아웃, 공통 컴포넌트
 ├── data/             # 워크플로우, 스타터 팩, 분류, 에이전트 로더
 ├── i18n/             # 로케일 설정과 UI 문구
@@ -113,7 +114,7 @@ scripts/
 | 명령 | 설명 |
 | --- | --- |
 | `npm run dev` | 개발 서버 실행 |
-| `npm run build` | 프로덕션 빌드 |
+| `npm run build` | `out/`으로 정적 export (하위 경로 배포 시 `NEXT_PUBLIC_BASE_PATH` 지정) |
 | `npm run lint` | ESLint 실행 |
 | `npm run typecheck` | TypeScript 타입 검사 |
 | `npm run check:data` | 에이전트 스키마 검증과 워크플로우·분류 참조 검사 |
@@ -133,7 +134,7 @@ scripts/
 ## 로드맵
 
 - [x] 에이전트 하나당 파일 하나로 분리하고 스키마로 검증
-- [ ] 공개 URL로 사이트 호스팅
+- [x] 공개 URL로 사이트 호스팅 ([yohan-work.github.io/agentive](https://yohan-work.github.io/agentive/))
 - [ ] 브라우저 없이 URL로 설치 키트 받기
 - [ ] 직접 검증한 에이전트와 샘플 실행 결과 확충
 

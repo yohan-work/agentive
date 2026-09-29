@@ -61,8 +61,8 @@ const workflowSlugs = matchAll(workflowsSource, /slug:\s*"([^"]+)"/g);
 const impactWorkflowSlugs = matchAll(impactSource, /primaryWorkflowSlug:\s*"([^"]+)"/g);
 const missingImpactWorkflows = unique(impactWorkflowSlugs.filter((slug) => !workflowSlugs.includes(slug)));
 const impactScenarioCount = matchAll(impactSource, /slug:\s*"([^"]+)"/g).length;
-const dictionaryEnKeys = matchAll(dictionarySource.match(/en:\s*{([\s\S]*?)},\n  ko:/)?.[1] ?? "", /([a-zA-Z][a-zA-Z0-9]*):/g);
-const dictionaryKoKeys = matchAll(dictionarySource.match(/ko:\s*{([\s\S]*?)\n  }\n} as const/)?.[1] ?? "", /([a-zA-Z][a-zA-Z0-9]*):/g);
+const dictionaryEnKeys = matchAll(dictionarySource.match(/en:\s*{([\s\S]*?)},\n  ko:/)?.[1] ?? "", /^\s+([a-zA-Z][a-zA-Z0-9]*):/gm);
+const dictionaryKoKeys = matchAll(dictionarySource.match(/ko:\s*{([\s\S]*?)\n  }\n} as const/)?.[1] ?? "", /^\s+([a-zA-Z][a-zA-Z0-9]*):/gm);
 const missingKoDictionaryKeys = unique(dictionaryEnKeys.filter((key) => !dictionaryKoKeys.includes(key)));
 const missingEnDictionaryKeys = unique(dictionaryKoKeys.filter((key) => !dictionaryEnKeys.includes(key)));
 

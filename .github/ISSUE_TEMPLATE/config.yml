@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Browse existing agents
-    url: https://github.com/yohan-work/agentive#features
+    url: https://yohan-work.github.io/agentive/en/agents/
     about: Check whether an agent already exists before suggesting one.
   - name: Report a security vulnerability
     url: https://github.com/yohan-work/agentive/security/advisories/new

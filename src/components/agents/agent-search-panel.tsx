@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ComponentProps, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import type { Agent } from "@/types/agent";
 import { defaultLocale, type Locale } from "@/i18n/config";
@@ -148,4 +149,13 @@ function FilterRow({
       </div>
     </div>
   );
+}
+
+/**
+ * Seeds the search box from `?query=` on the client. The static page renders the unfiltered list;
+ * remounting on a new query keeps the panel in sync when the top-nav search changes the URL.
+ */
+export function AgentSearchPanelFromUrl(props: Omit<ComponentProps<typeof AgentSearchPanel>, "initialQuery">) {
+  const query = useSearchParams().get("query") ?? "";
+  return <AgentSearchPanel key={query} {...props} initialQuery={query} />;
 }

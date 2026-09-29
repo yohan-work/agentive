@@ -11,7 +11,7 @@ export default function NotFound() {
           The requested page does not exist in this archive.
         </p>
         <div className="mt-6">
-          <ButtonLink href="/agents" variant="primary">Browse agents</ButtonLink>
+          <ButtonLink href="/en/agents" variant="primary">Browse agents</ButtonLink>
         </div>
       </div>
     </AppShell>
