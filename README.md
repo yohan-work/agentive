@@ -84,8 +84,8 @@ pr-review-agent-EVALUATION.md     # quality score, known weaknesses, sample runs
 Or fetch the same kit from a terminal. Every file has a stable URL at `/kits/<slug>/<file>`, and the agent page shows the exact command:
 
 ```sh
-curl -fsSL --create-dirs --output-dir agent-kits/pr-review-agent --remote-name-all \
-  "https://yohan-work.github.io/agentive/kits/pr-review-agent/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}"
+mkdir -p agent-kits/pr-review-agent && (cd agent-kits/pr-review-agent && curl -fsSL --remote-name-all \
+  "https://yohan-work.github.io/agentive/kits/pr-review-agent/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}")
 ```
 
 This saves the files into `agent-kits/pr-review-agent/` without their slug prefix and never touches your existing project files.

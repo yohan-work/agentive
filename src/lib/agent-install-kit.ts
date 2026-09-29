@@ -45,7 +45,8 @@ function getAgentPageUrl(slug: string) {
 /** One curl command that downloads the whole kit into agent-kits/<slug>/ without touching existing project files. */
 export function getInstallKitCommand(slug: string) {
   const files = `{${KIT_FILE_NAMES.join(",")}}`;
-  return `curl -fsSL --create-dirs --output-dir agent-kits/${slug} --remote-name-all "${getInstallKitUrl(slug, files)}"`;
+  // A subshell instead of --output-dir, which needs curl 7.73+ and is missing on older LTS distros.
+  return `mkdir -p agent-kits/${slug} && (cd agent-kits/${slug} && curl -fsSL --remote-name-all "${getInstallKitUrl(slug, files)}")`;
 }
 
 function list(items: string[]) {
