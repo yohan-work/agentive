@@ -89,7 +89,7 @@ pr-review-agent-EVALUATION.md     # 품질 점수, 알려진 약점, 샘플 실�
 
 ## 구조
 
-Agent Archive는 **정적 데이터를 기준으로 하는** Next.js 앱입니다. 데이터베이스나 백엔드 없이, 모든 에이전트와 워크플로우, 분류 정보를 `src/data`에 타입이 지정된 데이터로 두고 빌드할 때 검증합니다.
+Agent Archive는 **정적 데이터를 기준으로 하는** Next.js 앱입니다. 데이터베이스나 백엔드 없이, 모든 에이전트와 워크플로우, 분류 정보를 `src/data`에 타입이 지정된 데이터로 두고 `npm run check:data`로 검증합니다.
 
 ```text
 src/

@@ -89,7 +89,7 @@ Then place the files where your tool expects them:
 
 ## How it works
 
-Agent Archive is a **static-data-first** Next.js app. There is no database or backend: every agent, workflow, and taxonomy entry is typed data in `src/data`, validated at build time.
+Agent Archive is a **static-data-first** Next.js app. There is no database or backend: every agent, workflow, and taxonomy entry is typed data in `src/data`, validated by `npm run check:data`.
 
 ```text
 src/
