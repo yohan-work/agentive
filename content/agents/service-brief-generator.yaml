@@ -53,6 +53,6 @@ realUseCases:
 relatedAgents:
   - feature-requirements-analyst
   - user-scenario-writer
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

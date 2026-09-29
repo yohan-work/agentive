@@ -51,6 +51,6 @@ realUseCases:
     exampleInput: 무료 체험 가입자를 유료 전환으로 유도하는 이메일을 만드는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 email sequence을 만들어줘.
     expectedResult: email sequence 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Content Production Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

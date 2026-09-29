@@ -49,6 +49,6 @@ realUseCases:
     exampleInput: 새 예약 서비스 DB 설계를 배포 전에 검토하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 schema review을 만들어줘.
     expectedResult: schema review 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Codex Development Prep Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

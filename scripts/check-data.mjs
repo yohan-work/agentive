@@ -86,6 +86,10 @@ const incompleteInstallable = installableAgents.flatMap((agent) => {
   if (!agent.decisionGuide?.length) problems.push("decisionGuide");
   return problems.length ? [`${agent.slug}: missing ${problems.join(", ")}`] : [];
 });
+// "tested" and "expert" promise recorded sample runs (see CONTRIBUTING.md), so the evidence has to be in the file.
+const overstatedVerification = agents
+  .filter((agent) => ["tested", "expert"].includes(agent.verifiedStatus) && !(agent.evaluation?.sampleRuns.length >= 2))
+  .map((agent) => `${agent.slug}: verifiedStatus "${agent.verifiedStatus}" needs an evaluation with at least 2 sample runs`);
 const evaluationScores = installableAgents.flatMap((agent) => (agent.evaluation ? [agent.evaluation.qualityScore] : []));
 const hasDifferentiatedQualityScores = unique(evaluationScores).length > 1;
 const agentLoaderSource = read("src/data/agents.ts");
@@ -123,6 +127,7 @@ const failures = [
   duplicateIds.length ? `Duplicate agent ids: ${duplicateIds.join(", ")}` : "",
   installableAgents.length < 20 ? `Expected at least 20 installable agents, found ${installableAgents.length}` : "",
   ...incompleteInstallable,
+  ...overstatedVerification,
   !hasRunbookKitFile ? "Installable kits must include RUNBOOK.md" : "",
   !hasEvaluationKitFile ? "Installable kits must include EVALUATION.md" : "",
   !hasDifferentiatedQualityScores ? "Installable agent quality scores must be differentiated" : "",

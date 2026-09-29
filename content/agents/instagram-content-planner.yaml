@@ -53,5 +53,5 @@ realUseCases:
 relatedAgents:
   - copywriting-agent
   - target-reader-agent
-verifiedStatus: tested
+verifiedStatus: unverified
 updatedAt: 2026-07-01

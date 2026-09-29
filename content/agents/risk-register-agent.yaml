@@ -50,6 +50,6 @@ realUseCases:
     exampleInput: 신규 프로젝트 착수 전 주요 리스크를 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 risk register을 만들어줘.
     expectedResult: risk register 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Local Business Validation Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

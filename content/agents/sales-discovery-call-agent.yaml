@@ -50,6 +50,6 @@ realUseCases:
     exampleInput: 잠재 고객과 첫 상담을 앞두고 질문 리스트를 준비하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 discovery call guide을 만들어줘.
     expectedResult: discovery call guide 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Local Business Validation Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

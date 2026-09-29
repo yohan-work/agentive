@@ -51,6 +51,6 @@ realUseCases:
     exampleInput: 긴 블로그 글 하나를 SNS, 뉴스레터, 영상 스크립트로 재활용하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 repurposed content set을 만들어줘.
     expectedResult: repurposed content set 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Content Production Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

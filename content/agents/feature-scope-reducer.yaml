@@ -51,6 +51,6 @@ realUseCases:
     exampleInput: 출시까지 2주밖에 남지 않았는데 기능 범위가 너무 큰 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 reduced MVP scope을 만들어줘.
     expectedResult: reduced MVP scope 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Codex Development Prep Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

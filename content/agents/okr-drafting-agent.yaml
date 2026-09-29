@@ -49,6 +49,6 @@ realUseCases:
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 OKR Drafting Agent에게 OKR draft 형태로 정리해 달라고 요청합니다.
     exampleInput: 작은 팀이 분기 목표를 처음으로 OKR 형태로 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 OKR draft을 만들어줘.
     expectedResult: OKR draft 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

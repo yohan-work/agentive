@@ -51,6 +51,6 @@ realUseCases:
     exampleInput: 한 달간 블로그, SNS, 이메일 발행 계획을 세우는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 marketing calendar을 만들어줘.
     expectedResult: marketing calendar 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
     recommendedWorkflow: Content Production Flow
-verifiedStatus: tested
+verifiedStatus: unverified
 createdBy: Agent Archive
 updatedAt: 2026-07-01

@@ -53,5 +53,5 @@ realUseCases:
 relatedAgents:
   - user-scenario-writer
   - target-reader-agent
-verifiedStatus: tested
+verifiedStatus: unverified
 updatedAt: 2026-07-01
