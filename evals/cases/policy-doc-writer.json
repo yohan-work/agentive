@@ -1,0 +1,15 @@
+{
+  "slug": "policy-doc-writer",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "AI tools with customer data policy for a 60-person SaaS",
+      "input": "Please draft an internal policy we can publish in Notion this month.\n\nCompany: Relaymint, a 60-person B2B SaaS (appointment scheduling for dental clinics in Korea and Japan). Teams: Engineering (22), Customer Support (14), Sales (9), Marketing (6), Ops/Finance/HR (9).\n\nPolicy topic: Using generative AI tools (ChatGPT, Claude, Gemini, GitHub Copilot, Cursor, Notion AI) at work when customer data may be involved.\n\nAudience: all employees and contractors. Must be readable by non-engineers; support agents are the most frequent users.\n\nRules we've already agreed on with Legal and the CTO:\n1. Approved tools: Claude Team plan and ChatGPT Enterprise (both under signed DPAs, training opt-out confirmed), GitHub Copilot Business, Cursor Business with privacy mode on. Everything else (free/personal accounts, browser extensions, Gemini consumer) is not approved for any company data.\n2. Patient data (names, phone numbers, appointment reasons, treatment notes) from clinic accounts must NEVER be pasted into any AI tool, approved or not. This is PHI-adjacent and covered by our contracts with clinics and Korea's PIPA.\n3. Clinic business data (clinic name, staff emails, billing plan, ticket text with patient details removed) may be used in approved tools only.\n4. Production credentials, API keys, and database dumps may never be pasted into any AI tool.\n5. AI-generated customer-facing replies must be reviewed by a human before sending.\n6. Code from Copilot/Cursor follows normal PR review; no special rule.\n\nExceptions: Security lead (Minji Park) can approve time-boxed exceptions for a specific tool + dataset, in writing via the #security-requests Slack channel, max 90 days.\n\nEscalation: suspected leaks go to security@relaymint.io within 24 hours; the security lead decides whether it's a reportable incident.\n\nEnforcement: first violation = retraining; repeated or willful = HR process.\n\nPlease include definitions, concrete examples of allowed vs. not allowed (use support-ticket and sales-email examples), and a review checklist for the policy owner."
+    },
+    {
+      "id": "boundary",
+      "title": "Policy request with no rules and a contradictory goal",
+      "input": "Write our AI usage policy. We want people to use AI as much as possible to be faster, but also nothing confidential should ever leave the company. Make it short, one page max, and cover everything."
+    }
+  ]
+}

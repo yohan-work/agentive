@@ -1,0 +1,15 @@
+{
+  "slug": "feature-requirements-analyst",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Role-based starter-pack picker on the install page",
+      "input": "I need an implementation-ready feature spec I can paste into a GitHub issue.\n\nProduct: Agent Archive (https://yohan-work.github.io/agentive/) — an open-source library of 100 AI agent prompts. Static Next.js 16 site exported to GitHub Pages, no backend, no accounts. English (/en) and Korean (/ko) UI. 20 of the agents are \"project-ready\" and have downloadable install kits (AGENTS.md, CLAUDE.md, Cursor .mdc rule, agent.json, README, RUNBOOK, EVALUATION).\n\nFeature goal: On /install, add a \"Pick your role\" step at the top. The visitor picks one of four roles — Developer, PM, Designer, Operations — and sees a recommended starter pack of 3–5 project-ready agents for that role, with a single \"Download all kits for this role\" action.\n\nUser story: As a developer landing on /install for the first time, I want to pick my role and get a small, trusted set of agents to drop into my repo, so I don't have to read 20 agent pages to decide.\n\nExisting behavior today:\n- /install lists 4 static starter packs (engineering, product planning, design QA, operations) defined in src/data/starter-packs.ts, then a grid of all 20 project-ready agents using the existing AgentCard component.\n- Each project-ready agent page has a \"Download Kit\" button that downloads 7 files for that one agent, and a curl one-liner that fetches /kits/<slug>/<file>.\n- Bookmarks are stored in localStorage; nothing else is persisted.\n- Agents have verifiedStatus (unverified / community / tested / expert). 15 of the 20 project-ready agents are \"tested\" or \"expert\"; the other 5 are \"community\".\n\nConstraints:\n- Static data only; no server, no analytics SDK, no login.\n- Reuse the existing AgentCard and starter-pack data; don't invent a new agent schema field unless it's justified.\n- Every new UI string must exist in both en and ko dictionaries.\n- Must work at 375px wide.\n- \"Download all\" can't use a server-side zip; GitHub Pages only serves static files.\n\nSuccess criteria: a first-time visitor can go from /install to having kit files for their role in under 60 seconds; role packs should only include agents whose verifiedStatus is \"tested\" or \"expert\".\n\nPlease give me requirements, acceptance criteria, edge cases, and out-of-scope notes."
+    },
+    {
+      "id": "boundary",
+      "title": "Vague 'personalized recommendations' request with conflicting constraints",
+      "input": "We want personalized agent recommendations on the Agent Archive home page, like \"recommended for you\", based on what each user has used before. Keep it fully static (GitHub Pages, no backend) and we don't want to store anything about users. PM wants it in next week's release. Can you write the spec?"
+    }
+  ]
+}

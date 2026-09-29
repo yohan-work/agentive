@@ -1,0 +1,15 @@
+{
+  "slug": "readme-generator",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "README for a real CLI companion to the agent archive",
+      "input": "Write a README.md for a new small open-source project. Keep it concise — it's a CLI, not a framework.\n\nProject name: agentkit-cli\nPurpose: a zero-config Node CLI that installs \"install kits\" from Agent Archive (https://yohan-work.github.io/agentive/) into your repo. Each project-ready agent in the archive publishes 7 files at stable URLs: https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Today users copy a curl one-liner per agent; this CLI does it for many agents at once and merges into existing files safely.\n\nTech stack: TypeScript, Node >= 20.9, commander for args, undici fetch, vitest for tests, tsup for bundling, published to npm as `agentkit-cli`. MIT license. Repo: github.com/yohan-work/agentkit-cli.\n\nFeatures (all implemented in v0.3.0):\n- `agentkit add <slug...>` downloads kits into ./agent-kits/<slug>/\n- `agentkit add <slug> --target codex|claude|cursor` also appends the instructions to AGENTS.md / CLAUDE.md, or writes .cursor/rules/<slug>.mdc\n- Appends are wrapped in `<!-- agentkit:<slug>:start -->` / `<!-- agentkit:<slug>:end -->` markers, so re-running updates in place instead of duplicating\n- `agentkit remove <slug>` removes the marked block and the kit folder\n- `agentkit list` shows installed kits and their agent.json version\n- `--dry-run` prints the diff without writing\n- `--base-url` for self-hosted mirrors of the archive\n- Exits non-zero if any file 404s; never overwrites files outside marked blocks\n\nSetup / scripts:\n```\nnpm install\nnpm run build      # tsup -> dist/\nnpm test           # vitest run\nnpm run lint       # eslint\nnpm run typecheck  # tsc --noEmit\nnpm link           # try the CLI locally\n```\nUsage example: `npx agentkit-cli add pr-review-agent test-case-generator --target claude`\n\nKnown limitations: no Windows CI yet (works on macOS/Linux in CI); no offline cache; no signature verification of downloaded files.\n\nRoadmap: Windows CI, `agentkit update` to refresh all installed kits, checksum verification using agent.json, a `--pack <starter-pack>` option.\n\nAudience: developers using Codex, Claude Code, or Cursor. Include getting started, scripts, and a roadmap section."
+    },
+    {
+      "id": "boundary",
+      "title": "README request with only a repo name",
+      "input": "Generate a README for my project \"tiny-ledger\". Make it look professional with badges, install instructions, and a features list."
+    }
+  ]
+}

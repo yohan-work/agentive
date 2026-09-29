@@ -49,3 +49,6 @@ plan/
 
 # Generated from content/ by scripts/build-content.mjs
 src/data/generated/
+
+# Scratch files for evals (inputs handed to runner/judge sessions)
+.eval-work/

@@ -1,0 +1,15 @@
+{
+  "slug": "refactor-plan-agent",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Korean plan to split the 298-line install-kit generator",
+      "input": "리팩터링 계획을 세워 주세요. PR 여러 개로 나눠서 안전하게 진행하고 싶습니다.\n\n프로젝트: Agent Archive (Next.js 16 + TypeScript, 정적 export → GitHub Pages). 검증 명령: `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`(node:test + tsx, 현재 20개 통과), `npm run build`. CI가 이 다섯 개를 모두 돌립니다.\n\n대상: src/lib/agent-install-kit.ts (298줄). 한 파일에 다 들어 있는 export 함수들:\n- `isInstallable(agent)`, `getInstallKitPath(slug, name)`, `getInstallKitUrl(slug, name)`(basePath `/agentive`와 사이트 URL 반영), `getInstallKitCommand(slug)` — curl 명령 생성(`mkdir -p ... && (cd ... && curl -fsSL --remote-name-all \"...{a,b,c}\")`).\n- 파일별 본문 생성: `toCodexAgentFile`, `toClaudeProjectFile`, `toCursorRuleFile`, `toInstallManifest`(agent.json), `toInstallReadme`, `toRunbookFile`(60줄), `toEvaluationFile`(60줄). 모두 markdown을 문자열 템플릿으로 직접 조립. 내부 헬퍼 `agentInstructions`, `list`, `getAgentPageUrl`가 섞여 있고, 공통 헤더/출처 문구가 여러 함수에 복붙돼 있음.\n- `getInstallKitFiles(agent)` → 7개 `{ name, content, mimeType }` 배열(AGENTS.md, CLAUDE.md, cursor-rule.mdc, agent.json, README.md, RUNBOOK.md, EVALUATION.md).\n\n이 모듈을 쓰는 곳:\n- src/app/kits/[slug]/[file]/route.ts — generateStaticParams와 GET에서 getInstallKitFiles 사용(빌드 시 out/kits/<slug>/<file> 생성).\n- src/components/agents/agent-export-panel.tsx — 다운로드 버튼, curl 명령 표시, 파일별 링크.\n- tests/agent-install-kit.test.ts — 파일 7개 이름, URL, curl 명령 문자열을 검사하는 테스트.\n\n목표:\n- 파일 종류별로 모듈 분리(예: src/lib/install-kit/ 아래), 공통 헤더/푸터 한 곳으로.\n- 출력은 바이트 단위로 동일해야 함(외부 사용자들이 curl로 받아 AGENTS.md에 붙이고 있어서 diff가 생기면 안 됨).\n- 공개 API(`getInstallKitFiles`, URL/curl 헬퍼 이름)는 유지.\n\n제약: 새 의존성 금지. 한 PR은 리뷰어가 20분 안에 볼 수 있는 크기. 기능 추가 없음. 이 작업 중에도 다른 사람이 에이전트 YAML을 계속 추가함.\n\n원하는 결과: 단계별 PR 순서, 각 단계에서 동작 보존을 확인하는 방법(구체적 명령 포함), 롤백 방법, 가정, 리스크, 다음 액션."
+    },
+    {
+      "id": "boundary",
+      "title": "Rewrite-everything request with no code or constraints",
+      "input": "레거시 코드가 너무 지저분해서 전부 리팩터링하고 싶어요. 테스트는 거의 없고요. 한 번에 싹 갈아엎는 계획 짜주세요. 다음 주 배포 전에 끝내야 합니다."
+    }
+  ]
+}

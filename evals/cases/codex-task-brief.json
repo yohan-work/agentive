@@ -1,0 +1,15 @@
+{
+  "slug": "codex-task-brief",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Brief for URL-persisted filters on the /agents page",
+      "input": "Write a task brief I can hand to Codex.\n\nRepo: Agent Archive (github.com/yohan-work/agentive). Next.js 16 App Router + TypeScript + Tailwind, `output: \"export\"` static build deployed to GitHub Pages. No middleware, no server-side searchParams — query strings must be read on the client with useSearchParams. Pages live under src/app/[locale]/ (en, ko).\n\nGoal: persist the /agents page filters in the URL so a filtered view can be shared and survives reload. Today only `?query=` is read (seeded once into the search box); role, category, difficulty, automation level, tool, verified status, and \"installable only\" live in React state and are lost on reload.\n\nFiles involved:\n- src/components/agents/agent-search-panel.tsx — client component, holds `query` and `filters` (type AgentFilters) in useState; exports AgentSearchPanel and AgentSearchPanelFromUrl (the latter reads `?query=` via useSearchParams and passes initialQuery).\n- src/lib/search.ts — `AgentFilters` type, `searchAgents`, `filterAgents`, `getUniqueTools`.\n- src/app/[locale]/agents/page.tsx — renders `<Suspense fallback={<AgentSearchPanel .../>}><AgentSearchPanelFromUrl .../></Suspense>`.\n- src/components/layout/top-nav.tsx — the header search navigates to /agents?query=...\n- tests/search.test.ts — node:test suite run with `npm test` (tsx loader).\n- src/i18n/dictionaries.ts — any new UI string needs both en and ko.\n\nConstraints:\n- Keep the static export working (`npm run build` must still produce out/ with no dynamic server usage).\n- Use router.replace (no new history entry per click) and don't scroll to top on filter change.\n- Unknown or invalid param values (e.g. ?difficulty=expertish, ?automation=9) must be ignored, not crash.\n- The top-nav search must keep working and must not wipe other active filters.\n- No new dependencies.\n\nAcceptance criteria:\n- Selecting filters updates the URL, e.g. /en/agents?role=developer&difficulty=advanced&installable=1\n- Loading that URL directly shows the same filtered result and highlighted chips.\n- \"Clear all\" removes all params; \"Clear filters only\" keeps ?query=.\n- Unit tests cover parse/serialize of filters, including invalid values.\n- `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` all pass.\n\nNon-goals: saving filters to localStorage, changing the search ranking, adding new filter types."
+    },
+    {
+      "id": "boundary",
+      "title": "Codex brief request with no repo details",
+      "input": "Can you write a Codex task brief for adding dark mode to our app? It should be quick for Codex to do. Thanks."
+    }
+  ]
+}

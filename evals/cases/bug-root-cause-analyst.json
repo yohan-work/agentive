@@ -1,0 +1,15 @@
+{
+  "slug": "bug-root-cause-analyst",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "CI npm ci fails with missing @emnapi packages after adding tsx",
+      "input": "Need a root-cause analysis for a CI failure that's blocking a PR.\n\nProject: Agent Archive, Next.js 16 + TypeScript, open-source repo on GitHub. CI is GitHub Actions on ubuntu-latest: actions/setup-node@v7 with `node-version-file: .nvmrc` (.nvmrc contains `22`) and `cache: npm`, then `npm ci`, then schema check, check:data, lint, typecheck, test, build.\n\nSymptom: On the PR branch, the \"npm ci\" step fails in about 6 seconds. Every step after it is skipped. The same branch installs and runs all checks fine on my laptop. main is green.\n\nCI log (trimmed):\n```\nRun npm ci\nnpm error code EUSAGE\nnpm error\nnpm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.\nnpm error\nnpm error Missing: @emnapi/runtime@1.11.3 from lock file\nnpm error Missing: @emnapi/core@1.11.3 from lock file\nnpm error\nnpm error Clean install a project from your package.json & package-lock.json only. Remove node_modules to regenerate lock file.\nnpm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-09-29T05_12_44_101Z-debug-0.log\nError: Process completed with exit code 1.\n```\n\nLocal environment: macOS 15 on Apple Silicon, Node v24.9.0, npm 11.6.2. `rm -rf node_modules && npm ci` succeeds locally with no warnings.\n\nSteps to reproduce: push the branch / open the PR; CI fails at npm ci every time (3 re-runs, same error, also with the Actions cache cleared).\n\nRecent changes on the branch (the only dependency change):\n- Ran `npm install -D tsx` to add a test runner (`\"test\": \"node --import tsx --test tests/*.test.ts\"`).\n- package.json diff: `+ \"tsx\": \"^4.23.15\"` in devDependencies.\n- package-lock.json diff: +61 / -38 lines. tsx and esbuild entries added; I didn't hand-edit it. I noticed a few `\"optional\": true` / `\"peer\": true` flags moved around under node_modules/@img/... and node_modules/@napi-rs/... but I don't know if that matters.\n- Nobody touched .nvmrc or the workflow file.\n\nNeither I nor the project uses @emnapi directly; `npm ls @emnapi/runtime` locally prints `(empty)`.\n\nPlease give hypotheses ranked by likelihood, an evidence map, a reproduction plan, and a fix direction I can act on today."
+    },
+    {
+      "id": "boundary",
+      "title": "Intermittent bookmark loss with almost no evidence",
+      "input": "Users say their bookmarks disappear \"sometimes\". Can't reproduce it. What's the root cause?"
+    }
+  ]
+}

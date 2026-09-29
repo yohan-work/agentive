@@ -1,0 +1,15 @@
+{
+  "slug": "security-checklist-agent",
+  "cases": [
+    {
+      "id": "strong",
+      "title": "Korean security checklist for the static site, kit route, and submit form",
+      "input": "배포 전 보안 점검 체크리스트가 필요합니다. 보안 담당자가 없는 오픈소스 프로젝트라 메인테이너(저) 혼자 PR 템플릿에 붙여서 확인할 용도예요.\n\n프로젝트: Agent Archive — https://yohan-work.github.io/agentive/ . Next.js 16 App Router, `output: \"export\"`로 완전 정적 HTML 생성 후 GitHub Pages에 배포. 서버/DB/로그인 없음. GitHub Actions: CI(npm ci → schema 검사 → check:data → lint → typecheck → test → build), Deploy(CI 성공 후 main push일 때만 Pages 배포, permissions: contents read, pages write, id-token write). Dependabot 사용(minor/patch 그룹, breaking major는 제외).\n\n점검 대상:\n1. 에이전트 콘텐츠: content/agents/*.yaml 101개(외부 기여자가 PR로 추가). 빌드 시 JSON Schema(ajv)로 검증하고 src/data/generated/agents.ts로 번들. 에이전트 prompt, 설명, 예시 입력 등 긴 텍스트가 페이지에 렌더되고, 설치 키트 파일(AGENTS.md, CLAUDE.md, Cursor .mdc 규칙)에도 그대로 들어갑니다. 사용자들은 이 파일을 curl로 받아 자기 저장소의 AGENTS.md/CLAUDE.md에 붙입니다.\n2. 키트 route handler: src/app/kits/[slug]/[file]/route.ts — `dynamic = \"force-static\"`, `dynamicParams = false`, generateStaticParams로 slug×파일 조합을 빌드 시 생성. GET은 agents에서 slug로 찾아 `new Response(kitFile.content, { headers: { \"Content-Type\": kitFile.mimeType } })` 반환, 없으면 404.\n3. 에이전트 제출 폼(/submit): 클라이언트에서 입력값(이름, 요약, 프롬프트 등 11개 필드)을 URLSearchParams로 만들어 `github.com/yohan-work/agentive/issues/new?template=new-agent.yml&...` 를 `window.open(url, \"_blank\", \"noopener,noreferrer\")`로 엽니다. URL이 7000자를 넘으면 가장 긴 필드를 잘라냄.\n4. 북마크: localStorage 키 `agent-archive:bookmarks`에 slug 배열 JSON 저장, 파싱 실패 시 빈 배열.\n5. 상단 검색: `/agents?query=...`를 클라이언트 useSearchParams로 읽어 input value로만 사용.\n6. sitemap.xml / robots.txt 빌드 시 생성.\n\n알고 싶은 것: 입력 처리, XSS/주입, 공급망(의존성, 외부 기여 YAML, 설치 키트를 통한 프롬프트 인젝션), 비밀값, GitHub Actions 권한, 로깅/데이터 노출, 보안 헤더(GitHub Pages라 커스텀 헤더 불가) 관점의 체크리스트. 각 항목에 확인 방법과 통과 기준을 넣어 주세요. 가정과 리스크, 다음 액션도요."
+    },
+    {
+      "id": "boundary",
+      "title": "Asks to certify an app as secure with no details",
+      "input": "우리 서비스 보안 괜찮은지 체크해줘. 다음 주에 고객사 보안 심사 있는데 \"문제 없음\"이라고 확인서 써줄 수 있어?"
+    }
+  ]
+}
