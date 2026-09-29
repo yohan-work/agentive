@@ -66,21 +66,30 @@ export function listDirs(path) {
 
 /** Maps a judge's "A" / "B" / "tie" back to a variant id. order1 shows variantA as A; order2 swaps them. */
 export function resolveWinner(order, verdict, variantA, variantB) {
+  if (!["A", "B", "tie"].includes(verdict)) throw new Error(`Invalid verdict "${verdict}": expected "A", "B", or "tie"`);
   if (verdict === "tie") return "tie";
   const [first, second] = order === 1 ? [variantA, variantB] : [variantB, variantA];
   return verdict === "A" ? first : second;
 }
 
-/** Minimal --flag value parser; positional args are returned in order. */
-export function parseArgs(argv) {
+/**
+ * Minimal flag parser. Flags listed in `booleans` never take a value; every other flag requires one.
+ * Positional args are returned in order.
+ */
+export function parseArgs(argv, booleans = []) {
   const flags = {};
   const positional = [];
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i].startsWith("--")) {
-      const next = argv[i + 1];
-      const hasValue = next !== undefined && !next.startsWith("--");
-      flags[argv[i].slice(2)] = hasValue ? next : true;
-      if (hasValue) i += 1;
+      const name = argv[i].slice(2);
+      if (booleans.includes(name)) {
+        flags[name] = true;
+        continue;
+      }
+      const value = argv[i + 1];
+      if (value === undefined || value.startsWith("--")) throw new Error(`--${name} needs a value`);
+      flags[name] = value;
+      i += 1;
     } else {
       positional.push(argv[i]);
     }

@@ -19,14 +19,29 @@ describe("resolveWinner", () => {
     assert.equal(resolveWinner(2, "B", "new", "none"), "new");
     assert.equal(resolveWinner(2, "tie", "new", "none"), "tie");
   });
+
+  it("rejects anything other than A, B, or tie", () => {
+    for (const verdict of ["a", "Tie", "A (slight)", undefined]) {
+      assert.throws(() => resolveWinner(1, verdict, "new", "none"), /Invalid verdict/);
+    }
+  });
 });
 
 describe("parseArgs", () => {
-  it("reads valued flags, bare flags, and positionals", () => {
-    assert.deepEqual(parseArgs(["pr-review-agent", "--model", "m1", "--baseline"]), {
+  it("reads valued flags, boolean flags, and positionals in any order", () => {
+    assert.deepEqual(parseArgs(["pr-review-agent", "--model", "m1", "--baseline"], ["baseline"]), {
       flags: { model: "m1", baseline: true },
       positional: ["pr-review-agent"]
     });
-    assert.deepEqual(parseArgs(["--baseline", "--model", "m1", "slug"]).flags, { baseline: true, model: "m1" });
+    // A boolean flag must not swallow the positional after it.
+    assert.deepEqual(parseArgs(["--baseline", "pr-review-agent", "--model", "m1"], ["baseline"]), {
+      flags: { baseline: true, model: "m1" },
+      positional: ["pr-review-agent"]
+    });
+  });
+
+  it("rejects a valued flag with no value", () => {
+    assert.throws(() => parseArgs(["slug", "--model", "--baseline"], ["baseline"]), /--model needs a value/);
+    assert.throws(() => parseArgs(["slug", "--prompt"]), /--prompt needs a value/);
   });
 });

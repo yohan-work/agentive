@@ -20,9 +20,9 @@ import {
   writeJson
 } from "./lib.mjs";
 
-const { flags, positional } = parseArgs(process.argv.slice(2));
+const { flags, positional } = parseArgs(process.argv.slice(2), ["baseline"]);
 const [slug] = positional;
-const baseline = "baseline" in flags;
+const baseline = flags.baseline === true;
 if (!slug || !flags.model) {
   console.error("Usage: node scripts/eval/prepare.mjs <slug> --model <id> [--prompt <file> | --baseline]");
   process.exit(1);

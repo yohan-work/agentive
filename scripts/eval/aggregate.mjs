@@ -25,6 +25,7 @@ const cases = readCases(slug).map((testCase) => {
   const [order1, order2] = orders.map((verdicts, index) => {
     const verdict = verdicts.find((candidate) => candidate.id === testCase.id);
     if (!verdict) throw new Error(`No verdict for case ${testCase.id} in order${index + 1}`);
+    // Throws on anything other than "A", "B", or "tie" so a malformed verdict is never credited.
     return resolveWinner(index + 1, verdict.winner, variantA, variantB);
   });
   return { id: testCase.id, order1, order2, result: order1 === order2 ? order1 : "inconsistent" };
