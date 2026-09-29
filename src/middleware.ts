@@ -28,5 +28,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|.*\\..*).*)"]
+  // Skip Next internals, file-based metadata routes, and any path with a file extension.
+  matcher: ["/((?!(?:_next|opengraph-image|twitter-image|icon|apple-icon|manifest|sitemap|robots)(?:/|$)|.*\\..*).*)"]
 };

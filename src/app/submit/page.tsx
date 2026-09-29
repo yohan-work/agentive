@@ -13,7 +13,7 @@ export default function SubmitPage() {
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">Contribution</p>
         <h1 className="text-4xl font-semibold text-primary">Submit an agent</h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-secondary">
-          Share a reusable agent idea. The MVP stores nothing yet, but the form mirrors the future review flow.
+          Share a reusable agent idea. Filling in this form opens a pre-filled GitHub issue so maintainers can review it in the open.
         </p>
       </header>
       <SubmitForm />

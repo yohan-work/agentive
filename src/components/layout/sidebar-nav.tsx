@@ -21,23 +21,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/categories", label: dictionary.nav.categories, icon: Boxes },
     { href: "/roles", label: dictionary.nav.roles, icon: Users }
   ];
-  const groups = [
-    {
-      title: dictionary.nav.forUsers,
-      links: [dictionary.nav.gettingStarted, dictionary.nav.howToUseAgents, dictionary.nav.promptTemplates, dictionary.nav.workflowPacks]
-    },
-    {
-      title: dictionary.nav.forCreators,
-      links: [dictionary.nav.submitAgent, dictionary.nav.agentCardFormat, dictionary.nav.bestPractices, dictionary.nav.evaluationGuide]
-    },
-    {
-      title: dictionary.nav.forTeams,
-      links: [dictionary.nav.internalArchive, dictionary.nav.teamKnowledgeBase, dictionary.nav.governance]
-    }
-  ];
 
   return (
-    <nav className="space-y-7">
+    <nav>
       <div className="space-y-1">
         {primary.map((item) => {
           const Icon = item.icon;
@@ -91,24 +77,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           {dictionary.nav.about}
         </Link>
       </div>
-
-      {groups.map((group) => (
-        <div key={group.title}>
-          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted">{group.title}</p>
-          <div className="space-y-1">
-            {group.links.map((link) => (
-              <Link
-                key={link}
-                href={link === dictionary.nav.submitAgent ? withLocale("/submit", locale) : withLocale("/about", locale)}
-                onClick={onNavigate}
-                className="block rounded-md px-3 py-1.5 text-sm text-secondary transition hover:bg-elevated/70 hover:text-primary"
-              >
-                {link}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))}
     </nav>
   );
 }
