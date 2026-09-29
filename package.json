@@ -21,7 +21,7 @@
     "start": "node scripts/preview.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test \"tests/**/*.test.ts\"",
+    "test": "node --import tsx --test tests/*.test.ts",
     "content": "node scripts/build-content.mjs",
     "schema": "node scripts/generate-schema.mjs",
     "prebuild": "npm run content",
