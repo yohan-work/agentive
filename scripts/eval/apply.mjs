@@ -1,7 +1,7 @@
 // Writes an evaluated variant into content/agents/<slug>.yaml: its prompt, recorded runs, review, and
 // blind comparison results.
 //
-//   node scripts/eval/apply.mjs <slug> <variant> --judge <judge model id> --date <YYYY-MM-DD>
+//   node scripts/eval/apply.mjs <slug> <variant> --judge <judge model id> --date <YYYY-MM-DD> [--previous <variant>]
 //
 // Needs evals/runs/<slug>/<variant>/ (one output per case plus meta.json) and a review at
 // evals/reviews/<slug>/<variant>.json (see evals/prompts/reviewer.md). Every comparison summary under
@@ -11,7 +11,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseDocument } from "yaml";
-import { BASELINE, evalsDir, listDirs, parseArgs, readCases, readRun, root } from "./lib.mjs";
+import { BASELINE, evalsDir, listDirs, parseArgs, readCases, readRun, root, variantFor } from "./lib.mjs";
 
 const { flags, positional } = parseArgs(process.argv.slice(2));
 const [slug, variant] = positional;
@@ -27,16 +27,26 @@ const readJson = (path) => {
 
 const meta = readJson(join(evalsDir, "runs", slug, variant, "meta.json"));
 if (!meta.systemPrompt) throw new Error(`${variant} has no system prompt; only agent variants can be applied`);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.preparedAt ?? "")) throw new Error(`${variant} meta.preparedAt must be YYYY-MM-DD`);
 const review = readJson(join(evalsDir, "reviews", slug, `${variant}.json`));
 const cases = readCases(slug);
 
+const file = join(root, "content/agents", `${slug}.yaml`);
+const doc = parseDocument(readFileSync(file, "utf8"));
+// The prompt this variant replaces: the one in the YAML now, unless this variant is already applied
+// (re-running apply), in which case pass --previous explicitly.
+const currentVariant = variantFor(doc.get("prompt"));
+const previousVariant = flags.previous ?? (currentVariant === variant ? null : currentVariant);
+
 function describe(other) {
-  return other === BASELINE ? "the same model with no system prompt" : `the previous prompt (${other})`;
+  if (other === BASELINE) return "the same model with no system prompt";
+  return other === previousVariant ? `the previous prompt (${other})` : `another candidate prompt (${other})`;
 }
 
 const verdictsRoot = join(evalsDir, "verdicts", slug);
 const comparisons = listDirs(verdictsRoot)
-  .filter((dir) => dir.startsWith(`${variant}__vs__`))
+  // Comparisons can be filed in either direction; include both so no result is left out.
+  .filter((dir) => dir.startsWith(`${variant}__vs__`) || dir.endsWith(`__vs__${variant}`))
   .map((dir) => {
     const summary = readJson(join(verdictsRoot, dir, "summary.json"));
     const other = summary.variants.find((candidate) => candidate !== variant);
@@ -45,8 +55,6 @@ const comparisons = listDirs(verdictsRoot)
 
 const runNote = `Real run on ${meta.preparedAt}: ${meta.generator} with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate model reviewer against the evaluation criteria; not yet reviewed by a human maintainer.`;
 
-const file = join(root, "content/agents", `${slug}.yaml`);
-const doc = parseDocument(readFileSync(file, "utf8"));
 const [first] = cases;
 
 doc.set("prompt", meta.systemPrompt);

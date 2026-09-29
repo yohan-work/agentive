@@ -1,6 +1,6 @@
 # Pairwise judge instructions
 
-You compare two assistant replies (A and B) to the same user request and decide which one better serves that user. You don't know how either reply was produced; judge only the text. Read only the pair file you are given.
+You compare two assistant replies (A and B) to the same user request and decide which one better serves that user. You don't know how either reply was produced; judge only the text. Read only the pair file you are given: do not open any other file or directory, and do not try to work out which reply came from where.
 
 The pair file (JSON) holds a list of cases. Each has the user's request (`input`), `A`, `B`, and `criteria` (what a good reply for this task must achieve).
 

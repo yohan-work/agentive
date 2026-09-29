@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { variantFor } from "./eval/lib.mjs";
 import { loadAgentContent } from "./lib/agent-content.mjs";
@@ -90,10 +90,20 @@ const incompleteInstallable = installableAgents.flatMap((agent) => {
 // "tested" and "expert" promise recorded sample runs (see CONTRIBUTING.md), so the evidence has to be in the file.
 // Recorded runs must come from the prompt the agent ships now; editing a prompt without re-running the
 // evaluation (see evals/README.md) would leave sample runs that no longer describe the agent.
+function recordedOutputs(slug, variant) {
+  const dir = join(root, "evals/runs", slug, variant);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => readFileSync(join(dir, file), "utf8").trim());
+}
 const staleEvaluations = agents
   .filter((agent) => agent.evaluation?.sampleRuns.some((run) => run.reviewNotes[0]?.startsWith("Real run on ")))
-  .filter((agent) => !existsSync(join(root, "evals/runs", agent.slug, variantFor(agent.prompt), "meta.json")))
-  .map((agent) => `${agent.slug}: sample runs don't match the current prompt (no evals/runs/${agent.slug}/${variantFor(agent.prompt)}); re-run the evaluation`);
+  .filter((agent) => {
+    const outputs = recordedOutputs(agent.slug, variantFor(agent.prompt));
+    return !agent.evaluation.sampleRuns.every((run) => outputs.includes(run.sampleOutput.trim()));
+  })
+  .map((agent) => `${agent.slug}: sample runs aren't outputs of the current prompt (evals/runs/${agent.slug}/${variantFor(agent.prompt)}); re-run the evaluation`);
 const overstatedVerification = agents
   .filter((agent) => ["tested", "expert"].includes(agent.verifiedStatus) && !(agent.evaluation?.sampleRuns.length >= 2))
   .map((agent) => `${agent.slug}: verifiedStatus "${agent.verifiedStatus}" needs an evaluation with at least 2 sample runs`);

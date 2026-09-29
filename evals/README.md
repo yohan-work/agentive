@@ -47,7 +47,7 @@ npm run eval:apply -- <slug> <variant> --judge <judge-id> --date <YYYY-MM-DD>
 ```
 
 - `prepare` writes one input file per case under `.eval-work/` (gitignored) and prints where each runner should save its output.
-- `pairs` writes the two judge files under random names, so neither the path nor the content tells a judge which variant is which. The mapping stays in `.eval-work/judge/manifest.json`.
+- `pairs` writes the two judge files under random names, so neither the path nor the content tells a judge which variant is which. The mapping stays in `.eval-work/judge-manifest.json`, outside the folder judges work in.
 - `collect` files finished verdicts under `evals/verdicts/`.
 - `aggregate` tallies the verdicts into `summary.json`.
 

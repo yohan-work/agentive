@@ -9,6 +9,7 @@ import { join } from "node:path";
 import {
   BASELINE,
   evalsDir,
+  localDate,
   parseArgs,
   promptHash,
   readAgent,
@@ -45,7 +46,7 @@ if (existsSync(metaPath)) {
     systemPrompt: prompt,
     promptSha256: prompt ? promptHash(prompt) : null,
     generator: flags.model,
-    preparedAt: new Date().toLocaleDateString("en-CA") // local YYYY-MM-DD, the date the maintainer ran it
+    preparedAt: localDate()
   });
 }
 

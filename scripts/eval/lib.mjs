@@ -72,6 +72,12 @@ export function resolveWinner(order, verdict, variantA, variantB) {
   return verdict === "A" ? first : second;
 }
 
+/** Today's local date as YYYY-MM-DD, built by hand so it doesn't depend on ICU locale data. */
+export function localDate(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 /**
  * Minimal flag parser. Flags listed in `booleans` never take a value; every other flag requires one.
  * Positional args are returned in order.
