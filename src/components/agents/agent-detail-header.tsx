@@ -13,9 +13,11 @@ export function AgentDetailHeader({ agent, labels }: { agent: Agent; labels: Dic
         <Badge tone="accent">
           {labels.automation} {agent.automationLevel}/5
         </Badge>
-        {agent.evaluation ? <Badge tone="success">
+        {agent.evaluation ? (
+          <Badge tone="success">
             {labels.quality} {agent.evaluation.qualityScore}/5
-          </Badge> : null}
+          </Badge>
+        ) : null}
       </div>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
