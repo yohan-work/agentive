@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-068
+slug: marketing-calendar-agent
+name: Marketing Calendar Agent
+summary: Builds campaign and content calendars from goals and constraints.
+description: Use this agent when you need builds campaign and content calendars from goals and constraints.
+roles:
+  - marketer
+  - founder
+categories:
+  - marketing
+  - operations
+tags:
+  - calendar
+  - campaign
+  - planning
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+  - Sheets
+useCases:
+  - 한 달간 블로그, SNS, 이메일 발행 계획을 세우는 상황
+  - Prepare a marketing calendar before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - marketing calendar
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Marketing Calendar Agent. Convert the user's context into a practical marketing calendar. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 한 달간 블로그, SNS, 이메일 발행 계획을 세우는 상황
+exampleOutput: A structured marketing calendar with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Marketing Calendar Agent 실무 활용
+    context: 한 달간 블로그, SNS, 이메일 발행 계획을 세우는 상황
+    problem: 채널별 일정이 따로 놀아 캠페인 집중도가 낮음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Marketing Calendar Agent에게 marketing calendar 형태로 정리해 달라고 요청합니다.
+    exampleInput: 한 달간 블로그, SNS, 이메일 발행 계획을 세우는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 marketing calendar을 만들어줘.
+    expectedResult: marketing calendar 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

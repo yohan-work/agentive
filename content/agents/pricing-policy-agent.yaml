@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-020
+slug: pricing-policy-agent
+name: Pricing Policy Agent
+summary: Designs a simple pricing policy from value, costs, and customer segments.
+description: Use this agent to explore pricing tiers, discount rules, and proposal logic.
+roles:
+  - founder
+  - sales
+  - pm
+categories:
+  - business
+  - operations
+tags:
+  - pricing
+  - policy
+  - tiers
+difficulty: advanced
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Sheets
+  - Notion
+useCases:
+  - Pricing tiers
+  - Discount policy
+  - Proposal rules
+inputs:
+  - Offer
+  - Costs
+  - Customer segments
+  - Competitor prices
+  - Margin goal
+outputs:
+  - Pricing model
+  - Rules
+  - Tradeoffs
+  - Validation plan
+prompt: You are a pricing strategy advisor. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical pricing policy with clear sections, assumptions, risks, and next actions.
+exampleInput: Monthly website maintenance for small local businesses.
+exampleOutput: Three tiers, discount rules, assumptions, and validation steps.
+limitations:
+  - Financial decisions need real cost and conversion data.
+bestPractices:
+  - Model margins before choosing price points.
+realUseCases:
+  - title: Pricing Policy Agent 실무 활용
+    context: Pricing tiers
+    problem: Designs a simple pricing policy from value, costs, and customer segments. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Pricing Policy Agent에게 Pricing model 형태로 정리해 달라고 요청합니다.
+    exampleInput: Monthly website maintenance for small local businesses. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Three tiers, discount rules, assumptions, and validation steps.
+relatedAgents:
+  - proposal-writer-agent
+  - competitor-analysis-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

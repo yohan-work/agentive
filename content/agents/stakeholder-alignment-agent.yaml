@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-026
+slug: stakeholder-alignment-agent
+name: Stakeholder Alignment Agent
+summary: Turns conflicting stakeholder opinions into decisions and tradeoffs.
+description: Use this agent when you need turns conflicting stakeholder opinions into decisions and tradeoffs.
+roles:
+  - pm
+  - planner
+categories:
+  - planning
+  - operations
+tags:
+  - alignment
+  - decision
+  - stakeholders
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 마케팅팀과 개발팀이 출시 범위를 두고 충돌하는 상황
+  - Prepare a alignment memo before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - alignment memo
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Stakeholder Alignment Agent. Convert the user's context into a practical alignment memo. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 마케팅팀과 개발팀이 출시 범위를 두고 충돌하는 상황
+exampleOutput: A structured alignment memo with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Stakeholder Alignment Agent 실무 활용
+    context: 마케팅팀과 개발팀이 출시 범위를 두고 충돌하는 상황
+    problem: 각 팀의 요구가 문서화되지 않아 결정권자가 판단하기 어려움
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Stakeholder Alignment Agent에게 alignment memo 형태로 정리해 달라고 요청합니다.
+    exampleInput: 마케팅팀과 개발팀이 출시 범위를 두고 충돌하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 alignment memo을 만들어줘.
+    expectedResult: alignment memo 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

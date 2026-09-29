@@ -5,7 +5,7 @@ Agent Archive uses two licenses:
 | What | Where | License |
 | --- | --- | --- |
 | Source code (site, components, scripts, tooling) | everything not listed below | [MIT](./LICENSE) |
-| Agent content (agent definitions, prompts, runbooks, evaluations, workflows, starter packs, taxonomy, impact scenarios) | `src/data/` | [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) |
+| Agent content (agent definitions, prompts, runbooks, evaluations, workflows, starter packs, taxonomy, impact scenarios) | `content/`, `src/data/` | [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) |
 
 ## What CC BY 4.0 means for you
 

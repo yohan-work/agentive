@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-071
+slug: proposal-follow-up-agent
+name: Proposal Follow-up Agent
+summary: Writes follow-up messages after sending proposals.
+description: Use this agent when you need writes follow-up messages after sending proposals.
+roles:
+  - sales
+  - founder
+categories:
+  - business
+  - operations
+tags:
+  - follow-up
+  - proposal
+  - sales
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Email
+  - CRM
+useCases:
+  - 견적서 발송 후 5일째 답변이 없는 고객에게 연락하는 상황
+  - Prepare a follow-up sequence before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - follow-up sequence
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Proposal Follow-up Agent. Convert the user's context into a practical follow-up sequence. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 견적서 발송 후 5일째 답변이 없는 고객에게 연락하는 상황
+exampleOutput: A structured follow-up sequence with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Proposal Follow-up Agent 실무 활용
+    context: 견적서 발송 후 5일째 답변이 없는 고객에게 연락하는 상황
+    problem: 재촉처럼 보이지 않으면서 다음 행동을 유도해야 함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Proposal Follow-up Agent에게 follow-up sequence 형태로 정리해 달라고 요청합니다.
+    exampleInput: 견적서 발송 후 5일째 답변이 없는 고객에게 연락하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 follow-up sequence을 만들어줘.
+    expectedResult: follow-up sequence 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

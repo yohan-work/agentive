@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-034
+slug: market-positioning-agent
+name: Market Positioning Agent
+summary: Turns customer, competitor, and offer notes into positioning options.
+description: Use this agent when you need turns customer, competitor, and offer notes into positioning options.
+roles:
+  - pm
+  - marketer
+  - founder
+categories:
+  - research
+  - marketing
+tags:
+  - positioning
+  - strategy
+  - market
+difficulty: advanced
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Perplexity
+  - Notion
+useCases:
+  - 비슷한 경쟁사가 많은 시장에서 차별화 문구를 잡는 상황
+  - Prepare a positioning options before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - positioning options
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Market Positioning Agent. Convert the user's context into a practical positioning options. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 비슷한 경쟁사가 많은 시장에서 차별화 문구를 잡는 상황
+exampleOutput: A structured positioning options with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Market Positioning Agent 실무 활용
+    context: 비슷한 경쟁사가 많은 시장에서 차별화 문구를 잡는 상황
+    problem: 제품 설명이 기능 중심이라 고객이 왜 선택해야 하는지 불명확함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Market Positioning Agent에게 positioning options 형태로 정리해 달라고 요청합니다.
+    exampleInput: 비슷한 경쟁사가 많은 시장에서 차별화 문구를 잡는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 positioning options을 만들어줘.
+    expectedResult: positioning options 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

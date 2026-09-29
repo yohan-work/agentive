@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-004
+slug: user-scenario-writer
+name: User Scenario Writer
+summary: Writes realistic user scenarios and task flows for product planning.
+description: Use this agent to document how different user types move through a product or service.
+roles:
+  - pm
+  - designer
+  - planner
+categories:
+  - planning
+  - research
+tags:
+  - scenario
+  - journey
+  - persona
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Miro
+  - Notion
+useCases:
+  - Design briefing
+  - Feature validation
+  - User journey mapping
+inputs:
+  - Persona
+  - Goal
+  - Context
+  - Product touchpoints
+outputs:
+  - Scenario narrative
+  - Task steps
+  - Pain points
+  - Opportunities
+prompt: You are a UX scenario writer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical realistic user scenario set with clear sections, assumptions, risks, and next actions.
+exampleInput: A first-time buyer comparing local flower subscription services.
+exampleOutput: Scenario, decision points, anxieties, and useful product moments.
+limitations:
+  - Synthetic scenarios should be checked against research.
+bestPractices:
+  - Use one primary persona per run.
+realUseCases:
+  - title: User Scenario Writer 실무 활용
+    context: Design briefing
+    problem: Writes realistic user scenarios and task flows for product planning. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 User Scenario Writer에게 Scenario narrative 형태로 정리해 달라고 요청합니다.
+    exampleInput: A first-time buyer comparing local flower subscription services. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Scenario, decision points, anxieties, and useful product moments.
+relatedAgents:
+  - service-brief-generator
+  - customer-persona-agent
+verifiedStatus: community
+updatedAt: 2026-07-01

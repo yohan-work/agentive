@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-059
+slug: email-sequence-agent
+name: Email Sequence Agent
+summary: Writes lifecycle email sequences for onboarding and conversion.
+description: Use this agent when you need writes lifecycle email sequences for onboarding and conversion.
+roles:
+  - marketer
+  - sales
+categories:
+  - marketing
+  - operations
+tags:
+  - email
+  - lifecycle
+  - sequence
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - HubSpot
+  - Mailchimp
+useCases:
+  - 무료 체험 가입자를 유료 전환으로 유도하는 이메일을 만드는 상황
+  - Prepare a email sequence before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - email sequence
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Email Sequence Agent. Convert the user's context into a practical email sequence. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 무료 체험 가입자를 유료 전환으로 유도하는 이메일을 만드는 상황
+exampleOutput: A structured email sequence with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Email Sequence Agent 실무 활용
+    context: 무료 체험 가입자를 유료 전환으로 유도하는 이메일을 만드는 상황
+    problem: 첫 메일 이후 어떤 순서로 가치를 전달해야 할지 모호함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Email Sequence Agent에게 email sequence 형태로 정리해 달라고 요청합니다.
+    exampleInput: 무료 체험 가입자를 유료 전환으로 유도하는 이메일을 만드는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 email sequence을 만들어줘.
+    expectedResult: email sequence 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

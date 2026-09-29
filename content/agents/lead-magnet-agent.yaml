@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-066
+slug: lead-magnet-agent
+name: Lead Magnet Agent
+summary: Designs lead magnets with target audience and conversion path.
+description: Use this agent when you need designs lead magnets with target audience and conversion path.
+roles:
+  - marketer
+  - founder
+categories:
+  - marketing
+  - business
+tags:
+  - lead magnet
+  - conversion
+  - offer
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+  - Canva
+useCases:
+  - 뉴스레터 구독자를 늘리기 위한 무료 자료를 만드는 상황
+  - Prepare a lead magnet concept before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - lead magnet concept
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Lead Magnet Agent. Convert the user's context into a practical lead magnet concept. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 뉴스레터 구독자를 늘리기 위한 무료 자료를 만드는 상황
+exampleOutput: A structured lead magnet concept with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Lead Magnet Agent 실무 활용
+    context: 뉴스레터 구독자를 늘리기 위한 무료 자료를 만드는 상황
+    problem: 자료 아이디어는 많지만 실제 전환될 만큼 구체적이지 않음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Lead Magnet Agent에게 lead magnet concept 형태로 정리해 달라고 요청합니다.
+    exampleInput: 뉴스레터 구독자를 늘리기 위한 무료 자료를 만드는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 lead magnet concept을 만들어줘.
+    expectedResult: lead magnet concept 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

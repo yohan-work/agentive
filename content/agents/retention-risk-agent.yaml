@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-077
+slug: retention-risk-agent
+name: Retention Risk Agent
+summary: Identifies churn risks and suggests retention actions.
+description: Use this agent when you need identifies churn risks and suggests retention actions.
+roles:
+  - cs
+  - founder
+  - pm
+categories:
+  - business
+  - operations
+tags:
+  - retention
+  - churn
+  - customer success
+difficulty: advanced
+automationLevel: 3
+tools:
+  - ChatGPT
+  - CRM
+  - Sheets
+useCases:
+  - 사용량이 줄어든 고객 계정을 점검하는 상황
+  - Prepare a retention risk analysis before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - retention risk analysis
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Retention Risk Agent. Convert the user's context into a practical retention risk analysis. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 사용량이 줄어든 고객 계정을 점검하는 상황
+exampleOutput: A structured retention risk analysis with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Retention Risk Agent 실무 활용
+    context: 사용량이 줄어든 고객 계정을 점검하는 상황
+    problem: 이탈 신호는 보이지만 어떤 조치를 먼저 해야 할지 모름
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Retention Risk Agent에게 retention risk analysis 형태로 정리해 달라고 요청합니다.
+    exampleInput: 사용량이 줄어든 고객 계정을 점검하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 retention risk analysis을 만들어줘.
+    expectedResult: retention risk analysis 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-093
+slug: zapier-workflow-agent
+name: Zapier Workflow Agent
+summary: Designs no-code automation flows with triggers, actions, and failure handling.
+description: Use this agent when you need designs no-code automation flows with triggers, actions, and failure handling.
+roles:
+  - founder
+  - marketer
+  - sales
+categories:
+  - automation
+  - operations
+tags:
+  - zapier
+  - automation
+  - workflow
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - Zapier
+  - Make
+  - ChatGPT
+useCases:
+  - 폼 제출 시 CRM 등록과 Slack 알림을 자동화하는 상황
+  - Prepare a automation workflow before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - automation workflow
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Zapier Workflow Agent. Convert the user's context into a practical automation workflow. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 폼 제출 시 CRM 등록과 Slack 알림을 자동화하는 상황
+exampleOutput: A structured automation workflow with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Zapier Workflow Agent 실무 활용
+    context: 폼 제출 시 CRM 등록과 Slack 알림을 자동화하는 상황
+    problem: 자동화는 만들었지만 실패했을 때 확인할 방법이 없음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Zapier Workflow Agent에게 automation workflow 형태로 정리해 달라고 요청합니다.
+    exampleInput: 폼 제출 시 CRM 등록과 Slack 알림을 자동화하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 automation workflow을 만들어줘.
+    expectedResult: automation workflow 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

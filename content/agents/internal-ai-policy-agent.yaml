@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-100
+slug: internal-ai-policy-agent
+name: Internal AI Policy Agent
+summary: Creates practical internal rules for using AI tools safely.
+description: Use this agent when you need creates practical internal rules for using AI tools safely.
+roles:
+  - founder
+  - pm
+  - developer
+categories:
+  - operations
+  - documentation
+tags:
+  - ai policy
+  - governance
+  - security
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 팀에서 AI 도구 사용 기준을 정하려는 상황
+  - Prepare a internal AI policy before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - internal AI policy
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Internal AI Policy Agent. Convert the user's context into a practical internal AI policy. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 팀에서 AI 도구 사용 기준을 정하려는 상황
+exampleOutput: A structured internal AI policy with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Internal AI Policy Agent 실무 활용
+    context: 팀에서 AI 도구 사용 기준을 정하려는 상황
+    problem: 고객 데이터, 코드, 문서 업로드 기준이 없어 보안 리스크가 생김
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Internal AI Policy Agent에게 internal AI policy 형태로 정리해 달라고 요청합니다.
+    exampleInput: 팀에서 AI 도구 사용 기준을 정하려는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 internal AI policy을 만들어줘.
+    expectedResult: internal AI policy 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thanks for suggesting an agent! Good submissions describe a **real, repeatable piece of work**, not just a clever prompt.
-        Check [existing agents](https://github.com/yohan-work/agentive/tree/main/src/data) first to avoid duplicates.
+        Check [existing agents](https://github.com/yohan-work/agentive/tree/main/content/agents) first to avoid duplicates.
   - type: input
     id: name
     attributes:

@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-022
+slug: local-market-analysis-agent
+name: Local Market Analysis Agent
+summary: Analyzes a local business area using customer, competitor, and channel context.
+description: Use this agent to plan local business positioning and acquisition experiments.
+roles:
+  - founder
+  - marketer
+  - sales
+categories:
+  - business
+  - research
+tags:
+  - local business
+  - market
+  - validation
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Maps
+  - Sheets
+useCases:
+  - Local launch research
+  - Service validation
+  - Neighborhood marketing
+inputs:
+  - Location
+  - Business type
+  - Target customer
+  - Competitors
+outputs:
+  - Market notes
+  - Customer hypotheses
+  - Channels
+  - Validation ideas
+prompt: You are a local market research analyst. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical local business validation plan with clear sections, assumptions, risks, and next actions.
+exampleInput: Validate a premium laundry pickup service in Gangnam.
+exampleOutput: Customer segments, competitor patterns, channel ideas, assumptions.
+limitations:
+  - Needs current location data for accuracy.
+bestPractices:
+  - Pair analysis with direct customer conversations.
+realUseCases:
+  - title: Local Market Analysis Agent 실무 활용
+    context: Local launch research
+    problem: Analyzes a local business area using customer, competitor, and channel context. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Local Market Analysis Agent에게 Market notes 형태로 정리해 달라고 요청합니다.
+    exampleInput: Validate a premium laundry pickup service in Gangnam. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Customer segments, competitor patterns, channel ideas, assumptions.
+relatedAgents:
+  - customer-persona-agent
+  - customer-dm-writer
+verifiedStatus: community
+updatedAt: 2026-07-01

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-065
+slug: community-post-agent
+name: Community Post Agent
+summary: Writes helpful community posts without sounding promotional.
+description: Use this agent when you need writes helpful community posts without sounding promotional.
+roles:
+  - marketer
+  - creator
+  - founder
+categories:
+  - marketing
+  - content
+tags:
+  - community
+  - post
+  - organic
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Reddit
+  - LinkedIn
+useCases:
+  - 커뮤니티에 제품 학습 내용을 공유하고 싶지만 홍보처럼 보이면 안 되는 상황
+  - Prepare a community post variants before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - community post variants
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Community Post Agent. Convert the user's context into a practical community post variants. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 커뮤니티에 제품 학습 내용을 공유하고 싶지만 홍보처럼 보이면 안 되는 상황
+exampleOutput: A structured community post variants with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Community Post Agent 실무 활용
+    context: 커뮤니티에 제품 학습 내용을 공유하고 싶지만 홍보처럼 보이면 안 되는 상황
+    problem: 가치 제공과 CTA 사이의 균형을 잡기 어려움
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Community Post Agent에게 community post variants 형태로 정리해 달라고 요청합니다.
+    exampleInput: 커뮤니티에 제품 학습 내용을 공유하고 싶지만 홍보처럼 보이면 안 되는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 community post variants을 만들어줘.
+    expectedResult: community post variants 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

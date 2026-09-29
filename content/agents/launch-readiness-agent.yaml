@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-033
+slug: launch-readiness-agent
+name: Launch Readiness Agent
+summary: Checks whether a product or campaign is ready to launch.
+description: Use this agent when you need checks whether a product or campaign is ready to launch.
+roles:
+  - pm
+  - marketer
+  - developer
+categories:
+  - planning
+  - operations
+tags:
+  - launch
+  - checklist
+  - readiness
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 신규 기능 출시 전 마케팅/CS/개발 체크리스트를 통합하는 상황
+  - Prepare a launch readiness review before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - launch readiness review
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Launch Readiness Agent. Convert the user's context into a practical launch readiness review. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신규 기능 출시 전 마케팅/CS/개발 체크리스트를 통합하는 상황
+exampleOutput: A structured launch readiness review with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Launch Readiness Agent 실무 활용
+    context: 신규 기능 출시 전 마케팅/CS/개발 체크리스트를 통합하는 상황
+    problem: 부서별 준비 상태가 흩어져 있어 출시 리스크를 놓칠 수 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Launch Readiness Agent에게 launch readiness review 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신규 기능 출시 전 마케팅/CS/개발 체크리스트를 통합하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 launch readiness review을 만들어줘.
+    expectedResult: launch readiness review 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

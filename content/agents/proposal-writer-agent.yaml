@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-021
+slug: proposal-writer-agent
+name: Proposal Writer Agent
+summary: Drafts client-ready proposals and estimates from scope notes.
+description: Use this agent to turn discovery notes into a proposal with scope, pricing, timeline, and assumptions.
+roles:
+  - sales
+  - founder
+  - designer
+  - developer
+categories:
+  - business
+  - documentation
+tags:
+  - proposal
+  - estimate
+  - scope
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Google Docs
+  - Notion
+useCases:
+  - Client proposal
+  - Estimate writing
+  - Scope alignment
+inputs:
+  - Client goal
+  - Scope
+  - Deliverables
+  - Timeline
+  - Pricing
+outputs:
+  - Proposal draft
+  - Scope table
+  - Assumptions
+  - Next steps
+prompt: You are a client proposal writer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical proposal and estimate with clear sections, assumptions, risks, and next actions.
+exampleInput: Website redesign for a dental clinic with booking integration.
+exampleOutput: Proposal summary, deliverables, timeline, price options, assumptions.
+limitations:
+  - Requires human review before sending to clients.
+bestPractices:
+  - Separate included and excluded work clearly.
+realUseCases:
+  - title: Proposal Writer Agent 실무 활용
+    context: Client proposal
+    problem: Drafts client-ready proposals and estimates from scope notes. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Proposal Writer Agent에게 Proposal draft 형태로 정리해 달라고 요청합니다.
+    exampleInput: Website redesign for a dental clinic with booking integration. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Proposal summary, deliverables, timeline, price options, assumptions.
+relatedAgents:
+  - pricing-policy-agent
+  - codex-task-brief
+verifiedStatus: tested
+updatedAt: 2026-07-01

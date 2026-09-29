@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-012
+slug: landing-section-planner
+name: Landing Section Planner
+summary: Plans conversion-focused landing page sections.
+description: Use this agent to structure a landing page before copywriting or design.
+roles:
+  - designer
+  - marketer
+  - founder
+categories:
+  - web
+  - marketing
+tags:
+  - landing page
+  - sections
+  - conversion
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Figma
+  - Webflow
+useCases:
+  - Landing page planning
+  - Website proposal
+  - Section outline
+inputs:
+  - Offer
+  - Audience
+  - Proof points
+  - CTA
+outputs:
+  - Section map
+  - Messaging goal
+  - Content requirements
+prompt: You are a landing page strategist. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical landing section plan with clear sections, assumptions, risks, and next actions.
+exampleInput: A subscription meal prep service for solo professionals.
+exampleOutput: Hero, problem, offer, proof, pricing, FAQ, CTA section plan.
+limitations:
+  - Does not generate final visual design.
+bestPractices:
+  - Provide one primary conversion goal.
+realUseCases:
+  - title: Landing Section Planner 실무 활용
+    context: Landing page planning
+    problem: Plans conversion-focused landing page sections. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Landing Section Planner에게 Section map 형태로 정리해 달라고 요청합니다.
+    exampleInput: A subscription meal prep service for solo professionals. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Hero, problem, offer, proof, pricing, FAQ, CTA section plan.
+relatedAgents:
+  - copywriting-agent
+  - website-research-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-058
+slug: newsletter-planner-agent
+name: Newsletter Planner Agent
+summary: Plans newsletter issues with angle, structure, and CTA.
+description: Use this agent when you need plans newsletter issues with angle, structure, and CTA.
+roles:
+  - marketer
+  - creator
+  - founder
+categories:
+  - marketing
+  - content
+tags:
+  - newsletter
+  - email
+  - content
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Mailchimp
+  - Notion
+useCases:
+  - 매주 발송하는 뉴스레터 주제를 정해야 하는 상황
+  - Prepare a newsletter plan before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - newsletter plan
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Newsletter Planner Agent. Convert the user's context into a practical newsletter plan. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 매주 발송하는 뉴스레터 주제를 정해야 하는 상황
+exampleOutput: A structured newsletter plan with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Newsletter Planner Agent 실무 활용
+    context: 매주 발송하는 뉴스레터 주제를 정해야 하는 상황
+    problem: 매번 소재를 즉흥적으로 고르다 보니 일관성과 전환 목표가 약함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Newsletter Planner Agent에게 newsletter plan 형태로 정리해 달라고 요청합니다.
+    exampleInput: 매주 발송하는 뉴스레터 주제를 정해야 하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 newsletter plan을 만들어줘.
+    expectedResult: newsletter plan 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-018
+slug: customer-dm-writer
+name: Customer DM Writer
+summary: Writes concise outreach and follow-up messages for prospects or customers.
+description: Use this agent to draft respectful DMs for sales, support, and local business outreach.
+roles:
+  - sales
+  - cs
+  - founder
+  - marketer
+categories:
+  - marketing
+  - operations
+tags:
+  - dm
+  - sales
+  - outreach
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Instagram
+  - CRM
+useCases:
+  - Cold outreach
+  - Follow-up
+  - Customer support reply
+inputs:
+  - Recipient context
+  - Goal
+  - Offer
+  - Tone
+  - Constraints
+outputs:
+  - DM variants
+  - Follow-up sequence
+  - Personalization notes
+prompt: You are a concise customer outreach writer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical DM sequence with clear sections, assumptions, risks, and next actions.
+exampleInput: Invite local cafe owners to try a reservation landing page audit.
+exampleOutput: Warm intro DM, follow-up, and objection-aware reply variants.
+limitations:
+  - Cannot guarantee deliverability or response.
+bestPractices:
+  - Avoid fake familiarity and unsupported claims.
+realUseCases:
+  - title: Customer DM Writer 실무 활용
+    context: Cold outreach
+    problem: Writes concise outreach and follow-up messages for prospects or customers. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Customer DM Writer에게 DM variants 형태로 정리해 달라고 요청합니다.
+    exampleInput: Invite local cafe owners to try a reservation landing page audit. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Warm intro DM, follow-up, and objection-aware reply variants.
+relatedAgents:
+  - local-market-analysis-agent
+  - copywriting-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

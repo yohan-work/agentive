@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-064
+slug: webinar-outline-agent
+name: Webinar Outline Agent
+summary: Plans webinars with audience promise, agenda, and CTA.
+description: Use this agent when you need plans webinars with audience promise, agenda, and CTA.
+roles:
+  - marketer
+  - sales
+categories:
+  - marketing
+  - content
+tags:
+  - webinar
+  - outline
+  - lead generation
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Zoom
+  - Notion
+useCases:
+  - B2B 리드를 모으기 위한 40분 웨비나를 기획하는 상황
+  - Prepare a webinar outline before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - webinar outline
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Webinar Outline Agent. Convert the user's context into a practical webinar outline. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: B2B 리드를 모으기 위한 40분 웨비나를 기획하는 상황
+exampleOutput: A structured webinar outline with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Webinar Outline Agent 실무 활용
+    context: B2B 리드를 모으기 위한 40분 웨비나를 기획하는 상황
+    problem: 홍보성 내용이 많아 참석자가 얻는 가치가 불명확함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Webinar Outline Agent에게 webinar outline 형태로 정리해 달라고 요청합니다.
+    exampleInput: B2B 리드를 모으기 위한 40분 웨비나를 기획하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 webinar outline을 만들어줘.
+    expectedResult: webinar outline 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-030
+slug: user-interview-script-agent
+name: User Interview Script Agent
+summary: Creates user interview scripts that avoid leading questions.
+description: Use this agent when you need creates user interview scripts that avoid leading questions.
+roles:
+  - pm
+  - designer
+  - founder
+categories:
+  - research
+  - planning
+tags:
+  - interview
+  - research
+  - script
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Google Docs
+useCases:
+  - 신규 서비스 아이디어 검증을 위해 잠재고객 5명을 인터뷰하는 상황
+  - Prepare a interview script before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - interview script
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are User Interview Script Agent. Convert the user's context into a practical interview script. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신규 서비스 아이디어 검증을 위해 잠재고객 5명을 인터뷰하는 상황
+exampleOutput: A structured interview script with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: User Interview Script Agent 실무 활용
+    context: 신규 서비스 아이디어 검증을 위해 잠재고객 5명을 인터뷰하는 상황
+    problem: 질문이 유도형이어서 진짜 문제를 확인하기 어려움
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 User Interview Script Agent에게 interview script 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신규 서비스 아이디어 검증을 위해 잠재고객 5명을 인터뷰하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 interview script을 만들어줘.
+    expectedResult: interview script 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

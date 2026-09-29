@@ -1,0 +1,429 @@
+{
+  "$id": "https://github.com/yohan-work/agentive/blob/main/schema/agent.schema.json",
+  "title": "Agent Archive agent",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^agent-[0-9]{3,}$"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Kebab-case identifier. Must match the file name in content/agents.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "automationLevel": {
+      "type": "number",
+      "enum": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "useCases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 20
+    },
+    "exampleInput": {
+      "type": "string"
+    },
+    "exampleOutput": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "bestPractices": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "realUseCases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "context": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          },
+          "howToUse": {
+            "type": "string"
+          },
+          "exampleInput": {
+            "type": "string"
+          },
+          "expectedResult": {
+            "type": "string"
+          },
+          "recommendedWorkflow": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "context",
+          "problem",
+          "howToUse",
+          "exampleInput",
+          "expectedResult"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sourceNotes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "installTargets": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "codex",
+          "claude",
+          "cursor"
+        ]
+      }
+    },
+    "runbook": {
+      "type": "object",
+      "properties": {
+        "projectContext": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inputTemplate": {
+          "type": "string"
+        },
+        "starterInputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label",
+              "description",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "goodInputExample": {
+          "type": "string"
+        },
+        "badInputExample": {
+          "type": "string"
+        },
+        "weakInputFixes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "weakInput": {
+                "type": "string"
+              },
+              "whyItFails": {
+                "type": "string"
+              },
+              "strongerInput": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "weakInput",
+              "whyItFails",
+              "strongerInput"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "expectedOutputShape": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "setupContextNotes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputChecklist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failureModes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "handoffTips": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "projectContext",
+        "inputTemplate",
+        "goodInputExample",
+        "badInputExample",
+        "outputChecklist",
+        "failureModes",
+        "handoffTips"
+      ],
+      "additionalProperties": false
+    },
+    "evaluation": {
+      "type": "object",
+      "properties": {
+        "qualityScore": {
+          "type": "number",
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        "testedWith": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "codex",
+              "claude",
+              "cursor"
+            ]
+          }
+        },
+        "recommendedFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notRecommendedFor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "knownWeaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evaluationCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sampleRuns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "input": {
+                "type": "string"
+              },
+              "expectedOutputSummary": {
+                "type": "string"
+              },
+              "sampleOutput": {
+                "type": "string"
+              },
+              "reviewNotes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "title",
+              "input",
+              "expectedOutputSummary",
+              "sampleOutput",
+              "reviewNotes"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "qualityScore",
+        "testedWith",
+        "recommendedFor",
+        "notRecommendedFor",
+        "knownWeaknesses",
+        "evaluationCriteria",
+        "sampleRuns"
+      ],
+      "additionalProperties": false
+    },
+    "decisionGuide": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "guidance": {
+            "type": "string"
+          },
+          "alternativeAgentSlug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "guidance"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "relatedAgents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verifiedStatus": {
+      "type": "string",
+      "enum": [
+        "unverified",
+        "tested",
+        "community",
+        "expert"
+      ]
+    },
+    "createdBy": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name",
+    "summary",
+    "description",
+    "roles",
+    "categories",
+    "tags",
+    "difficulty",
+    "automationLevel",
+    "tools",
+    "useCases",
+    "inputs",
+    "outputs",
+    "prompt",
+    "verifiedStatus",
+    "updatedAt"
+  ],
+  "additionalProperties": false,
+  "description": "Shape of an agent file in content/agents. `projectUse` is derived from `installTargets` at build time.",
+  "definitions": {}
+}

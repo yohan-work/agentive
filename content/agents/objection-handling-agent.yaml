@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-070
+slug: objection-handling-agent
+name: Objection Handling Agent
+summary: Prepares thoughtful responses to common sales objections.
+description: Use this agent when you need prepares thoughtful responses to common sales objections.
+roles:
+  - sales
+  - founder
+categories:
+  - business
+  - marketing
+tags:
+  - sales
+  - objection
+  - reply
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - CRM
+useCases:
+  - 가격이 비싸다는 반응에 설득력 있게 답해야 하는 상황
+  - Prepare a objection responses before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - objection responses
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Objection Handling Agent. Convert the user's context into a practical objection responses. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 가격이 비싸다는 반응에 설득력 있게 답해야 하는 상황
+exampleOutput: A structured objection responses with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Objection Handling Agent 실무 활용
+    context: 가격이 비싸다는 반응에 설득력 있게 답해야 하는 상황
+    problem: 할인으로만 대응해 가치와 조건 설명이 약해짐
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Objection Handling Agent에게 objection responses 형태로 정리해 달라고 요청합니다.
+    exampleInput: 가격이 비싸다는 반응에 설득력 있게 답해야 하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 objection responses을 만들어줘.
+    expectedResult: objection responses 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

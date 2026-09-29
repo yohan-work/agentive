@@ -61,7 +61,12 @@ export type AgentDecisionGuide = {
 };
 
 export type Agent = {
+  /** @pattern ^agent-[0-9]{3,}$ */
   id: string;
+  /**
+   * Kebab-case identifier. Must match the file name in content/agents.
+   * @pattern ^[a-z0-9]+(-[a-z0-9]+)*$
+   */
   slug: string;
   name: string;
   summary: string;
@@ -75,6 +80,7 @@ export type Agent = {
   useCases: string[];
   inputs: string[];
   outputs: string[];
+  /** @minLength 20 */
   prompt: string;
   exampleInput?: string;
   exampleOutput?: string;
@@ -94,5 +100,9 @@ export type Agent = {
   relatedAgents?: string[];
   verifiedStatus: VerifiedStatus;
   createdBy?: string;
+  /** @pattern ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ */
   updatedAt: string;
 };
+
+/** Shape of an agent file in content/agents. `projectUse` is derived from `installTargets` at build time. */
+export type AgentSource = Omit<Agent, "projectUse">;

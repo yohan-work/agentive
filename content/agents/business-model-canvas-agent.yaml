@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-079
+slug: business-model-canvas-agent
+name: Business Model Canvas Agent
+summary: Drafts a business model canvas from an idea and market context.
+description: Use this agent when you need drafts a business model canvas from an idea and market context.
+roles:
+  - founder
+  - pm
+categories:
+  - business
+  - planning
+tags:
+  - business model
+  - canvas
+  - startup
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 새 서비스 아이디어를 사업 모델 관점에서 정리하는 상황
+  - Prepare a business model canvas before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - business model canvas
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Business Model Canvas Agent. Convert the user's context into a practical business model canvas. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 새 서비스 아이디어를 사업 모델 관점에서 정리하는 상황
+exampleOutput: A structured business model canvas with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Business Model Canvas Agent 실무 활용
+    context: 새 서비스 아이디어를 사업 모델 관점에서 정리하는 상황
+    problem: 고객, 채널, 수익, 비용 구조가 따로 흩어져 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Business Model Canvas Agent에게 business model canvas 형태로 정리해 달라고 요청합니다.
+    exampleInput: 새 서비스 아이디어를 사업 모델 관점에서 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 business model canvas을 만들어줘.
+    expectedResult: business model canvas 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

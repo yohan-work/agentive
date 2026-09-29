@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-050
+slug: onboarding-flow-agent
+name: Onboarding Flow Agent
+summary: Designs product onboarding steps and activation moments.
+description: Use this agent when you need designs product onboarding steps and activation moments.
+roles:
+  - designer
+  - pm
+  - marketer
+categories:
+  - design
+  - web
+tags:
+  - onboarding
+  - activation
+  - ux
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Figma
+useCases:
+  - 신규 사용자가 에이전트 아카이브를 처음 사용할 때 흐름을 설계하는 상황
+  - Prepare a onboarding flow before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - onboarding flow
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Onboarding Flow Agent. Convert the user's context into a practical onboarding flow. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신규 사용자가 에이전트 아카이브를 처음 사용할 때 흐름을 설계하는 상황
+exampleOutput: A structured onboarding flow with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Onboarding Flow Agent 실무 활용
+    context: 신규 사용자가 에이전트 아카이브를 처음 사용할 때 흐름을 설계하는 상황
+    problem: 첫 방문자가 무엇을 검색하고 어떻게 복사해 쓰는지 이해하지 못함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Onboarding Flow Agent에게 onboarding flow 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신규 사용자가 에이전트 아카이브를 처음 사용할 때 흐름을 설계하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 onboarding flow을 만들어줘.
+    expectedResult: onboarding flow 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

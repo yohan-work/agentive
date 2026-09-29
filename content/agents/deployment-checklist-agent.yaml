@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-011
+slug: deployment-checklist-agent
+name: Deployment Checklist Agent
+summary: Prepares a release checklist for web app deployment.
+description: Use this agent before deploying a new app or feature to production.
+roles:
+  - developer
+  - pm
+categories:
+  - development
+  - operations
+tags:
+  - deployment
+  - release
+  - ops
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - Vercel
+  - GitHub
+  - Sentry
+useCases:
+  - Production launch
+  - Feature rollout
+  - Rollback planning
+inputs:
+  - Deployment target
+  - Release contents
+  - Environment variables
+  - Rollback needs
+outputs:
+  - Preflight checklist
+  - Launch steps
+  - Rollback checklist
+prompt: You are a web deployment lead. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical deployment readiness checklist with clear sections, assumptions, risks, and next actions.
+exampleInput: Deploy a Next.js MVP to Vercel with no database.
+exampleOutput: Build checks, env checks, smoke tests, monitoring, rollback notes.
+limitations:
+  - Cannot validate environment access.
+bestPractices:
+  - Include owner and timing for each launch step.
+realUseCases:
+  - title: Deployment Checklist Agent 실무 활용
+    context: Production launch
+    problem: Prepares a release checklist for web app deployment. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Deployment Checklist Agent에게 Preflight checklist 형태로 정리해 달라고 요청합니다.
+    exampleInput: Deploy a Next.js MVP to Vercel with no database. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Build checks, env checks, smoke tests, monitoring, rollback notes.
+relatedAgents:
+  - qa-checklist-agent
+  - bug-root-cause-analyst
+verifiedStatus: community
+updatedAt: 2026-07-01

@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-090
+slug: weekly-report-agent
+name: Weekly Report Agent
+summary: Creates weekly status reports from tasks, metrics, and blockers.
+description: Use this agent when you need creates weekly status reports from tasks, metrics, and blockers.
+roles:
+  - pm
+  - founder
+categories:
+  - operations
+  - documentation
+tags:
+  - weekly report
+  - status
+  - metrics
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Linear
+  - Sheets
+useCases:
+  - 팀 주간 업무와 지표를 대표에게 공유하는 상황
+  - Prepare a weekly report before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - weekly report
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Weekly Report Agent. Convert the user's context into a practical weekly report. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 팀 주간 업무와 지표를 대표에게 공유하는 상황
+exampleOutput: A structured weekly report with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Weekly Report Agent 실무 활용
+    context: 팀 주간 업무와 지표를 대표에게 공유하는 상황
+    problem: 할 일 목록만 나열되고 진척, 리스크, 요청사항이 보이지 않음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Weekly Report Agent에게 weekly report 형태로 정리해 달라고 요청합니다.
+    exampleInput: 팀 주간 업무와 지표를 대표에게 공유하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 weekly report을 만들어줘.
+    expectedResult: weekly report 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

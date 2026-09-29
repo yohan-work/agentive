@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-041
+slug: architecture-decision-record-agent
+name: Architecture Decision Record Agent
+summary: Writes ADRs with context, options, decision, and consequences.
+description: Use this agent when you need writes ADRs with context, options, decision, and consequences.
+roles:
+  - developer
+  - pm
+categories:
+  - development
+  - documentation
+tags:
+  - adr
+  - architecture
+  - decision
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - GitHub
+useCases:
+  - Supabase를 쓸지 정적 데이터로 갈지 기술 결정을 남기는 상황
+  - Prepare a ADR draft before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - ADR draft
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Architecture Decision Record Agent. Convert the user's context into a practical ADR draft. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: Supabase를 쓸지 정적 데이터로 갈지 기술 결정을 남기는 상황
+exampleOutput: A structured ADR draft with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Architecture Decision Record Agent 실무 활용
+    context: Supabase를 쓸지 정적 데이터로 갈지 기술 결정을 남기는 상황
+    problem: 결정 배경이 문서화되지 않아 나중에 같은 논쟁이 반복됨
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Architecture Decision Record Agent에게 ADR draft 형태로 정리해 달라고 요청합니다.
+    exampleInput: Supabase를 쓸지 정적 데이터로 갈지 기술 결정을 남기는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 ADR draft을 만들어줘.
+    expectedResult: ADR draft 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

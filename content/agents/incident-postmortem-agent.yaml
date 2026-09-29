@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-046
+slug: incident-postmortem-agent
+name: Incident Postmortem Agent
+summary: Structures incident timelines, causes, impact, and prevention actions.
+description: Use this agent when you need structures incident timelines, causes, impact, and prevention actions.
+roles:
+  - developer
+  - pm
+  - cs
+categories:
+  - development
+  - operations
+tags:
+  - incident
+  - postmortem
+  - ops
+difficulty: advanced
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Sentry
+  - Notion
+useCases:
+  - 결제 오류 장애 이후 재발 방지 문서를 작성하는 상황
+  - Prepare a postmortem report before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - postmortem report
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Incident Postmortem Agent. Convert the user's context into a practical postmortem report. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 결제 오류 장애 이후 재발 방지 문서를 작성하는 상황
+exampleOutput: A structured postmortem report with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Incident Postmortem Agent 실무 활용
+    context: 결제 오류 장애 이후 재발 방지 문서를 작성하는 상황
+    problem: 사실, 추정, 책임, 개선 액션이 섞여 문서 신뢰도가 낮아짐
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Incident Postmortem Agent에게 postmortem report 형태로 정리해 달라고 요청합니다.
+    exampleInput: 결제 오류 장애 이후 재발 방지 문서를 작성하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 postmortem report을 만들어줘.
+    expectedResult: postmortem report 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

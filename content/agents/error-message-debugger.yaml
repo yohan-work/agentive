@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-039
+slug: error-message-debugger
+name: Error Message Debugger
+summary: Explains stack traces and suggests focused debugging steps.
+description: Use this agent when you need explains stack traces and suggests focused debugging steps.
+roles:
+  - developer
+categories:
+  - development
+tags:
+  - error
+  - debug
+  - stack trace
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - Codex
+  - Sentry
+  - ChatGPT
+useCases:
+  - Next.js 빌드 에러가 갑자기 발생해 원인을 좁히는 상황
+  - Prepare a debugging plan before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - debugging plan
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Error Message Debugger. Convert the user's context into a practical debugging plan. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: Next.js 빌드 에러가 갑자기 발생해 원인을 좁히는 상황
+exampleOutput: A structured debugging plan with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Error Message Debugger 실무 활용
+    context: Next.js 빌드 에러가 갑자기 발생해 원인을 좁히는 상황
+    problem: 스택트레이스는 길지만 실제 수정해야 할 파일을 찾기 어려움
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Error Message Debugger에게 debugging plan 형태로 정리해 달라고 요청합니다.
+    exampleInput: Next.js 빌드 에러가 갑자기 발생해 원인을 좁히는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 debugging plan을 만들어줘.
+    expectedResult: debugging plan 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -90,18 +90,24 @@ pr-review-agent-EVALUATION.md     # 품질 점수, 알려진 약점, 샘플 실�
 
 ## 구조
 
-Agent Archive는 **정적 데이터를 기준으로 하는** Next.js 앱입니다. 데이터베이스나 백엔드 없이, 모든 에이전트와 워크플로우, 분류 정보를 `src/data`에 타입이 지정된 데이터로 두고 `npm run check:data`로 검증합니다.
+Agent Archive는 데이터베이스나 백엔드 없이 **정적 데이터를 기준으로 하는** Next.js 앱입니다. **에이전트 하나는 `content/agents/`의 YAML 파일 하나**이고 JSON Schema로 검증합니다. 워크플로우와 분류 정보는 `src/data`에 타입이 지정된 데이터로 둡니다.
 
 ```text
+content/
+└── agents/           # 에이전트 하나당 YAML 파일 하나 (원본 데이터), 새로 만들 땐 _template.yaml에서 시작
+schema/
+└── agent.schema.json # src/types/agent.ts에서 생성한 JSON Schema
 src/
 ├── app/              # Next.js App Router 페이지 (로케일 경로: /en, /ko)
 ├── components/       # UI: 에이전트, 워크플로우, 레이아웃, 공통 컴포넌트
-├── data/             # 원본 데이터: 에이전트, 워크플로우, 스타터 팩, 분류
+├── data/             # 워크플로우, 스타터 팩, 분류, 에이전트 로더
 ├── i18n/             # 로케일 설정과 UI 문구
 ├── lib/              # 검색, 내보내기, 설치 키트 생성
 └── types/            # 에이전트, 워크플로우, 분류 타입
 scripts/
-└── check-data.mjs    # 데이터 무결성 검사 (slug, 참조, 필수 메타데이터)
+├── build-content.mjs # content/agents를 앱용으로 묶음
+├── generate-schema.mjs
+└── check-data.mjs    # 스키마와 무결성 검사 (slug, 참조, 필수 메타데이터)
 ```
 
 | 명령 | 설명 |
@@ -110,14 +116,15 @@ scripts/
 | `npm run build` | 프로덕션 빌드 |
 | `npm run lint` | ESLint 실행 |
 | `npm run typecheck` | TypeScript 타입 검사 |
-| `npm run check:data` | 에이전트, 워크플로우, 분류 데이터 검증 |
+| `npm run check:data` | 에이전트 스키마 검증과 워크플로우·분류 참조 검사 |
+| `npm run schema` | `schema/agent.schema.json` 다시 생성 |
 
 ## 기여하기
 
 새 에이전트, 더 나은 프롬프트, 솔직한 평가 모두 환영합니다. 어떤 기여를 받는지와 에이전트 검증 단계는 **[기여 가이드](./CONTRIBUTING.md)**(영문)에 정리되어 있습니다.
 
 - **에이전트 제안**: [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) 이슈를 열거나 사이트의 Submit 페이지를 이용해 주세요.
-- **기존 에이전트 개선**: `src/data`에서 해당 항목을 고치고 검사를 실행한 뒤 PR을 보내주세요.
+- **에이전트 추가·개선**: `content/agents/_template.yaml`을 복사하거나 `content/agents/`의 기존 파일을 고친 뒤, `npm run check:data`를 실행하고 PR을 보내주세요.
 - **버그 신고**: [버그 리포트 열기](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml)
 - **보안 이슈**: 공개 이슈 대신 비공개로 신고해 주세요 ([SECURITY.md](./SECURITY.md) 참고).
 
@@ -125,7 +132,7 @@ scripts/
 
 ## 로드맵
 
-- [ ] 에이전트 하나당 파일 하나로 분리하고 스키마로 검증
+- [x] 에이전트 하나당 파일 하나로 분리하고 스키마로 검증
 - [ ] 공개 URL로 사이트 호스팅
 - [ ] 브라우저 없이 URL로 설치 키트 받기
 - [ ] 직접 검증한 에이전트와 샘플 실행 결과 확충
@@ -133,6 +140,6 @@ scripts/
 ## 라이선스
 
 - 코드: [MIT](./LICENSE)
-- `src/data`의 에이전트 콘텐츠(프롬프트, 런북, 평가, 워크플로우): [CC BY 4.0](./LICENSE-CONTENT.md)
+- `content/`와 `src/data`의 에이전트 콘텐츠(프롬프트, 런북, 평가, 워크플로우): [CC BY 4.0](./LICENSE-CONTENT.md)
 
 내보낸 프롬프트와 설치 키트는 상업 프로젝트를 포함해 자유롭게 쓸 수 있습니다. 출처를 밝혀주시면 감사하겠습니다.

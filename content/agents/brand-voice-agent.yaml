@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-062
+slug: brand-voice-agent
+name: Brand Voice Agent
+summary: Defines brand voice rules and rewrites copy consistently.
+description: Use this agent when you need defines brand voice rules and rewrites copy consistently.
+roles:
+  - marketer
+  - creator
+  - founder
+categories:
+  - marketing
+  - documentation
+tags:
+  - brand voice
+  - copy
+  - style
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 여러 사람이 같은 브랜드 계정의 글을 작성하는 상황
+  - Prepare a brand voice guide before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - brand voice guide
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Brand Voice Agent. Convert the user's context into a practical brand voice guide. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 여러 사람이 같은 브랜드 계정의 글을 작성하는 상황
+exampleOutput: A structured brand voice guide with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Brand Voice Agent 실무 활용
+    context: 여러 사람이 같은 브랜드 계정의 글을 작성하는 상황
+    problem: 문체와 표현 수준이 매번 달라 브랜드 인상이 흔들림
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Brand Voice Agent에게 brand voice guide 형태로 정리해 달라고 요청합니다.
+    exampleInput: 여러 사람이 같은 브랜드 계정의 글을 작성하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 brand voice guide을 만들어줘.
+    expectedResult: brand voice guide 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

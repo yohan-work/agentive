@@ -22,6 +22,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Check agent schema is up to date
+        run: npm run schema && git diff --exit-code schema/
       - name: Check data integrity
         run: npm run check:data
       - name: Lint

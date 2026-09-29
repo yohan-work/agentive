@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-067
+slug: content-repurposing-agent
+name: Content Repurposing Agent
+summary: Turns one long-form asset into posts, emails, and scripts.
+description: Use this agent when you need turns one long-form asset into posts, emails, and scripts.
+roles:
+  - marketer
+  - creator
+categories:
+  - marketing
+  - content
+tags:
+  - repurpose
+  - content
+  - social
+difficulty: beginner
+automationLevel: 5
+tools:
+  - ChatGPT
+  - Notion
+  - Canva
+useCases:
+  - 긴 블로그 글 하나를 SNS, 뉴스레터, 영상 스크립트로 재활용하는 상황
+  - Prepare a repurposed content set before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - repurposed content set
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Content Repurposing Agent. Convert the user's context into a practical repurposed content set. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 긴 블로그 글 하나를 SNS, 뉴스레터, 영상 스크립트로 재활용하는 상황
+exampleOutput: A structured repurposed content set with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Content Repurposing Agent 실무 활용
+    context: 긴 블로그 글 하나를 SNS, 뉴스레터, 영상 스크립트로 재활용하는 상황
+    problem: 매 채널에 새로 쓰느라 시간이 오래 걸리고 메시지가 흩어짐
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Content Repurposing Agent에게 repurposed content set 형태로 정리해 달라고 요청합니다.
+    exampleInput: 긴 블로그 글 하나를 SNS, 뉴스레터, 영상 스크립트로 재활용하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 repurposed content set을 만들어줘.
+    expectedResult: repurposed content set 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

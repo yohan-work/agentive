@@ -38,18 +38,36 @@ New submissions start as `unverified` or `community`. Maintainers promote them a
 
 ## Agent data
 
-All content lives in `src/data` and is validated by `npm run check:data`.
+**Every agent is one YAML file** in [`content/agents/`](./content/agents), named after its slug (e.g. `content/agents/pr-review-agent.yaml`).
+
+### Adding an agent
+
+1. Copy [`content/agents/_template.yaml`](./content/agents/_template.yaml) to `content/agents/<your-agent-slug>.yaml`.
+2. Fill it in. With the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml), VS Code autocompletes and validates fields from [`schema/agent.schema.json`](./schema/agent.schema.json).
+3. Run `npm run check:data`.
+
+That's it: no index file to edit. The site picks up every file in `content/agents` (files starting with `_` are skipped). While `npm run dev` is running, edits to agent files reload automatically.
+
+### Validation
+
+`npm run check:data` checks that:
+
+- every file uses the `.yaml` extension and matches the JSON Schema (field names, types, allowed values). `npm run build` runs the same schema check and TypeScript types the bundled data
+- the `slug` matches the file name, and slugs and ids are unique
+- `roles` and `categories` exist in `src/data/taxonomy.ts`
+- every `relatedAgents` / `decisionGuide` slug points to an existing agent
+- project-ready agents (with `installTargets`) have a complete `runbook`, an `evaluation` with at least two sample runs, and a `decisionGuide`
+
+### Other data
 
 | File | Contents |
 | --- | --- |
-| `src/data/agents.ts` | Core agent definitions |
-| `src/data/agent-expansion.ts` | Additional agents built from compact specs |
-| `src/data/installable-agents.ts` | Install metadata, runbooks, and evaluations for project-ready agents |
 | `src/data/workflows.ts` | Multi-agent workflow packs |
 | `src/data/starter-packs.ts` | Starter packs shown on the Install page |
+| `src/data/impact-scenarios.ts` | Before/after scenarios on the home and cases pages |
 | `src/data/taxonomy.ts` | Roles and categories |
 
-The `Agent` type in `src/types/agent.ts` documents every field. Slugs must be unique and kebab-case, and every `relatedAgents`, role, and category reference must exist. The data check enforces this.
+The schema is generated from the `AgentSource` type in `src/types/agent.ts`. If you change that type, run `npm run schema` and commit the updated `schema/agent.schema.json` (CI checks that it's current).
 
 ## Development setup
 
@@ -80,7 +98,7 @@ npm run build
 
 ## Licensing of contributions
 
-By contributing, you agree that code is licensed under [MIT](./LICENSE) and agent content (anything under `src/data`) under [CC BY 4.0](./LICENSE-CONTENT.md).
+By contributing, you agree that code is licensed under [MIT](./LICENSE) and agent content (anything under `content/` or `src/data`) under [CC BY 4.0](./LICENSE-CONTENT.md).
 
 ## Code of Conduct
 

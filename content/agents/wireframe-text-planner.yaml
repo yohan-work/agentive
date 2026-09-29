@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-015
+slug: wireframe-text-planner
+name: Wireframe Text Planner
+summary: Produces realistic UX copy for wireframes and low-fidelity screens.
+description: Use this agent to replace placeholder text with useful interface copy during design.
+roles:
+  - designer
+  - pm
+categories:
+  - design
+  - documentation
+tags:
+  - ux writing
+  - wireframe
+  - microcopy
+difficulty: beginner
+automationLevel: 3
+tools:
+  - Figma
+  - ChatGPT
+useCases:
+  - Wireframe copy
+  - Form labels
+  - Empty states
+inputs:
+  - Screen purpose
+  - User state
+  - Product tone
+  - Data available
+outputs:
+  - Screen copy
+  - Labels
+  - Empty states
+  - Error text
+prompt: You are a UX writer for product wireframes. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical screen-ready UX copy with clear sections, assumptions, risks, and next actions.
+exampleInput: A bookmarks empty state for an agent archive.
+exampleOutput: Heading, supporting copy, and CTA text for the empty state.
+limitations:
+  - Does not replace product naming decisions.
+bestPractices:
+  - Provide the user action expected on the screen.
+realUseCases:
+  - title: Wireframe Text Planner 실무 활용
+    context: Wireframe copy
+    problem: Produces realistic UX copy for wireframes and low-fidelity screens. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Wireframe Text Planner에게 Screen copy 형태로 정리해 달라고 요청합니다.
+    exampleInput: A bookmarks empty state for an agent archive. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Heading, supporting copy, and CTA text for the empty state.
+relatedAgents:
+  - design-qa-agent
+  - copywriting-agent
+verifiedStatus: community
+updatedAt: 2026-07-01

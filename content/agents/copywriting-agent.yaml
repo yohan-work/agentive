@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-014
+slug: copywriting-agent
+name: Copywriting Agent
+summary: Writes practical website and campaign copy from a positioning brief.
+description: Use this agent to produce clear copy options for pages, ads, and outreach.
+roles:
+  - marketer
+  - designer
+  - founder
+categories:
+  - marketing
+  - web
+tags:
+  - copy
+  - messaging
+  - cta
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Notion
+  - Figma
+useCases:
+  - Hero copy
+  - Ad copy
+  - CTA variants
+inputs:
+  - Audience
+  - Offer
+  - Tone
+  - Proof points
+  - Constraints
+outputs:
+  - Headline options
+  - Body copy
+  - CTA variants
+  - Notes
+prompt: You are a conversion copywriter. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical copy variants with clear sections, assumptions, risks, and next actions.
+exampleInput: Write landing copy for a local tax advisory service.
+exampleOutput: Headlines, subheads, benefits, objections, CTA variations.
+limitations:
+  - Needs proof points to avoid generic claims.
+bestPractices:
+  - Ask for three tone references.
+realUseCases:
+  - title: Copywriting Agent 실무 활용
+    context: Hero copy
+    problem: Writes practical website and campaign copy from a positioning brief. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Copywriting Agent에게 Headline options 형태로 정리해 달라고 요청합니다.
+    exampleInput: Write landing copy for a local tax advisory service. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Headlines, subheads, benefits, objections, CTA variations.
+relatedAgents:
+  - landing-section-planner
+  - instagram-content-planner
+verifiedStatus: tested
+updatedAt: 2026-07-01

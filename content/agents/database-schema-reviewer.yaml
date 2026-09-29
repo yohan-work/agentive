@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-038
+slug: database-schema-reviewer
+name: Database Schema Reviewer
+summary: Reviews schema design for constraints, indexing, and future changes.
+description: Use this agent when you need reviews schema design for constraints, indexing, and future changes.
+roles:
+  - developer
+categories:
+  - development
+tags:
+  - database
+  - schema
+  - review
+difficulty: advanced
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Postgres
+  - Supabase
+useCases:
+  - 새 예약 서비스 DB 설계를 배포 전에 검토하는 상황
+  - Prepare a schema review before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - schema review
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Database Schema Reviewer. Convert the user's context into a practical schema review. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 새 예약 서비스 DB 설계를 배포 전에 검토하는 상황
+exampleOutput: A structured schema review with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Database Schema Reviewer 실무 활용
+    context: 새 예약 서비스 DB 설계를 배포 전에 검토하는 상황
+    problem: 인덱스와 제약 조건이 부족해 운영 중 데이터 품질 문제가 생길 수 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Database Schema Reviewer에게 schema review 형태로 정리해 달라고 요청합니다.
+    exampleInput: 새 예약 서비스 DB 설계를 배포 전에 검토하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 schema review을 만들어줘.
+    expectedResult: schema review 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

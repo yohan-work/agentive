@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-027
+slug: okr-drafting-agent
+name: OKR Drafting Agent
+summary: Drafts measurable objectives and key results from team goals.
+description: Use this agent when you need drafts measurable objectives and key results from team goals.
+roles:
+  - pm
+  - founder
+categories:
+  - planning
+  - operations
+tags:
+  - okr
+  - goals
+  - metrics
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 작은 팀이 분기 목표를 처음으로 OKR 형태로 정리하는 상황
+  - Prepare a OKR draft before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - OKR draft
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are OKR Drafting Agent. Convert the user's context into a practical OKR draft. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 작은 팀이 분기 목표를 처음으로 OKR 형태로 정리하는 상황
+exampleOutput: A structured OKR draft with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: OKR Drafting Agent 실무 활용
+    context: 작은 팀이 분기 목표를 처음으로 OKR 형태로 정리하는 상황
+    problem: 목표는 많지만 측정 가능한 지표와 우선순위가 부족함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 OKR Drafting Agent에게 OKR draft 형태로 정리해 달라고 요청합니다.
+    exampleInput: 작은 팀이 분기 목표를 처음으로 OKR 형태로 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 OKR draft을 만들어줘.
+    expectedResult: OKR draft 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

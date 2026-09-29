@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-052
+slug: form-ux-agent
+name: Form UX Agent
+summary: Improves forms with better fields, labels, validation, and states.
+description: Use this agent when you need improves forms with better fields, labels, validation, and states.
+roles:
+  - designer
+  - developer
+categories:
+  - design
+  - web
+tags:
+  - form
+  - ux
+  - validation
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Figma
+useCases:
+  - 에이전트 제출 폼의 입력 항목을 다듬는 상황
+  - Prepare a form UX review before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - form UX review
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Form UX Agent. Convert the user's context into a practical form UX review. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 에이전트 제출 폼의 입력 항목을 다듬는 상황
+exampleOutput: A structured form UX review with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Form UX Agent 실무 활용
+    context: 에이전트 제출 폼의 입력 항목을 다듬는 상황
+    problem: 필드가 많아 사용자가 어떤 수준으로 작성해야 하는지 모름
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Form UX Agent에게 form UX review 형태로 정리해 달라고 요청합니다.
+    exampleInput: 에이전트 제출 폼의 입력 항목을 다듬는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 form UX review을 만들어줘.
+    expectedResult: form UX review 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01
