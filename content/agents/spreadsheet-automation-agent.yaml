@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-092
+slug: spreadsheet-automation-agent
+name: Spreadsheet Automation Agent
+summary: Plans formulas, tables, and lightweight automations for spreadsheets.
+description: Use this agent when you need plans formulas, tables, and lightweight automations for spreadsheets.
+roles:
+  - founder
+  - marketer
+  - sales
+categories:
+  - automation
+  - operations
+tags:
+  - spreadsheet
+  - automation
+  - formula
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - Sheets
+  - ChatGPT
+  - Zapier
+useCases:
+  - 리드 관리 시트에서 상태별 자동 집계를 만들고 싶은 상황
+  - Prepare a spreadsheet automation plan before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - spreadsheet automation plan
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Spreadsheet Automation Agent. Convert the user's context into a practical spreadsheet automation plan. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 리드 관리 시트에서 상태별 자동 집계를 만들고 싶은 상황
+exampleOutput: A structured spreadsheet automation plan with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Spreadsheet Automation Agent 실무 활용
+    context: 리드 관리 시트에서 상태별 자동 집계를 만들고 싶은 상황
+    problem: 수작업 집계가 많아 업데이트가 늦고 오류가 발생함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Spreadsheet Automation Agent에게 spreadsheet automation plan 형태로 정리해 달라고 요청합니다.
+    exampleInput: 리드 관리 시트에서 상태별 자동 집계를 만들고 싶은 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 spreadsheet automation plan을 만들어줘.
+    expectedResult: spreadsheet automation plan 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

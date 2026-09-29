@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-036
+slug: unit-test-writer
+name: Unit Test Writer
+summary: Drafts unit tests from code behavior and edge cases.
+description: Use this agent when you need drafts unit tests from code behavior and edge cases.
+roles:
+  - developer
+categories:
+  - development
+tags:
+  - unit test
+  - jest
+  - vitest
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - Codex
+  - Jest
+  - Vitest
+useCases:
+  - 유틸 함수 리팩터링 전 회귀 테스트를 추가하는 상황
+  - Prepare a unit test draft before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - unit test draft
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Unit Test Writer. Convert the user's context into a practical unit test draft. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 유틸 함수 리팩터링 전 회귀 테스트를 추가하는 상황
+exampleOutput: A structured unit test draft with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Unit Test Writer 실무 활용
+    context: 유틸 함수 리팩터링 전 회귀 테스트를 추가하는 상황
+    problem: 기존 동작을 문서화한 테스트가 없어 변경이 불안함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Unit Test Writer에게 unit test draft 형태로 정리해 달라고 요청합니다.
+    exampleInput: 유틸 함수 리팩터링 전 회귀 테스트를 추가하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 unit test draft을 만들어줘.
+    expectedResult: unit test draft 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

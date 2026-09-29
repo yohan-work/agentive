@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-080
+slug: lean-experiment-agent
+name: Lean Experiment Agent
+summary: Designs small validation experiments with success metrics.
+description: Use this agent when you need designs small validation experiments with success metrics.
+roles:
+  - founder
+  - pm
+  - marketer
+categories:
+  - business
+  - research
+tags:
+  - experiment
+  - validation
+  - lean
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Sheets
+useCases:
+  - 개발 전에 수요를 검증할 작은 실험을 설계하는 상황
+  - Prepare a validation experiment before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - validation experiment
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Lean Experiment Agent. Convert the user's context into a practical validation experiment. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 개발 전에 수요를 검증할 작은 실험을 설계하는 상황
+exampleOutput: A structured validation experiment with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Lean Experiment Agent 실무 활용
+    context: 개발 전에 수요를 검증할 작은 실험을 설계하는 상황
+    problem: 아이디어가 좋아 보이지만 고객이 실제로 반응할지 근거가 부족함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Lean Experiment Agent에게 validation experiment 형태로 정리해 달라고 요청합니다.
+    exampleInput: 개발 전에 수요를 검증할 작은 실험을 설계하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 validation experiment을 만들어줘.
+    expectedResult: validation experiment 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

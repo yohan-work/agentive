@@ -46,3 +46,6 @@ Thumbs.db
 
 # Private working notes (kept locally, not published)
 plan/
+
+# Generated from content/ by scripts/build-content.mjs
+src/data/generated/

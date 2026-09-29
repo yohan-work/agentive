@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-054
+slug: mobile-layout-qa-agent
+name: Mobile Layout QA Agent
+summary: Checks mobile layouts for overflow, hierarchy, and tap targets.
+description: Use this agent when you need checks mobile layouts for overflow, hierarchy, and tap targets.
+roles:
+  - designer
+  - developer
+categories:
+  - design
+  - development
+tags:
+  - mobile
+  - qa
+  - responsive
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - Playwright
+  - ChatGPT
+useCases:
+  - 데스크톱 기준으로 만든 문서형 UI를 모바일에서 확인하는 상황
+  - Prepare a mobile QA findings before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - mobile QA findings
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Mobile Layout QA Agent. Convert the user's context into a practical mobile QA findings. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 데스크톱 기준으로 만든 문서형 UI를 모바일에서 확인하는 상황
+exampleOutput: A structured mobile QA findings with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Mobile Layout QA Agent 실무 활용
+    context: 데스크톱 기준으로 만든 문서형 UI를 모바일에서 확인하는 상황
+    problem: 텍스트 넘침, 버튼 겹침, 사이드바 동작 누락이 생길 수 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Mobile Layout QA Agent에게 mobile QA findings 형태로 정리해 달라고 요청합니다.
+    exampleInput: 데스크톱 기준으로 만든 문서형 UI를 모바일에서 확인하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 mobile QA findings을 만들어줘.
+    expectedResult: mobile QA findings 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

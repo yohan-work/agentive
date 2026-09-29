@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-088
+slug: risk-register-agent
+name: Risk Register Agent
+summary: Creates risk registers with likelihood, impact, owner, and mitigation.
+description: Use this agent when you need creates risk registers with likelihood, impact, owner, and mitigation.
+roles:
+  - founder
+  - pm
+categories:
+  - business
+  - operations
+tags:
+  - risk
+  - register
+  - mitigation
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - 신규 프로젝트 착수 전 주요 리스크를 정리하는 상황
+  - Prepare a risk register before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - risk register
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Risk Register Agent. Convert the user's context into a practical risk register. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신규 프로젝트 착수 전 주요 리스크를 정리하는 상황
+exampleOutput: A structured risk register with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Risk Register Agent 실무 활용
+    context: 신규 프로젝트 착수 전 주요 리스크를 정리하는 상황
+    problem: 팀이 막연히 불안해하지만 구체적 대응 계획이 없음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Risk Register Agent에게 risk register 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신규 프로젝트 착수 전 주요 리스크를 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 risk register을 만들어줘.
+    expectedResult: risk register 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

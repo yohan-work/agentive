@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-057
+slug: seo-content-brief-agent
+name: SEO Content Brief Agent
+summary: Creates SEO article briefs from keyword and audience intent.
+description: Use this agent when you need creates SEO article briefs from keyword and audience intent.
+roles:
+  - marketer
+  - creator
+categories:
+  - marketing
+  - content
+tags:
+  - seo
+  - brief
+  - content
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Ahrefs
+  - Notion
+useCases:
+  - 블로그 글을 외주 작가에게 맡기기 전 브리프를 만드는 상황
+  - Prepare a SEO content brief before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - SEO content brief
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are SEO Content Brief Agent. Convert the user's context into a practical SEO content brief. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 블로그 글을 외주 작가에게 맡기기 전 브리프를 만드는 상황
+exampleOutput: A structured SEO content brief with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: SEO Content Brief Agent 실무 활용
+    context: 블로그 글을 외주 작가에게 맡기기 전 브리프를 만드는 상황
+    problem: 키워드는 있지만 독자 의도와 글 구조가 정리되지 않음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 SEO Content Brief Agent에게 SEO content brief 형태로 정리해 달라고 요청합니다.
+    exampleInput: 블로그 글을 외주 작가에게 맡기기 전 브리프를 만드는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 SEO content brief을 만들어줘.
+    expectedResult: SEO content brief 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-017
+slug: instagram-content-planner
+name: Instagram Content Planner
+summary: Plans repeatable Instagram content for a product or service.
+description: Use this agent to generate content pillars, post ideas, hooks, and production notes.
+roles:
+  - marketer
+  - creator
+  - founder
+categories:
+  - marketing
+  - content
+tags:
+  - instagram
+  - content
+  - hooks
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Canva
+  - Notion
+useCases:
+  - Monthly content planning
+  - Campaign ideation
+  - Creator workflow
+inputs:
+  - Brand
+  - Audience
+  - Offer
+  - Tone
+  - Posting frequency
+outputs:
+  - Content pillars
+  - Post ideas
+  - Hooks
+  - Format suggestions
+prompt: You are a social content strategist. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical Instagram content plan with clear sections, assumptions, risks, and next actions.
+exampleInput: A neighborhood bakery launching weekend pastry boxes.
+exampleOutput: Pillars, 20 post ideas, hooks, captions, and production notes.
+limitations:
+  - Performance depends on audience feedback.
+bestPractices:
+  - Include past posts that performed well.
+realUseCases:
+  - title: Instagram Content Planner 실무 활용
+    context: Monthly content planning
+    problem: Plans repeatable Instagram content for a product or service. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Instagram Content Planner에게 Content pillars 형태로 정리해 달라고 요청합니다.
+    exampleInput: A neighborhood bakery launching weekend pastry boxes. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Pillars, 20 post ideas, hooks, captions, and production notes.
+relatedAgents:
+  - copywriting-agent
+  - target-reader-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

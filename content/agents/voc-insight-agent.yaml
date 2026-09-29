@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-075
+slug: voc-insight-agent
+name: VOC Insight Agent
+summary: Turns customer conversations into product and service insights.
+description: Use this agent when you need turns customer conversations into product and service insights.
+roles:
+  - cs
+  - pm
+  - founder
+categories:
+  - research
+  - operations
+tags:
+  - voc
+  - insight
+  - customer
+difficulty: intermediate
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Sheets
+  - Zendesk
+useCases:
+  - 한 달간 고객 문의를 제품팀에 전달할 리포트로 정리하는 상황
+  - Prepare a VOC insight report before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - VOC insight report
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are VOC Insight Agent. Convert the user's context into a practical VOC insight report. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 한 달간 고객 문의를 제품팀에 전달할 리포트로 정리하는 상황
+exampleOutput: A structured VOC insight report with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: VOC Insight Agent 실무 활용
+    context: 한 달간 고객 문의를 제품팀에 전달할 리포트로 정리하는 상황
+    problem: 문의량은 많지만 제품 개선에 필요한 패턴이 보이지 않음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 VOC Insight Agent에게 VOC insight report 형태로 정리해 달라고 요청합니다.
+    exampleInput: 한 달간 고객 문의를 제품팀에 전달할 리포트로 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 VOC insight report을 만들어줘.
+    expectedResult: VOC insight report 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

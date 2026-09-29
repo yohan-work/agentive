@@ -90,18 +90,25 @@ Then place the files where your tool expects them:
 
 ## How it works
 
-Agent Archive is a **static-data-first** Next.js app. There is no database or backend: every agent, workflow, and taxonomy entry is typed data in `src/data`, validated by `npm run check:data`.
+Agent Archive is a **static-data-first** Next.js app with no database or backend. **Each agent is a single YAML file** in `content/agents/`, validated against a JSON Schema. Workflows and taxonomy are typed data in `src/data`.
 
 ```text
+content/
+├── agents/           # One YAML file per agent (the source of truth)
+└── TEMPLATE.yaml     # Starting point for a new agent
+schema/
+└── agent.schema.json # JSON Schema generated from src/types/agent.ts
 src/
 ├── app/              # Next.js App Router pages (locale-prefixed: /en, /ko)
 ├── components/       # UI: agents, workflows, layout, common primitives
-├── data/             # Source of truth: agents, workflows, starter packs, taxonomy
+├── data/             # Workflows, starter packs, taxonomy, and the agent loader
 ├── i18n/             # Locale config and UI dictionaries
 ├── lib/              # Search, export, and install-kit generation
 └── types/            # Agent, workflow, and taxonomy types
 scripts/
-└── check-data.mjs    # Data integrity checks (slugs, references, required metadata)
+├── build-content.mjs # Bundles content/agents into the app
+├── generate-schema.mjs
+└── check-data.mjs    # Schema and integrity checks (slugs, references, required metadata)
 ```
 
 | Command | What it does |
@@ -110,14 +117,15 @@ scripts/
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type check |
-| `npm run check:data` | Validate agent, workflow, and taxonomy data |
+| `npm run check:data` | Validate agents against the schema, plus workflow and taxonomy references |
+| `npm run schema` | Regenerate `schema/agent.schema.json` |
 
 ## Contributing
 
 Contributions are welcome, especially new agents, better prompts, and honest evaluations. Read the **[contributing guide](./CONTRIBUTING.md)** for what we accept and how agent verification levels work.
 
 - **Suggest an agent**: open a [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) issue, or use the Submit page on the site.
-- **Improve an existing agent**: edit its entry in `src/data`, run the checks, and open a pull request.
+- **Add or improve an agent**: copy `content/TEMPLATE.yaml` (or edit an existing file in `content/agents/`), run `npm run check:data`, and open a pull request.
 - **Report a bug**: [open a bug report](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml).
 - **Security issues**: please report them privately (see [SECURITY.md](./SECURITY.md)).
 
@@ -125,7 +133,7 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). AI coding
 
 ## Roadmap
 
-- [ ] One file per agent, with schema validation
+- [x] One file per agent, with schema validation
 - [ ] Hosted site with a public URL
 - [ ] Download install kits straight from a URL, no browser needed
 - [ ] More hand-verified agents and sample runs
@@ -133,6 +141,6 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). AI coding
 ## License
 
 - Code: [MIT](./LICENSE)
-- Agent content in `src/data` (prompts, runbooks, evaluations, workflows): [CC BY 4.0](./LICENSE-CONTENT.md)
+- Agent content in `content/` and `src/data` (prompts, runbooks, evaluations, workflows): [CC BY 4.0](./LICENSE-CONTENT.md)
 
 You can use exported prompts and install kits in your own projects, including commercial ones. Attribution is appreciated.

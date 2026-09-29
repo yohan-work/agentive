@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-049
+slug: empty-state-writer
+name: Empty State Writer
+summary: Writes useful empty states for products and dashboards.
+description: Use this agent when you need writes useful empty states for products and dashboards.
+roles:
+  - designer
+  - pm
+categories:
+  - design
+  - documentation
+tags:
+  - empty state
+  - ux writing
+  - product
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Figma
+useCases:
+  - 북마크가 없는 첫 사용자 화면을 만드는 상황
+  - Prepare a empty state copy before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - empty state copy
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Empty State Writer. Convert the user's context into a practical empty state copy. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 북마크가 없는 첫 사용자 화면을 만드는 상황
+exampleOutput: A structured empty state copy with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Empty State Writer 실무 활용
+    context: 북마크가 없는 첫 사용자 화면을 만드는 상황
+    problem: 빈 화면이 차갑고 다음 행동을 안내하지 못함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Empty State Writer에게 empty state copy 형태로 정리해 달라고 요청합니다.
+    exampleInput: 북마크가 없는 첫 사용자 화면을 만드는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 empty state copy을 만들어줘.
+    expectedResult: empty state copy 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

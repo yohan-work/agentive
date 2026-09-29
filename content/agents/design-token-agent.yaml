@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-055
+slug: design-token-agent
+name: Design Token Agent
+summary: Creates or reviews color, spacing, typography, and state tokens.
+description: Use this agent when you need creates or reviews color, spacing, typography, and state tokens.
+roles:
+  - designer
+  - developer
+categories:
+  - design
+  - development
+tags:
+  - tokens
+  - design system
+  - css
+difficulty: advanced
+automationLevel: 3
+tools:
+  - Figma
+  - Tailwind
+  - ChatGPT
+useCases:
+  - 다크모드 UI의 색상과 컴포넌트 상태를 정리하는 상황
+  - Prepare a design token proposal before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - design token proposal
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Design Token Agent. Convert the user's context into a practical design token proposal. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 다크모드 UI의 색상과 컴포넌트 상태를 정리하는 상황
+exampleOutput: A structured design token proposal with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Design Token Agent 실무 활용
+    context: 다크모드 UI의 색상과 컴포넌트 상태를 정리하는 상황
+    problem: 페이지마다 색과 spacing이 조금씩 달라 제품 완성도가 떨어짐
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Design Token Agent에게 design token proposal 형태로 정리해 달라고 요청합니다.
+    exampleInput: 다크모드 UI의 색상과 컴포넌트 상태를 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 design token proposal을 만들어줘.
+    expectedResult: design token proposal 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

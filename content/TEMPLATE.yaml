@@ -1,0 +1,39 @@
+# Copy this file to content/agents/<your-agent-slug>.yaml and fill it in.
+# Your editor can autocomplete fields from the schema below (YAML extension by Red Hat in VS Code).
+# Run `npm run check:data` to validate. See CONTRIBUTING.md for what makes a good agent.
+# yaml-language-server: $schema=../schema/agent.schema.json
+id: agent-101 # next free number; check the highest id in content/agents
+slug: your-agent-slug # must match the file name
+name: Your Agent Name
+summary: One sentence describing what the agent produces.
+description: When and why to use this agent.
+roles: # planner, pm, designer, developer, marketer, sales, cs, founder, creator
+  - developer
+categories: # planning, development, design, web, marketing, research, documentation, operations, automation, business, content
+  - development
+tags:
+  - example
+difficulty: intermediate # beginner | intermediate | advanced
+automationLevel: 3 # 1 (manual) to 5 (fully automated)
+tools:
+  - Claude Code
+useCases:
+  - A concrete situation where this agent helps
+inputs:
+  - What the user must provide
+outputs:
+  - What the agent returns
+prompt: |
+  You are ...
+  Describe the role, the context you need, the output format,
+  and what to do when information is missing.
+exampleInput: A realistic input.
+exampleOutput: A real (or realistic) output from running the prompt.
+limitations:
+  - When not to use this agent
+bestPractices:
+  - How to get the best results
+relatedAgents: [] # slugs of related agents
+verifiedStatus: community # unverified | community (you ran it) | tested | expert (maintainers set these)
+createdBy: Your Name
+updatedAt: "2026-09-29"

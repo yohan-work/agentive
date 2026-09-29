@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-096
+slug: training-material-agent
+name: Training Material Agent
+summary: Creates training materials for internal tools and workflows.
+description: Use this agent when you need creates training materials for internal tools and workflows.
+roles:
+  - founder
+  - cs
+  - pm
+categories:
+  - documentation
+  - operations
+tags:
+  - training
+  - manual
+  - enablement
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Slides
+  - Notion
+useCases:
+  - 신입 팀원에게 내부 업무 프로세스를 교육하는 상황
+  - Prepare a training material before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - training material
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Training Material Agent. Convert the user's context into a practical training material. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신입 팀원에게 내부 업무 프로세스를 교육하는 상황
+exampleOutput: A structured training material with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Training Material Agent 실무 활용
+    context: 신입 팀원에게 내부 업무 프로세스를 교육하는 상황
+    problem: 구두 설명에 의존해 교육 품질이 사람마다 다름
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Training Material Agent에게 training material 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신입 팀원에게 내부 업무 프로세스를 교육하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 training material을 만들어줘.
+    expectedResult: training material 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

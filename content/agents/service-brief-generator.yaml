@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-001
+slug: service-brief-generator
+name: Service Brief Generator
+summary: Turns a rough idea into a structured service planning brief.
+description: Use this agent to convert an early product or service idea into a clear planning document with users, problems, scope, and risks.
+roles:
+  - planner
+  - pm
+  - founder
+categories:
+  - planning
+  - documentation
+tags:
+  - brief
+  - requirements
+  - scope
+  - product
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Claude
+  - Notion
+useCases:
+  - Prepare a kickoff brief
+  - Clarify product scope
+  - Align stakeholders before design
+inputs:
+  - Service idea
+  - Target user
+  - Business goal
+  - Known constraints
+outputs:
+  - Problem statement
+  - Feature outline
+  - Assumptions
+  - Open questions
+prompt: You are a senior service planner. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical service planning brief with clear sections, assumptions, risks, and next actions.
+exampleInput: A booking site for local Pilates studios targeting busy office workers.
+exampleOutput: A concise brief covering target users, booking flow, MVP scope, risks, and next planning questions.
+limitations:
+  - Cannot validate market demand without research data.
+bestPractices:
+  - Provide target user and business model before asking for features.
+realUseCases:
+  - title: Service Brief Generator 실무 활용
+    context: Prepare a kickoff brief
+    problem: Turns a rough idea into a structured service planning brief. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Service Brief Generator에게 Problem statement 형태로 정리해 달라고 요청합니다.
+    exampleInput: A booking site for local Pilates studios targeting busy office workers. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: A concise brief covering target users, booking flow, MVP scope, risks, and next planning questions.
+relatedAgents:
+  - feature-requirements-analyst
+  - user-scenario-writer
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-069
+slug: sales-discovery-call-agent
+name: Sales Discovery Call Agent
+summary: Creates discovery call questions and qualification notes.
+description: Use this agent when you need creates discovery call questions and qualification notes.
+roles:
+  - sales
+  - founder
+categories:
+  - business
+  - operations
+tags:
+  - sales
+  - discovery
+  - qualification
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - CRM
+useCases:
+  - 잠재 고객과 첫 상담을 앞두고 질문 리스트를 준비하는 상황
+  - Prepare a discovery call guide before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - discovery call guide
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Sales Discovery Call Agent. Convert the user's context into a practical discovery call guide. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 잠재 고객과 첫 상담을 앞두고 질문 리스트를 준비하는 상황
+exampleOutput: A structured discovery call guide with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Sales Discovery Call Agent 실무 활용
+    context: 잠재 고객과 첫 상담을 앞두고 질문 리스트를 준비하는 상황
+    problem: 요구사항만 듣고 예산, 의사결정자, 긴급도를 확인하지 못함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Sales Discovery Call Agent에게 discovery call guide 형태로 정리해 달라고 요청합니다.
+    exampleInput: 잠재 고객과 첫 상담을 앞두고 질문 리스트를 준비하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 discovery call guide을 만들어줘.
+    expectedResult: discovery call guide 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

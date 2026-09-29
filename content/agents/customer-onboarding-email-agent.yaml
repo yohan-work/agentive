@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-076
+slug: customer-onboarding-email-agent
+name: Customer Onboarding Email Agent
+summary: Writes onboarding emails that guide customers to first value.
+description: Use this agent when you need writes onboarding emails that guide customers to first value.
+roles:
+  - cs
+  - marketer
+categories:
+  - operations
+  - marketing
+tags:
+  - onboarding
+  - email
+  - customer success
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Email
+useCases:
+  - 신규 고객이 결제 후 서비스를 제대로 시작하게 안내하는 상황
+  - Prepare a onboarding email before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - onboarding email
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Customer Onboarding Email Agent. Convert the user's context into a practical onboarding email. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 신규 고객이 결제 후 서비스를 제대로 시작하게 안내하는 상황
+exampleOutput: A structured onboarding email with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Customer Onboarding Email Agent 실무 활용
+    context: 신규 고객이 결제 후 서비스를 제대로 시작하게 안내하는 상황
+    problem: 환영 메일은 있지만 첫 행동과 기대 결과가 명확하지 않음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Customer Onboarding Email Agent에게 onboarding email 형태로 정리해 달라고 요청합니다.
+    exampleInput: 신규 고객이 결제 후 서비스를 제대로 시작하게 안내하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 onboarding email을 만들어줘.
+    expectedResult: onboarding email 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

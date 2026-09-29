@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-061
+slug: campaign-retrospective-agent
+name: Campaign Retrospective Agent
+summary: Analyzes campaign results and extracts next experiments.
+description: Use this agent when you need analyzes campaign results and extracts next experiments.
+roles:
+  - marketer
+  - pm
+categories:
+  - marketing
+  - research
+tags:
+  - campaign
+  - retrospective
+  - metrics
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Sheets
+  - GA4
+useCases:
+  - 광고 캠페인 종료 후 다음 실험을 정하는 상황
+  - Prepare a campaign retrospective before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - campaign retrospective
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Campaign Retrospective Agent. Convert the user's context into a practical campaign retrospective. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 광고 캠페인 종료 후 다음 실험을 정하는 상황
+exampleOutput: A structured campaign retrospective with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Campaign Retrospective Agent 실무 활용
+    context: 광고 캠페인 종료 후 다음 실험을 정하는 상황
+    problem: 성과 숫자는 있지만 왜 잘됐는지/안됐는지 해석이 부족함
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Campaign Retrospective Agent에게 campaign retrospective 형태로 정리해 달라고 요청합니다.
+    exampleInput: 광고 캠페인 종료 후 다음 실험을 정하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 campaign retrospective을 만들어줘.
+    expectedResult: campaign retrospective 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Content Production Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

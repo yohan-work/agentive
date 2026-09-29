@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-029
+slug: feature-scope-reducer
+name: Feature Scope Reducer
+summary: Cuts a feature down to the smallest useful MVP.
+description: Use this agent when you need cuts a feature down to the smallest useful MVP.
+roles:
+  - pm
+  - founder
+  - developer
+categories:
+  - planning
+  - development
+tags:
+  - mvp
+  - scope
+  - release
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Linear
+useCases:
+  - 출시까지 2주밖에 남지 않았는데 기능 범위가 너무 큰 상황
+  - Prepare a reduced MVP scope before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - reduced MVP scope
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Feature Scope Reducer. Convert the user's context into a practical reduced MVP scope. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 출시까지 2주밖에 남지 않았는데 기능 범위가 너무 큰 상황
+exampleOutput: A structured reduced MVP scope with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Feature Scope Reducer 실무 활용
+    context: 출시까지 2주밖에 남지 않았는데 기능 범위가 너무 큰 상황
+    problem: 완성도를 유지하면서 무엇을 빼야 할지 합의가 안 됨
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Feature Scope Reducer에게 reduced MVP scope 형태로 정리해 달라고 요청합니다.
+    exampleInput: 출시까지 2주밖에 남지 않았는데 기능 범위가 너무 큰 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 reduced MVP scope을 만들어줘.
+    expectedResult: reduced MVP scope 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

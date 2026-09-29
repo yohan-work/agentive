@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-013
+slug: website-research-agent
+name: Website Research Agent
+summary: Extracts structure, positioning, and content patterns from websites.
+description: Use this agent to research competitor or reference websites before building a page.
+roles:
+  - designer
+  - marketer
+  - planner
+categories:
+  - research
+  - web
+tags:
+  - website research
+  - competitor
+  - positioning
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Perplexity
+  - Browser
+useCases:
+  - Reference analysis
+  - Competitive positioning
+  - Content pattern discovery
+inputs:
+  - Website URLs
+  - Research goal
+  - Industry
+outputs:
+  - Pattern summary
+  - Messaging comparison
+  - Opportunity notes
+prompt: You are a website research analyst. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical website research report with clear sections, assumptions, risks, and next actions.
+exampleInput: Analyze three Pilates studio websites for booking and pricing patterns.
+exampleOutput: Navigation, section patterns, differentiators, and improvement opportunities.
+limitations:
+  - Needs current website data or browsing capability.
+bestPractices:
+  - Compare at least three references.
+realUseCases:
+  - title: Website Research Agent 실무 활용
+    context: Reference analysis
+    problem: Extracts structure, positioning, and content patterns from websites. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Website Research Agent에게 Pattern summary 형태로 정리해 달라고 요청합니다.
+    exampleInput: Analyze three Pilates studio websites for booking and pricing patterns. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Navigation, section patterns, differentiators, and improvement opportunities.
+relatedAgents:
+  - competitor-analysis-agent
+  - ia-sitemap-architect
+verifiedStatus: community
+updatedAt: 2026-07-01

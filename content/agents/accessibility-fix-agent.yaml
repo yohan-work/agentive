@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-044
+slug: accessibility-fix-agent
+name: Accessibility Fix Agent
+summary: Reviews UI for accessibility issues and suggests concrete fixes.
+description: Use this agent when you need reviews UI for accessibility issues and suggests concrete fixes.
+roles:
+  - developer
+  - designer
+categories:
+  - development
+  - design
+tags:
+  - a11y
+  - accessibility
+  - ui
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Playwright
+  - Lighthouse
+useCases:
+  - 다크모드 문서형 UI의 버튼과 폼 접근성을 점검하는 상황
+  - Prepare a accessibility fixes before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - accessibility fixes
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Accessibility Fix Agent. Convert the user's context into a practical accessibility fixes. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 다크모드 문서형 UI의 버튼과 폼 접근성을 점검하는 상황
+exampleOutput: A structured accessibility fixes with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Accessibility Fix Agent 실무 활용
+    context: 다크모드 문서형 UI의 버튼과 폼 접근성을 점검하는 상황
+    problem: 색 대비, aria label, 키보드 포커스가 일관되지 않을 수 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Accessibility Fix Agent에게 accessibility fixes 형태로 정리해 달라고 요청합니다.
+    exampleInput: 다크모드 문서형 UI의 버튼과 폼 접근성을 점검하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 accessibility fixes을 만들어줘.
+    expectedResult: accessibility fixes 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

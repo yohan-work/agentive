@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-095
+slug: knowledge-base-article-agent
+name: Knowledge Base Article Agent
+summary: Writes help center articles from support issues and product behavior.
+description: Use this agent when you need writes help center articles from support issues and product behavior.
+roles:
+  - cs
+  - pm
+categories:
+  - documentation
+  - operations
+tags:
+  - help center
+  - knowledge base
+  - support
+difficulty: beginner
+automationLevel: 4
+tools:
+  - ChatGPT
+  - Intercom
+  - Notion
+useCases:
+  - 반복 문의가 많은 기능 사용법을 도움말로 정리하는 상황
+  - Prepare a help center article before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - help center article
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Knowledge Base Article Agent. Convert the user's context into a practical help center article. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 반복 문의가 많은 기능 사용법을 도움말로 정리하는 상황
+exampleOutput: A structured help center article with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Knowledge Base Article Agent 실무 활용
+    context: 반복 문의가 많은 기능 사용법을 도움말로 정리하는 상황
+    problem: CS가 매번 같은 답변을 작성하느라 시간이 낭비됨
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Knowledge Base Article Agent에게 help center article 형태로 정리해 달라고 요청합니다.
+    exampleInput: 반복 문의가 많은 기능 사용법을 도움말로 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 help center article을 만들어줘.
+    expectedResult: help center article 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+verifiedStatus: community
+createdBy: Agent Archive
+updatedAt: 2026-07-01

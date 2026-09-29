@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-087
+slug: vendor-comparison-agent
+name: Vendor Comparison Agent
+summary: Compares vendors by criteria, risk, cost, and implementation effort.
+description: Use this agent when you need compares vendors by criteria, risk, cost, and implementation effort.
+roles:
+  - founder
+  - pm
+categories:
+  - business
+  - research
+tags:
+  - vendor
+  - comparison
+  - procurement
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Sheets
+useCases:
+  - 메일 자동화 툴을 바꾸기 전 후보를 비교하는 상황
+  - Prepare a vendor comparison before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - vendor comparison
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Vendor Comparison Agent. Convert the user's context into a practical vendor comparison. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 메일 자동화 툴을 바꾸기 전 후보를 비교하는 상황
+exampleOutput: A structured vendor comparison with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Vendor Comparison Agent 실무 활용
+    context: 메일 자동화 툴을 바꾸기 전 후보를 비교하는 상황
+    problem: 가격표만 보고 선택하면 운영 제약과 이전 비용을 놓칠 수 있음
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Vendor Comparison Agent에게 vendor comparison 형태로 정리해 달라고 요청합니다.
+    exampleInput: 메일 자동화 툴을 바꾸기 전 후보를 비교하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 vendor comparison을 만들어줘.
+    expectedResult: vendor comparison 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Local Business Validation Flow
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

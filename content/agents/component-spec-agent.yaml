@@ -1,0 +1,201 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-048
+slug: component-spec-agent
+name: Component Spec Agent
+summary: Writes component behavior, states, variants, and responsive rules.
+description: Use this agent when you need writes component behavior, states, variants, and responsive rules.
+roles:
+  - designer
+  - developer
+categories:
+  - design
+  - development
+tags:
+  - component
+  - spec
+  - design system
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - Figma
+  - ChatGPT
+useCases:
+  - 검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황
+  - Prepare a component spec before team handoff
+  - Clarify assumptions, inputs, outputs, and next actions
+inputs:
+  - Current context
+  - Goal
+  - Audience or stakeholder
+  - Constraints
+  - Available notes or data
+outputs:
+  - component spec
+  - Assumptions
+  - Risks
+  - Recommended next actions
+prompt: You are Component Spec Agent. Convert the user's context into a practical component spec. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+exampleInput: 검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황
+exampleOutput: A structured component spec with practical recommendations, tradeoffs, and next steps.
+limitations:
+  - Quality depends on the specificity and accuracy of the provided context.
+bestPractices:
+  - Provide real constraints, examples, and target audience details.
+  - Review the output before sharing it with customers or stakeholders.
+realUseCases:
+  - title: Component Spec Agent 실무 활용
+    context: 검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황
+    problem: 상태와 반응형 규칙이 없어 구현자마다 다르게 만듦
+    howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Component Spec Agent에게 component spec 형태로 정리해 달라고 요청합니다.
+    exampleInput: 검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 component spec을 만들어줘.
+    expectedResult: component spec 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    recommendedWorkflow: Codex Development Prep Flow
+installTargets:
+  - codex
+  - claude
+  - cursor
+runbook:
+  projectContext:
+    - Project goal
+    - Current repository or workflow context
+    - Current context
+    - Goal
+    - Audience or stakeholder
+    - Constraints
+    - Available notes or data
+  setupContextNotes:
+    - Prepare component purpose, required actions, variants, states, content constraints, and accessibility needs.
+    - Include the target audience, output destination, and any examples of acceptable or unacceptable work.
+    - Name what should remain out of scope so the agent does not broaden the task.
+  inputTemplate: |-
+    Project:
+
+    Goal:
+
+    Current context:
+
+    Constraints:
+
+    Available files, notes, or data:
+
+    Expected output:
+    - component spec
+    - Assumptions
+    - Risks
+    - Recommended next actions
+  starterInputs:
+    - label: First useful run
+      description: Use this when you know the goal but still need a structured first draft.
+      value: |-
+        Specify an agent quality badge and installable filter control.
+
+        Context:
+        - Current state:
+        - Constraints:
+        - Audience:
+        - Success criteria:
+    - label: Project handoff run
+      description: Use this when the output will be pasted into a ticket, PR, document, or project brief.
+      value: |-
+        Goal: produce component spec for a real project.
+        Source material:
+        - 
+        Constraints:
+        - 
+        Review needs:
+        - Call out assumptions.
+        - Flag missing context.
+        - End with concrete next actions.
+    - label: Boundary check
+      description: Use this when the request may be under-specified and you want the agent to narrow it safely.
+      value: |-
+        Design a full design system from one button example.
+
+        Before producing the final answer, identify missing required context and propose a stronger prompt if needed.
+  goodInputExample: |-
+    검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황
+
+    Goal: produce component spec for a real project.
+    Constraints: keep the result specific, structured, and ready for handoff.
+  badInputExample: Help me with Component Spec Agent.
+  weakInputFixes:
+    - weakInput: Help me with Component Spec Agent.
+      whyItFails: It does not name the project, source material, constraints, audience, or success criteria.
+      strongerInput: Specify an agent quality badge and installable filter control. Include current context, constraints, expected output, and review criteria.
+    - weakInput: Make this better.
+      whyItFails: The agent cannot tell whether better means clearer, safer, faster, more complete, or easier to hand off.
+      strongerInput: Improve the output for 검색 필터 컴포넌트를 디자인 시스템에 추가하는 상황. Optimize for component spec, keep assumptions explicit, and list the changes made.
+  expectedOutputShape:
+    - A short summary of the recommended component spec
+    - A clearly labeled component spec section
+    - A clearly labeled Assumptions section
+    - A clearly labeled Risks section
+    - A clearly labeled Recommended next actions section
+    - Assumptions and missing context separated from confirmed facts
+    - Risks, review checkpoints, and concrete next actions
+  outputChecklist:
+    - Includes component spec
+    - Includes Assumptions
+    - Includes Risks
+    - Includes Recommended next actions
+    - States assumptions separately from confirmed facts
+    - Lists concrete next actions
+    - Calls out risks or missing context
+  failureModes:
+    - The input is too broad or lacks project context
+    - The output is generic and does not mention concrete constraints
+    - The result skips assumptions, risks, or next actions
+    - The agent invents project facts that were not provided
+  handoffTips:
+    - Paste relevant project files, notes, or constraints before asking for the final output.
+    - Ask for a first draft, then request a stricter revision using the checklist.
+    - Keep the generated output with the project ticket, PR, proposal, or team document.
+evaluation:
+  qualityScore: 4
+  testedWith:
+    - codex
+    - claude
+    - cursor
+  recommendedFor:
+    - Writing component states, variants, behavior, and responsive rules for implementation
+    - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
+    - Project work where a human owner will review assumptions, risks, and final output
+  notRecommendedFor:
+    - The product team has not decided the component purpose or user actions
+    - Fully autonomous production changes without human review
+    - Work requiring legal, financial, medical, compliance, or security certification
+  knownWeaknesses:
+    - Can over-specify variants if the design system maturity is unclear
+    - Output quality drops when constraints, source material, or target audience are omitted
+    - Final decisions still need review by the project owner
+  evaluationCriteria:
+    - Defines props, states, interactions, accessibility notes, and responsive constraints
+    - Produces component spec in a format that can be pasted into a ticket, PR, document, or handoff
+    - States assumptions, missing context, risks, and concrete next actions separately
+  sampleRuns:
+    - title: Component Spec Agent strong-context run
+      input: Specify an agent quality badge and installable filter control.
+      expectedOutputSummary: A usable component spec with project-specific assumptions, risks, and next steps.
+      sampleOutput: "component spec: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+      reviewNotes:
+        - Confirm the output references the supplied scenario instead of generic advice.
+        - Check that assumptions and missing context are separated from confirmed facts.
+        - Verify the result can be reused in the project artifact named by the request.
+    - title: Component Spec Agent boundary run
+      input: Design a full design system from one button example.
+      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
+      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+      reviewNotes:
+        - The agent should not invent project facts to fill missing context.
+        - The response should make the next user action clear.
+        - A strong output refuses false certainty while still moving the work forward.
+decisionGuide:
+  - question: Is this the right agent for my task?
+    guidance: Writing component states, variants, behavior, and responsive rules for implementation
+  - question: When should I choose something else?
+    guidance: The product team has not decided the component purpose or user actions
+  - question: What should I run next?
+    guidance: After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests.
+verifiedStatus: tested
+createdBy: Agent Archive
+updatedAt: 2026-07-01

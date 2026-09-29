@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-023
+slug: customer-persona-agent
+name: Customer Persona Agent
+summary: Creates useful customer personas from research notes and business context.
+description: Use this agent to synthesize audience data into actionable personas for messaging and product decisions.
+roles:
+  - marketer
+  - pm
+  - founder
+  - designer
+categories:
+  - research
+  - marketing
+tags:
+  - persona
+  - audience
+  - research
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+  - Sheets
+useCases:
+  - Audience definition
+  - Messaging planning
+  - Product discovery
+inputs:
+  - Research notes
+  - Product
+  - Audience signals
+  - Goals
+outputs:
+  - Personas
+  - Jobs to be done
+  - Objections
+  - Messaging angles
+prompt: You are a customer research synthesizer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical customer persona set with clear sections, assumptions, risks, and next actions.
+exampleInput: Notes from interviews with freelance designers buying admin tools.
+exampleOutput: Three personas with motivations, pain points, objections, and triggers.
+limitations:
+  - Personas are weak without real research inputs.
+bestPractices:
+  - Mark assumptions separately from observed facts.
+realUseCases:
+  - title: Customer Persona Agent 실무 활용
+    context: Audience definition
+    problem: Creates useful customer personas from research notes and business context. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Customer Persona Agent에게 Personas 형태로 정리해 달라고 요청합니다.
+    exampleInput: Notes from interviews with freelance designers buying admin tools. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Three personas with motivations, pain points, objections, and triggers.
+relatedAgents:
+  - user-scenario-writer
+  - target-reader-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-002
+slug: ia-sitemap-architect
+name: IA Sitemap Architect
+summary: Creates a sitemap and navigation model from content and business goals.
+description: Use this agent when a website or app needs information architecture before design or development starts.
+roles:
+  - planner
+  - designer
+  - developer
+categories:
+  - planning
+  - web
+tags:
+  - sitemap
+  - navigation
+  - ia
+difficulty: intermediate
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Figma
+  - Notion
+useCases:
+  - Website IA
+  - Admin navigation
+  - Content grouping
+inputs:
+  - Business type
+  - Pages or content list
+  - Primary conversions
+outputs:
+  - Sitemap
+  - Navigation labels
+  - Page purpose notes
+prompt: You are an information architect. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical sitemap and navigation model with clear sections, assumptions, risks, and next actions.
+exampleInput: A clinic website with services, doctors, booking, pricing, and articles.
+exampleOutput: Top-level nav, secondary pages, page intent, and conversion paths.
+limitations:
+  - Does not replace user testing for complex taxonomies.
+bestPractices:
+  - Include real content inventory when available.
+realUseCases:
+  - title: IA Sitemap Architect 실무 활용
+    context: Website IA
+    problem: Creates a sitemap and navigation model from content and business goals. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 IA Sitemap Architect에게 Sitemap 형태로 정리해 달라고 요청합니다.
+    exampleInput: A clinic website with services, doctors, booking, pricing, and articles. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Top-level nav, secondary pages, page intent, and conversion paths.
+relatedAgents:
+  - landing-section-planner
+  - website-research-agent
+verifiedStatus: tested
+updatedAt: 2026-07-01

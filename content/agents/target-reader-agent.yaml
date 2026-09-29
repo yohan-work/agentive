@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schema/agent.schema.json
+id: agent-024
+slug: target-reader-agent
+name: Target Reader Agent
+summary: Defines readers, angles, and article structure for content work.
+description: Use this agent before drafting articles, newsletters, or long-form posts.
+roles:
+  - creator
+  - marketer
+  - founder
+categories:
+  - content
+  - marketing
+tags:
+  - reader
+  - article
+  - content strategy
+difficulty: beginner
+automationLevel: 3
+tools:
+  - ChatGPT
+  - Notion
+useCases:
+  - Article planning
+  - Newsletter strategy
+  - Thought leadership
+inputs:
+  - Topic
+  - Audience
+  - Goal
+  - Publishing channel
+outputs:
+  - Reader profile
+  - Angle options
+  - Outline
+  - Hook ideas
+prompt: You are a content strategist. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical reader-aware content plan with clear sections, assumptions, risks, and next actions.
+exampleInput: Write about using AI agents for small agency operations.
+exampleOutput: Target readers, angles, outline, examples, and hook options.
+limitations:
+  - Does not verify topic originality.
+bestPractices:
+  - Define the reader's current belief and desired belief.
+realUseCases:
+  - title: Target Reader Agent 실무 활용
+    context: Article planning
+    problem: Defines readers, angles, and article structure for content work. 업무를 매번 처음부터 정리하느라 시간이 오래 걸리고 결과물 품질이 흔들립니다.
+    howToUse: 현재 상황, 목표, 대상, 제약 조건을 입력한 뒤 Target Reader Agent에게 Reader profile 형태로 정리해 달라고 요청합니다.
+    exampleInput: Write about using AI agents for small agency operations. 목표와 제약 조건을 기준으로 바로 사용할 수 있는 결과물을 만들어줘.
+    expectedResult: Target readers, angles, outline, examples, and hook options.
+relatedAgents:
+  - instagram-content-planner
+  - copywriting-agent
+verifiedStatus: community
+updatedAt: 2026-07-01
