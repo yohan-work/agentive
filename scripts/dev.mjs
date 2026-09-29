@@ -12,6 +12,7 @@ function stop(code = 0) {
   process.exit(code);
 }
 
-for (const child of children) child.on("exit", (code) => stop(code ?? 0));
+// A child killed by a signal reports code null; treat that as a failure, not a clean exit.
+for (const child of children) child.on("exit", (code, signal) => stop(code ?? (signal ? 1 : 0)));
 process.on("SIGINT", () => stop());
 process.on("SIGTERM", () => stop());

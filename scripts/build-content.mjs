@@ -25,11 +25,18 @@ function bundle() {
 }
 
 if (process.argv.includes("--watch")) {
-  bundle();
+  // Without an initial bundle the app cannot start, so stop here with the validation errors.
+  if (!bundle()) {
+    process.exit(1);
+  }
   let timer;
   watch(contentDir, () => {
     clearTimeout(timer);
-    timer = setTimeout(bundle, 100);
+    timer = setTimeout(() => {
+      if (!bundle()) {
+        console.error("Keeping the previously bundled content until the errors above are fixed.");
+      }
+    }, 100);
   });
   console.log(`Watching ${contentDir} for changes...`);
 } else if (!bundle()) {
