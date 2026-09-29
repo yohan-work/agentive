@@ -1,15 +1,24 @@
 import type { Agent } from "@/types/agent";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { Badge, DifficultyBadge, StatusBadge } from "@/components/common/badge";
 import { titleCase } from "@/lib/utils";
 import { BookmarkButton } from "./bookmark-button";
 
-export function AgentDetailHeader({ agent, labels }: { agent: Agent; labels: Dictionary["agentDetail"] }) {
+export function AgentDetailHeader({
+  agent,
+  labels,
+  locale
+}: {
+  agent: Agent;
+  labels: Dictionary["agentDetail"];
+  locale: Locale;
+}) {
   return (
     <header className="border-b border-line pb-8">
       <div className="mb-4 flex flex-wrap gap-2">
-        <StatusBadge status={agent.verifiedStatus} />
-        <DifficultyBadge difficulty={agent.difficulty} />
+        <StatusBadge status={agent.verifiedStatus} locale={locale} />
+        <DifficultyBadge difficulty={agent.difficulty} locale={locale} />
         <Badge tone="accent">
           {labels.automation} {agent.automationLevel}/5
         </Badge>

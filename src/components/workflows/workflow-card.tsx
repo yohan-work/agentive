@@ -4,14 +4,17 @@ import type { Workflow } from "@/types/workflow";
 import { Badge, DifficultyBadge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import { titleCase } from "@/lib/utils";
 
 export function WorkflowCard({ workflow, locale = defaultLocale }: { workflow: Workflow; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
+
   return (
     <Card className="p-5">
       <div className="mb-4 flex flex-wrap gap-2">
-        <DifficultyBadge difficulty={workflow.difficulty} />
-        <Badge tone="accent">{workflow.steps.length} steps</Badge>
+        <DifficultyBadge difficulty={workflow.difficulty} locale={locale} />
+        <Badge tone="accent">{dictionary.agentMeta.stepCount.replace("{count}", String(workflow.steps.length))}</Badge>
       </div>
       <h3 className="text-xl font-semibold text-primary">{workflow.name}</h3>
       <p className="mt-2 text-sm leading-6 text-secondary">{workflow.summary}</p>
@@ -26,7 +29,7 @@ export function WorkflowCard({ workflow, locale = defaultLocale }: { workflow: W
         </p>
       </div>
       <Link href={withLocale(`/workflows/${workflow.slug}`, locale)} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
-        View workflow <ArrowRight className="h-4 w-4" />
+        {dictionary.common.viewWorkflow} <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>
   );

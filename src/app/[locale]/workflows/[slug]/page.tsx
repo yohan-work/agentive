@@ -40,9 +40,9 @@ async function WorkflowDetailPageContent({
     <AppShell toc={[{ title: dictionary.nav.overview, href: "#overview" }, { title: dictionary.workflows.steps, href: "#steps" }, { title: dictionary.common.finalOutput, href: "#final-output" }]}>
       <header id="overview" className="border-b border-line pb-8">
         <div className="mb-4 flex flex-wrap gap-2">
-          <DifficultyBadge difficulty={workflow.difficulty} />
+          <DifficultyBadge difficulty={workflow.difficulty} locale={locale} />
           <Badge tone="accent">{workflow.estimatedTime}</Badge>
-          <Badge>{workflow.steps.length} steps</Badge>
+          <Badge>{dictionary.agentMeta.stepCount.replace("{count}", String(workflow.steps.length))}</Badge>
         </div>
         <h1 className="text-4xl font-semibold text-primary">{workflow.name}</h1>
         <p className="mt-4 max-w-3xl text-lg leading-8 text-secondary">{workflow.summary}</p>
