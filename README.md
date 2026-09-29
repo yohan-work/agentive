@@ -81,6 +81,15 @@ pr-review-agent-RUNBOOK.md        # context to prepare, good/bad inputs, output 
 pr-review-agent-EVALUATION.md     # quality score, known weaknesses, sample runs
 ```
 
+Or fetch the same kit from a terminal. Every file has a stable URL at `/kits/<slug>/<file>`, and the agent page shows the exact command:
+
+```sh
+mkdir -p agent-kits/pr-review-agent && (cd agent-kits/pr-review-agent && curl -fsSL --remote-name-all \
+  "https://yohan-work.github.io/agentive/kits/pr-review-agent/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}")
+```
+
+This saves the files into `agent-kits/pr-review-agent/` without their slug prefix and never touches your existing project files.
+
 Then place the files where your tool expects them:
 
 | Tool | Where to put it |
@@ -136,7 +145,7 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). AI coding
 
 - [x] One file per agent, with schema validation
 - [x] Hosted site with a public URL ([yohan-work.github.io/agentive](https://yohan-work.github.io/agentive/))
-- [ ] Download install kits straight from a URL, no browser needed
+- [x] Download install kits straight from a URL, no browser needed
 - [ ] More hand-verified agents and sample runs
 
 ## License

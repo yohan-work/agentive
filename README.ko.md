@@ -81,6 +81,15 @@ pr-review-agent-RUNBOOK.md        # 준비할 맥락, 좋은 입력과 나쁜 �
 pr-review-agent-EVALUATION.md     # 품질 점수, 알려진 약점, 샘플 실행 결과
 ```
 
+터미널에서 받을 수도 있습니다. 키트 파일마다 `/kits/<slug>/<file>` 형태의 고정 URL이 있고, 에이전트 화면에 정확한 명령어가 표시됩니다.
+
+```sh
+mkdir -p agent-kits/pr-review-agent && (cd agent-kits/pr-review-agent && curl -fsSL --remote-name-all \
+  "https://yohan-work.github.io/agentive/kits/pr-review-agent/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}")
+```
+
+파일은 슬러그 접두사 없이 `agent-kits/pr-review-agent/`에 저장되며, 기존 프로젝트 파일은 건드리지 않습니다.
+
 받은 파일은 도구에 맞는 위치에 둡니다.
 
 | 도구 | 파일 위치 |
@@ -136,7 +145,7 @@ scripts/
 
 - [x] 에이전트 하나당 파일 하나로 분리하고 스키마로 검증
 - [x] 공개 URL로 사이트 호스팅 ([yohan-work.github.io/agentive](https://yohan-work.github.io/agentive/))
-- [ ] 브라우저 없이 URL로 설치 키트 받기
+- [x] 브라우저 없이 URL로 설치 키트 받기
 - [ ] 직접 검증한 에이전트와 샘플 실행 결과 확충
 
 ## 라이선스
