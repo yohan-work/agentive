@@ -2,6 +2,18 @@
   "name": "agent-archive",
   "version": "0.1.0",
   "private": true,
+  "description": "A curated, open-source library of practical AI agents, prompts, runbooks, and install kits for Codex, Claude, and Cursor.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yohan-work/agentive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yohan-work/agentive/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
