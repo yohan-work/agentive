@@ -94,8 +94,7 @@ Agent Archive는 데이터베이스나 백엔드 없이 **정적 데이터를 �
 
 ```text
 content/
-├── agents/           # 에이전트 하나당 YAML 파일 하나 (원본 데이터)
-└── TEMPLATE.yaml     # 새 에이전트 작성용 템플릿
+└── agents/           # 에이전트 하나당 YAML 파일 하나 (원본 데이터), 새로 만들 땐 _template.yaml에서 시작
 schema/
 └── agent.schema.json # src/types/agent.ts에서 생성한 JSON Schema
 src/
@@ -125,7 +124,7 @@ scripts/
 새 에이전트, 더 나은 프롬프트, 솔직한 평가 모두 환영합니다. 어떤 기여를 받는지와 에이전트 검증 단계는 **[기여 가이드](./CONTRIBUTING.md)**(영문)에 정리되어 있습니다.
 
 - **에이전트 제안**: [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) 이슈를 열거나 사이트의 Submit 페이지를 이용해 주세요.
-- **에이전트 추가·개선**: `content/TEMPLATE.yaml`을 복사하거나 `content/agents/`의 기존 파일을 고친 뒤, `npm run check:data`를 실행하고 PR을 보내주세요.
+- **에이전트 추가·개선**: `content/agents/_template.yaml`을 복사하거나 `content/agents/`의 기존 파일을 고친 뒤, `npm run check:data`를 실행하고 PR을 보내주세요.
 - **버그 신고**: [버그 리포트 열기](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml)
 - **보안 이슈**: 공개 이슈 대신 비공개로 신고해 주세요 ([SECURITY.md](./SECURITY.md) 참고).
 

@@ -42,17 +42,17 @@ New submissions start as `unverified` or `community`. Maintainers promote them a
 
 ### Adding an agent
 
-1. Copy [`content/TEMPLATE.yaml`](./content/TEMPLATE.yaml) to `content/agents/<your-agent-slug>.yaml`.
+1. Copy [`content/agents/_template.yaml`](./content/agents/_template.yaml) to `content/agents/<your-agent-slug>.yaml`.
 2. Fill it in. With the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml), VS Code autocompletes and validates fields from [`schema/agent.schema.json`](./schema/agent.schema.json).
 3. Run `npm run check:data`.
 
-That's it: no index file to edit. The site picks up every file in `content/agents` at build time.
+That's it: no index file to edit. The site picks up every file in `content/agents` (files starting with `_` are skipped). While `npm run dev` is running, edits to agent files reload automatically.
 
 ### Validation
 
 `npm run check:data` checks that:
 
-- every file matches the JSON Schema (field names, types, allowed values)
+- every file uses the `.yaml` extension and matches the JSON Schema (field names, types, allowed values). `npm run build` runs the same schema check and TypeScript types the bundled data
 - the `slug` matches the file name, and slugs and ids are unique
 - `roles` and `categories` exist in `src/data/taxonomy.ts`
 - every `relatedAgents` / `decisionGuide` slug points to an existing agent

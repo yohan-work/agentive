@@ -94,8 +94,7 @@ Agent Archive is a **static-data-first** Next.js app with no database or backend
 
 ```text
 content/
-├── agents/           # One YAML file per agent (the source of truth)
-└── TEMPLATE.yaml     # Starting point for a new agent
+└── agents/           # One YAML file per agent (the source of truth); _template.yaml to start
 schema/
 └── agent.schema.json # JSON Schema generated from src/types/agent.ts
 src/
@@ -125,7 +124,7 @@ scripts/
 Contributions are welcome, especially new agents, better prompts, and honest evaluations. Read the **[contributing guide](./CONTRIBUTING.md)** for what we accept and how agent verification levels work.
 
 - **Suggest an agent**: open a [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) issue, or use the Submit page on the site.
-- **Add or improve an agent**: copy `content/TEMPLATE.yaml` (or edit an existing file in `content/agents/`), run `npm run check:data`, and open a pull request.
+- **Add or improve an agent**: copy `content/agents/_template.yaml` (or edit an existing file in `content/agents/`), run `npm run check:data`, and open a pull request.
 - **Report a bug**: [open a bug report](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml).
 - **Security issues**: please report them privately (see [SECURITY.md](./SECURITY.md)).
 

@@ -9,9 +9,9 @@ Agent Archive is a static-data-first Next.js 15 (App Router) + TypeScript + Tail
 ## Commands
 
 ```bash
-npm run dev          # dev server on :3000
+npm run dev          # dev server on :3000 + content watcher
 npm run check:data   # schema + integrity checks (slugs, references, required metadata)
-npm run content      # bundle content/agents/*.yaml -> src/data/generated/agents.json (auto-runs before dev/build/typecheck)
+npm run content      # validate + bundle content/agents/*.yaml -> src/data/generated/agents.ts (auto-runs before build/typecheck; dev watches)
 npm run schema       # regenerate schema/agent.schema.json after changing AgentSource in src/types/agent.ts
 npm run lint         # ESLint (flat config in eslint.config.mjs)
 npm run typecheck    # tsc --noEmit
@@ -24,7 +24,7 @@ Run `check:data`, `lint`, `typecheck`, and `build` before you consider a change 
 
 - `src/app/[locale]/…`: locale-prefixed routes (`en`, `ko`). Localized pages re-export the page implementations in `src/app/…`.
 - `src/components/`: UI grouped by domain (`agents`, `workflows`, `layout`, `common`, …).
-- `content/agents/*.yaml`: one file per agent, validated against `schema/agent.schema.json`. Start from `content/TEMPLATE.yaml`.
+- `content/agents/*.yaml`: one file per agent, validated against `schema/agent.schema.json`. Start from `content/agents/_template.yaml`.
 - `src/data/`: workflows, starter packs, taxonomy, and the agent loader. `src/data/generated/` is build output. Never edit it.
 - `src/types/agent.ts`: `Agent` and `AgentSource` types (the schema is generated from `AgentSource`).
 - `src/lib/`: search, exports, and install-kit generation (`agent-install-kit.ts`).

@@ -1,6 +1,6 @@
-import type { Agent, AgentSource } from "@/types/agent";
+import type { Agent } from "@/types/agent";
 // Generated from content/agents/*.yaml by scripts/build-content.mjs (runs before dev, build, and typecheck).
-import agentSources from "./generated/agents.json";
+import { agentSources } from "./generated/agents";
 
 // Install guidance is the same for every project-ready agent, so it lives here instead of in each content file.
 const projectUse: NonNullable<Agent["projectUse"]> = {
@@ -24,7 +24,7 @@ const projectUse: NonNullable<Agent["projectUse"]> = {
   ]
 };
 
-export const agents: Agent[] = (agentSources as unknown as AgentSource[]).map((agent) =>
+export const agents: Agent[] = agentSources.map((agent) =>
   agent.installTargets?.length ? { ...agent, projectUse } : agent
 );
 

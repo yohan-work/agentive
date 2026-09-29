@@ -1,7 +1,7 @@
-# Copy this file to content/agents/<your-agent-slug>.yaml and fill it in.
+# Copy this file to content/agents/<your-agent-slug>.yaml (no leading underscore) and fill it in.
 # Your editor can autocomplete fields from the schema below (YAML extension by Red Hat in VS Code).
 # Run `npm run check:data` to validate. See CONTRIBUTING.md for what makes a good agent.
-# yaml-language-server: $schema=../schema/agent.schema.json
+# yaml-language-server: $schema=../../schema/agent.schema.json
 id: agent-101 # next free number; check the highest id in content/agents
 slug: your-agent-slug # must match the file name
 name: Your Agent Name
@@ -33,6 +33,13 @@ limitations:
   - When not to use this agent
 bestPractices:
   - How to get the best results
+realUseCases: # shown on the Use Cases page; add at least one
+  - title: A short title for the scenario
+    context: Who is using it and in what situation
+    problem: What goes wrong without the agent
+    howToUse: What to paste in and what to ask for
+    exampleInput: The actual input used
+    expectedResult: What a good output looks like
 relatedAgents: [] # slugs of related agents
 verifiedStatus: community # unverified | community (you ran it) | tested | expert (maintainers set these)
 createdBy: Your Name

@@ -1,7 +1,6 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { basename, join } from "node:path";
-import Ajv from "ajv";
-import { parse } from "yaml";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { loadAgentContent } from "./lib/agent-content.mjs";
 
 const root = process.cwd();
 
@@ -29,29 +28,7 @@ const dictionarySource = read("src/i18n/dictionaries.ts");
 const installKitSource = read("src/lib/agent-install-kit.ts");
 
 // Agents: one YAML file per agent in content/agents, validated against schema/agent.schema.json.
-const schemaFailures = [];
-const validateAgent = new Ajv({ allErrors: true }).compile(JSON.parse(read("schema/agent.schema.json")));
-const agentFiles = readdirSync(join(root, "content/agents")).filter((file) => file.endsWith(".yaml"));
-const agents = agentFiles.flatMap((file) => {
-  const path = `content/agents/${file}`;
-  let agent;
-  try {
-    agent = parse(read(path));
-  } catch (error) {
-    schemaFailures.push(`${path}: invalid YAML (${error.message})`);
-    return [];
-  }
-  if (!validateAgent(agent)) {
-    for (const error of validateAgent.errors ?? []) {
-      schemaFailures.push(`${path}: ${error.instancePath || "/"} ${error.message}${error.params?.additionalProperty ? ` (${error.params.additionalProperty})` : ""}`);
-    }
-    return [];
-  }
-  if (agent.slug !== basename(file, ".yaml")) {
-    schemaFailures.push(`${path}: slug "${agent.slug}" must match the file name`);
-  }
-  return [agent];
-});
+const { agents, failures: schemaFailures } = loadAgentContent(root);
 
 const agentSlugs = agents.map((agent) => agent.slug);
 const uniqueAgentSlugs = unique(agentSlugs);
@@ -111,8 +88,10 @@ const incompleteInstallable = installableAgents.flatMap((agent) => {
 });
 const evaluationScores = installableAgents.flatMap((agent) => (agent.evaluation ? [agent.evaluation.qualityScore] : []));
 const hasDifferentiatedQualityScores = unique(evaluationScores).length > 1;
-const hasRunbookKitFile = /RUNBOOK\.md/.test(installKitSource) && /toRunbookFile/.test(installKitSource);
-const hasEvaluationKitFile = /EVALUATION\.md/.test(installKitSource) && /toEvaluationFile/.test(installKitSource);
+const agentLoaderSource = read("src/data/agents.ts");
+const setupFilesBlock = agentLoaderSource.match(/setupFiles:\s*\[([\s\S]*?)\]/)?.[1] ?? "";
+const hasRunbookKitFile = /"RUNBOOK\.md"/.test(setupFilesBlock) && /toRunbookFile/.test(installKitSource);
+const hasEvaluationKitFile = /"EVALUATION\.md"/.test(setupFilesBlock) && /toEvaluationFile/.test(installKitSource);
 
 const taxonomyRoles = parseStringArray(taxonomySource.match(/export const roles:[\s\S]*?\];/)?.[0] ?? "").filter((value) =>
   /^[a-z0-9-]+$/.test(value)
