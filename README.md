@@ -6,6 +6,7 @@
 
 **An open-source library of practical AI agents, with prompts, runbooks, evaluations, and install kits for Codex, Claude Code, and Cursor.**
 
+[![CI](https://github.com/yohan-work/agentive/actions/workflows/ci.yml/badge.svg)](https://github.com/yohan-work/agentive/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](./LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey.svg)](./LICENSE-CONTENT.md)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
@@ -108,15 +109,19 @@ scripts/
 | `npm run dev` | Start the dev server |
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript type check |
 | `npm run check:data` | Validate agent, workflow, and taxonomy data |
 
 ## Contributing
 
-Contributions are welcome, especially new agents, better prompts, and honest evaluations.
+Contributions are welcome, especially new agents, better prompts, and honest evaluations. Read the **[contributing guide](./CONTRIBUTING.md)** for what we accept and how agent verification levels work.
 
-- **Suggest an agent**: use the [submit form](https://github.com/yohan-work/agentive/issues/new?labels=new-agent) or open an issue.
-- **Improve an existing agent**: edit its entry in `src/data`, run `npm run check:data && npm run lint && npm run build`, and open a pull request.
-- **Report a bug**: [open an issue](https://github.com/yohan-work/agentive/issues).
+- **Suggest an agent**: open a [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) issue, or use the Submit page on the site.
+- **Improve an existing agent**: edit its entry in `src/data`, run the checks, and open a pull request.
+- **Report a bug**: [open a bug report](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml).
+- **Security issues**: please report them privately (see [SECURITY.md](./SECURITY.md)).
+
+This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). AI coding agents should read [AGENTS.md](./AGENTS.md).
 
 ## Roadmap
 

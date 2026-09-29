@@ -6,6 +6,7 @@
 
 **실무에 바로 쓰는 AI 에이전트 오픈소스 라이브러리. 에이전트마다 프롬프트, 런북, 품질 평가, 그리고 Codex·Claude Code·Cursor용 설치 키트를 제공합니다.**
 
+[![CI](https://github.com/yohan-work/agentive/actions/workflows/ci.yml/badge.svg)](https://github.com/yohan-work/agentive/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](./LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey.svg)](./LICENSE-CONTENT.md)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
@@ -108,15 +109,19 @@ scripts/
 | `npm run dev` | 개발 서버 실행 |
 | `npm run build` | 프로덕션 빌드 |
 | `npm run lint` | ESLint 실행 |
+| `npm run typecheck` | TypeScript 타입 검사 |
 | `npm run check:data` | 에이전트, 워크플로우, 분류 데이터 검증 |
 
 ## 기여하기
 
-새 에이전트, 더 나은 프롬프트, 솔직한 평가 모두 환영합니다.
+새 에이전트, 더 나은 프롬프트, 솔직한 평가 모두 환영합니다. 어떤 기여를 받는지와 에이전트 검증 단계는 **[기여 가이드](./CONTRIBUTING.md)**(영문)에 정리되어 있습니다.
 
-- **에이전트 제안**: [제출 폼](https://github.com/yohan-work/agentive/issues/new?labels=new-agent)을 쓰거나 이슈를 열어주세요.
-- **기존 에이전트 개선**: `src/data`에서 해당 항목을 고친 뒤 `npm run check:data && npm run lint && npm run build`를 실행하고 PR을 보내주세요.
-- **버그 신고**: [이슈 열기](https://github.com/yohan-work/agentive/issues)
+- **에이전트 제안**: [Suggest an agent](https://github.com/yohan-work/agentive/issues/new?template=new-agent.yml) 이슈를 열거나 사이트의 Submit 페이지를 이용해 주세요.
+- **기존 에이전트 개선**: `src/data`에서 해당 항목을 고치고 검사를 실행한 뒤 PR을 보내주세요.
+- **버그 신고**: [버그 리포트 열기](https://github.com/yohan-work/agentive/issues/new?template=bug-report.yml)
+- **보안 이슈**: 공개 이슈 대신 비공개로 신고해 주세요 ([SECURITY.md](./SECURITY.md) 참고).
+
+이 프로젝트는 [Contributor Covenant](./CODE_OF_CONDUCT.md)를 따릅니다. AI 코딩 에이전트는 [AGENTS.md](./AGENTS.md)를 먼저 읽어주세요.
 
 ## 로드맵
 

@@ -1,0 +1,18 @@
+name: Improve an agent or feature
+description: Suggest a better prompt, a fix to agent content, or a new feature.
+title: "[Improve]: "
+labels: ["enhancement"]
+body:
+  - type: input
+    id: target
+    attributes:
+      label: Agent or area
+      description: Agent slug (e.g. pr-review-agent) or site area (search, install kits, ...).
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should change, and why?
+    validations:
+      required: true

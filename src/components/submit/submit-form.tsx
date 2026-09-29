@@ -5,18 +5,19 @@ import { Github } from "lucide-react";
 import { Button } from "@/components/common/button";
 import { siteConfig } from "@/lib/site";
 
+// Each field maps to an input id in .github/ISSUE_TEMPLATE/new-agent.yml so GitHub pre-fills the issue form.
 const fields = [
-  ["Agent name", "text"],
-  ["Summary", "text"],
-  ["Role", "text"],
-  ["Category", "text"],
-  ["Tags", "text"],
-  ["Tools", "text"],
-  ["Example input", "textarea"],
-  ["Example output", "textarea"],
-  ["Creator name", "text"],
-  ["Notes", "textarea"],
-  ["Prompt", "prompt"]
+  ["Agent name", "text", "name"],
+  ["Summary", "text", "summary"],
+  ["Role", "text", "roles"],
+  ["Category", "text", "categories"],
+  ["Tags", "text", "tags"],
+  ["Tools", "text", "tools"],
+  ["Example input", "textarea", "example-input"],
+  ["Example output", "textarea", "example-output"],
+  ["Creator name", "text", "creator"],
+  ["Notes", "textarea", "notes"],
+  ["Prompt", "prompt", "prompt"]
 ] as const;
 
 const inputClassName =
@@ -25,24 +26,14 @@ const inputClassName =
 // GitHub rejects very long /issues/new URLs, so long fields are trimmed and the submitter
 // is asked to paste the full text into the issue.
 const MAX_ISSUE_URL_LENGTH = 7000;
-const CODE_FIELDS = new Set<string>(["Example input", "Example output", "Prompt"]);
-
-function formatField(label: string, value: string) {
-  if (!value) {
-    return `### ${label}\n\n_No response_`;
-  }
-
-  if (CODE_FIELDS.has(label)) {
-    const fence = value.includes("```") ? "~~~~" : "```";
-    return `### ${label}\n\n${fence}text\n${value}\n${fence}`;
-  }
-
-  return `### ${label}\n\n${value}`;
-}
 
 function buildIssueUrl(title: string, values: Record<string, string>) {
-  const body = fields.map(([label]) => formatField(label, values[label] ?? "")).join("\n\n");
-  const params = new URLSearchParams({ title, labels: "new-agent", body });
+  const params = new URLSearchParams({ template: "new-agent.yml", title });
+  for (const [label, , id] of fields) {
+    if (values[label]) {
+      params.set(id, values[label]);
+    }
+  }
   return `${siteConfig.repoUrl}/issues/new?${params.toString()}`;
 }
 

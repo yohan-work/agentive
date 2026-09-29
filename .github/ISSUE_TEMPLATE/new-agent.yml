@@ -1,0 +1,87 @@
+name: Suggest an agent
+description: Propose a new agent for the archive.
+title: "[Agent]: "
+labels: ["new-agent"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an agent! Good submissions describe a **real, repeatable piece of work**, not just a clever prompt.
+        Check [existing agents](https://github.com/yohan-work/agentive/tree/main/src/data) first to avoid duplicates.
+  - type: input
+    id: name
+    attributes:
+      label: Agent name
+      placeholder: PR Review Agent
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence. What does it produce?
+      placeholder: Reviews pull requests for correctness, regression risk, and missing tests.
+    validations:
+      required: true
+  - type: input
+    id: roles
+    attributes:
+      label: Roles
+      description: "Who uses it? One or more of: planner, pm, designer, developer, marketer, sales, cs, founder, creator"
+    validations:
+      required: true
+  - type: input
+    id: categories
+    attributes:
+      label: Categories
+      description: "One or more of: planning, development, design, web, marketing, research, documentation, operations, automation, business, content"
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      placeholder: review, quality, tests
+  - type: input
+    id: tools
+    attributes:
+      label: Tools
+      placeholder: Claude Code, Codex, GitHub
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Prompt
+      description: The full system prompt or instructions.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: example-input
+    attributes:
+      label: Example input
+      render: text
+  - type: textarea
+    id: example-output
+    attributes:
+      label: Example output
+      description: A real (or realistic) output from running the prompt.
+      render: text
+  - type: input
+    id: creator
+    attributes:
+      label: Creator name
+      description: How you'd like to be credited.
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Limitations, when not to use it, which models you tested with.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I have tested this prompt with at least one AI tool.
+          required: true
+        - label: I agree to license this content under CC BY 4.0.
+          required: true
