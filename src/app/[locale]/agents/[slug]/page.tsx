@@ -68,7 +68,7 @@ async function AgentDetailPageContent({
 
   return (
     <AppShell toc={toc}>
-      <AgentDetailHeader agent={agent} labels={labels} />
+      <AgentDetailHeader agent={agent} labels={labels} locale={locale} />
       <div id="expected-effect">
         <AgentEffectSummary agent={agent} relatedAgent={related[0]} labels={labels} />
       </div>

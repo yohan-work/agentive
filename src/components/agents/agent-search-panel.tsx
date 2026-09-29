@@ -3,14 +3,15 @@
 import { type ComponentProps, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
-import type { Agent } from "@/types/agent";
+import type { Agent, Difficulty, VerifiedStatus } from "@/types/agent";
 import { defaultLocale, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import { filterAgents, getUniqueTools, searchAgents, type AgentFilters } from "@/lib/search";
 import { titleCase } from "@/lib/utils";
 import { AgentGrid } from "./agent-grid";
 
-const difficulties = ["beginner", "intermediate", "advanced"];
-const statuses = ["unverified", "tested", "community", "expert"];
+const difficulties: Difficulty[] = ["beginner", "intermediate", "advanced"];
+const statuses: VerifiedStatus[] = ["unverified", "community", "tested", "expert"];
 const levels = ["1", "2", "3", "4", "5"];
 
 export function AgentSearchPanel({
@@ -26,6 +27,11 @@ export function AgentSearchPanel({
   categories: string[];
   locale?: Locale;
 }) {
+  const dictionary = getDictionary(locale);
+  const labels = dictionary.agentSearch;
+  const meta = dictionary.agentMeta;
+  const difficultyLabel = (value: string) => meta.difficulty[value as Difficulty];
+  const statusLabel = (value: string) => meta.status[value as VerifiedStatus];
   const [query, setQuery] = useState(initialQuery);
   // When the URL query changes (e.g. top-nav search), adopt it without resetting the other filters.
   const [appliedInitialQuery, setAppliedInitialQuery] = useState(initialQuery);
@@ -37,14 +43,14 @@ export function AgentSearchPanel({
   const tools = useMemo(() => getUniqueTools(agents), [agents]);
   const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
   const activeFilters = [
-    query ? `Search: ${query}` : undefined,
-    filters.role ? `Role: ${titleCase(filters.role)}` : undefined,
-    filters.category ? `Category: ${titleCase(filters.category)}` : undefined,
-    filters.difficulty ? `Difficulty: ${titleCase(filters.difficulty)}` : undefined,
-    filters.automationLevel ? `Automation: ${filters.automationLevel}/5` : undefined,
-    filters.tool ? `Tool: ${filters.tool}` : undefined,
-    filters.verifiedStatus ? `Verified: ${titleCase(filters.verifiedStatus)}` : undefined,
-    filters.installableOnly ? "Installable only" : undefined
+    query ? `${labels.search}: ${query}` : undefined,
+    filters.role ? `${labels.role}: ${titleCase(filters.role)}` : undefined,
+    filters.category ? `${labels.category}: ${titleCase(filters.category)}` : undefined,
+    filters.difficulty ? `${labels.difficulty}: ${difficultyLabel(filters.difficulty)}` : undefined,
+    filters.automationLevel ? `${labels.automation}: ${filters.automationLevel}/5` : undefined,
+    filters.tool ? `${labels.tool}: ${filters.tool}` : undefined,
+    filters.verifiedStatus ? `${labels.verified}: ${statusLabel(filters.verifiedStatus)}` : undefined,
+    filters.installableOnly ? labels.installableOnly : undefined
   ].filter((item): item is string => Boolean(item));
 
   function setFilter(key: keyof AgentFilters, value: string) {
@@ -63,7 +69,7 @@ export function AgentSearchPanel({
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by name, role, task, tag, or tool..."
+          placeholder={labels.placeholder}
           className="h-12 w-full rounded-lg border border-line bg-panel pl-10 pr-4 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20"
         />
       </label>
@@ -76,23 +82,33 @@ export function AgentSearchPanel({
             onChange={(event) => setFilters((current) => ({ ...current, installableOnly: event.target.checked }))}
             className="h-4 w-4 accent-sky-400"
           />
-          Installable only
+          {labels.installableOnly}
         </label>
-        <FilterRow title="Role" values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
-        <FilterRow title="Category" values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
-        <FilterRow title="Difficulty" values={difficulties} active={filters.difficulty} onSelect={(value) => setFilter("difficulty", value)} />
-        <FilterRow title="Automation" values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
-        <FilterRow title="Tool" values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
-        <FilterRow title="Verified" values={statuses} active={filters.verifiedStatus} onSelect={(value) => setFilter("verifiedStatus", value)} />
+        <FilterRow title={labels.role} values={roles} active={filters.role} onSelect={(value) => setFilter("role", value)} />
+        <FilterRow title={labels.category} values={categories} active={filters.category} onSelect={(value) => setFilter("category", value)} />
+        <FilterRow
+          title={labels.difficulty}
+          values={difficulties}
+          active={filters.difficulty}
+          onSelect={(value) => setFilter("difficulty", value)}
+          label={difficultyLabel}
+        />
+        <FilterRow title={labels.automation} values={levels} active={filters.automationLevel} onSelect={(value) => setFilter("automationLevel", value)} label={(value) => `${value}/5`} />
+        <FilterRow title={labels.tool} values={tools} active={filters.tool} onSelect={(value) => setFilter("tool", value)} label={(value) => value} />
+        <FilterRow
+          title={labels.verified}
+          values={statuses}
+          active={filters.verifiedStatus}
+          onSelect={(value) => setFilter("verifiedStatus", value)}
+          label={statusLabel}
+        />
       </div>
 
       <div className="rounded-lg border border-line bg-panel/45 p-4">
         <div className="flex flex-col gap-3 text-sm text-secondary sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            Showing <span className="font-semibold text-primary">{results.length}</span> of {agents.length} agents
-          </span>
+          <span>{formatCount(labels.showing, { shown: results.length, total: agents.length })}</span>
           <button type="button" onClick={clearAll} className="self-start text-sky-200 transition hover:text-primary sm:self-auto">
-            Clear all
+            {labels.clearAll}
           </button>
         </div>
         {activeFilters.length ? (
@@ -104,21 +120,32 @@ export function AgentSearchPanel({
             ))}
           </div>
         ) : null}
-        <p className="mt-3 text-xs text-muted">
-          Search includes agent metadata, tools, prompt context, and Korean real-use-case scenarios.
-        </p>
+        <p className="mt-3 text-xs text-muted">{labels.searchScope}</p>
       </div>
 
       <div className="flex items-center justify-between text-sm text-secondary">
-        <span>{results.length} agents</span>
+        <span>{formatCount(labels.resultCount, { count: results.length })}</span>
         <button type="button" onClick={() => setFilters({})} className="text-sky-200 transition hover:text-primary">
-          Clear filters only
+          {labels.clearFilters}
         </button>
       </div>
 
       <AgentGrid agents={results} locale={locale} />
     </div>
   );
+}
+
+// Fills {name} placeholders in a dictionary string, highlighting the {shown} count as the old markup did.
+function formatCount(template: string, values: Record<string, number>) {
+  return template.split(/(\{\w+\})/).map((part, index) => {
+    const key = part.match(/^\{(\w+)\}$/)?.[1];
+    if (!key || !(key in values)) return part;
+    return (
+      <span key={index} className={key === "shown" ? "font-semibold text-primary" : undefined}>
+        {values[key]}
+      </span>
+    );
+  });
 }
 
 function FilterRow({

@@ -215,6 +215,40 @@ export const dictionaries = {
       expectedOutput: "Expected output",
       sampleOutput: "Sample output"
     },
+    agentMeta: {
+      status: {
+        unverified: "Unverified",
+        community: "Community Verified",
+        tested: "Tested",
+        expert: "Expert Reviewed"
+      },
+      difficulty: {
+        beginner: "Beginner",
+        intermediate: "Intermediate",
+        advanced: "Advanced"
+      },
+      installable: "Installable",
+      quality: "Quality",
+      automation: "Automation",
+      stepCount: "{count} steps",
+      viewAgent: "View agent"
+    },
+    agentSearch: {
+      placeholder: "Search by name, role, task, tag, or tool...",
+      installableOnly: "Installable only",
+      search: "Search",
+      role: "Role",
+      category: "Category",
+      difficulty: "Difficulty",
+      automation: "Automation",
+      tool: "Tool",
+      verified: "Verified",
+      showing: "Showing {shown} of {total} agents",
+      clearAll: "Clear all",
+      searchScope: "Search includes agent metadata, tools, prompt context, and Korean real-use-case scenarios.",
+      resultCount: "{count} agents",
+      clearFilters: "Clear filters only"
+    },
     submit: {
       title: "Submit an agent",
       eyebrow: "Contribution",
@@ -457,6 +491,40 @@ export const dictionaries = {
       sampleInput: "입력",
       expectedOutput: "기대 결과",
       sampleOutput: "샘플 결과"
+    },
+    agentMeta: {
+      status: {
+        unverified: "미검증",
+        community: "커뮤니티 검증",
+        tested: "테스트 완료",
+        expert: "전문가 검토"
+      },
+      difficulty: {
+        beginner: "입문",
+        intermediate: "중급",
+        advanced: "고급"
+      },
+      installable: "설치 가능",
+      quality: "품질",
+      automation: "자동화",
+      stepCount: "{count}단계",
+      viewAgent: "에이전트 보기"
+    },
+    agentSearch: {
+      placeholder: "이름, 역할, 업무, 태그, 도구로 검색...",
+      installableOnly: "설치 가능한 것만",
+      search: "검색",
+      role: "역할",
+      category: "카테고리",
+      difficulty: "난이도",
+      automation: "자동화",
+      tool: "도구",
+      verified: "검증",
+      showing: "에이전트 {total}개 중 {shown}개",
+      clearAll: "모두 지우기",
+      searchScope: "에이전트 정보, 도구, 프롬프트 맥락, 한국어 실제 활용 사례까지 검색합니다.",
+      resultCount: "에이전트 {count}개",
+      clearFilters: "필터만 지우기"
     },
     submit: {
       title: "에이전트 제출",

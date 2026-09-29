@@ -11,10 +11,6 @@ export function titleCase(value: string) {
     .join(" ");
 }
 
-export function formatStatus(value: string) {
-  return titleCase(value).replace("Community", "Community Verified").replace("Expert", "Expert Reviewed");
-}
-
 export function pluralize(count: number, singular: string, plural = `${singular}s`) {
   return `${count} ${count === 1 ? singular : plural}`;
 }

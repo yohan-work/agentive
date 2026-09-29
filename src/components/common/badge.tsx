@@ -1,4 +1,7 @@
-import { cn, formatStatus, titleCase } from "@/lib/utils";
+import { defaultLocale, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { cn } from "@/lib/utils";
+import type { Difficulty, VerifiedStatus } from "@/types/agent";
 
 type BadgeProps = {
   children: React.ReactNode;
@@ -23,12 +26,12 @@ export function Badge({ children, tone = "default", className }: BadgeProps) {
   );
 }
 
-export function DifficultyBadge({ difficulty }: { difficulty: string }) {
+export function DifficultyBadge({ difficulty, locale = defaultLocale }: { difficulty: Difficulty; locale?: Locale }) {
   const tone = difficulty === "advanced" ? "warning" : difficulty === "intermediate" ? "accent" : "default";
-  return <Badge tone={tone}>{titleCase(difficulty)}</Badge>;
+  return <Badge tone={tone}>{getDictionary(locale).agentMeta.difficulty[difficulty]}</Badge>;
 }
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, locale = defaultLocale }: { status: VerifiedStatus; locale?: Locale }) {
   const tone = status === "expert" || status === "tested" ? "success" : status === "community" ? "accent" : "default";
-  return <Badge tone={tone}>{formatStatus(status)}</Badge>;
+  return <Badge tone={tone}>{getDictionary(locale).agentMeta.status[status]}</Badge>;
 }

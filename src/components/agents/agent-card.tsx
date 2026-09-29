@@ -5,20 +5,26 @@ import { Badge, DifficultyBadge, StatusBadge } from "@/components/common/badge";
 import { Card } from "@/components/common/card";
 import { Tag } from "@/components/common/tag";
 import { defaultLocale, type Locale, withLocale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
 import { titleCase } from "@/lib/utils";
 import { BookmarkButton } from "./bookmark-button";
 
 export function AgentCard({ agent, locale = defaultLocale }: { agent: Agent; locale?: Locale }) {
   const href = withLocale(`/agents/${agent.slug}`, locale);
+  const labels = getDictionary(locale).agentMeta;
 
   return (
     <Card className="group flex h-full flex-col p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex flex-wrap gap-2">
-          <StatusBadge status={agent.verifiedStatus} />
-          <DifficultyBadge difficulty={agent.difficulty} />
-          {agent.installTargets?.length ? <Badge tone="success">Installable</Badge> : null}
-          {agent.evaluation ? <Badge tone="accent">Quality {agent.evaluation.qualityScore}/5</Badge> : null}
+          <StatusBadge status={agent.verifiedStatus} locale={locale} />
+          <DifficultyBadge difficulty={agent.difficulty} locale={locale} />
+          {agent.installTargets?.length ? <Badge tone="success">{labels.installable}</Badge> : null}
+          {agent.evaluation ? (
+            <Badge tone="accent">
+              {labels.quality} {agent.evaluation.qualityScore}/5
+            </Badge>
+          ) : null}
         </div>
         <BookmarkButton slug={agent.slug} compact />
       </div>
@@ -39,7 +45,8 @@ export function AgentCard({ agent, locale = defaultLocale }: { agent: Agent; loc
         </div>
         <p className="flex items-center gap-2">
           <Gauge className="h-4 w-4 text-muted" />
-          Automation {agent.automationLevel}/5{agent.evaluation ? ` · Quality ${agent.evaluation.qualityScore}/5` : ""}
+          {labels.automation} {agent.automationLevel}/5
+          {agent.evaluation ? ` · ${labels.quality} ${agent.evaluation.qualityScore}/5` : ""}
         </p>
         <p className="flex items-center gap-2">
           <Wrench className="h-4 w-4 text-muted" />
@@ -47,7 +54,7 @@ export function AgentCard({ agent, locale = defaultLocale }: { agent: Agent; loc
         </p>
       </div>
       <Link href={href} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-sky-200">
-        View agent <ArrowRight className="h-4 w-4" />
+        {labels.viewAgent} <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>
   );
