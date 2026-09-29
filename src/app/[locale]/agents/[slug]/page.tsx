@@ -16,24 +16,6 @@ import { defaultLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { resolveLocale, type LocaleParams } from "@/i18n/server";
 
-const toc = [
-  { title: "Expected effect", href: "#expected-effect" },
-  { title: "What this agent does", href: "#what-this-agent-does" },
-  { title: "Use this agent", href: "#use-this-agent" },
-  { title: "How to run this agent", href: "#how-to-run-this-agent" },
-  { title: "Quality evaluation", href: "#quality-evaluation" },
-  { title: "Decision guide", href: "#decision-guide" },
-  { title: "When to use", href: "#when-to-use" },
-  { title: "Inputs", href: "#inputs" },
-  { title: "Outputs", href: "#outputs" },
-  { title: "Prompt", href: "#prompt" },
-  { title: "Example", href: "#example" },
-  { title: "Real use cases", href: "#real-use-cases" },
-  { title: "Best practices", href: "#best-practices" },
-  { title: "Limitations", href: "#limitations" },
-  { title: "Related agents", href: "#related-agents" }
-];
-
 export function generateStaticParams() {
   return agents.map((agent) => ({ slug: agent.slug }));
 }
@@ -61,17 +43,36 @@ async function AgentDetailPageContent({
   }
 
   const dictionary = getDictionary(locale);
+  const labels = dictionary.agentDetail;
+  const sections = labels.sections;
+  const toc = [
+    { title: labels.effectSummaryTitle, href: "#expected-effect" },
+    { title: sections.whatItDoes, href: "#what-this-agent-does" },
+    { title: sections.useThisAgent, href: "#use-this-agent" },
+    { title: sections.howToRun, href: "#how-to-run-this-agent" },
+    { title: sections.qualityEvaluation, href: "#quality-evaluation" },
+    { title: sections.decisionGuide, href: "#decision-guide" },
+    { title: sections.whenToUse, href: "#when-to-use" },
+    { title: sections.inputs, href: "#inputs" },
+    { title: sections.outputs, href: "#outputs" },
+    { title: sections.prompt, href: "#prompt" },
+    { title: sections.example, href: "#example" },
+    { title: sections.realUseCases, href: "#real-use-cases" },
+    { title: sections.bestPractices, href: "#best-practices" },
+    { title: sections.limitations, href: "#limitations" },
+    { title: sections.relatedAgents, href: "#related-agents" }
+  ];
   const related = (agent.relatedAgents ?? [])
     .map((relatedSlug) => getAgentBySlug(relatedSlug))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
     <AppShell toc={toc}>
-      <AgentDetailHeader agent={agent} />
+      <AgentDetailHeader agent={agent} labels={labels} />
       <div id="expected-effect">
-        <AgentEffectSummary agent={agent} relatedAgent={related[0]} labels={dictionary.agentDetail} />
+        <AgentEffectSummary agent={agent} relatedAgent={related[0]} labels={labels} />
       </div>
-      <DetailSection id="what-this-agent-does" title="What this agent does">
+      <DetailSection id="what-this-agent-does" title={sections.whatItDoes}>
         <p>{agent.description}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {agent.tags.map((tag) => (
@@ -79,17 +80,17 @@ async function AgentDetailPageContent({
           ))}
         </div>
       </DetailSection>
-      <DetailSection id="use-this-agent" title="Use this agent">
-        <AgentExportPanel agent={agent} />
+      <DetailSection id="use-this-agent" title={sections.useThisAgent}>
+        <AgentExportPanel agent={agent} labels={dictionary.agentExport} />
       </DetailSection>
-      <DetailSection id="how-to-run-this-agent" title="How to run this agent">
-        <AgentRunbookPanel runbook={agent.runbook} />
+      <DetailSection id="how-to-run-this-agent" title={sections.howToRun}>
+        <AgentRunbookPanel runbook={agent.runbook} labels={dictionary.agentRunbook} />
       </DetailSection>
-      <DetailSection id="quality-evaluation" title="Quality evaluation">
-        <AgentEvaluationPanel evaluation={agent.evaluation} />
+      <DetailSection id="quality-evaluation" title={sections.qualityEvaluation}>
+        <AgentEvaluationPanel evaluation={agent.evaluation} labels={dictionary.agentEvaluation} />
       </DetailSection>
       {agent.decisionGuide?.length ? (
-        <DetailSection id="decision-guide" title="Decision guide">
+        <DetailSection id="decision-guide" title={sections.decisionGuide}>
           <div className="grid gap-4">
             {agent.decisionGuide.map((item) => {
               const alternative = item.alternativeAgentSlug ? getAgentBySlug(item.alternativeAgentSlug) : undefined;
@@ -100,7 +101,7 @@ async function AgentDetailPageContent({
                   <p className="mt-2 text-sm leading-6 text-secondary">{item.guidance}</p>
                   {alternative ? (
                     <p className="mt-3 text-xs text-muted">
-                      Related option: <span className="text-sky-200">{alternative.name}</span>
+                      {labels.relatedOption} <span className="text-sky-200">{alternative.name}</span>
                     </p>
                   ) : null}
                 </div>
@@ -109,34 +110,34 @@ async function AgentDetailPageContent({
           </div>
         </DetailSection>
       ) : null}
-      <DetailSection id="when-to-use" title="When to use">
+      <DetailSection id="when-to-use" title={sections.whenToUse}>
         <List items={agent.useCases} />
       </DetailSection>
-      <DetailSection id="inputs" title="Inputs">
+      <DetailSection id="inputs" title={sections.inputs}>
         <List items={agent.inputs} />
       </DetailSection>
-      <DetailSection id="outputs" title="Outputs">
+      <DetailSection id="outputs" title={sections.outputs}>
         <List items={agent.outputs} />
       </DetailSection>
-      <DetailSection id="prompt" title="Prompt">
+      <DetailSection id="prompt" title={sections.prompt}>
         <CodeBlock value={agent.prompt} />
       </DetailSection>
-      <DetailSection id="example" title="Example">
+      <DetailSection id="example" title={sections.example}>
         <div className="grid gap-4 md:grid-cols-2">
-          <ExampleBlock title="Example input" value={agent.exampleInput ?? "No example input provided."} />
-          <ExampleBlock title="Example output" value={agent.exampleOutput ?? "No example output provided."} />
+          <ExampleBlock title={labels.exampleInput} value={agent.exampleInput ?? labels.noExampleInput} />
+          <ExampleBlock title={labels.exampleOutput} value={agent.exampleOutput ?? labels.noExampleOutput} />
         </div>
       </DetailSection>
-      <DetailSection id="real-use-cases" title="Real use cases">
+      <DetailSection id="real-use-cases" title={sections.realUseCases}>
         <AgentUseCaseList useCases={agent.realUseCases ?? []} />
       </DetailSection>
-      <DetailSection id="best-practices" title="Best practices">
+      <DetailSection id="best-practices" title={sections.bestPractices}>
         <List items={agent.bestPractices ?? []} />
       </DetailSection>
-      <DetailSection id="limitations" title="Limitations">
+      <DetailSection id="limitations" title={sections.limitations}>
         <List items={agent.limitations ?? []} />
       </DetailSection>
-      <DetailSection id="related-agents" title="Related agents">
+      <DetailSection id="related-agents" title={sections.relatedAgents}>
         <RelatedAgents agents={related} locale={locale} />
       </DetailSection>
     </AppShell>
