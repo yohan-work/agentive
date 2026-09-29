@@ -144,6 +144,34 @@ export const dictionaries = {
       reducesWork: "Reduces",
       createsOutput: "Creates",
       nextStep: "Next step"
+    },
+    submit: {
+      title: "Submit an agent",
+      eyebrow: "Contribution",
+      description: "Share a reusable agent idea. Filling in this form opens a pre-filled GitHub issue so maintainers can review it in the open.",
+      button: "Open submission on GitHub",
+      help: "Submissions are reviewed as GitHub issues. This opens a pre-filled issue in a new tab; nothing is stored on this site."
+    },
+    about: {
+      title: "About",
+      eyebrow: "About",
+      description: "Agent Archive is an open-source library of practical AI agents. Each agent documents when to use it, what context it needs, how to review its output, and how to install it in a project.",
+      tocWhat: "What it is",
+      tocOpenSource: "Open source",
+      principles: [
+        ["Work context first", "Agents are described by the job they do: use cases, inputs, outputs, and limits."],
+        ["Honest verification", "Every agent shows how far it has been verified. New agents start as unverified until someone runs them."],
+        ["Installable", "Project-ready agents export AGENTS.md, CLAUDE.md, and Cursor rules you can drop into a repository."]
+      ],
+      openSourceTitle: "Open source",
+      openSourceBody: "Code is MIT licensed and agent content is CC BY 4.0. Suggestions, fixes, and verification reports are welcome.",
+      repoLink: "View on GitHub",
+      contributingLink: "Contributing guide"
+    },
+    notFound: {
+      title: "Page not found",
+      description: "The requested page does not exist in this archive.",
+      browse: "Browse agents"
     }
   },
   ko: {
@@ -289,6 +317,34 @@ export const dictionaries = {
       reducesWork: "줄여주는 일",
       createsOutput: "얻는 산출물",
       nextStep: "다음 단계"
+    },
+    submit: {
+      title: "에이전트 제출",
+      eyebrow: "기여하기",
+      description: "재사용할 수 있는 에이전트 아이디어를 공유해 주세요. 이 폼을 작성하면 내용이 채워진 GitHub 이슈가 열리고, 메인테이너가 공개적으로 검토합니다.",
+      button: "GitHub에서 제출하기",
+      help: "제출 내용은 GitHub 이슈로 검토합니다. 새 탭에서 내용이 채워진 이슈가 열리며, 이 사이트에는 아무것도 저장되지 않습니다."
+    },
+    about: {
+      title: "소개",
+      eyebrow: "소개",
+      description: "Agent Archive는 실무용 AI 에이전트 오픈소스 라이브러리입니다. 에이전트마다 언제 쓰는지, 어떤 맥락이 필요한지, 결과를 어떻게 검토하는지, 프로젝트에 어떻게 설치하는지를 정리합니다.",
+      tocWhat: "무엇인가요",
+      tocOpenSource: "오픈소스",
+      principles: [
+        ["업무 맥락 중심", "에이전트를 하는 일 기준으로 설명합니다: 활용 사례, 입력, 출력, 한계."],
+        ["솔직한 검증 표시", "에이전트마다 어디까지 검증됐는지 보여줍니다. 새 에이전트는 누군가 직접 실행해 보기 전까지 미검증 상태입니다."],
+        ["바로 설치", "프로젝트용 에이전트는 저장소에 바로 넣을 수 있는 AGENTS.md, CLAUDE.md, Cursor 규칙으로 내보낼 수 있습니다."]
+      ],
+      openSourceTitle: "오픈소스",
+      openSourceBody: "코드는 MIT, 에이전트 콘텐츠는 CC BY 4.0 라이선스입니다. 제안, 수정, 검증 결과 공유 모두 환영합니다.",
+      repoLink: "GitHub에서 보기",
+      contributingLink: "기여 가이드"
+    },
+    notFound: {
+      title: "페이지를 찾을 수 없습니다",
+      description: "요청한 페이지가 아카이브에 없습니다.",
+      browse: "에이전트 둘러보기"
     }
   }
 } as const;

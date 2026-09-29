@@ -1,27 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Agent } from "@/types/agent";
-import { readBookmarks } from "@/lib/bookmarks";
+import { useBookmarks } from "@/lib/bookmarks";
+import type { Locale } from "@/i18n/config";
 import { AgentGrid } from "./agent-grid";
 import { EmptyState } from "@/components/common/empty-state";
 
-export function BookmarksList({ agents }: { agents: Agent[] }) {
-  const [bookmarks, setBookmarks] = useState<string[]>([]);
-
-  useEffect(() => {
-    function sync() {
-      setBookmarks(readBookmarks());
-    }
-
-    sync();
-    window.addEventListener("agent-archive:bookmarks-changed", sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener("agent-archive:bookmarks-changed", sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
+export function BookmarksList({ agents, locale }: { agents: Agent[]; locale: Locale }) {
+  const bookmarks = useBookmarks();
 
   const bookmarkedAgents = useMemo(
     () => agents.filter((agent) => bookmarks.includes(agent.slug)),
@@ -32,5 +19,5 @@ export function BookmarksList({ agents }: { agents: Agent[] }) {
     return <EmptyState title="No bookmarks yet." description="Save agents from cards or detail pages to build your working library." />;
   }
 
-  return <AgentGrid agents={bookmarkedAgents} />;
+  return <AgentGrid agents={bookmarkedAgents} locale={locale} />;
 }

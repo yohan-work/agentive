@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ComponentProps, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import type { Agent } from "@/types/agent";
 import { defaultLocale, type Locale } from "@/i18n/config";
@@ -26,6 +27,12 @@ export function AgentSearchPanel({
   locale?: Locale;
 }) {
   const [query, setQuery] = useState(initialQuery);
+  // When the URL query changes (e.g. top-nav search), adopt it without resetting the other filters.
+  const [appliedInitialQuery, setAppliedInitialQuery] = useState(initialQuery);
+  if (initialQuery !== appliedInitialQuery) {
+    setAppliedInitialQuery(initialQuery);
+    setQuery(initialQuery);
+  }
   const [filters, setFilters] = useState<AgentFilters>({});
   const tools = useMemo(() => getUniqueTools(agents), [agents]);
   const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
@@ -148,4 +155,10 @@ function FilterRow({
       </div>
     </div>
   );
+}
+
+/** Seeds the search box from `?query=` on the client. The static page renders the unfiltered list. */
+export function AgentSearchPanelFromUrl(props: Omit<ComponentProps<typeof AgentSearchPanel>, "initialQuery">) {
+  const query = useSearchParams().get("query") ?? "";
+  return <AgentSearchPanel {...props} initialQuery={query} />;
 }

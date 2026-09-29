@@ -4,7 +4,7 @@ Guidance for AI coding agents (Codex, Claude Code, Cursor, and others) working i
 
 ## Project
 
-Agent Archive is a static-data-first Next.js 15 (App Router) + TypeScript + Tailwind site. There is no database or backend. Agents are one YAML file each in `content/agents/`; workflows, starter packs, and taxonomy are TypeScript in `src/data/`.
+Agent Archive is a static-data-first Next.js 16 (App Router) + TypeScript + Tailwind site, exported as static HTML (`output: "export"`) and deployed to GitHub Pages. There is no database or backend. Agents are one YAML file each in `content/agents/`; workflows, starter packs, and taxonomy are TypeScript in `src/data/`.
 
 ## Commands
 
@@ -22,7 +22,7 @@ Run `check:data`, `lint`, `typecheck`, and `build` before you consider a change 
 
 ## Layout
 
-- `src/app/[locale]/…`: locale-prefixed routes (`en`, `ko`). Localized pages re-export the page implementations in `src/app/…`.
+- `src/app/[locale]/…`: every page lives here and reads its locale from `params` via `resolveLocale()`. `src/app/(root)` only redirects `/` to `/en/`. The build is fully static: no middleware, `headers()`, or server-side `searchParams` (read query strings on the client with `useSearchParams`).
 - `src/components/`: UI grouped by domain (`agents`, `workflows`, `layout`, `common`, …).
 - `content/agents/*.yaml`: one file per agent, validated against `schema/agent.schema.json`. Start from `content/agents/_template.yaml`.
 - `src/data/`: workflows, starter packs, taxonomy, and the agent loader. `src/data/generated/` is build output. Never edit it.

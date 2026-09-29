@@ -28,7 +28,7 @@ export function AgentCard({ agent, locale = defaultLocale }: { agent: Agent; loc
       </Link>
       <div className="mt-4 flex flex-wrap gap-2">
         {agent.tags.slice(0, 4).map((tag) => (
-          <Tag key={tag} value={tag} />
+          <Tag key={tag} value={tag} locale={locale} />
         ))}
       </div>
       <div className="mt-5 space-y-2 border-t border-line pt-4 text-sm text-secondary">

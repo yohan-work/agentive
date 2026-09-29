@@ -69,7 +69,7 @@ function buildSubmissionIssueUrl(rawValues: Record<string, string>) {
   return url;
 }
 
-export function SubmitForm() {
+export function SubmitForm({ buttonLabel, helpText }: { buttonLabel: string; helpText: string }) {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -97,10 +97,10 @@ export function SubmitForm() {
       </div>
       <Button type="submit" variant="primary">
         <Github className="h-4 w-4" />
-        Open submission on GitHub
+        {buttonLabel}
       </Button>
       <p className="text-sm leading-6 text-muted">
-        Submissions are reviewed as GitHub issues. This opens a pre-filled issue in a new tab; nothing is stored on this site.
+        {helpText}
       </p>
     </form>
   );

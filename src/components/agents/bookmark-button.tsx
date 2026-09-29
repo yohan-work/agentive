@@ -1,23 +1,15 @@
 "use client";
 
 import { Bookmark } from "lucide-react";
-import { useEffect, useState } from "react";
-import { readBookmarks, writeBookmarks } from "@/lib/bookmarks";
+import { readBookmarks, useBookmarks, writeBookmarks } from "@/lib/bookmarks";
 import { cn } from "@/lib/utils";
 
 export function BookmarkButton({ slug, compact = false }: { slug: string; compact?: boolean }) {
-  const [bookmarked, setBookmarked] = useState(false);
-
-  useEffect(() => {
-    setBookmarked(readBookmarks().includes(slug));
-  }, [slug]);
+  const bookmarked = useBookmarks().includes(slug);
 
   function toggle() {
     const current = readBookmarks();
-    const next = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug];
-    writeBookmarks(next);
-    setBookmarked(next.includes(slug));
-    window.dispatchEvent(new CustomEvent("agent-archive:bookmarks-changed"));
+    writeBookmarks(current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug]);
   }
 
   return (

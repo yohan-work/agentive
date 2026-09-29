@@ -9,11 +9,12 @@
 [![CI](https://github.com/yohan-work/agentive/actions/workflows/ci.yml/badge.svg)](https://github.com/yohan-work/agentive/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](./LICENSE)
 [![Content: CC BY 4.0](https://img.shields.io/badge/content-CC%20BY%204.0-lightgrey.svg)](./LICENSE-CONTENT.md)
-[![Next.js 15](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![Live site](https://img.shields.io/badge/live-yohan--work.github.io%2Fagentive-60a5fa)](https://yohan-work.github.io/agentive/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-[Features](#features) · [Quick start](#quick-start) · [Install kits](#install-kits) · [Contributing](#contributing) · [한국어](./README.ko.md)
+**[Live site](https://yohan-work.github.io/agentive/)** · [Features](#features) · [Quick start](#quick-start) · [Install kits](#install-kits) · [Contributing](#contributing) · [한국어](./README.ko.md)
 
 <img src="docs/assets/screenshot-home.png" alt="Agent Archive home page" width="900" />
 
@@ -90,7 +91,7 @@ Then place the files where your tool expects them:
 
 ## How it works
 
-Agent Archive is a **static-data-first** Next.js app with no database or backend. **Each agent is a single YAML file** in `content/agents/`, validated against a JSON Schema. Workflows and taxonomy are typed data in `src/data`.
+Agent Archive is a **static-data-first** Next.js app with no database or backend, exported to static HTML and deployed to GitHub Pages on every push to `main`. **Each agent is a single YAML file** in `content/agents/`, validated against a JSON Schema. Workflows and taxonomy are typed data in `src/data`.
 
 ```text
 content/
@@ -98,7 +99,7 @@ content/
 schema/
 └── agent.schema.json # JSON Schema generated from src/types/agent.ts
 src/
-├── app/              # Next.js App Router pages (locale-prefixed: /en, /ko)
+├── app/[locale]/     # Next.js App Router pages (/en, /ko), statically exported
 ├── components/       # UI: agents, workflows, layout, common primitives
 ├── data/             # Workflows, starter packs, taxonomy, and the agent loader
 ├── i18n/             # Locale config and UI dictionaries
@@ -113,7 +114,8 @@ scripts/
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Start the dev server |
-| `npm run build` | Production build |
+| `npm run build` | Static export to `out/` (set `NEXT_PUBLIC_BASE_PATH` for a sub-path) |
+| `npm start` | Preview `out/` locally the way GitHub Pages serves it |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type check |
 | `npm run check:data` | Validate agents against the schema, plus workflow and taxonomy references |
@@ -133,7 +135,7 @@ This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). AI coding
 ## Roadmap
 
 - [x] One file per agent, with schema validation
-- [ ] Hosted site with a public URL
+- [x] Hosted site with a public URL ([yohan-work.github.io/agentive](https://yohan-work.github.io/agentive/))
 - [ ] Download install kits straight from a URL, no browser needed
 - [ ] More hand-verified agents and sample runs
 

@@ -1,8 +1,169 @@
-import AgentDetailPage, { generateMetadata, generateStaticParams } from "../../../agents/[slug]/page";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { AgentDetailHeader } from "@/components/agents/agent-detail-header";
+import { AgentEffectSummary } from "@/components/agents/agent-effect-summary";
+import { AgentEvaluationPanel } from "@/components/agents/agent-evaluation";
+import { AgentExportPanel } from "@/components/agents/agent-export-panel";
+import { AgentRunbookPanel } from "@/components/agents/agent-runbook";
+import { AgentUseCaseList } from "@/components/agents/agent-use-case-list";
+import { DetailSection } from "@/components/agents/detail-section";
+import { RelatedAgents } from "@/components/agents/related-agents";
+import { CodeBlock } from "@/components/common/code-block";
+import { Tag } from "@/components/common/tag";
+import { AppShell } from "@/components/layout/app-shell";
+import { agents, getAgentBySlug } from "@/data/agents";
+import { defaultLocale, type Locale } from "@/i18n/config";
+import { getDictionary } from "@/i18n/dictionaries";
+import { resolveLocale, type LocaleParams } from "@/i18n/server";
 
-export { generateMetadata, generateStaticParams };
+const toc = [
+  { title: "Expected effect", href: "#expected-effect" },
+  { title: "What this agent does", href: "#what-this-agent-does" },
+  { title: "Use this agent", href: "#use-this-agent" },
+  { title: "How to run this agent", href: "#how-to-run-this-agent" },
+  { title: "Quality evaluation", href: "#quality-evaluation" },
+  { title: "Decision guide", href: "#decision-guide" },
+  { title: "When to use", href: "#when-to-use" },
+  { title: "Inputs", href: "#inputs" },
+  { title: "Outputs", href: "#outputs" },
+  { title: "Prompt", href: "#prompt" },
+  { title: "Example", href: "#example" },
+  { title: "Real use cases", href: "#real-use-cases" },
+  { title: "Best practices", href: "#best-practices" },
+  { title: "Limitations", href: "#limitations" },
+  { title: "Related agents", href: "#related-agents" }
+];
 
-export default async function LocalizedAgentDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+export function generateStaticParams() {
+  return agents.map((agent) => ({ slug: agent.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  return <AgentDetailPage params={Promise.resolve({ slug })} />;
+  const agent = getAgentBySlug(slug);
+  return {
+    title: agent?.name ?? "Agent"
+  };
+}
+
+async function AgentDetailPageContent({
+  params,
+  locale = defaultLocale
+}: {
+  params: Promise<{ slug: string }>;
+  locale?: Locale;
+}) {
+  const { slug } = await params;
+  const agent = getAgentBySlug(slug);
+
+  if (!agent) {
+    notFound();
+  }
+
+  const dictionary = getDictionary(locale);
+  const related = (agent.relatedAgents ?? [])
+    .map((relatedSlug) => getAgentBySlug(relatedSlug))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  return (
+    <AppShell toc={toc}>
+      <AgentDetailHeader agent={agent} />
+      <div id="expected-effect">
+        <AgentEffectSummary agent={agent} relatedAgent={related[0]} labels={dictionary.agentDetail} />
+      </div>
+      <DetailSection id="what-this-agent-does" title="What this agent does">
+        <p>{agent.description}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {agent.tags.map((tag) => (
+            <Tag key={tag} value={tag} locale={locale} />
+          ))}
+        </div>
+      </DetailSection>
+      <DetailSection id="use-this-agent" title="Use this agent">
+        <AgentExportPanel agent={agent} />
+      </DetailSection>
+      <DetailSection id="how-to-run-this-agent" title="How to run this agent">
+        <AgentRunbookPanel runbook={agent.runbook} />
+      </DetailSection>
+      <DetailSection id="quality-evaluation" title="Quality evaluation">
+        <AgentEvaluationPanel evaluation={agent.evaluation} />
+      </DetailSection>
+      {agent.decisionGuide?.length ? (
+        <DetailSection id="decision-guide" title="Decision guide">
+          <div className="grid gap-4">
+            {agent.decisionGuide.map((item) => {
+              const alternative = item.alternativeAgentSlug ? getAgentBySlug(item.alternativeAgentSlug) : undefined;
+
+              return (
+                <div key={item.question} className="rounded-lg border border-line bg-panel p-4">
+                  <h3 className="text-sm font-semibold text-primary">{item.question}</h3>
+                  <p className="mt-2 text-sm leading-6 text-secondary">{item.guidance}</p>
+                  {alternative ? (
+                    <p className="mt-3 text-xs text-muted">
+                      Related option: <span className="text-sky-200">{alternative.name}</span>
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </DetailSection>
+      ) : null}
+      <DetailSection id="when-to-use" title="When to use">
+        <List items={agent.useCases} />
+      </DetailSection>
+      <DetailSection id="inputs" title="Inputs">
+        <List items={agent.inputs} />
+      </DetailSection>
+      <DetailSection id="outputs" title="Outputs">
+        <List items={agent.outputs} />
+      </DetailSection>
+      <DetailSection id="prompt" title="Prompt">
+        <CodeBlock value={agent.prompt} />
+      </DetailSection>
+      <DetailSection id="example" title="Example">
+        <div className="grid gap-4 md:grid-cols-2">
+          <ExampleBlock title="Example input" value={agent.exampleInput ?? "No example input provided."} />
+          <ExampleBlock title="Example output" value={agent.exampleOutput ?? "No example output provided."} />
+        </div>
+      </DetailSection>
+      <DetailSection id="real-use-cases" title="Real use cases">
+        <AgentUseCaseList useCases={agent.realUseCases ?? []} />
+      </DetailSection>
+      <DetailSection id="best-practices" title="Best practices">
+        <List items={agent.bestPractices ?? []} />
+      </DetailSection>
+      <DetailSection id="limitations" title="Limitations">
+        <List items={agent.limitations ?? []} />
+      </DetailSection>
+      <DetailSection id="related-agents" title="Related agents">
+        <RelatedAgents agents={related} locale={locale} />
+      </DetailSection>
+    </AppShell>
+  );
+}
+
+export default async function AgentDetailPage({ params }: { params: LocaleParams<{ slug: string }> }) {
+  return <AgentDetailPageContent params={params} locale={await resolveLocale(params)} />;
+}
+
+function List({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li key={item} className="rounded-md border border-line bg-panel px-3 py-2">
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ExampleBlock({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-line bg-panel p-4">
+      <h3 className="mb-2 text-sm font-semibold text-primary">{title}</h3>
+      <p className="text-sm leading-6 text-secondary">{value}</p>
+    </div>
+  );
 }
