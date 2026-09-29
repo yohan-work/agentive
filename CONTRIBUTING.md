@@ -86,6 +86,7 @@ Before opening a PR, run the same checks as CI:
 npm run check:data
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
 

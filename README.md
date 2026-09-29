@@ -127,6 +127,7 @@ scripts/
 | `npm start` | Preview `out/` locally the way GitHub Pages serves it |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type check |
+| `npm test` | Unit tests for install kits, search, and locale helpers |
 | `npm run check:data` | Validate agents against the schema, plus workflow and taxonomy references |
 | `npm run schema` | Regenerate `schema/agent.schema.json` |
 

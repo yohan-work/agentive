@@ -15,10 +15,11 @@ npm run content      # validate + bundle content/agents/*.yaml -> src/data/gener
 npm run schema       # regenerate schema/agent.schema.json after changing AgentSource in src/types/agent.ts
 npm run lint         # ESLint (flat config in eslint.config.mjs)
 npm run typecheck    # tsc --noEmit
+npm test             # unit tests in tests/*.test.ts (node:test via tsx)
 npm run build        # production build
 ```
 
-Run `check:data`, `lint`, `typecheck`, and `build` before you consider a change done. CI runs the same four.
+Run `check:data`, `lint`, `typecheck`, `test`, and `build` before you consider a change done. CI runs the same five.
 
 ## Layout
 
