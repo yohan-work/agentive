@@ -1,7 +1,10 @@
 name: Deploy
 
+# Deploy only after CI has passed on main, so a commit that fails checks is never published.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -16,9 +19,12 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
@@ -29,7 +35,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /agentive
-          NEXT_PUBLIC_SITE_URL: https://yohan-work.github.io/agentive
+          NEXT_PUBLIC_SITE_URL: https://yohan-work.github.io
       - uses: actions/upload-pages-artifact@v5
         with:
           path: out

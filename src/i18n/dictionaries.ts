@@ -167,6 +167,11 @@ export const dictionaries = {
       openSourceBody: "Code is MIT licensed and agent content is CC BY 4.0. Suggestions, fixes, and verification reports are welcome.",
       repoLink: "View on GitHub",
       contributingLink: "Contributing guide"
+    },
+    notFound: {
+      title: "Page not found",
+      description: "The requested page does not exist in this archive.",
+      browse: "Browse agents"
     }
   },
   ko: {
@@ -335,6 +340,11 @@ export const dictionaries = {
       openSourceBody: "코드는 MIT, 에이전트 콘텐츠는 CC BY 4.0 라이선스입니다. 제안, 수정, 검증 결과 공유 모두 환영합니다.",
       repoLink: "GitHub에서 보기",
       contributingLink: "기여 가이드"
+    },
+    notFound: {
+      title: "페이지를 찾을 수 없습니다",
+      description: "요청한 페이지가 아카이브에 없습니다.",
+      browse: "에이전트 둘러보기"
     }
   }
 } as const;

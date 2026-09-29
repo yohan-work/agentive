@@ -115,6 +115,7 @@ scripts/
 | --- | --- |
 | `npm run dev` | 개발 서버 실행 |
 | `npm run build` | `out/`으로 정적 export (하위 경로 배포 시 `NEXT_PUBLIC_BASE_PATH` 지정) |
+| `npm start` | GitHub Pages와 같은 방식으로 `out/`을 로컬에서 미리보기 |
 | `npm run lint` | ESLint 실행 |
 | `npm run typecheck` | TypeScript 타입 검사 |
 | `npm run check:data` | 에이전트 스키마 검증과 워크플로우·분류 참조 검사 |

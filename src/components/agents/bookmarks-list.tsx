@@ -3,10 +3,11 @@
 import { useMemo } from "react";
 import type { Agent } from "@/types/agent";
 import { useBookmarks } from "@/lib/bookmarks";
+import type { Locale } from "@/i18n/config";
 import { AgentGrid } from "./agent-grid";
 import { EmptyState } from "@/components/common/empty-state";
 
-export function BookmarksList({ agents }: { agents: Agent[] }) {
+export function BookmarksList({ agents, locale }: { agents: Agent[]; locale: Locale }) {
   const bookmarks = useBookmarks();
 
   const bookmarkedAgents = useMemo(
@@ -18,5 +19,5 @@ export function BookmarksList({ agents }: { agents: Agent[] }) {
     return <EmptyState title="No bookmarks yet." description="Save agents from cards or detail pages to build your working library." />;
   }
 
-  return <AgentGrid agents={bookmarkedAgents} />;
+  return <AgentGrid agents={bookmarkedAgents} locale={locale} />;
 }

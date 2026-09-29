@@ -27,6 +27,12 @@ export function AgentSearchPanel({
   locale?: Locale;
 }) {
   const [query, setQuery] = useState(initialQuery);
+  // When the URL query changes (e.g. top-nav search), adopt it without resetting the other filters.
+  const [appliedInitialQuery, setAppliedInitialQuery] = useState(initialQuery);
+  if (initialQuery !== appliedInitialQuery) {
+    setAppliedInitialQuery(initialQuery);
+    setQuery(initialQuery);
+  }
   const [filters, setFilters] = useState<AgentFilters>({});
   const tools = useMemo(() => getUniqueTools(agents), [agents]);
   const results = useMemo(() => filterAgents(searchAgents(agents, query), filters), [agents, filters, query]);
@@ -151,11 +157,8 @@ function FilterRow({
   );
 }
 
-/**
- * Seeds the search box from `?query=` on the client. The static page renders the unfiltered list;
- * remounting on a new query keeps the panel in sync when the top-nav search changes the URL.
- */
+/** Seeds the search box from `?query=` on the client. The static page renders the unfiltered list. */
 export function AgentSearchPanelFromUrl(props: Omit<ComponentProps<typeof AgentSearchPanel>, "initialQuery">) {
   const query = useSearchParams().get("query") ?? "";
-  return <AgentSearchPanel key={query} {...props} initialQuery={query} />;
+  return <AgentSearchPanel {...props} initialQuery={query} />;
 }

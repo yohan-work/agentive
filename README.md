@@ -115,6 +115,7 @@ scripts/
 | --- | --- |
 | `npm run dev` | Start the dev server |
 | `npm run build` | Static export to `out/` (set `NEXT_PUBLIC_BASE_PATH` for a sub-path) |
+| `npm start` | Preview `out/` locally the way GitHub Pages serves it |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript type check |
 | `npm run check:data` | Validate agents against the schema, plus workflow and taxonomy references |

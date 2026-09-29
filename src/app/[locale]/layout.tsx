@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { isLocale, locales } from "@/i18n/config";
+import { locales } from "@/i18n/config";
+import { resolveLocale } from "@/i18n/server";
 import { siteConfig } from "@/lib/site";
 import "../globals.css";
 
@@ -12,7 +12,7 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(siteConfig.origin),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`
@@ -22,11 +22,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: siteConfig.name }]
+    images: [{ url: siteConfig.ogImagePath, width: 1200, height: 630, alt: siteConfig.name }]
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/og-image.png"]
+    images: [siteConfig.ogImagePath]
   }
 };
 
@@ -37,11 +37,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
-
-  if (!isLocale(locale)) {
-    notFound();
-  }
+  const locale = await resolveLocale(params);
 
   return (
     <html lang={locale}>

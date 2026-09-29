@@ -1,10 +1,16 @@
 // Replaces the exported 404.html with a static page for GitHub Pages.
 // Old links without a locale (e.g. /agents/pr-review-agent) are forwarded to the default locale;
 // anything else shows a plain "not found" page.
-import { writeFileSync } from "node:fs";
+//
+// GitHub Pages can't send real HTTP redirects, so this forwarding is client-side and the response is
+// still a 404 for crawlers and no-JS clients.
+import { readFileSync, writeFileSync } from "node:fs";
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const locales = ["en", "ko"];
+// Read locales from the app's config so this page never drifts from the routes that were exported.
+const i18nConfig = readFileSync("src/i18n/config.ts", "utf8");
+const locales = JSON.parse(i18nConfig.match(/export const locales = (\[[^\]]*\])/)[1]);
+const defaultLocale = i18nConfig.match(/export const defaultLocale: Locale = "([^"]+)"/)[1];
+const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").replace(/\/$/, "");
 
 const html = `<!doctype html>
 <html lang="en">
@@ -17,9 +23,8 @@ const html = `<!doctype html>
   var base = ${JSON.stringify(basePath)};
   var locales = ${JSON.stringify(locales)};
   var path = location.pathname.slice(base.length) || "/";
-  var first = path.split("/")[1];
-  if (locales.indexOf(first) === -1) {
-    location.replace(base + "/en" + (path === "/" ? "/" : path) + location.search + location.hash);
+  if (locales.indexOf(path.split("/")[1]) === -1) {
+    location.replace(base + ${JSON.stringify(`/${defaultLocale}`)} + path + location.search + location.hash);
   }
 })();
 </script>
@@ -36,11 +41,11 @@ const html = `<!doctype html>
 <main>
   <p class="eyebrow">404</p>
   <h1>Page not found</h1>
-  <p>The requested page does not exist in this archive. <a href="${basePath}/en/agents/">Browse agents</a></p>
+  <p>The requested page does not exist in this archive. <a href="${basePath}/${defaultLocale}/agents/">Browse agents</a></p>
 </main>
 </body>
 </html>
 `;
 
 writeFileSync("out/404.html", html);
-console.log("Wrote out/404.html");
+console.log(`Wrote out/404.html (locales: ${locales.join(", ")}; default: ${defaultLocale})`);

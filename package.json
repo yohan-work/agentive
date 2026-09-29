@@ -18,7 +18,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "next build",
     "check:data": "node scripts/check-data.mjs",
-    "start": "next start",
+    "start": "node scripts/preview.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "content": "node scripts/build-content.mjs",

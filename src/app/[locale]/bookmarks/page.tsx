@@ -22,7 +22,7 @@ function BookmarksPageContent({ locale = defaultLocale }: { locale?: Locale }) {
           {dictionary.bookmarks.description}
         </p>
       </header>
-      <BookmarksList agents={agents} />
+      <BookmarksList agents={agents} locale={locale} />
     </AppShell>
   );
 }

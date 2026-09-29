@@ -12,7 +12,14 @@ function parseBookmarks(raw: string | null): string[] {
   }
 }
 
+// Used when localStorage can't be written (private mode, blocked site data, quota), so bookmarks
+// still work for the rest of the session instead of silently doing nothing.
+let memoryFallback: string | null = null;
+
 function readRaw() {
+  if (memoryFallback !== null) {
+    return memoryFallback;
+  }
   try {
     return window.localStorage.getItem(STORAGE_KEY);
   } catch {
@@ -25,10 +32,12 @@ export function readBookmarks() {
 }
 
 export function writeBookmarks(bookmarks: string[]) {
+  const value = JSON.stringify(Array.from(new Set(bookmarks)));
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(new Set(bookmarks))));
+    window.localStorage.setItem(STORAGE_KEY, value);
+    memoryFallback = null;
   } catch {
-    // Storage can be unavailable (private mode, blocked site data); bookmarks just won't persist.
+    memoryFallback = value;
   }
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
