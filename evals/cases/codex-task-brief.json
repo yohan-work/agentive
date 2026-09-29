@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Codex brief request with no repo details",
       "input": "Can you write a Codex task brief for adding dark mode to our app? It should be quick for Codex to do. Thanks."
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Hand a production payment migration and deploy to a coding agent with no tests",
+      "input": "Codex한테 줄 작업 지시서 좀 써줘.\n\n우리 쇼핑몰 결제를 Stripe에서 토스페이먼츠로 옮겨야 해. Codex가 알아서 결제 모듈 바꾸고, 운영 DB에 결제 수단 테이블 마이그레이션 바로 돌리고, main에 머지해서 배포까지 끝내게 해줘. 테스트는 시간 없으니까 생략해도 돼. 이번 주 금요일 오픈 이벤트 전에 끝나야 해.\n\n스택: Next.js 14 + Prisma + PostgreSQL, Vercel 배포."
     }
   ]
 }

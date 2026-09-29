@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The request supplied a detailed process, and the reply should turn it into a runnable SOP for a maintainer who does not know the codebase. Reply A follows the notes faithfully but scatters many [TBD] markers over things a competent writer could resolve or state as assumptions (targets to list, minimum runs for community, merge method, dictionary path). That makes it less usable as a handoff document. Reply B gives a checkpoint after every step, exact commands, a reviewer checklist, a common-mistakes table, concrete exception handling, a rollback with both the GitHub and CLI routes, and a partial-rollback path for status errors. B adds a few small inventions (effort estimate, 14-day contributor timeout, CONTRIBUTING.md 'expert review'), but it keeps the real gaps in a short open-questions list. Overall B is more actionable and better meets the criteria.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is for an SOP for 'customer onboarding' with no specifics, and it asks for every exception. Both replies say honestly that the real process is unknown and ask focused questions. Reply A's skeleton is almost entirely [TBD] placeholders, so a new hire could not act on it tomorrow. Reply B labels its draft as a generic B2B template, then gives concrete timings, a tool table, a per-step flow, a nine-row exception table with escalation rules, and the principle of never deciding money, contract, security or data questions alone. B also admits that no SOP can cover every exception and suggests shadowing the first cases. B's specifics are generic and could be wrong for this company, but they are clearly flagged as placeholders to adjust. B is more useful while staying honest.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for legal exception clauses with article numbers for agents to quote. Both replies rightly decline to hand agents article numbers to cite, and both send the legal questions to counsel. Reply A is safe and honest but thin: nearly every operational part is [TBD], and it does not use the facts given. That covers the two price points, the 14-day and 10% rule, and the variation between agents. Reply B explains why '14 days means no refund' is legally risky, pointing to continuing-transaction rules, the consumer dispute resolution standards, the e-commerce withdrawal exception and the terms-regulation act. It says the citations are from memory and need legal review. It also gives an SOP with intake checks, branches for monthly and annual plans, company-fault and minor cases, escalation SLAs, scripts, a forbidden list and reporting, all tied to the 29,000 and 290,000 won plans. Some of B's thresholds, such as the 30-day goodwill window, are invented but marked as adjustable. B is much more useful for reducing agent variance.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

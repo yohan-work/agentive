@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use the request's files and constraints correctly, give a parse/serialize plan with a fixed param order, and cover the tests, Suspense and debounce concerns. A puts a dedicated non-goals list, the URL contract table and the scope before the implementation plan, which matches the criterion of stating these before implementation begins. B scatters the non-goals into a recap after the plan. A also decides how top-nav should read the query (window.location at submit time) and explains why, where B hedges between two options. A's Assumptions and Risks sections are mostly substantive, though a few assumptions (for example that the clear buttons exist) are hedged. B is slightly tighter and adds a useful manual check with npx serve, but it is less decisive overall.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, so neither reply can name real files. Both handle this honestly with bracketed placeholders and clear scope. A prefills sensible defaults (follow the OS setting, header toggle) so the brief is usable as-is. It also states explicit in/out scope and asks three focused questions at the end. B is more compact and offers a useful tip to split the work into two tasks, but it leaves many more brackets to fill and asks for a theme-logic test that adds work to a task the user wanted quick. A's Risks and Next actions sections are somewhat padded, which narrows the gap. On balance A's stated assumptions, hydration note and stronger non-goals make it a little more useful.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on the same three risky requests: Codex running the production migration, merging and deploying, and skipping tests. Both keep the work to a PR, additive migrations, and a minimal four-case test set. A's acceptance criteria are more checkable. They include that PAYMENT_PROVIDER=stripe still works as a rollback, that the migration SQL is in the PR, and a list of what the PR description must contain. A also has a concrete env-var switch, --create-only for the migration, and a clear assumptions list with two focused questions (subscriptions, live keys). B is good and adds useful details (the cancel endpoint, webhook URL registration, merchant review for live keys), but its completion criteria are thinner and its rollback is vaguer (a feature flag). A invents a Mon-Wed schedule, a minor flaw. Overall A is slightly stronger.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

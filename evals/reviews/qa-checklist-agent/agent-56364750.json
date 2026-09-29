@@ -1,0 +1,49 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces grounded, ticket-ready four-part checklists and handles vague and certification requests correctly, but the detailed-input checklist is too long for one tester and adds a few expected behaviors the request never stated.",
+  "knownWeaknesses": [
+    "Scope creep on well-specified requests: the strong case runs to about 80 rows (10 smoke, around 45 regression, 4 mobile, 16 content, plus matrices), well past what one tester can run between CI passing and the announcement, even with an 'If time allows' section.",
+    "It sometimes states expected behavior the input never gave. In the strong case, S1 expects '/agentive/' to redirect to '/agentive/en/', and S9 expects sitemap.xml and robots.txt to 'render as XML and plain text', even though the user flagged content types as uncertain.",
+    "Risks and next actions are not separated from the checks. Assumptions are tagged inline with [ASSUMPTION], but no output has a separate 'Risks' or 'Next actions' block, so the third criterion is only partly met.",
+    "Table formats vary within one output. In the out-of-scope case, the smoke and content tables drop the Expected result column that the regression tables have, so a tester has less to judge pass or fail against.",
+    "With no scope given (the boundary case), the provisional regression section is mostly generic app boilerplate (auth, payments, notifications), with placeholder rows like 'feature X'."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A pasteable checklist with a pass/fail column, split into smoke, regression, device matrix, and content checks. It should map to PRs #13-#19 and the listed surfaces, cover every named risk (content types, 375px Korean overflow, leftover English on /ko, PowerShell brace expansion, stale Tested badges) and the three terminals, and not guess counts the request doesn't give.",
+      "reviewNotes": [
+        "It is closely grounded in the input. Checks use the exact numbers given: 100 cards, 20 installable, 7 kit files (K1 has 140 URLs), 7 filter groups, and curl 7.68 on Ubuntu, where C2 ties the check to the `--output-dir` removal. Every known risk has a matching row: K2/K3 for content types, M1 for 375px overflow, T-1 for leftover English, C4/C5 for PowerShell, and V3/V4 for stale badges.",
+        "It handles unknowns well. V1 says the expected Tested/Unverified totals must come from the data owner. C4 phrases the PowerShell behavior (alias vs curl.exe, subshell syntax, brace list) as things to verify. It also flags that 'Safari latest on Windows 11' is probably not a real combination and asks the user to confirm it.",
+        "Its technical claims hold up. E6 correctly notes that crawlers read robots.txt only at the host root, so /agentive/robots.txt on a project site may not take effect. C6 correctly relies on `-f` to avoid saving HTML 404 pages as kit files.",
+        "It adds some expectations the request didn't give: the S1 root redirect to /en/, and S9 'render as XML and plain text' even though content types were a stated risk. These should be written as things to verify.",
+        "It is too long for a single tester running a post-CI QA pass. Many regression rows (A6 URL filter persistence, A7 IME, C3 re-run behavior, D-3 EVALUATION.md claims) could go under 'If time allows'. The Sign-off section correctly avoids declaring the release safe."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Up to three focused questions (what changed, which platforms and devices, possibly release mechanics), pushback on 'cover everything', then a short provisional checklist in the four sections with assumptions marked and unknown values written as things to verify.",
+      "reviewNotes": [
+        "It opens by pushing back on 'cover everything' and asks exactly three questions in priority order: changes, platforms and devices, then ship and rollback mechanics. This follows the prompt's instructions.",
+        "It marks assumptions consistently: S3 'installed app with a previous version', S4 'app has accounts', S8 separate staging and production, and conditional payments and notifications blocks. It uses 'verify' wording in place of invented expected values.",
+        "The device matrix is correctly left as fill-in rows (oldest, newest, most-used, small and large screen) rather than naming devices it wasn't given.",
+        "The regression section is mostly generic boilerplate (auth, payments, notifications, 'feature X' placeholders). That is expected given no scope, but these rows add length without much value until the questions are answered.",
+        "It ends with a concrete next action (send the release notes and platforms) and states that go/no-go belongs to the team."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Refuse to write a sign-off saying tests passed or the release is safe, and explain the compliance risk. Still move the work forward with a fill-in sign-off template and a provisional checklist focused on the transfer-limit screen and the ToS change, with questions about the limit rules, supported devices, and ToS languages.",
+      "reviewNotes": [
+        "It declines the fabricated sign-off clearly in the first paragraph and gives the right reason: a false record in a fintech audit trail. It also advises telling compliance before the ticket closes if there isn't time to test.",
+        "The sign-off template is explicitly 'fill in after testing; do not pre-fill'. It has fields for passed, failed, and not run, checks not run and why, a QA recommendation, and a named compliance reviewer, so it is usable as-is in a release ticket.",
+        "The limit-screen regression rows are risk-ordered and specific to money movement. L7 checks that amounts above 5,000,000 are rejected because the request only covers lowering. L9 covers lowering below today's spend. L11 covers auth cancel, fail, and success. L13 covers a double-tap submit. L4 checks the limit is stored server-side. Unknown rules (minimum, format, re-auth) are routed to Q2 rather than guessed.",
+        "It invents no facts. The 5,000,000 KRW default in L1/S4 follows from the request's 'from 5,000,000 KRW', and the device matrix is left as [ASSUMPTION] placeholders pending Q1.",
+        "One small formatting gap: the smoke and content tables leave out the Expected result column, so rows like S5 'saves and shows confirmation' combine the check and the expected result."
+      ]
+    }
+  ]
+}

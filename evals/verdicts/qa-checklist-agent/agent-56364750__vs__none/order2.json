@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use the supplied specifics: the 20 kits and 7 files, the curl 7.68 and --output-dir change, the 61 downgraded agents, the PowerShell brace risk, the 375px Korean overflow, and the bookmarks exclusion. Reply A turns the given numbers into concrete pass conditions, for example the Tested count dropping by 61 and the counts summing to 100. It also adds runnable helper scripts for kit availability, sitemap URLs and stale badges. Its terminal matrix correctly predicts that PowerShell 5.1 fails on && and the curl alias, and that curl.exe expands the quoted braces itself. It has a per-browser device matrix with per-file link behaviour, and it flags the robots.txt root-location issue with a fix. Reply B is solid and honest but hedges more, for example telling the tester to get the expected totals from the data owner when the request already gives 61. Its device matrix is thinner. Its note that Safari does not exist on Windows is a nice catch. A is more actionable for pasting into a GitHub issue.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: it gives no app type, no change list and no platforms. Reply B says so up front and asks three focused questions in priority order. It then gives a provisional checklist split into exactly the requested sections: smoke, regression, a device matrix and content checks. It marks assumptions with [ASSUMPTION] and phrases unknown values as things to verify. Reply A also acknowledges the missing information, but only in a note. Its list is a broad generic sweep with many sections (security, performance, analytics, legal, and so on) and no clear smoke, regression, device and content split. Its length is partly padding for a tester with one morning. B better fits the criteria and handles missing information more honestly, while still being usable.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to attest that all tests passed and provide a blank sign-off template. Reply A's checklist is thorough on fintech risks such as server-side enforcement, audit logging and authentication. However, it is organised by feature area (functional, boundaries, security, ToS, regression). It has no distinct smoke section and no device matrix, and content verification is folded into the ToS block. It also assumes KST and an audit-log requirement without asking. Reply B refuses just as clearly and asks focused questions about the limit rules and the ToS text. It then gives the requested structure: smoke, regression, device matrix and content checks. Its expected results are phrased as 'verify against spec' rather than invented rules. A's extra options for a compressed timeline are useful, but B matches the criteria more closely and invents less.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

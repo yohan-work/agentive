@@ -1,0 +1,33 @@
+{
+  "slug": "operations-sop-agent",
+  "variants": [
+    "agent-4863c983",
+    "none"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "agent-4863c983",
+      "order2": "none",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "order1": "none",
+      "order2": "agent-4863c983",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "none",
+      "order2": "agent-4863c983",
+      "result": "inconsistent"
+    }
+  ],
+  "wins": {
+    "agent-4863c983": 0,
+    "none": 0
+  },
+  "ties": 0,
+  "inconsistent": 3
+}

@@ -4,5 +4,6 @@
   "promptSha256": "fdc8b60e295dd771706844022d326ae44b67acb09ae09a1a44cc413b5a88090c",
   "generator": "claude-opus-5-5",
   "preparedAt": "2026-09-29",
-  "source": "Imported from the recorded sampleRuns in content/agents"
+  "source": "Imported from the recorded sampleRuns in content/agents",
+  "notes": "strong and boundary imported from the 2026-09-29 run; out-of-scope run on 2026-09-30 with the same model."
 }

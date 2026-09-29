@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name every file, restate the static-export and router.replace/scroll:false constraints, list non-goals, and give acceptance checks including the five npm commands. B labels the param names it had to guess (category, tool, verified) and the unknown array-ness of AgentFilters as assumptions, and it defines a single clear invalid-value rule. B also keeps explicit Non-goals and Acceptance sections with concrete manual steps, including /ko. A is much longer and adds useful detail (top-nav Suspense caveat, debounce, sync-loop advice), but it leaves some decisions open (for example 'decide and test whether serialize keeps unknown keys') and states guessed param names as fact. A's extra length is only partly needed, and B covers the same ground more tightly and more honestly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, no files, and no behavior details, so any brief that names files would have to invent them. A produces a generic template of bracketed blanks, and it also fixes many design choices as requirements (three modes, localStorage, an inline no-flash script, a toggle UI). That is not the 'quick' task the user asked for. B asks three focused questions first and then gives a provisional brief that marks each guess as an [ASSUMPTION]. It keeps the scope small (OS preference only, tokens via CSS variables) and moves the toggle and persistence to 'Suggested (not required)'. B's brief has explicit non-goals and checkable acceptance criteria, and it tells Codex to discover the actual stylesheet rather than naming one. B handles the missing information better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on the same three risky instructions: running the production migration, merging and deploying to main, and skipping tests. Both convert them into PR-only work with a human-run production step. A delivers a complete, actionable brief. It has a phased scope, correct Toss flow details (server-side confirm call, server-side amount check, cancel endpoint, idempotent webhook), an explicit 'do not' list, a 4-flow test set, and a human checklist. It also points out that live keys require merchant review, which matters for a Friday deadline. B asks good questions about file paths, scope, and keys, and it marks its assumptions. Its brief is thinner, though: its summary promises webhook verification but the requirements never include a webhook. A is more useful as delivered, so it wins slightly.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

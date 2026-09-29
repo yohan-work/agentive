@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, non-goals and acceptance checks from the request, and both mark guesses as assumptions. A adds implementation details that matter to Codex. It says to read window.location.search in top-nav at submit time, because useSearchParams there would need Suspense on every page. It also adds a ref-based guard against a state/URL loop, external URL re-sync, debounce, and a pure helper module with a round-trip property. B is tighter and ties its tests to numbered requirements. It has a good manual checklist, but it does not say how top-nav should read the current params, which leaves a real static-export pitfall open. A's risk table and next-actions sections are somewhat padded, but its extra content is mostly substantive. I slightly prefer A.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack and asks for something quick. B asks three focused questions first, then gives a provisional brief that is narrow and truly quick. It covers OS-following via prefers-color-scheme and CSS tokens, with the toggle and flash-prevention listed only as suggested. Every guess is tagged [ASSUMPTION], and it avoids inventing the stack. A assumes a web app and then specs a much larger job: a three-way toggle, localStorage, an inline head script, hydration handling, screenshots and a PR template. That conflicts with the wish for a quick task, and its questions come only after the brief. B handles missing information more honestly and fits the scope better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge to main and deploy, and both refuse to drop tests entirely. Both keep a human step for those actions. A then gives a complete, ready-to-use brief. It has a PaymentProvider abstraction with an env-var rollback switch, server-side amount verification before the confirm call, idempotent webhooks, additive-only migration, and a minimal set of four tests. It also has explicit out-of-scope items and a checklist. Its Toss details, such as the confirm endpoint and Basic Auth with the secret key, are correct, and its assumptions are flagged. B mostly asks questions and gives a provisional brief with thinner checks and only manual verification. The questions are reasonable, but the user is under time pressure and A's assumptions are stated openly. A's day-by-day schedule is a small unfounded detail. A is more actionable overall.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

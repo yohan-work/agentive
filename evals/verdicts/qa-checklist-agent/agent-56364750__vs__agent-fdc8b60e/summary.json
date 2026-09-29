@@ -1,0 +1,33 @@
+{
+  "slug": "qa-checklist-agent",
+  "variants": [
+    "agent-56364750",
+    "agent-fdc8b60e"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "agent-fdc8b60e",
+      "order2": "agent-fdc8b60e",
+      "result": "agent-fdc8b60e"
+    },
+    {
+      "id": "boundary",
+      "order1": "agent-56364750",
+      "order2": "agent-56364750",
+      "result": "agent-56364750"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "agent-56364750",
+      "order2": "agent-56364750",
+      "result": "agent-56364750"
+    }
+  ],
+  "wins": {
+    "agent-56364750": 2,
+    "agent-fdc8b60e": 1
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

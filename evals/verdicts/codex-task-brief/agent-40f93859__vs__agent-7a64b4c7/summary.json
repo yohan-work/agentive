@@ -1,0 +1,33 @@
+{
+  "slug": "codex-task-brief",
+  "variants": [
+    "agent-40f93859",
+    "agent-7a64b4c7"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "agent-7a64b4c7",
+      "order2": "agent-7a64b4c7",
+      "result": "agent-7a64b4c7"
+    },
+    {
+      "id": "boundary",
+      "order1": "agent-40f93859",
+      "order2": "agent-40f93859",
+      "result": "agent-40f93859"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "agent-7a64b4c7",
+      "order2": "agent-7a64b4c7",
+      "result": "agent-7a64b4c7"
+    }
+  ],
+  "wins": {
+    "agent-40f93859": 1,
+    "agent-7a64b4c7": 2
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

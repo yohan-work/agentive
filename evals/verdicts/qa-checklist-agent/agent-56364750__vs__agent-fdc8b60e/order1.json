@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies follow the requested smoke, regression, device and content split, and both use the request's specifics (20 kits, 100 agents, 61 downgrades, curl without --output-dir, PowerShell braces risk). Reply B gives sharper analysis: it notes that the braces sit inside quotes so curl globbing handles them, and that the real PowerShell failures are likely `&&`, `mkdir -p` and the `curl` alias. It also notes that Content-Type matters for browser links but not for curl, and that robots.txt under /agentive/ is ignored by crawlers. B adds a blocker versus fix-later list and next actions, which make the checklist easier to act on. Reply A is very thorough and catches that Safari does not exist on Windows, but it is much longer and has more padding, and it needs the user to fill in slugs. Neither invents serious facts, though B assumes the status filter buckets sum to 100. B is slightly more useful.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is too vague to write a tailored checklist. Reply A says so plainly, asks three focused questions, and then gives a provisional checklist with assumptions marked and unknowns written as things to verify. It is organised into the four required parts: smoke, regression, device matrix and content checks. Reply B also makes its assumptions explicit and asks questions at the end. However, it is organised around release readiness, with blockers, non-functional checks and rollback. It has no distinct device matrix or content verification section, apart from a localization bullet, so it meets the criteria less well. B also assumes staging, database migrations and a team size, which the user did not say. A is the better fit for the stated criteria and handles missing information more honestly.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to attest that tests passed, and both offer a blank sign-off template and a real checklist. The gap is in structure and substance for the criteria. Reply A gives explicit smoke checks, regression checks split by the limit screen, the ToS flow and adjacent areas, a device matrix, and content checks. It also asks focused questions about limit rules, the supported device range and ToS re-acceptance, and it marks its assumptions. Reply B has good risk insight, such as server-side enforcement, consent version recording and the day boundary. It organises the checklist as P0/P1 lists with no device matrix or content-verification section, and it states several assumptions as fact. A matches the required split and is more careful about unknowns.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 // @ts-expect-error -- plain ESM script without type declarations
-import { parseArgs, promptHash, resolveWinner, variantFor } from "../scripts/eval/lib.mjs";
+import { localDate, parseArgs, promptHash, resolveWinner, variantFor } from "../scripts/eval/lib.mjs";
 
 describe("eval variants", () => {
   it("derives a stable id from the prompt text, ignoring surrounding whitespace", () => {
@@ -43,5 +43,12 @@ describe("parseArgs", () => {
   it("rejects a valued flag with no value", () => {
     assert.throws(() => parseArgs(["slug", "--model", "--baseline"], ["baseline"]), /--model needs a value/);
     assert.throws(() => parseArgs(["slug", "--prompt"]), /--prompt needs a value/);
+  });
+});
+
+describe("localDate", () => {
+  it("formats the local calendar date as YYYY-MM-DD", () => {
+    assert.equal(localDate(new Date(2026, 0, 5, 23, 59)), "2026-01-05");
+    assert.equal(localDate(new Date(2026, 8, 30, 0, 1)), "2026-09-30");
   });
 });

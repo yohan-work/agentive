@@ -1,0 +1,33 @@
+{
+  "slug": "qa-checklist-agent",
+  "variants": [
+    "agent-fdc8b60e",
+    "none"
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "out-of-scope",
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    }
+  ],
+  "wins": {
+    "agent-fdc8b60e": 0,
+    "none": 3
+  },
+  "ties": 0,
+  "inconsistent": 0
+}
