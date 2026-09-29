@@ -34,8 +34,162 @@ outputs:
   - Scripts
   - Roadmap
 prompt: You are a software documentation writer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical concise README with clear sections, assumptions, risks, and next actions.
-exampleInput: Next.js app for browsing AI agents.
-exampleOutput: Overview, features, tech stack, install commands, roadmap.
+exampleInput: |-
+  Write a README.md for a new small open-source project. Keep it concise — it's a CLI, not a framework.
+
+  Project name: agentkit-cli
+  Purpose: a zero-config Node CLI that installs "install kits" from Agent Archive (https://yohan-work.github.io/agentive/) into your repo. Each project-ready agent in the archive publishes 7 files at stable URLs: https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Today users copy a curl one-liner per agent; this CLI does it for many agents at once and merges into existing files safely.
+
+  Tech stack: TypeScript, Node >= 20.9, commander for args, undici fetch, vitest for tests, tsup for bundling, published to npm as `agentkit-cli`. MIT license. Repo: github.com/yohan-work/agentkit-cli.
+
+  Features (all implemented in v0.3.0):
+  - `agentkit add <slug...>` downloads kits into ./agent-kits/<slug>/
+  - `agentkit add <slug> --target codex|claude|cursor` also appends the instructions to AGENTS.md / CLAUDE.md, or writes .cursor/rules/<slug>.mdc
+  - Appends are wrapped in `<!-- agentkit:<slug>:start -->` / `<!-- agentkit:<slug>:end -->` markers, so re-running updates in place instead of duplicating
+  - `agentkit remove <slug>` removes the marked block and the kit folder
+  - `agentkit list` shows installed kits and their agent.json version
+  - `--dry-run` prints the diff without writing
+  - `--base-url` for self-hosted mirrors of the archive
+  - Exits non-zero if any file 404s; never overwrites files outside marked blocks
+
+  Setup / scripts:
+  ```
+  npm install
+  npm run build      # tsup -> dist/
+  npm test           # vitest run
+  npm run lint       # eslint
+  npm run typecheck  # tsc --noEmit
+  npm link           # try the CLI locally
+  ```
+  Usage example: `npx agentkit-cli add pr-review-agent test-case-generator --target claude`
+
+  Known limitations: no Windows CI yet (works on macOS/Linux in CI); no offline cache; no signature verification of downloaded files.
+
+  Roadmap: Windows CI, `agentkit update` to refresh all installed kits, checksum verification using agent.json, a `--pack <starter-pack>` option.
+
+  Audience: developers using Codex, Claude Code, or Cursor. Include getting started, scripts, and a roadmap section.
+exampleOutput: |-
+  Here's the README. I kept it short and made a few assumptions, which are listed under the file.
+
+  ````markdown
+  # agentkit-cli
+
+  A zero-config Node CLI that installs agent **install kits** from [Agent Archive](https://yohan-work.github.io/agentive/) into your repo. It handles many agents at once and merges into existing files safely.
+
+  Without it, you run one curl command per agent. With it:
+
+  ```bash
+  npx agentkit-cli add pr-review-agent test-case-generator --target claude
+  ```
+
+  ## What gets installed
+
+  Every project-ready agent in the archive publishes 7 files at stable URLs:
+
+  ```
+  https://yohan-work.github.io/agentive/kits/<slug>/
+    AGENTS.md  CLAUDE.md  cursor-rule.mdc  agent.json  README.md  RUNBOOK.md  EVALUATION.md
+  ```
+
+  `agentkit add` downloads them to `./agent-kits/<slug>/`. If you pass `--target`, it also wires the agent into your tool's config:
+
+  | `--target` | Writes to |
+  |---|---|
+  | `codex`  | appends to `AGENTS.md` |
+  | `claude` | appends to `CLAUDE.md` |
+  | `cursor` | writes `.cursor/rules/<slug>.mdc` |
+
+  Each append is wrapped in markers:
+
+  ```md
+  <!-- agentkit:pr-review-agent:start -->
+  ...
+  <!-- agentkit:pr-review-agent:end -->
+  ```
+
+  When you run the command again, it updates the block in place instead of adding a second copy. **agentkit never changes content outside its own marked blocks.**
+
+  ## Getting started
+
+  Requires **Node >= 20.9**.
+
+  ```bash
+  # one-off
+  npx agentkit-cli add <slug...>
+
+  # or install globally
+  npm install -g agentkit-cli
+  agentkit add <slug...>
+  ```
+
+  Find slugs on [Agent Archive](https://yohan-work.github.io/agentive/). They're in each agent's URL.
+
+  ## Usage
+
+  ```bash
+  agentkit add <slug...>                        # download kits to ./agent-kits/<slug>/
+  agentkit add <slug> --target codex|claude|cursor
+  agentkit remove <slug>                        # remove the marked block and the kit folder
+  agentkit list                                 # installed kits and their agent.json version
+  ```
+
+  | Option | Description |
+  |---|---|
+  | `--target <tool>` | `codex`, `claude`, or `cursor` (see table above) |
+  | `--dry-run` | Print the diff without writing anything |
+  | `--base-url <url>` | Use a self-hosted mirror of the archive |
+
+  **Exit codes:** the command exits non-zero if any kit file returns 404.
+
+  Tip: run with `--dry-run` first on repos that already have an `AGENTS.md` or `CLAUDE.md`.
+
+  ## Development
+
+  ```bash
+  npm install
+  npm run build      # tsup -> dist/
+  npm test           # vitest run
+  npm run lint       # eslint
+  npm run typecheck  # tsc --noEmit
+  npm link           # try the `agentkit` command locally
+  ```
+
+  Stack: TypeScript, commander, undici fetch, vitest, tsup.
+
+  ## Known limitations
+
+  - **No Windows CI yet.** It's tested in CI on macOS and Linux only.
+  - **No offline cache.** Every `add` fetches from the network.
+  - **No signature or checksum verification.** Downloaded files are trusted as served. Only use `--base-url` with mirrors you control or trust, and review the diff (`--dry-run`) before committing, because these files become instructions for your coding agent.
+
+  ## Roadmap
+
+  - [ ] Windows CI
+  - [ ] `agentkit update` to refresh all installed kits
+  - [ ] Checksum verification using `agent.json`
+  - [ ] `--pack <starter-pack>` to install a curated set of agents at once
+
+  ## Contributing
+
+  Issues and PRs are welcome at [github.com/yohan-work/agentkit-cli](https://github.com/yohan-work/agentkit-cli). Please run `lint`, `typecheck`, and `test` before you open a PR.
+
+  ## License
+
+  MIT
+  ````
+
+  **Assumptions to check:**
+  1. The npm bin name is `agentkit`, so `npx agentkit-cli …` and a global `agentkit …` both work.
+  2. `--target claude` appends the kit's `CLAUDE.md`, and `--target codex` appends its `AGENTS.md`.
+  3. `--target` takes one value per run. If it accepts several (for example `--target claude,cursor`), update the usage line.
+  4. I left out a "what happens on a partial failure" line, because the brief doesn't say whether files already written are rolled back when one 404s.
+
+  **Risk to note:** The biggest one is unverified downloads that turn into agent instructions (a prompt-injection risk). I called it out under limitations instead of hiding it. Once checksum verification ships, change that bullet.
+
+  **Next actions:**
+  - Confirm the four assumptions above.
+  - Add a `CHANGELOG.md` entry for v0.3.0.
+  - Add npm version and CI badges under the title once the CI workflow URL is final.
 limitations:
   - Will not infer hidden setup requirements.
 bestPractices:
@@ -149,9 +303,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Creating or refreshing project documentation from known setup and feature details
     - "Teams with the required inputs ready: Project purpose, Tech stack, Setup commands"
@@ -161,30 +313,269 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - May omit hidden setup requirements unless scripts and config are supplied
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - The boundary draft nests ```bash blocks inside an outer ```markdown fence, so the first inner fence closes the outer block and the draft cannot be pasted and rendered as one unit. The strong run avoided this by using four-backtick fences.
+    - When facts are missing it still fills a features list with guessed domain examples ("Record income and expense entries", "JSON/CSV/SQLite"). They are marked as examples, but they invite copy-paste of invented content.
+    - It adds small unrequested claims that the brief does not support, e.g. "Find slugs ... They're in each agent's URL" and a global `npm install -g` path that depends on an assumed bin name.
+    - The assumptions, risks, and next-actions sections come after the README instead of inside it. That fits the criteria, but it means the user has to strip them out before committing the file.
   evaluationCriteria:
     - Documents purpose, features, setup, scripts, validation, and roadmap accurately
     - Produces README draft in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: README Generator strong-context run
-      input: Update the Agent Archive README after adding install kits and evaluations.
-      expectedOutputSummary: A usable README draft with project-specific assumptions, risks, and next steps.
-      sampleOutput: "README draft: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: README for a real CLI companion to the agent archive
+      input: |-
+        Write a README.md for a new small open-source project. Keep it concise — it's a CLI, not a framework.
+
+        Project name: agentkit-cli
+        Purpose: a zero-config Node CLI that installs "install kits" from Agent Archive (https://yohan-work.github.io/agentive/) into your repo. Each project-ready agent in the archive publishes 7 files at stable URLs: https://yohan-work.github.io/agentive/kits/<slug>/{AGENTS.md,CLAUDE.md,cursor-rule.mdc,agent.json,README.md,RUNBOOK.md,EVALUATION.md}. Today users copy a curl one-liner per agent; this CLI does it for many agents at once and merges into existing files safely.
+
+        Tech stack: TypeScript, Node >= 20.9, commander for args, undici fetch, vitest for tests, tsup for bundling, published to npm as `agentkit-cli`. MIT license. Repo: github.com/yohan-work/agentkit-cli.
+
+        Features (all implemented in v0.3.0):
+        - `agentkit add <slug...>` downloads kits into ./agent-kits/<slug>/
+        - `agentkit add <slug> --target codex|claude|cursor` also appends the instructions to AGENTS.md / CLAUDE.md, or writes .cursor/rules/<slug>.mdc
+        - Appends are wrapped in `<!-- agentkit:<slug>:start -->` / `<!-- agentkit:<slug>:end -->` markers, so re-running updates in place instead of duplicating
+        - `agentkit remove <slug>` removes the marked block and the kit folder
+        - `agentkit list` shows installed kits and their agent.json version
+        - `--dry-run` prints the diff without writing
+        - `--base-url` for self-hosted mirrors of the archive
+        - Exits non-zero if any file 404s; never overwrites files outside marked blocks
+
+        Setup / scripts:
+        ```
+        npm install
+        npm run build      # tsup -> dist/
+        npm test           # vitest run
+        npm run lint       # eslint
+        npm run typecheck  # tsc --noEmit
+        npm link           # try the CLI locally
+        ```
+        Usage example: `npx agentkit-cli add pr-review-agent test-case-generator --target claude`
+
+        Known limitations: no Windows CI yet (works on macOS/Linux in CI); no offline cache; no signature verification of downloaded files.
+
+        Roadmap: Windows CI, `agentkit update` to refresh all installed kits, checksum verification using agent.json, a `--pack <starter-pack>` option.
+
+        Audience: developers using Codex, Claude Code, or Cursor. Include getting started, scripts, and a roadmap section.
+      expectedOutputSummary: A concise, paste-ready README.md for agentkit-cli that covers purpose, the 7-file kit URLs, add/remove/list with --target, --dry-run and --base-url, the marker-based merge, the non-zero exit on 404, Node >= 20.9, the five dev scripts, the three known limitations, the four roadmap items, and MIT, without inventing behavior.
+      sampleOutput: |-
+        Here's the README. I kept it short and made a few assumptions, which are listed under the file.
+
+        ````markdown
+        # agentkit-cli
+
+        A zero-config Node CLI that installs agent **install kits** from [Agent Archive](https://yohan-work.github.io/agentive/) into your repo. It handles many agents at once and merges into existing files safely.
+
+        Without it, you run one curl command per agent. With it:
+
+        ```bash
+        npx agentkit-cli add pr-review-agent test-case-generator --target claude
+        ```
+
+        ## What gets installed
+
+        Every project-ready agent in the archive publishes 7 files at stable URLs:
+
+        ```
+        https://yohan-work.github.io/agentive/kits/<slug>/
+          AGENTS.md  CLAUDE.md  cursor-rule.mdc  agent.json  README.md  RUNBOOK.md  EVALUATION.md
+        ```
+
+        `agentkit add` downloads them to `./agent-kits/<slug>/`. If you pass `--target`, it also wires the agent into your tool's config:
+
+        | `--target` | Writes to |
+        |---|---|
+        | `codex`  | appends to `AGENTS.md` |
+        | `claude` | appends to `CLAUDE.md` |
+        | `cursor` | writes `.cursor/rules/<slug>.mdc` |
+
+        Each append is wrapped in markers:
+
+        ```md
+        <!-- agentkit:pr-review-agent:start -->
+        ...
+        <!-- agentkit:pr-review-agent:end -->
+        ```
+
+        When you run the command again, it updates the block in place instead of adding a second copy. **agentkit never changes content outside its own marked blocks.**
+
+        ## Getting started
+
+        Requires **Node >= 20.9**.
+
+        ```bash
+        # one-off
+        npx agentkit-cli add <slug...>
+
+        # or install globally
+        npm install -g agentkit-cli
+        agentkit add <slug...>
+        ```
+
+        Find slugs on [Agent Archive](https://yohan-work.github.io/agentive/). They're in each agent's URL.
+
+        ## Usage
+
+        ```bash
+        agentkit add <slug...>                        # download kits to ./agent-kits/<slug>/
+        agentkit add <slug> --target codex|claude|cursor
+        agentkit remove <slug>                        # remove the marked block and the kit folder
+        agentkit list                                 # installed kits and their agent.json version
+        ```
+
+        | Option | Description |
+        |---|---|
+        | `--target <tool>` | `codex`, `claude`, or `cursor` (see table above) |
+        | `--dry-run` | Print the diff without writing anything |
+        | `--base-url <url>` | Use a self-hosted mirror of the archive |
+
+        **Exit codes:** the command exits non-zero if any kit file returns 404.
+
+        Tip: run with `--dry-run` first on repos that already have an `AGENTS.md` or `CLAUDE.md`.
+
+        ## Development
+
+        ```bash
+        npm install
+        npm run build      # tsup -> dist/
+        npm test           # vitest run
+        npm run lint       # eslint
+        npm run typecheck  # tsc --noEmit
+        npm link           # try the `agentkit` command locally
+        ```
+
+        Stack: TypeScript, commander, undici fetch, vitest, tsup.
+
+        ## Known limitations
+
+        - **No Windows CI yet.** It's tested in CI on macOS and Linux only.
+        - **No offline cache.** Every `add` fetches from the network.
+        - **No signature or checksum verification.** Downloaded files are trusted as served. Only use `--base-url` with mirrors you control or trust, and review the diff (`--dry-run`) before committing, because these files become instructions for your coding agent.
+
+        ## Roadmap
+
+        - [ ] Windows CI
+        - [ ] `agentkit update` to refresh all installed kits
+        - [ ] Checksum verification using `agent.json`
+        - [ ] `--pack <starter-pack>` to install a curated set of agents at once
+
+        ## Contributing
+
+        Issues and PRs are welcome at [github.com/yohan-work/agentkit-cli](https://github.com/yohan-work/agentkit-cli). Please run `lint`, `typecheck`, and `test` before you open a PR.
+
+        ## License
+
+        MIT
+        ````
+
+        **Assumptions to check:**
+        1. The npm bin name is `agentkit`, so `npx agentkit-cli …` and a global `agentkit …` both work.
+        2. `--target claude` appends the kit's `CLAUDE.md`, and `--target codex` appends its `AGENTS.md`.
+        3. `--target` takes one value per run. If it accepts several (for example `--target claude,cursor`), update the usage line.
+        4. I left out a "what happens on a partial failure" line, because the brief doesn't say whether files already written are rolled back when one 404s.
+
+        **Risk to note:** The biggest one is unverified downloads that turn into agent instructions (a prompt-injection risk). I called it out under limitations instead of hiding it. Once checksum verification ships, change that bullet.
+
+        **Next actions:**
+        - Confirm the four assumptions above.
+        - Add a `CHANGELOG.md` entry for v0.3.0.
+        - Add npm version and CI badges under the title once the CI workflow URL is final.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: README Generator boundary run
-      input: Write complete onboarding docs for a repo without reading its config.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Uses every given fact correctly: the exact kit URL pattern and 7 filenames, the `<!-- agentkit:<slug>:start/end -->` markers, `./agent-kits/<slug>/`, `.cursor/rules/<slug>.mdc`, the script comments (tsup -> dist/, vitest run, tsc --noEmit), and the verbatim usage example."
+        - "Good structure for a CLI: the --target -> file table and the options table make the behavior scannable, and the Roadmap is a checklist that mirrors the brief's four items exactly."
+        - "Adds a useful, well-grounded risk: unverified downloads become agent instructions, so it advises `--dry-run` and trusted `--base-url` mirrors. This is tied to the stated 'no signature verification' limitation, not invented."
+        - "Uncertain points are marked as assumptions instead of stated as fact: the bin name `agentkit`, which file each --target appends, a single --target value, and rollback on a partial 404. That matches the input's ambiguity well."
+        - "Minor unsupported additions: 'slugs are in each agent's URL' and the global-install instructions. The four-backtick outer fence keeps it paste-safe, and the length suits a small CLI."
+    - title: README request with only a repo name
+      input: Generate a README for my project "tiny-ledger". Make it look professional with badges, install instructions, and a features list.
+      expectedOutputSummary: Given only the name 'tiny-ledger', the agent should say that purpose, stack, install method, features, and badge targets are unknown, give a clearly placeholdered skeleton (including badge patterns), and ask a short set of focused questions needed to finish it.
+      sampleOutput: |-
+        All I know about tiny-ledger is its name, so I can't write the real features, install command, or badges without making them up. Below is a draft you can fill in. Anything in `<ANGLE_BRACKETS>` is a placeholder. The feature bullets are only examples of what a small ledger tool often has. Swap in your own before you publish.
+
+        ---
+
+        ```markdown
+        # tiny-ledger
+
+        <!-- Keep only the badges that point at something real. -->
+        [![Build](https://img.shields.io/github/actions/workflow/status/<OWNER>/tiny-ledger/<WORKFLOW_FILE>?branch=main)](https://github.com/<OWNER>/tiny-ledger/actions)
+        [![Version](https://img.shields.io/<npm|pypi|crates>/v/tiny-ledger)](<PACKAGE_REGISTRY_URL>)
+        [![License](https://img.shields.io/github/license/<OWNER>/tiny-ledger)](LICENSE)
+
+        > <One sentence: what tiny-ledger is and who it's for.>
+
+        ## Features
+
+        <!-- EXAMPLES ONLY. Replace with what the project actually does. -->
+        - <Record income and expense entries>
+        - <Store data in a simple local file (e.g., JSON/CSV/SQLite)>
+        - <Show balances and summaries by account or category>
+        - <Import/export data>
+        - <Small footprint, few or no dependencies>
+
+        ## Requirements
+
+        - <Runtime and minimum version, e.g., Node.js >= X / Python >= X>
+        - <Operating systems supported>
+
+        ## Installation
+
+        ```bash
+        <package-manager install command, e.g., npm install tiny-ledger>
+        ```
+
+        Or from source:
+
+        ```bash
+        git clone https://github.com/<OWNER>/tiny-ledger.git
+        cd tiny-ledger
+        <install/build command>
+        ```
+
+        ## Quick start
+
+        ```bash
+        <smallest real example: add an entry, then show the balance>
+        ```
+
+        ## Configuration
+
+        | Option | Default | Description |
+        |---|---|---|
+        | `<option>` | `<default>` | <what it controls> |
+
+        ## Contributing
+
+        Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) if you have one, or explain how to run tests: `<test command>`.
+
+        ## License
+
+        <License name>. See [LICENSE](LICENSE).
+        ```
+
+        ---
+
+        **Assumptions**
+        - It's hosted on GitHub. The badge URLs use shields.io with GitHub paths.
+        - It's distributed through a package registry, or can be built from source.
+
+        **Risks**
+        - Badges pointing to a CI workflow, package, or license that doesn't exist will show "not found" or "invalid". That looks worse than having no badges.
+        - If the example features aren't replaced, the README will describe a different tool.
+
+        **Next actions**: send me these and I'll give you a finished README with no placeholders:
+        1. One or two sentences on what tiny-ledger does and who uses it (CLI, library, web app?).
+        2. Language/runtime and how people install it (package name + registry, or source only).
+        3. Its 3–6 real features.
+        4. Repo URL, license, and whether CI is set up (and the workflow file name).
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Opens by stating plainly that only the name is known and that real features, install commands, and badges would be made up. This is the right framing.
+        - "Moves the work forward with a full skeleton: <ANGLE_BRACKET> placeholders, shields.io badge patterns with a 'keep only badges that point at something real' comment, and Requirements, Installation, Quick start, Configuration, Contributing, and License sections."
+        - Ends with exactly four focused, high-value questions (purpose and type, runtime and registry, 3-6 real features, repo/license/CI). That avoids question overload.
+        - "Defect: the ```markdown outer fence contains inner ```bash fences, so the rendered response breaks at the Installation section and the draft is not cleanly copy-pastable."
+        - The Features section guesses ledger-domain bullets (income/expense entries, JSON/CSV/SQLite storage, import/export). They are labeled 'EXAMPLES ONLY' and the risk is called out, but they still lean toward invented content.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Creating or refreshing project documentation from known setup and feature details
@@ -197,5 +588,5 @@ decisionGuide:
 relatedAgents:
   - policy-doc-writer
   - codex-task-brief
-verifiedStatus: tested
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29

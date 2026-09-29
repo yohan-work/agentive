@@ -35,8 +35,288 @@ outputs:
   - Risks
   - Recommended next actions
 prompt: You are Test Case Generator. Convert the user's context into a practical test case matrix. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
-exampleInput: 새 검색 필터 기능을 배포하기 전 테스트 케이스를 빠르게 만드는 상황
-exampleOutput: A structured test case matrix with practical recommendations, tradeoffs, and next steps.
+exampleInput: |-
+  /agents 페이지의 검색·필터 기능을 이번에 한국어화(PR #19)하면서 회귀 테스트 케이스를 다시 정리하려고 합니다. QA 1명이 수동으로 돌리고, 일부는 node:test 단위 테스트로 옮길 예정이에요.
+
+  프로젝트: Agent Archive (Next.js 16 정적 export, GitHub Pages). /en/agents, /ko/agents 두 경로. 에이전트 100개, 그중 installTargets가 있는(설치 가능) 에이전트 20개.
+
+  현재 동작(코드 기준):
+  - 검색어: name, summary, description, tags, categories, roles, tools, realUseCases(한국어 사용 사례 텍스트 포함)를 공백으로 이어 붙여 소문자화한 문자열에 `includes`로 부분 일치. 앞뒤 공백은 trim. 빈 문자열이면 전체.
+  - 필터 7종(모두 단일 선택, AND 조합): 역할(role), 카테고리(category), 난이도(beginner/intermediate/advanced), 자동화 수준(1~5), 도구(tool, 에이전트 데이터에서 중복 제거해 정렬), 검증 상태(unverified/community/tested/expert), "설치 가능만 보기" 체크박스.
+  - 같은 필터 칩을 다시 누르면 해당 필터가 해제됨(토글). 다른 값을 누르면 교체.
+  - "모두 지우기"(Clear all): 검색어와 필터 모두 초기화. "필터만 지우기"(Clear filters only): 필터만 초기화, 검색어 유지.
+  - 결과 카운트: "100개 중 N개 표시"(ko) / "Showing N of 100 agents"(en). 활성 필터는 칩으로 표시(예: "난이도: 중급").
+  - URL: `?query=`만 읽음(상단 검색창에서 넘어올 때). 다른 필터는 URL에 저장 안 됨 → 새로고침하면 초기화. 상단 검색으로 query가 바뀌면 다른 필터는 유지.
+  - 결과 0개면 EmptyState 컴포넌트 표시.
+  - 정적 페이지이므로 JS 로드 전에는 필터 없는 전체 목록이 렌더됨.
+
+  테스트 대상 사용자: 한국어/영어 UI 사용자, 모바일(375px)과 데스크톱.
+  제약: 테스트 서버 없음(로컬 `npm run dev` 또는 배포된 GitHub Pages). 자동화는 node:test + tsx로 src/lib/search.ts 함수 단위만 가능, E2E 도구는 아직 없음.
+
+  원하는 결과: ID/분류/전제조건/절차/기대결과/우선순위 컬럼이 있는 테스트 케이스 매트릭스(정상 흐름, 빈 결과, 필터 조합, 새로고침/URL 유지, 한국어 문자열, 회귀 위험), 단위 테스트로 옮길 후보 표시, 가정과 리스크.
+exampleOutput: |-
+  # /agents 검색·필터 회귀 테스트 매트릭스 (PR #19 한국어화 기준)
+
+  말씀해 주신 동작 명세만으로 매트릭스를 만들 수 있어서 바로 작성했습니다. 명세에서 비어 있는 부분은 아래 "가정"에 적었습니다. 판단이 필요한 항목은 "기대결과"에 **[결정 필요]**로 표시했습니다. 맨 끝의 확인 질문 4개에 답해 주시면 해당 행을 확정하겠습니다.
+
+  ---
+
+  ## 1. 범위와 표기
+
+  - **대상 경로**: `/en/agents`, `/ko/agents` (로컬 `npm run dev`와 GitHub Pages 배포본)
+  - **뷰포트**: 모바일 375px, 데스크톱 1440px
+  - **우선순위**
+    - P0: 릴리스를 막는 항목. 매 회귀 때 실행합니다.
+    - P1: 주요 흐름. 매 회귀 때 실행합니다.
+    - P2: 엣지 케이스와 사양 확인. 분기 1회 또는 관련 코드가 바뀔 때 실행합니다.
+  - **자동화 후보 열**
+    - **U**: `src/lib/search.ts` 함수 단위로 node:test에 옮길 수 있습니다.
+    - **M**: 수동으로만 확인할 수 있습니다(UI, URL, 렌더링).
+    - **U+M**: 로직은 단위 테스트로, 표시는 수동으로 확인합니다.
+  - **공통 전제조건 약칭**
+    - `P-KO` / `P-EN`: 해당 경로를 로드해 JS 하이드레이션이 끝난 상태입니다. 검색어와 필터가 비어 있고 "100개 중 100개 표시"가 보입니다.
+    - `ORC`: 기대 건수를 적은 오라클 시트입니다(3장 참고).
+
+  ---
+
+  ## 2. 가정
+
+  1. 검색은 로케일과 무관합니다. `/en`과 `/ko`에서 같은 haystack(에이전트 원본 필드)을 씁니다. 따라서 **ko UI에 보이는 번역 라벨**(예: 카테고리 한국어명)은 haystack에 들어 있지 않습니다. 한국어로 매칭되는 것은 realUseCases의 한국어 텍스트뿐입니다.
+  2. 필터 비교는 원시 값(`intermediate`, `tested`, 슬러그 등)으로 합니다. 번역은 칩 라벨에만 적용됩니다.
+  3. 역할·카테고리·도구처럼 배열인 필드는 "선택한 값이 배열에 포함되면 일치"로 처리합니다.
+  4. "설치 가능"은 `installTargets`가 1개 이상인 경우입니다. `installTargets: []`는 설치 불가로 봅니다.
+  5. 페이지 안 검색창에 입력한 값은 URL에 쓰지 않습니다. 따라서 새로고침하면 URL의 `?query=` 값으로 돌아갑니다.
+  6. 검색은 입력할 때마다 반영됩니다(Enter가 필요 없음). 디바운스가 있는지는 모릅니다.
+  7. 총 개수 "100"은 하드코딩이 아니라 전체 에이전트 수에서 계산됩니다.
+
+  ---
+
+  ## 3. 테스트 데이터 준비 (오라클 시트)
+
+  기대 건수 N을 화면이 아닌 **원본 데이터에서 따로 집계해 둬야** 회귀를 잡을 수 있습니다. 한 번 만들어 두고 에이전트 데이터가 바뀔 때만 갱신합니다.
+
+  | 오라클 키 | 내용 |
+  |---|---|
+  | ORC-A | 기준 에이전트 A: 이름으로 검색했을 때 **정확히 1건**만 나오는 에이전트 |
+  | ORC-F | tags, categories, roles, tools, summary, description, realUseCases(ko) 각각에**만** 들어 있는 단어 1개씩과 해당 에이전트 |
+  | ORC-D | 난이도 3값별 건수(합계 100) |
+  | ORC-L | 자동화 수준 1~5별 건수(합계 100) |
+  | ORC-V | 검증 상태 4값별 건수(합계 100) |
+  | ORC-I | 설치 가능 20건 목록 |
+  | ORC-C | 2~3개 교집합 조합 5개의 기대 건수. 결과가 0건인 조합 1개를 반드시 포함합니다 |
+
+  ---
+
+  ## 4. 테스트 케이스 매트릭스
+
+  ### 4.1 검색: 정상 흐름
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | SR-01 | 정상 | P-KO | 검색창을 비워 둔 채 목록을 확인합니다 | 100건 전부 표시, "100개 중 100개 표시" | P0 | U |
+  | SR-02 | 정상 | P-KO, ORC-A | A 이름의 중간 부분 3~4글자를 입력합니다 | A가 결과에 포함되고 건수가 오라클과 같음 | P0 | U |
+  | SR-03 | 정상 | P-EN, ORC-A | SR-02의 검색어를 전부 대문자로 입력합니다 | SR-02와 결과가 같음(대소문자 무시) | P0 | U |
+  | SR-04 | 정상 | P-KO | 앞뒤에 공백을 붙여 `"  review  "`를 입력합니다 | `"review"`와 결과가 같음 | P1 | U |
+  | SR-05 | 정상 | P-KO | 공백만 입력합니다(`"   "`) | 100건 전부 표시, EmptyState 없음 | P1 | U |
+  | SR-06 | 필드별 | ORC-F | 7개 필드의 전용 단어로 각각 검색합니다 | 각 단어마다 해당 에이전트가 포함됨 | P0 | U (테이블 기반) |
+  | SR-07 | 필드 경계 | ORC-A | "A 이름의 마지막 단어 + 공백 + summary 첫 단어"로 검색합니다 | 공백 결합이라 **현재는 매칭됨**. 의도한 동작인지 **[결정 필요]**. 현재 동작을 테스트로 고정합니다 | P2 | U |
+  | SR-08 | 공백 | P-EN | `"code  review"`처럼 중간에 공백 2칸을 넣어 검색합니다 | 현재는 0건일 수 있음. 내부 공백을 정규화할지 **[결정 필요]** | P2 | U |
+  | SR-09 | 특수문자 | P-EN | `c++`, `.*`, `(`, `\`, `%`로 각각 검색합니다 | 오류 없이 리터럴 부분 일치(`includes` 방식이라 정규식으로 해석되지 않음) | P1 | U |
+  | SR-10 | 입력 | P-KO | 빠르게 입력한 뒤 전부 지웁니다 | 최종 입력값 기준으로 결과가 보이고 이전 결과가 남지 않음. 마지막에 100건 복원 | P1 | M |
+  | SR-11 | 경계 | P-KO | 500자 문자열을 붙여 넣습니다 | 멈춤 없이 0건과 EmptyState 표시 | P2 | U+M |
+
+  ### 4.2 한국어 문자열
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | KO-01 | IME | P-KO, 데스크톱과 모바일 각각 | "코드"를 한 글자씩 입력하며 조합 중간 상태(`콛` 등)를 관찰합니다 | 조합 중에 EmptyState가 깜빡일 수 있는지 기록합니다. 조합이 끝나면 정상 결과. 글자 중복·누락 없음 | P0 | M |
+  | KO-02 | 부분 일치 | ORC-F(realUseCases) | 한국어 사용 사례 속 단어의 일부 음절("리뷰")로 검색합니다 | 해당 에이전트 포함 | P0 | U |
+  | KO-03 | 로케일 독립 | ORC-F | KO-02와 같은 검색어를 `/en/agents`에서 입력합니다 | `/ko`와 결과 건수가 같음 | P1 | U |
+  | KO-04 | 번역 라벨 | P-KO | ko 필터 칩에 보이는 **한국어 카테고리/역할 라벨**로 검색합니다 | 가정 1이 맞다면 **0건이 나올 수 있음**. 사용자는 매칭을 기대합니다. **[결정 필요]** 번역 라벨을 haystack에 넣을지 정해야 합니다 | P0 | U |
+  | KO-05 | 자모 | P-KO | `ㅋ`, `ㄹㅂ`처럼 자모만 입력합니다 | 0건(초성 검색 미지원). 의도한 동작인지 확인 | P2 | U |
+  | KO-06 | 정규화 | P-KO | NFD로 분해된 "리뷰"를 붙여 넣습니다(macOS 파일명에서 복사하는 등) | `includes`만 쓰면 매칭되지 않을 수 있음. `normalize('NFC')`를 적용할지 **[결정 필요]** | P2 | U |
+  | KO-07 | 혼합 | P-KO | `PR 리뷰`처럼 한영을 섞어 검색합니다 | haystack에 연속 문자열로 있을 때만 매칭 | P2 | U |
+  | KO-08 | 카운트 문구 | P-KO / P-EN | 결과가 0건, 1건, 100건인 상태를 만듭니다 | ko: "100개 중 N개 표시", en: "Showing N of 100 agents". 숫자가 정확함. en 1건일 때 "agents" 복수형을 허용할지 확인 | P0 | M |
+  | KO-09 | 칩 번역 | P-KO | 7개 필터의 **모든 값**을 하나씩 선택해 칩 라벨을 봅니다 | "난이도: 중급"처럼 번역된 라벨만 보임. `intermediate`, `filters.difficulty` 같은 원시 값이나 키가 노출되지 않음 | P0 | M |
+  | KO-10 | 칩 번역 | P-EN | KO-09를 영어로 반복합니다 | 한국어 문자열이 섞이지 않음 | P0 | M |
+  | KO-11 | EmptyState | P-KO / P-EN | 결과를 0건으로 만듭니다 | EmptyState 제목, 설명, 버튼이 각 로케일로 번역됨 | P1 | M |
+  | KO-12 | 정렬 | - | 도구 필터 목록 순서를 ko와 en에서 비교합니다 | 두 로케일에서 순서가 같음. 대소문자가 섞인 도구명의 정렬 규칙이 일관됨 | P2 | U |
+
+  ### 4.3 개별 필터
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | FL-01 | 정상 | P-KO, ORC | 7개 필터마다 대표 값을 1개씩 선택합니다(한 번에 하나) | 건수가 오라클과 같고 칩 1개가 표시됨 | P0 | U+M |
+  | FL-02 | 불변식 | ORC-D | 난이도 3값을 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+  | FL-03 | 불변식 | ORC-L | 자동화 수준 1~5를 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+  | FL-04 | 불변식 | ORC-V | 검증 상태 4값을 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+  | FL-05 | 설치 가능 | ORC-I | "설치 가능만 보기"를 체크합니다 | 20건, 오라클 목록과 일치 | P0 | U+M |
+  | FL-06 | 설치 가능 | 픽스처 | `installTargets: []`인 에이전트를 넣은 픽스처로 필터를 적용합니다 | 결과에서 제외됨 | P1 | U |
+  | FL-07 | 토글 | FL-01 상태 | 선택한 칩을 다시 누릅니다 | 필터가 해제되고 칩이 사라지며 100건 복원 | P0 | M |
+  | FL-08 | 교체 | P-KO | 난이도 "초급"을 누른 뒤 "중급"을 누릅니다 | "중급" 필터만 적용됨(OR 아님). 칩은 "난이도: 중급" 1개 | P0 | U+M |
+  | FL-09 | 체크박스 | FL-05 상태 | 체크를 해제합니다 | 100건 복원, 칩 제거 | P1 | M |
+  | FL-10 | 도구 목록 | - | 도구 필터 옵션을 확인합니다 | 중복 없음, 정렬됨, 빈 문자열 없음, 모든 에이전트의 도구가 들어 있음 | P1 | U |
+  | FL-11 | 배열 필드 | 역할이 2개 이상인 에이전트 B | B의 두 번째 역할로 필터링합니다 | B가 포함됨 | P1 | U |
+  | FL-12 | 칩 해제 | 활성 칩 1개 이상 | 활성 칩 영역의 개별 해제 버튼을 누릅니다(있는 경우) | 해당 필터만 해제되고 나머지는 유지 | P1 | M |
+
+  ### 4.4 필터 조합
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | CB-01 | AND | ORC-C | 검색어 1개와 필터 1개를 적용합니다 | 두 조건의 교집합, 건수가 오라클과 같음 | P0 | U |
+  | CB-02 | AND | ORC-C | 난이도=beginner와 설치 가능을 함께 적용합니다 | 교집합 건수가 오라클과 같음 | P0 | U |
+  | CB-03 | 전체 조합 | ORC-C | 7개 필터를 모두 적용하고 검색어도 입력합니다 | 교집합이 정확함(0건이면 EmptyState) | P1 | U |
+  | CB-04 | 순서 무관 | ORC-C | 필터를 A→B 순서와 B→A 순서로 각각 적용합니다 | 두 결과가 같음 | P2 | U |
+  | CB-05 | Clear all | 검색어와 필터 2개 이상 적용 | "모두 지우기"를 누릅니다 | 검색창이 비고 모든 필터와 칩이 해제되며 100건 표시 | P0 | M |
+  | CB-06 | Clear filters only | 검색어와 필터 2개 이상 적용 | "필터만 지우기"를 누릅니다 | 검색어는 유지되고 필터만 해제됨. 결과가 검색어만 적용한 결과와 같음 | P0 | M |
+  | CB-07 | Clear filters only | 필터만 적용(검색어 없음) | "필터만 지우기"를 누릅니다 | 100건 | P2 | M |
+  | CB-08 | 버튼 상태 | P-KO | 아무것도 적용하지 않은 상태에서 두 지우기 버튼을 봅니다 | 비활성 또는 숨김 등 일관된 상태. 눌러도 오류 없음 | P2 | M |
+  | CB-09 | 로케일 일치 | ORC-C | 같은 조합을 ko와 en에 각각 적용합니다 | 두 로케일의 건수가 같음(번역이 필터 로직에 섞이지 않음) | P0 | U+M |
+
+  ### 4.5 빈 결과
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | EM-01 | 검색 0건 | P-KO | `zzqqxx`로 검색합니다 | EmptyState 표시, "100개 중 0개 표시", 카드 없음 | P0 | U+M |
+  | EM-02 | 복구 | EM-01 상태 | 검색어를 지웁니다 | 100건 복원, EmptyState 사라짐 | P0 | M |
+  | EM-03 | 필터 0건 | ORC-C(0건 조합) | 교집합이 0건인 조합을 적용합니다 | EmptyState 표시. 안에 초기화 액션이 있으면 눌렀을 때 복원됨 | P1 | M |
+  | EM-04 | 전환 | - | 0건과 결과 있음 상태를 5번 오갑니다 | 레이아웃이 튀거나 스크롤 위치가 비정상이 되지 않음 | P2 | M |
+
+  ### 4.6 새로고침과 URL 유지
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | URL-01 | 진입 | - | `/ko/agents?query=review`로 바로 들어갑니다 | 검색창에 `review`가 채워지고 결과가 필터링됨 | P0 | M |
+  | URL-02 | 인코딩 | - | `?query=%EC%BD%94%EB%93%9C`로 들어갑니다 | 검색창에 "코드"가 보이고 결과가 필터링됨 | P0 | M |
+  | URL-03 | 인코딩 | - | `?query=code+review`와 `?query=code%20review`로 각각 들어갑니다 | 둘 다 공백으로 해석되어 결과가 같음 | P1 | M |
+  | URL-04 | 빈 값 | - | `?query=`, 파라미터 없음, `?query=%20%20`으로 각각 들어갑니다 | 모두 100건 | P1 | U+M |
+  | URL-05 | 새로고침 | URL-01 상태에서 필터 2개 적용 | 새로고침합니다 | 필터는 초기화되고(현재 사양) 검색어는 URL 값으로 복원됨 | P0 | M |
+  | URL-06 | 새로고침 | P-KO | 페이지 안 검색창에 입력한 뒤 새로고침합니다 | 가정 5에 따르면 검색어가 사라짐. 사양 확인 | P1 | M |
+  | URL-07 | 상단 검색 | 필터 2개 적용 | 상단 검색창으로 새 query를 보냅니다 | 필터는 유지되고 검색어만 바뀜. 결과는 교집합 | P0 | M |
+  | URL-08 | Clear all | URL-01 상태 | "모두 지우기"를 누른 뒤 새로고침합니다 | URL의 `?query=`가 남아 있으면 **검색어가 다시 살아남**. **[결정 필요]** Clear all 때 URL도 정리할지 정해야 함 | P1 | M |
+  | URL-09 | 히스토리 | - | 상단 검색을 두 번 한 뒤 뒤로 가기, 앞으로 가기를 합니다 | 검색창과 결과가 해당 URL의 query와 맞음 | P1 | M |
+  | URL-10 | JS 로드 전 | DevTools에서 JS를 끄거나 Slow 3G 설정 | `/ko/agents?query=review`로 들어갑니다 | JS 로드 전에는 전체 100건이 렌더되고, 하이드레이션 뒤 필터링됨. 콘솔에 하이드레이션 오류 없음 | P1 | M |
+  | URL-11 | 배포본 | GitHub Pages | URL-01, URL-02, URL-05를 배포 경로(basePath, 끝 슬래시 `/ko/agents/?query=` 포함)에서 반복합니다 | 로컬과 동작이 같고 404 없음 | P0 | M |
+  | URL-12 | 언어 전환 | 검색어와 필터 적용 | 언어 전환으로 `/en` ↔ `/ko`를 오갑니다 | 필터는 초기화됨. query를 유지할지는 사양 확인 | P1 | M |
+  | URL-13 | 무관 파라미터 | - | `?difficulty=advanced&foo=1`로 들어갑니다 | 무시되고 100건, 오류 없음 | P2 | M |
+
+  ### 4.7 반응형과 접근성
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | UI-01 | 모바일 | 375px, P-KO | 필터 패널을 열고 닫은 뒤 칩 5개를 적용합니다 | 가로 스크롤 없음. 칩이 줄바꿈되고 긴 한국어 라벨이 잘리지 않음 | P1 | M |
+  | UI-02 | 모바일 | 375px | 카운트와 두 지우기 버튼 위치를 확인합니다 | 스크롤 없이 또는 합리적인 위치에서 보이고 터치 영역이 충분함 | P1 | M |
+  | UI-03 | 데스크톱 | 1440px, P-EN / P-KO | SR-02, FL-01, CB-05를 스모크로 실행합니다 | 정상 | P1 | M |
+  | UI-04 | 키보드 | 데스크톱 | Tab으로 칩에 이동해 Enter/Space로 토글합니다 | 토글이 동작하고 포커스가 보이며 `aria-pressed`가 적절함 | P2 | M |
+  | UI-05 | 스크린리더 | VoiceOver | 필터를 바꿉니다 | 결과 건수 변경이 안내됨(aria-live가 있는 경우) | P2 | M |
+
+  ### 4.8 회귀 위험 (PR #19 전용)
+
+  | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+  |---|---|---|---|---|---|---|
+  | RG-01 | 문자열 누수 | P-EN | 검색·필터 영역의 모든 문자열을 훑어봅니다 | 한국어 문자열이 섞이지 않음 | P0 | M |
+  | RG-02 | 키 누락 | - | 사전의 en 키 집합과 ko 키 집합을 비교합니다 | 두 집합이 같음. 키 이름이 화면에 노출되지 않음 | P0 | U (search.ts 밖. 가능하면 추가) |
+  | RG-03 | 로직 분리 | ORC | 같은 필터를 ko와 en에서 선택합니다(CB-09 확장) | 모든 필터 값에서 두 로케일의 건수가 같음 | P0 | U |
+  | RG-04 | 카드 배지 | P-KO | 결과 카드의 배지(난이도, 검증 상태 등)를 확인합니다 | 번역된 라벨이 필터 칩 라벨과 같은 용어를 씀 | P1 | M |
+  | RG-05 | 카운트 | - | 에이전트를 1개 추가한 픽스처나 빌드에서 확인합니다 | 총 개수가 101로 바뀜(하드코딩이 아님) | P2 | U |
+  | RG-06 | 성능 | 저사양 모바일 | 빠르게 입력합니다 | 체감 지연 없음(100건 기준) | P2 | M |
+
+  ---
+
+  ## 5. 단위 테스트로 옮길 후보
+
+  자동화 열이 **U**인 행 가운데 먼저 옮길 것을 추리면 다음과 같습니다.
+
+  | 묶음 | 대상 ID | 비고 |
+  |---|---|---|
+  | 검색 정규화 | SR-01~09, SR-11, KO-02~07 | 작은 픽스처(5~8건)로 테이블 기반 테스트 |
+  | 필터 조건 | FL-01~06, FL-08, FL-10~11 | 필터별 조건을 개별로 검증 |
+  | 조합 | CB-01~04, CB-09, RG-03 | 교집합과 순서 무관성 |
+  | 실데이터 불변식 | FL-02~05, RG-05 | 실제 100건 데이터로 "합계=100", "설치 가능=20" 확인. 데이터가 바뀌면 깨지므로 숫자 대신 `agents.length`나 오라클 파일을 기준으로 삼는 것을 권장 |
+  | (search.ts 밖) | RG-02 | 사전 키 동일성. 같은 node:test 러너로 import할 수 있다면 비용 대비 효과가 가장 큼 |
+
+  예시 골격입니다. 함수 이름과 시그니처는 실제 `search.ts`에 맞게 바꿔 주세요.
+
+  ```ts
+  // search.test.ts (node --import tsx --test)
+  import { test } from "node:test";
+  import assert from "node:assert/strict";
+  import { filterAgents } from "../src/lib/search"; // 가정한 이름
+
+  const fx = [
+    { slug: "a", name: "Code Reviewer", summary: "PR review", installTargets: ["claude"], difficulty: "beginner", /* ... */ realUseCases: ["코드 리뷰 자동화"] },
+    { slug: "b", name: "Doc Writer", summary: "docs", installTargets: [], difficulty: "advanced", /* ... */ realUseCases: [] },
+  ];
+
+  const cases: [string, string, string[]][] = [
+    ["빈 검색은 전체", "", ["a", "b"]],
+    ["공백만은 전체", "   ", ["a", "b"]],
+    ["대소문자 무시", "CODE", ["a"]],
+    ["trim", "  review  ", ["a"]],
+    ["한국어 realUseCases", "리뷰", ["a"]],
+    ["특수문자 리터럴", ".*", []],
+  ];
+
+  for (const [name, query, expected] of cases) {
+    test(name, () => {
+      const got = filterAgents(fx, { query, filters: {} }).map((a) => a.slug);
+      assert.deepEqual(got, expected);
+    });
+  }
+
+  test("installTargets: [] 는 설치 가능에서 제외", () => {
+    const got = filterAgents(fx, { query: "", filters: { installable: true } }).map((a) => a.slug);
+    assert.deepEqual(got, ["a"]);
+  });
+  ```
+
+  ---
+
+  ## 6. 리스크
+
+  | # | 리스크 | 영향 | 관련 ID |
+  |---|---|---|---|
+  | R1 | ko 사용자가 화면에 보이는 한국어 카테고리/역할 라벨로 검색하면 0건이 나올 수 있음 | 높음. 한국어화의 체감 품질이 떨어짐 | KO-04 |
+  | R2 | IME 조합 중 결과가 0건으로 바뀌며 EmptyState가 깜빡임 | 중간. 모바일에서 특히 눈에 띔 | KO-01 |
+  | R3 | Clear all 뒤에도 URL `?query=`가 남아 새로고침하면 검색어가 되살아남 | 중간. 사용자가 혼란스러워함 | URL-08 |
+  | R4 | 필터가 URL에 저장되지 않아 공유나 새로고침 때 사라짐 | 중간. 현재 사양이지만 사용자 기대와 어긋남 | URL-05 |
+  | R5 | 필드를 공백으로 이어 붙여 경계를 넘는 오탐이 생기고, 내부 공백·NFD는 정규화하지 않음 | 낮음 | SR-07, SR-08, KO-06 |
+  | R6 | 사전 키 누락이나 원시 값 노출이 수동 QA에서 빠지기 쉬움 | 중간 | KO-09, RG-02 |
+  | R7 | GitHub Pages의 basePath나 끝 슬래시 때문에 로컬에서는 통과하고 배포본에서만 실패 | 높음 | URL-11 |
+  | R8 | 실데이터 불변식 테스트가 콘텐츠 추가 때마다 깨짐 | 낮음. 유지보수 비용 | FL-02~05 |
+  | R9 | E2E 도구가 없어 M 항목(약 60%)이 전부 사람에게 의존함 | 중간. 회귀 1회에 2~3시간 예상 | 전체 |
+
+  ---
+
+  ## 7. 권장사항
+
+  1. **P0만 추린 스모크 세트**(약 25건)를 PR마다, 전체 세트는 릴리스 전에 실행하세요.
+  2. **[결정 필요]** 항목 5개(SR-07, SR-08, KO-04, KO-06, URL-08)는 먼저 사양으로 확정하세요. 그다음 현재 동작을 단위 테스트로 고정해야 의도치 않은 변경을 잡을 수 있습니다.
+  3. KO-04는 ko에서 번역된 taxonomy 라벨을 haystack에 추가하는 것을 권장합니다. 이렇게 바꾸면 KO-03(로케일 독립) 기대값도 함께 바뀝니다.
+  4. 검색 전에 `query.normalize("NFC").replace(/\s+/g, " ")`를 적용하면 SR-08과 KO-06을 한 번에 해결할 수 있습니다.
+  5. E2E 도구를 도입한다면 URL-01, URL-05, URL-07, CB-05, CB-06부터 옮기는 것이 가장 효과가 큽니다.
+
+  ---
+
+  ## 8. 다음 액션
+
+  | 순서 | 할 일 | 담당(제안) |
+  |---|---|---|
+  | 1 | 오라클 시트(ORC-*)를 작성합니다 | QA |
+  | 2 | [결정 필요] 5건의 사양을 확정합니다 | PM/개발 |
+  | 3 | 5장의 U 후보를 node:test로 옮깁니다(검색 정규화 → 필터 → 조합 순) | 개발 |
+  | 4 | RG-02 사전 키 동일성 테스트를 추가합니다 | 개발 |
+  | 5 | M 항목 체크리스트로 로컬과 배포본에서 1회씩 실행하고 결과를 기록합니다 | QA |
+  | 6 | 결과를 바탕으로 P2 항목을 유지할지, 우선순위를 조정할지 검토합니다 | QA/개발 |
+
+  ---
+
+  ## 확인이 필요한 질문
+
+  1. ko 화면에서 검색할 때 **번역된 카테고리/역할/난이도 라벨**도 매칭되어야 하나요? (KO-04, KO-03의 기대결과가 달라집니다)
+  2. 페이지 안 검색창에 입력한 값이 URL `?query=`에 반영되나요, 읽기만 하나요? (URL-06, URL-08)
+  3. 활성 필터 칩에 개별 해제(X) 기능이 있나요? (FL-12)
+  4. `search.ts`에서 내보내는 함수 이름과 시그니처를 알려 주시면 5장의 골격을 실제 코드에 맞춰 드리겠습니다.
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -153,9 +433,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Generating functional, edge, and regression cases from clear requirements
     - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
@@ -165,30 +443,421 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - May produce many low-value cases if priority and risk are not stated
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Bookkeeping errors in summaries: the coupon run says 'P1(17개)' when the matrix actually contains 15 P1 rows, and the MAX-dependent set is cited as A-12~A-14 in one place and A-13~A-15 in another."
+    - "Generates code against guessed APIs: the node:test skeleton calls filterAgents(fx, { query, filters }) and models realUseCases as a string array, while the real src/lib/search.ts exposes separate searchAgents(agents, query) and filterAgents(agents, filters) and realUseCases are objects, so the skeleton needs rewriting."
+    - "Tends toward length over triage: the strong run has roughly 75 cases across 8 tables plus oracle, unit-test, risk, recommendation and next-action sections for a request framed as a QA handoff, with the P0 smoke subset described but not actually listed."
+    - Occasionally states unsupported estimates as facts, e.g. 'M 항목(약 60%)' and 'regression run 2~3시간 예상' without any basis in the input.
+    - Adds scope the user did not ask for (accessibility/VoiceOver, performance on low-end devices, generic coupon validation group D) which dilutes the priority signal.
   evaluationCriteria:
     - Covers happy path, empty states, combinations, persistence, and regression risk
     - Produces test case matrix in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Test Case Generator strong-context run
-      input: Generate tests for search, role filter, and installable-only filter combinations.
-      expectedOutputSummary: A usable test case matrix with project-specific assumptions, risks, and next steps.
-      sampleOutput: "test case matrix: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Korean test matrix for the real /agents search and filter panel
+      input: |-
+        /agents 페이지의 검색·필터 기능을 이번에 한국어화(PR #19)하면서 회귀 테스트 케이스를 다시 정리하려고 합니다. QA 1명이 수동으로 돌리고, 일부는 node:test 단위 테스트로 옮길 예정이에요.
+
+        프로젝트: Agent Archive (Next.js 16 정적 export, GitHub Pages). /en/agents, /ko/agents 두 경로. 에이전트 100개, 그중 installTargets가 있는(설치 가능) 에이전트 20개.
+
+        현재 동작(코드 기준):
+        - 검색어: name, summary, description, tags, categories, roles, tools, realUseCases(한국어 사용 사례 텍스트 포함)를 공백으로 이어 붙여 소문자화한 문자열에 `includes`로 부분 일치. 앞뒤 공백은 trim. 빈 문자열이면 전체.
+        - 필터 7종(모두 단일 선택, AND 조합): 역할(role), 카테고리(category), 난이도(beginner/intermediate/advanced), 자동화 수준(1~5), 도구(tool, 에이전트 데이터에서 중복 제거해 정렬), 검증 상태(unverified/community/tested/expert), "설치 가능만 보기" 체크박스.
+        - 같은 필터 칩을 다시 누르면 해당 필터가 해제됨(토글). 다른 값을 누르면 교체.
+        - "모두 지우기"(Clear all): 검색어와 필터 모두 초기화. "필터만 지우기"(Clear filters only): 필터만 초기화, 검색어 유지.
+        - 결과 카운트: "100개 중 N개 표시"(ko) / "Showing N of 100 agents"(en). 활성 필터는 칩으로 표시(예: "난이도: 중급").
+        - URL: `?query=`만 읽음(상단 검색창에서 넘어올 때). 다른 필터는 URL에 저장 안 됨 → 새로고침하면 초기화. 상단 검색으로 query가 바뀌면 다른 필터는 유지.
+        - 결과 0개면 EmptyState 컴포넌트 표시.
+        - 정적 페이지이므로 JS 로드 전에는 필터 없는 전체 목록이 렌더됨.
+
+        테스트 대상 사용자: 한국어/영어 UI 사용자, 모바일(375px)과 데스크톱.
+        제약: 테스트 서버 없음(로컬 `npm run dev` 또는 배포된 GitHub Pages). 자동화는 node:test + tsx로 src/lib/search.ts 함수 단위만 가능, E2E 도구는 아직 없음.
+
+        원하는 결과: ID/분류/전제조건/절차/기대결과/우선순위 컬럼이 있는 테스트 케이스 매트릭스(정상 흐름, 빈 결과, 필터 조합, 새로고침/URL 유지, 한국어 문자열, 회귀 위험), 단위 테스트로 옮길 후보 표시, 가정과 리스크.
+      expectedOutputSummary: "A Korean test case matrix with ID/category/precondition/steps/expected/priority columns covering normal search, empty results, filter combinations and toggling, Clear all vs Clear filters only, ?query= URL and refresh behavior, Korean strings and count copy, and PR #19 regression risks, marking which rows can move to node:test on src/lib/search.ts, plus assumptions and risks."
+      sampleOutput: |-
+        # /agents 검색·필터 회귀 테스트 매트릭스 (PR #19 한국어화 기준)
+
+        말씀해 주신 동작 명세만으로 매트릭스를 만들 수 있어서 바로 작성했습니다. 명세에서 비어 있는 부분은 아래 "가정"에 적었습니다. 판단이 필요한 항목은 "기대결과"에 **[결정 필요]**로 표시했습니다. 맨 끝의 확인 질문 4개에 답해 주시면 해당 행을 확정하겠습니다.
+
+        ---
+
+        ## 1. 범위와 표기
+
+        - **대상 경로**: `/en/agents`, `/ko/agents` (로컬 `npm run dev`와 GitHub Pages 배포본)
+        - **뷰포트**: 모바일 375px, 데스크톱 1440px
+        - **우선순위**
+          - P0: 릴리스를 막는 항목. 매 회귀 때 실행합니다.
+          - P1: 주요 흐름. 매 회귀 때 실행합니다.
+          - P2: 엣지 케이스와 사양 확인. 분기 1회 또는 관련 코드가 바뀔 때 실행합니다.
+        - **자동화 후보 열**
+          - **U**: `src/lib/search.ts` 함수 단위로 node:test에 옮길 수 있습니다.
+          - **M**: 수동으로만 확인할 수 있습니다(UI, URL, 렌더링).
+          - **U+M**: 로직은 단위 테스트로, 표시는 수동으로 확인합니다.
+        - **공통 전제조건 약칭**
+          - `P-KO` / `P-EN`: 해당 경로를 로드해 JS 하이드레이션이 끝난 상태입니다. 검색어와 필터가 비어 있고 "100개 중 100개 표시"가 보입니다.
+          - `ORC`: 기대 건수를 적은 오라클 시트입니다(3장 참고).
+
+        ---
+
+        ## 2. 가정
+
+        1. 검색은 로케일과 무관합니다. `/en`과 `/ko`에서 같은 haystack(에이전트 원본 필드)을 씁니다. 따라서 **ko UI에 보이는 번역 라벨**(예: 카테고리 한국어명)은 haystack에 들어 있지 않습니다. 한국어로 매칭되는 것은 realUseCases의 한국어 텍스트뿐입니다.
+        2. 필터 비교는 원시 값(`intermediate`, `tested`, 슬러그 등)으로 합니다. 번역은 칩 라벨에만 적용됩니다.
+        3. 역할·카테고리·도구처럼 배열인 필드는 "선택한 값이 배열에 포함되면 일치"로 처리합니다.
+        4. "설치 가능"은 `installTargets`가 1개 이상인 경우입니다. `installTargets: []`는 설치 불가로 봅니다.
+        5. 페이지 안 검색창에 입력한 값은 URL에 쓰지 않습니다. 따라서 새로고침하면 URL의 `?query=` 값으로 돌아갑니다.
+        6. 검색은 입력할 때마다 반영됩니다(Enter가 필요 없음). 디바운스가 있는지는 모릅니다.
+        7. 총 개수 "100"은 하드코딩이 아니라 전체 에이전트 수에서 계산됩니다.
+
+        ---
+
+        ## 3. 테스트 데이터 준비 (오라클 시트)
+
+        기대 건수 N을 화면이 아닌 **원본 데이터에서 따로 집계해 둬야** 회귀를 잡을 수 있습니다. 한 번 만들어 두고 에이전트 데이터가 바뀔 때만 갱신합니다.
+
+        | 오라클 키 | 내용 |
+        |---|---|
+        | ORC-A | 기준 에이전트 A: 이름으로 검색했을 때 **정확히 1건**만 나오는 에이전트 |
+        | ORC-F | tags, categories, roles, tools, summary, description, realUseCases(ko) 각각에**만** 들어 있는 단어 1개씩과 해당 에이전트 |
+        | ORC-D | 난이도 3값별 건수(합계 100) |
+        | ORC-L | 자동화 수준 1~5별 건수(합계 100) |
+        | ORC-V | 검증 상태 4값별 건수(합계 100) |
+        | ORC-I | 설치 가능 20건 목록 |
+        | ORC-C | 2~3개 교집합 조합 5개의 기대 건수. 결과가 0건인 조합 1개를 반드시 포함합니다 |
+
+        ---
+
+        ## 4. 테스트 케이스 매트릭스
+
+        ### 4.1 검색: 정상 흐름
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | SR-01 | 정상 | P-KO | 검색창을 비워 둔 채 목록을 확인합니다 | 100건 전부 표시, "100개 중 100개 표시" | P0 | U |
+        | SR-02 | 정상 | P-KO, ORC-A | A 이름의 중간 부분 3~4글자를 입력합니다 | A가 결과에 포함되고 건수가 오라클과 같음 | P0 | U |
+        | SR-03 | 정상 | P-EN, ORC-A | SR-02의 검색어를 전부 대문자로 입력합니다 | SR-02와 결과가 같음(대소문자 무시) | P0 | U |
+        | SR-04 | 정상 | P-KO | 앞뒤에 공백을 붙여 `"  review  "`를 입력합니다 | `"review"`와 결과가 같음 | P1 | U |
+        | SR-05 | 정상 | P-KO | 공백만 입력합니다(`"   "`) | 100건 전부 표시, EmptyState 없음 | P1 | U |
+        | SR-06 | 필드별 | ORC-F | 7개 필드의 전용 단어로 각각 검색합니다 | 각 단어마다 해당 에이전트가 포함됨 | P0 | U (테이블 기반) |
+        | SR-07 | 필드 경계 | ORC-A | "A 이름의 마지막 단어 + 공백 + summary 첫 단어"로 검색합니다 | 공백 결합이라 **현재는 매칭됨**. 의도한 동작인지 **[결정 필요]**. 현재 동작을 테스트로 고정합니다 | P2 | U |
+        | SR-08 | 공백 | P-EN | `"code  review"`처럼 중간에 공백 2칸을 넣어 검색합니다 | 현재는 0건일 수 있음. 내부 공백을 정규화할지 **[결정 필요]** | P2 | U |
+        | SR-09 | 특수문자 | P-EN | `c++`, `.*`, `(`, `\`, `%`로 각각 검색합니다 | 오류 없이 리터럴 부분 일치(`includes` 방식이라 정규식으로 해석되지 않음) | P1 | U |
+        | SR-10 | 입력 | P-KO | 빠르게 입력한 뒤 전부 지웁니다 | 최종 입력값 기준으로 결과가 보이고 이전 결과가 남지 않음. 마지막에 100건 복원 | P1 | M |
+        | SR-11 | 경계 | P-KO | 500자 문자열을 붙여 넣습니다 | 멈춤 없이 0건과 EmptyState 표시 | P2 | U+M |
+
+        ### 4.2 한국어 문자열
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | KO-01 | IME | P-KO, 데스크톱과 모바일 각각 | "코드"를 한 글자씩 입력하며 조합 중간 상태(`콛` 등)를 관찰합니다 | 조합 중에 EmptyState가 깜빡일 수 있는지 기록합니다. 조합이 끝나면 정상 결과. 글자 중복·누락 없음 | P0 | M |
+        | KO-02 | 부분 일치 | ORC-F(realUseCases) | 한국어 사용 사례 속 단어의 일부 음절("리뷰")로 검색합니다 | 해당 에이전트 포함 | P0 | U |
+        | KO-03 | 로케일 독립 | ORC-F | KO-02와 같은 검색어를 `/en/agents`에서 입력합니다 | `/ko`와 결과 건수가 같음 | P1 | U |
+        | KO-04 | 번역 라벨 | P-KO | ko 필터 칩에 보이는 **한국어 카테고리/역할 라벨**로 검색합니다 | 가정 1이 맞다면 **0건이 나올 수 있음**. 사용자는 매칭을 기대합니다. **[결정 필요]** 번역 라벨을 haystack에 넣을지 정해야 합니다 | P0 | U |
+        | KO-05 | 자모 | P-KO | `ㅋ`, `ㄹㅂ`처럼 자모만 입력합니다 | 0건(초성 검색 미지원). 의도한 동작인지 확인 | P2 | U |
+        | KO-06 | 정규화 | P-KO | NFD로 분해된 "리뷰"를 붙여 넣습니다(macOS 파일명에서 복사하는 등) | `includes`만 쓰면 매칭되지 않을 수 있음. `normalize('NFC')`를 적용할지 **[결정 필요]** | P2 | U |
+        | KO-07 | 혼합 | P-KO | `PR 리뷰`처럼 한영을 섞어 검색합니다 | haystack에 연속 문자열로 있을 때만 매칭 | P2 | U |
+        | KO-08 | 카운트 문구 | P-KO / P-EN | 결과가 0건, 1건, 100건인 상태를 만듭니다 | ko: "100개 중 N개 표시", en: "Showing N of 100 agents". 숫자가 정확함. en 1건일 때 "agents" 복수형을 허용할지 확인 | P0 | M |
+        | KO-09 | 칩 번역 | P-KO | 7개 필터의 **모든 값**을 하나씩 선택해 칩 라벨을 봅니다 | "난이도: 중급"처럼 번역된 라벨만 보임. `intermediate`, `filters.difficulty` 같은 원시 값이나 키가 노출되지 않음 | P0 | M |
+        | KO-10 | 칩 번역 | P-EN | KO-09를 영어로 반복합니다 | 한국어 문자열이 섞이지 않음 | P0 | M |
+        | KO-11 | EmptyState | P-KO / P-EN | 결과를 0건으로 만듭니다 | EmptyState 제목, 설명, 버튼이 각 로케일로 번역됨 | P1 | M |
+        | KO-12 | 정렬 | - | 도구 필터 목록 순서를 ko와 en에서 비교합니다 | 두 로케일에서 순서가 같음. 대소문자가 섞인 도구명의 정렬 규칙이 일관됨 | P2 | U |
+
+        ### 4.3 개별 필터
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | FL-01 | 정상 | P-KO, ORC | 7개 필터마다 대표 값을 1개씩 선택합니다(한 번에 하나) | 건수가 오라클과 같고 칩 1개가 표시됨 | P0 | U+M |
+        | FL-02 | 불변식 | ORC-D | 난이도 3값을 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+        | FL-03 | 불변식 | ORC-L | 자동화 수준 1~5를 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+        | FL-04 | 불변식 | ORC-V | 검증 상태 4값을 차례로 선택합니다 | 각 건수가 오라클과 같고 합계 100 | P1 | U |
+        | FL-05 | 설치 가능 | ORC-I | "설치 가능만 보기"를 체크합니다 | 20건, 오라클 목록과 일치 | P0 | U+M |
+        | FL-06 | 설치 가능 | 픽스처 | `installTargets: []`인 에이전트를 넣은 픽스처로 필터를 적용합니다 | 결과에서 제외됨 | P1 | U |
+        | FL-07 | 토글 | FL-01 상태 | 선택한 칩을 다시 누릅니다 | 필터가 해제되고 칩이 사라지며 100건 복원 | P0 | M |
+        | FL-08 | 교체 | P-KO | 난이도 "초급"을 누른 뒤 "중급"을 누릅니다 | "중급" 필터만 적용됨(OR 아님). 칩은 "난이도: 중급" 1개 | P0 | U+M |
+        | FL-09 | 체크박스 | FL-05 상태 | 체크를 해제합니다 | 100건 복원, 칩 제거 | P1 | M |
+        | FL-10 | 도구 목록 | - | 도구 필터 옵션을 확인합니다 | 중복 없음, 정렬됨, 빈 문자열 없음, 모든 에이전트의 도구가 들어 있음 | P1 | U |
+        | FL-11 | 배열 필드 | 역할이 2개 이상인 에이전트 B | B의 두 번째 역할로 필터링합니다 | B가 포함됨 | P1 | U |
+        | FL-12 | 칩 해제 | 활성 칩 1개 이상 | 활성 칩 영역의 개별 해제 버튼을 누릅니다(있는 경우) | 해당 필터만 해제되고 나머지는 유지 | P1 | M |
+
+        ### 4.4 필터 조합
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | CB-01 | AND | ORC-C | 검색어 1개와 필터 1개를 적용합니다 | 두 조건의 교집합, 건수가 오라클과 같음 | P0 | U |
+        | CB-02 | AND | ORC-C | 난이도=beginner와 설치 가능을 함께 적용합니다 | 교집합 건수가 오라클과 같음 | P0 | U |
+        | CB-03 | 전체 조합 | ORC-C | 7개 필터를 모두 적용하고 검색어도 입력합니다 | 교집합이 정확함(0건이면 EmptyState) | P1 | U |
+        | CB-04 | 순서 무관 | ORC-C | 필터를 A→B 순서와 B→A 순서로 각각 적용합니다 | 두 결과가 같음 | P2 | U |
+        | CB-05 | Clear all | 검색어와 필터 2개 이상 적용 | "모두 지우기"를 누릅니다 | 검색창이 비고 모든 필터와 칩이 해제되며 100건 표시 | P0 | M |
+        | CB-06 | Clear filters only | 검색어와 필터 2개 이상 적용 | "필터만 지우기"를 누릅니다 | 검색어는 유지되고 필터만 해제됨. 결과가 검색어만 적용한 결과와 같음 | P0 | M |
+        | CB-07 | Clear filters only | 필터만 적용(검색어 없음) | "필터만 지우기"를 누릅니다 | 100건 | P2 | M |
+        | CB-08 | 버튼 상태 | P-KO | 아무것도 적용하지 않은 상태에서 두 지우기 버튼을 봅니다 | 비활성 또는 숨김 등 일관된 상태. 눌러도 오류 없음 | P2 | M |
+        | CB-09 | 로케일 일치 | ORC-C | 같은 조합을 ko와 en에 각각 적용합니다 | 두 로케일의 건수가 같음(번역이 필터 로직에 섞이지 않음) | P0 | U+M |
+
+        ### 4.5 빈 결과
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | EM-01 | 검색 0건 | P-KO | `zzqqxx`로 검색합니다 | EmptyState 표시, "100개 중 0개 표시", 카드 없음 | P0 | U+M |
+        | EM-02 | 복구 | EM-01 상태 | 검색어를 지웁니다 | 100건 복원, EmptyState 사라짐 | P0 | M |
+        | EM-03 | 필터 0건 | ORC-C(0건 조합) | 교집합이 0건인 조합을 적용합니다 | EmptyState 표시. 안에 초기화 액션이 있으면 눌렀을 때 복원됨 | P1 | M |
+        | EM-04 | 전환 | - | 0건과 결과 있음 상태를 5번 오갑니다 | 레이아웃이 튀거나 스크롤 위치가 비정상이 되지 않음 | P2 | M |
+
+        ### 4.6 새로고침과 URL 유지
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | URL-01 | 진입 | - | `/ko/agents?query=review`로 바로 들어갑니다 | 검색창에 `review`가 채워지고 결과가 필터링됨 | P0 | M |
+        | URL-02 | 인코딩 | - | `?query=%EC%BD%94%EB%93%9C`로 들어갑니다 | 검색창에 "코드"가 보이고 결과가 필터링됨 | P0 | M |
+        | URL-03 | 인코딩 | - | `?query=code+review`와 `?query=code%20review`로 각각 들어갑니다 | 둘 다 공백으로 해석되어 결과가 같음 | P1 | M |
+        | URL-04 | 빈 값 | - | `?query=`, 파라미터 없음, `?query=%20%20`으로 각각 들어갑니다 | 모두 100건 | P1 | U+M |
+        | URL-05 | 새로고침 | URL-01 상태에서 필터 2개 적용 | 새로고침합니다 | 필터는 초기화되고(현재 사양) 검색어는 URL 값으로 복원됨 | P0 | M |
+        | URL-06 | 새로고침 | P-KO | 페이지 안 검색창에 입력한 뒤 새로고침합니다 | 가정 5에 따르면 검색어가 사라짐. 사양 확인 | P1 | M |
+        | URL-07 | 상단 검색 | 필터 2개 적용 | 상단 검색창으로 새 query를 보냅니다 | 필터는 유지되고 검색어만 바뀜. 결과는 교집합 | P0 | M |
+        | URL-08 | Clear all | URL-01 상태 | "모두 지우기"를 누른 뒤 새로고침합니다 | URL의 `?query=`가 남아 있으면 **검색어가 다시 살아남**. **[결정 필요]** Clear all 때 URL도 정리할지 정해야 함 | P1 | M |
+        | URL-09 | 히스토리 | - | 상단 검색을 두 번 한 뒤 뒤로 가기, 앞으로 가기를 합니다 | 검색창과 결과가 해당 URL의 query와 맞음 | P1 | M |
+        | URL-10 | JS 로드 전 | DevTools에서 JS를 끄거나 Slow 3G 설정 | `/ko/agents?query=review`로 들어갑니다 | JS 로드 전에는 전체 100건이 렌더되고, 하이드레이션 뒤 필터링됨. 콘솔에 하이드레이션 오류 없음 | P1 | M |
+        | URL-11 | 배포본 | GitHub Pages | URL-01, URL-02, URL-05를 배포 경로(basePath, 끝 슬래시 `/ko/agents/?query=` 포함)에서 반복합니다 | 로컬과 동작이 같고 404 없음 | P0 | M |
+        | URL-12 | 언어 전환 | 검색어와 필터 적용 | 언어 전환으로 `/en` ↔ `/ko`를 오갑니다 | 필터는 초기화됨. query를 유지할지는 사양 확인 | P1 | M |
+        | URL-13 | 무관 파라미터 | - | `?difficulty=advanced&foo=1`로 들어갑니다 | 무시되고 100건, 오류 없음 | P2 | M |
+
+        ### 4.7 반응형과 접근성
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | UI-01 | 모바일 | 375px, P-KO | 필터 패널을 열고 닫은 뒤 칩 5개를 적용합니다 | 가로 스크롤 없음. 칩이 줄바꿈되고 긴 한국어 라벨이 잘리지 않음 | P1 | M |
+        | UI-02 | 모바일 | 375px | 카운트와 두 지우기 버튼 위치를 확인합니다 | 스크롤 없이 또는 합리적인 위치에서 보이고 터치 영역이 충분함 | P1 | M |
+        | UI-03 | 데스크톱 | 1440px, P-EN / P-KO | SR-02, FL-01, CB-05를 스모크로 실행합니다 | 정상 | P1 | M |
+        | UI-04 | 키보드 | 데스크톱 | Tab으로 칩에 이동해 Enter/Space로 토글합니다 | 토글이 동작하고 포커스가 보이며 `aria-pressed`가 적절함 | P2 | M |
+        | UI-05 | 스크린리더 | VoiceOver | 필터를 바꿉니다 | 결과 건수 변경이 안내됨(aria-live가 있는 경우) | P2 | M |
+
+        ### 4.8 회귀 위험 (PR #19 전용)
+
+        | ID | 분류 | 전제조건 | 절차 | 기대결과 | 우선순위 | 자동화 |
+        |---|---|---|---|---|---|---|
+        | RG-01 | 문자열 누수 | P-EN | 검색·필터 영역의 모든 문자열을 훑어봅니다 | 한국어 문자열이 섞이지 않음 | P0 | M |
+        | RG-02 | 키 누락 | - | 사전의 en 키 집합과 ko 키 집합을 비교합니다 | 두 집합이 같음. 키 이름이 화면에 노출되지 않음 | P0 | U (search.ts 밖. 가능하면 추가) |
+        | RG-03 | 로직 분리 | ORC | 같은 필터를 ko와 en에서 선택합니다(CB-09 확장) | 모든 필터 값에서 두 로케일의 건수가 같음 | P0 | U |
+        | RG-04 | 카드 배지 | P-KO | 결과 카드의 배지(난이도, 검증 상태 등)를 확인합니다 | 번역된 라벨이 필터 칩 라벨과 같은 용어를 씀 | P1 | M |
+        | RG-05 | 카운트 | - | 에이전트를 1개 추가한 픽스처나 빌드에서 확인합니다 | 총 개수가 101로 바뀜(하드코딩이 아님) | P2 | U |
+        | RG-06 | 성능 | 저사양 모바일 | 빠르게 입력합니다 | 체감 지연 없음(100건 기준) | P2 | M |
+
+        ---
+
+        ## 5. 단위 테스트로 옮길 후보
+
+        자동화 열이 **U**인 행 가운데 먼저 옮길 것을 추리면 다음과 같습니다.
+
+        | 묶음 | 대상 ID | 비고 |
+        |---|---|---|
+        | 검색 정규화 | SR-01~09, SR-11, KO-02~07 | 작은 픽스처(5~8건)로 테이블 기반 테스트 |
+        | 필터 조건 | FL-01~06, FL-08, FL-10~11 | 필터별 조건을 개별로 검증 |
+        | 조합 | CB-01~04, CB-09, RG-03 | 교집합과 순서 무관성 |
+        | 실데이터 불변식 | FL-02~05, RG-05 | 실제 100건 데이터로 "합계=100", "설치 가능=20" 확인. 데이터가 바뀌면 깨지므로 숫자 대신 `agents.length`나 오라클 파일을 기준으로 삼는 것을 권장 |
+        | (search.ts 밖) | RG-02 | 사전 키 동일성. 같은 node:test 러너로 import할 수 있다면 비용 대비 효과가 가장 큼 |
+
+        예시 골격입니다. 함수 이름과 시그니처는 실제 `search.ts`에 맞게 바꿔 주세요.
+
+        ```ts
+        // search.test.ts (node --import tsx --test)
+        import { test } from "node:test";
+        import assert from "node:assert/strict";
+        import { filterAgents } from "../src/lib/search"; // 가정한 이름
+
+        const fx = [
+          { slug: "a", name: "Code Reviewer", summary: "PR review", installTargets: ["claude"], difficulty: "beginner", /* ... */ realUseCases: ["코드 리뷰 자동화"] },
+          { slug: "b", name: "Doc Writer", summary: "docs", installTargets: [], difficulty: "advanced", /* ... */ realUseCases: [] },
+        ];
+
+        const cases: [string, string, string[]][] = [
+          ["빈 검색은 전체", "", ["a", "b"]],
+          ["공백만은 전체", "   ", ["a", "b"]],
+          ["대소문자 무시", "CODE", ["a"]],
+          ["trim", "  review  ", ["a"]],
+          ["한국어 realUseCases", "리뷰", ["a"]],
+          ["특수문자 리터럴", ".*", []],
+        ];
+
+        for (const [name, query, expected] of cases) {
+          test(name, () => {
+            const got = filterAgents(fx, { query, filters: {} }).map((a) => a.slug);
+            assert.deepEqual(got, expected);
+          });
+        }
+
+        test("installTargets: [] 는 설치 가능에서 제외", () => {
+          const got = filterAgents(fx, { query: "", filters: { installable: true } }).map((a) => a.slug);
+          assert.deepEqual(got, ["a"]);
+        });
+        ```
+
+        ---
+
+        ## 6. 리스크
+
+        | # | 리스크 | 영향 | 관련 ID |
+        |---|---|---|---|
+        | R1 | ko 사용자가 화면에 보이는 한국어 카테고리/역할 라벨로 검색하면 0건이 나올 수 있음 | 높음. 한국어화의 체감 품질이 떨어짐 | KO-04 |
+        | R2 | IME 조합 중 결과가 0건으로 바뀌며 EmptyState가 깜빡임 | 중간. 모바일에서 특히 눈에 띔 | KO-01 |
+        | R3 | Clear all 뒤에도 URL `?query=`가 남아 새로고침하면 검색어가 되살아남 | 중간. 사용자가 혼란스러워함 | URL-08 |
+        | R4 | 필터가 URL에 저장되지 않아 공유나 새로고침 때 사라짐 | 중간. 현재 사양이지만 사용자 기대와 어긋남 | URL-05 |
+        | R5 | 필드를 공백으로 이어 붙여 경계를 넘는 오탐이 생기고, 내부 공백·NFD는 정규화하지 않음 | 낮음 | SR-07, SR-08, KO-06 |
+        | R6 | 사전 키 누락이나 원시 값 노출이 수동 QA에서 빠지기 쉬움 | 중간 | KO-09, RG-02 |
+        | R7 | GitHub Pages의 basePath나 끝 슬래시 때문에 로컬에서는 통과하고 배포본에서만 실패 | 높음 | URL-11 |
+        | R8 | 실데이터 불변식 테스트가 콘텐츠 추가 때마다 깨짐 | 낮음. 유지보수 비용 | FL-02~05 |
+        | R9 | E2E 도구가 없어 M 항목(약 60%)이 전부 사람에게 의존함 | 중간. 회귀 1회에 2~3시간 예상 | 전체 |
+
+        ---
+
+        ## 7. 권장사항
+
+        1. **P0만 추린 스모크 세트**(약 25건)를 PR마다, 전체 세트는 릴리스 전에 실행하세요.
+        2. **[결정 필요]** 항목 5개(SR-07, SR-08, KO-04, KO-06, URL-08)는 먼저 사양으로 확정하세요. 그다음 현재 동작을 단위 테스트로 고정해야 의도치 않은 변경을 잡을 수 있습니다.
+        3. KO-04는 ko에서 번역된 taxonomy 라벨을 haystack에 추가하는 것을 권장합니다. 이렇게 바꾸면 KO-03(로케일 독립) 기대값도 함께 바뀝니다.
+        4. 검색 전에 `query.normalize("NFC").replace(/\s+/g, " ")`를 적용하면 SR-08과 KO-06을 한 번에 해결할 수 있습니다.
+        5. E2E 도구를 도입한다면 URL-01, URL-05, URL-07, CB-05, CB-06부터 옮기는 것이 가장 효과가 큽니다.
+
+        ---
+
+        ## 8. 다음 액션
+
+        | 순서 | 할 일 | 담당(제안) |
+        |---|---|---|
+        | 1 | 오라클 시트(ORC-*)를 작성합니다 | QA |
+        | 2 | [결정 필요] 5건의 사양을 확정합니다 | PM/개발 |
+        | 3 | 5장의 U 후보를 node:test로 옮깁니다(검색 정규화 → 필터 → 조합 순) | 개발 |
+        | 4 | RG-02 사전 키 동일성 테스트를 추가합니다 | 개발 |
+        | 5 | M 항목 체크리스트로 로컬과 배포본에서 1회씩 실행하고 결과를 기록합니다 | QA |
+        | 6 | 결과를 바탕으로 P2 항목을 유지할지, 우선순위를 조정할지 검토합니다 | QA/개발 |
+
+        ---
+
+        ## 확인이 필요한 질문
+
+        1. ko 화면에서 검색할 때 **번역된 카테고리/역할/난이도 라벨**도 매칭되어야 하나요? (KO-04, KO-03의 기대결과가 달라집니다)
+        2. 페이지 안 검색창에 입력한 값이 URL `?query=`에 반영되나요, 읽기만 하나요? (URL-06, URL-08)
+        3. 활성 필터 칩에 개별 해제(X) 기능이 있나요? (FL-12)
+        4. `search.ts`에서 내보내는 함수 이름과 시그니처를 알려 주시면 5장의 골격을 실제 코드에 맞춰 드리겠습니다.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Test Case Generator boundary run
-      input: Create tests for a future feature without a spec.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Faithful to the spec: covers trim, empty/whitespace query, toggle-on-reclick (FL-07), replace-not-OR (FL-08), Clear all vs Clear filters only (CB-05/CB-06), refresh resets filters but keeps URL query (URL-05), top search keeps filters (URL-07), pre-hydration full list (URL-10), 20 installable agents (FL-05); assumptions 2-4 (raw-value comparison, array includes, installTargets length) match the actual filterAgents implementation."
+        - "Sharp, genuinely useful findings flagged as [결정 필요] rather than asserted: translated ko category/role labels are not in the haystack (KO-04), space-joined fields allow cross-field matches (SR-07), double internal spaces return 0 (SR-08), NFD Hangul (KO-06), and Clear all leaving ?query= in the URL (URL-08)."
+        - The U/M/U+M automation column and the section 5 grouping directly answer the 'unit-test candidates' request, and the oracle sheet (ORC-*) is a practical way to get expected N counts without hardcoding.
+        - The test skeleton guesses a combined filterAgents(fx, { query, filters }) signature and string-array realUseCases; the real module has separate searchAgents/filterAgents and object-shaped use cases. It is labeled as assumed, but it cannot be pasted as-is.
+        - Very long for a handoff (~75 rows); the 'P0 smoke set (약 25건)' is recommended but never enumerated, and '2~3시간' / '약 60%' figures are unsupported estimates.
+    - title: Test cases for a coupon feature with conflicting, unclear rules
+      input: 쿠폰 기능 테스트 케이스 뽑아주세요. 쿠폰은 중복 사용 가능하고, 한 주문에 하나만 쓸 수 있어요. 할인은 정률이나 정액인데 최대 할인 금액은 기획서 보고 알려드릴게요. 오늘 중으로 필요합니다.
+      expectedOutputSummary: Notice that '중복 사용 가능' conflicts or is ambiguous next to '한 주문에 하나만' and that the max discount cap is unknown, ask only those focused questions with explicit working assumptions, and still deliver a usable same-day matrix with the cap left as a placeholder.
+      sampleOutput: |-
+        오늘 바로 쓰실 수 있게 지금 정보로 테스트 케이스를 먼저 만들었습니다. 최대 할인 금액은 아직 정해지지 않아서 **`MAX`** 로 비워 두었어요. 기획서에서 값이 나오면 그 자리에 숫자만 넣으면 됩니다.
+
+        ## 1. 확인이 필요한 사항 (2개)
+
+        | # | 질문 | 왜 필요한가 | 답이 오기 전 가정 |
+        |---|---|---|---|
+        | Q1 | **최대 할인 금액(`MAX`)** 은 얼마인가요? 정률에만 적용되나요, 정액에도 적용되나요? | 경계값 케이스의 기대 결과가 이 값으로 정해집니다 | 정률에만 적용 |
+        | Q2 | "중복 사용 가능"은 **같은 쿠폰을 여러 주문에 반복해서 쓸 수 있다**는 뜻인가요? | "한 주문에 하나만"과 같이 놓고 보면 두 가지로 읽힙니다. 쿠폰을 여러 번 쓸 수 있다는 뜻인지, 여러 쿠폰을 겹쳐 쓸 수 있다는 뜻인지에 따라 케이스가 달라집니다 | 여러 주문에 반복 사용은 가능하고, 한 주문에 여러 장을 겹쳐 쓰는 것은 불가 |
+
+        Q2의 가정이 틀리면 섹션 3의 **B 그룹 전체**를 다시 봐야 합니다. 이 부분은 먼저 확인해 주세요.
+
+        ## 2. 가정
+
+        - A1. 할인 방식은 정률(%)과 정액(원) 두 가지입니다.
+        - A2. 할인 금액은 원 단위로 계산하고, 정률 계산에서 생기는 원 미만은 **버림**합니다. (기획 확인 필요)
+        - A3. 할인 금액은 주문 금액을 넘을 수 없고, 결제 금액은 0원 밑으로 내려가지 않습니다.
+        - A4. 쿠폰 유효기간, 최소 주문 금액, 적용 대상 상품 같은 조건은 이번 요청에 없어서 **일반 케이스로만** 넣었습니다. 해당 조건이 없는 기능이면 N/A로 처리하시면 됩니다.
+        - A5. 주문을 취소하거나 환불해도 반복 사용 쿠폰이라 별도 복원 절차는 없다고 가정합니다.
+
+        ## 3. 테스트 케이스 매트릭스
+
+        우선순위: **P1** = 반드시 오늘 실행 / **P2** = 가능하면 실행 / **P3** = 여유 있을 때
+
+        ### A. 할인 계산: 정액
+
+        | ID | 시나리오 | 입력 | 기대 결과 | 우선순위 |
+        |---|---|---|---|---|
+        | A-01 | 정액 기본 적용 | 주문 50,000원, 정액 5,000원 | 할인 5,000 / 결제 45,000 | P1 |
+        | A-02 | 할인액 = 주문 금액 | 주문 5,000원, 정액 5,000원 | 할인 5,000 / 결제 0 | P1 |
+        | A-03 | 할인액 > 주문 금액 | 주문 3,000원, 정액 5,000원 | 할인 3,000 / 결제 0 (음수 금지) | P1 |
+        | A-04 | 정액에 `MAX` 적용 여부 | 정액 > `MAX`인 쿠폰 | Q1 답변에 따라 결정 | P2 |
+
+        ### A. 할인 계산: 정률 (`MAX` 경계값)
+
+        | ID | 시나리오 | 입력 | 기대 결과 | 우선순위 |
+        |---|---|---|---|---|
+        | A-11 | 정률 기본 적용 (상한 미도달) | 주문 금액 × 율 < `MAX` | 할인 = 주문 금액 × 율 | P1 |
+        | A-12 | **상한 경계 -1원** | 계산 할인액 = `MAX` - 1 | 할인 = `MAX` - 1 | P1 |
+        | A-13 | **상한 경계 정확히** | 계산 할인액 = `MAX` | 할인 = `MAX` | P1 |
+        | A-14 | **상한 경계 +1원** | 계산 할인액 = `MAX` + 1 | 할인 = `MAX` (상한 적용) | P1 |
+        | A-15 | 상한 크게 초과 | 고액 주문 | 할인 = `MAX` | P1 |
+        | A-16 | 원 미만 절사 | 주문 9,999원, 10% | 할인 999 (A2 가정 기준) | P2 |
+        | A-17 | 100% 쿠폰 | 주문 10,000원, 100% | 할인 = min(10,000, `MAX`) | P2 |
+        | A-18 | 0% 또는 비정상 율 | 0%, 음수, 100% 초과 | 쿠폰 생성 또는 적용 단계에서 차단 | P3 |
+
+        > A-12~A-14 입력값 만드는 법: 10% 쿠폰에 `MAX` = 10,000원이면 주문 금액을 99,990원 / 100,000원 / 100,010원으로 잡으면 됩니다. `MAX`가 정해지면 같은 방식으로 역산하세요.
+
+        ### B. 사용 규칙: 한 주문에 하나 + 반복 사용
+
+        | ID | 시나리오 | 기대 결과 | 우선순위 |
+        |---|---|---|---|
+        | B-01 | 한 주문에 쿠폰 1장 적용 | 정상 적용 | P1 |
+        | B-02 | 한 주문에 쿠폰 2장 적용 시도 (UI) | 두 번째 쿠폰 선택 불가, 또는 기존 쿠폰이 교체됨 | P1 |
+        | B-03 | 한 주문에 쿠폰 2장 적용 시도 (API 직접 호출) | 서버에서 거절 | P1 |
+        | B-04 | 같은 쿠폰으로 두 번째 주문 | 정상 적용 (반복 사용 가능) | P1 |
+        | B-05 | 같은 쿠폰으로 주문 여러 건 연속 (3건 이상) | 매번 정상 적용, 할인액 동일 | P2 |
+        | B-06 | 적용한 쿠폰을 다른 쿠폰으로 교체 | 마지막에 선택한 쿠폰 1장만 반영, 금액 재계산 | P1 |
+        | B-07 | 쿠폰 적용 후 해제 | 할인 0, 원래 금액으로 복귀 | P2 |
+        | B-08 | 두 탭이나 기기에서 같은 쿠폰으로 동시에 결제 | 두 주문 모두 정상 처리 (반복 사용 가능이므로) | P2 |
+        | B-09 | 한 주문 결제 요청을 동시에 두 번 보냄 (쿠폰 1장) | 주문 1건만 생성되고 할인도 1번만 적용 | P2 |
+
+        ### C. 주문 흐름 연동
+
+        | ID | 시나리오 | 기대 결과 | 우선순위 |
+        |---|---|---|---|
+        | C-01 | 쿠폰 적용 후 장바구니 수량이나 상품 변경 | 할인액 재계산 (정률은 `MAX` 다시 확인) | P1 |
+        | C-02 | 쿠폰 적용 후 결제 실패 | 주문 미생성, 쿠폰 계속 사용 가능 | P2 |
+        | C-03 | 쿠폰 사용 주문 취소 또는 환불 | 환불액 = 실제 결제액 (할인액 제외) | P1 |
+        | C-04 | 주문서, 결제 화면, 주문 상세, 영수증의 할인 금액 표시 일치 | 모든 화면에서 같은 금액 | P2 |
+
+        ### D. 예외와 입력 검증 (A4 관련, 해당 조건이 있을 때만)
+
+        | ID | 시나리오 | 기대 결과 | 우선순위 |
+        |---|---|---|---|
+        | D-01 | 존재하지 않는 쿠폰 코드 입력 | 오류 메시지, 적용 안 됨 | P2 |
+        | D-02 | 만료된 쿠폰 | 적용 불가 | P2 |
+        | D-03 | 최소 주문 금액 미달 | 적용 불가 | P3 |
+        | D-04 | 다른 사용자의 쿠폰 사용 시도 | 적용 불가 | P3 |
+
+        ## 4. 권장 사항
+
+        1. **오늘은 P1(17개)부터 실행하세요.** 금액 계산 오류와 쿠폰 여러 장 적용이 사고로 이어질 가능성이 가장 큽니다.
+        2. `MAX` 경계값 케이스(A-12~A-14)는 기획서가 오면 **바로 숫자를 채워서 실행**하세요. 나머지 케이스는 `MAX` 없이도 지금 진행할 수 있습니다.
+        3. B-03(API 직접 호출)은 꼭 해 보세요. UI에서만 막고 서버에서 막지 않는 경우가 흔합니다.
+        4. 반복 사용이 가능한 쿠폰은 한 번 유출되면 계속 쓰일 수 있습니다. 사용 횟수나 기간 제한이 정말 없는지 기획에 한 번 더 확인해 보세요.
+
+        ## 5. 리스크
+
+        | 리스크 | 영향 | 대응 |
+        |---|---|---|
+        | "중복 사용" 해석이 기획 의도와 다름 | B 그룹 기대 결과가 반대로 뒤집힘 | Q2를 먼저 확인 |
+        | `MAX` 미정 상태로 배포 | 정률 쿠폰에서 할인이 과도하게 나감 | A-13~A-15는 `MAX` 확정 전까지 배포 차단 항목으로 관리 |
+        | 절사 규칙 미정 (A2) | 1원 단위 금액 불일치, 정산 차이 | 기획에 버림, 반올림, 올림 중 무엇인지 확인 |
+        | 동시 요청 처리 (B-08, B-09) | 중복 주문이나 할인 이중 적용 | 가능하면 부하 도구나 API 스크립트로 재현 |
+
+        ## 6. 다음 할 일
+
+        1. **Q1, Q2 답변 받기.** Q2는 짧게 확인만 하면 됩니다.
+        2. P1 케이스 실행 시작 (`MAX` 관련 3건 제외)
+        3. 기획서에서 `MAX`와 절사 규칙이 오면 A-04, A-12~A-17 기대값 채우고 실행
+        4. 유효기간, 최소 주문 금액 같은 조건이 있으면 알려 주세요. D 그룹을 구체적인 케이스로 넓혀 드리겠습니다.
+
+        `MAX` 값만 알려 주시면 경계값 케이스에 실제 금액을 넣은 버전으로 바로 다시 정리해 드릴게요.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Correctly identifies the core contradiction and asks just two focused questions (Q1 MAX value and scope, Q2 meaning of 중복 사용), each with a stated interim assumption and which group (B) flips if the assumption is wrong.
+        - Uses a MAX placeholder instead of inventing a cap, and gives a concrete way to derive boundary inputs (10% coupon, MAX 10,000 -> 99,990 / 100,000 / 100,010), which checks out arithmetically; A-16 (9,999 x 10% -> 999 with truncation) is also correct and labeled as an assumption.
+        - "Covers the high-value risks for coupons: negative payment clamp (A-03), UI vs API enforcement of one-coupon-per-order (B-02/B-03), idempotent double-submit (B-09), recalculation on cart change (C-01), refund amount (C-03)."
+        - "Consistency slips: says 'P1(17개)' when there are 15 P1 rows, says to start P1 'MAX 관련 3건 제외' though A-11 and A-15 also depend on MAX, and the risk table cites A-13~A-15 vs A-12~A-14 elsewhere."
+        - Group D (expiry, minimum order, other user's coupon) is generic filler that was not in the request, though it is clearly labeled as conditional under A4.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Generating functional, edge, and regression cases from clear requirements
@@ -198,4 +867,4 @@ decisionGuide:
     guidance: After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests.
 verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

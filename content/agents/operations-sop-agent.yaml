@@ -35,8 +35,313 @@ outputs:
   - Risks
   - Recommended next actions
 prompt: You are Operations SOP Agent. Convert the user's context into a practical SOP document. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
-exampleInput: 반복되는 고객 온보딩 작업을 팀원이 대신할 수 있게 정리하는 상황
-exampleOutput: A structured SOP document with practical recommendations, tradeoffs, and next steps.
+exampleInput: |-
+  Please write an SOP so a second maintainer can add project-ready agents to Agent Archive without me.
+
+  Process: adding a new "project-ready" agent (one with install kits) to https://github.com/yohan-work/agentive.
+  Trigger: a contributor's "New agent" GitHub issue gets the label `accepted`, or a maintainer decides to promote an existing agent. Roughly 2–4 per month.
+  Owner: content maintainer (currently me; handing off to Seoyeon Lee, who knows git but not the codebase). Reviewer: any other maintainer.
+
+  How it works today (my notes):
+  1. Create a branch `content/<slug>`.
+  2. Copy content/agents/_template.yaml to content/agents/<slug>.yaml. Slug is kebab-case and must be unique; check:data fails on duplicates.
+  3. Fill metadata: name, summary, description, roles, categories (must exist in src/data/taxonomy.ts), tags, tools, difficulty, automationLevel 1–5, prompt, inputs, outputs, exampleInput, limitations, updatedAt (today, YYYY-MM-DD).
+  4. To be installable, add installTargets (codex, claude, cursor), runbook (context to prepare, good input, bad input, output checklist), and evaluation (criteria, qualityScore 1–5, known weaknesses, sampleRuns).
+  5. verifiedStatus rules (CONTRIBUTING.md): "unverified" by default; "community" = run by the contributor with at least one AI tool, example output is real; "tested" or "expert" requires an evaluation with at least 2 recorded sample runs — check:data rejects it otherwise. Never set status or scores higher than what was actually tested.
+  6. Run sample runs: paste prompt + a real input into a fresh chat, record input/output summary/verdict in sampleRuns.
+  7. Add Korean realUseCases if possible (optional).
+  8. If the agent belongs in a starter pack or workflow, edit src/data/starter-packs.ts or src/data/workflows.ts.
+  9. Run `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Content bundling (`npm run content`) runs automatically before build/typecheck/test.
+  10. Open a PR with Conventional Commit title `feat(content): add <slug> agent`, link the issue.
+  11. After merge, CI runs; Deploy workflow publishes to GitHub Pages only if CI passes on main. Check /en/agents/<slug>, /ko/agents/<slug>, and https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md.
+
+  Common mistakes I've seen: category slug typo, updatedAt left as template date, "tested" with only 1 sample run, editing src/data/generated/agents.ts by hand (it's build output), forgetting the ko dictionary when a new UI string is added.
+
+  Rollback: revert the PR; Pages redeploys on the next green CI.
+
+  Quality bar: all five commands pass locally and in CI; kit URLs return 200; no status inflation.
+
+  Please produce the SOP with trigger, roles, inputs, outputs, steps with checkpoints, exceptions, quality checks, and rollback.
+exampleOutput: |-
+  # SOP: Adding a Project-Ready Agent to Agent Archive
+
+  **Repository:** https://github.com/yohan-work/agentive
+  **Process owner:** Content maintainer (handing over to Seoyeon Lee)
+  **Reviewer:** Any other maintainer
+  **Expected volume:** 2–4 agents per month
+  **Version:** 1.0 (draft for handover)
+
+  You gave me enough to write the full SOP without asking anything first. A few gaps I filled with assumptions. They're marked **[A#]** and collected in the Assumptions section, so you can confirm or fix them before Seoyeon uses this on her own.
+
+  ---
+
+  ## 1. Purpose and scope
+
+  This SOP lets a second maintainer add a **project-ready** agent to Agent Archive and take it through to a verified live deployment without the original maintainer's help. A project-ready agent is one that ships install kits.
+
+  **In scope:** new agent YAML files, promoting an existing agent to project-ready, optional starter-pack and workflow membership, PR, deploy verification, and rollback.
+  **Out of scope:** UI or code changes, taxonomy changes (adding new categories), and schema changes. If any of these is needed, see Exceptions (E3, E4).
+
+  ---
+
+  ## 2. Trigger
+
+  Start this SOP when either of these happens:
+
+  | Trigger | Source | Starting point |
+  |---|---|---|
+  | **T1**: A "New agent" GitHub issue gets the label `accepted` | Contributor issue | Create a new YAML file from the template |
+  | **T2**: A maintainer decides to promote an existing agent to project-ready | Maintainer decision | Edit the existing `content/agents/<slug>.yaml` file. Do **not** recopy the template. |
+
+  ---
+
+  ## 3. Roles
+
+  | Role | Who | Responsibilities |
+  |---|---|---|
+  | **Content maintainer (Owner)** | Seoyeon Lee (currently the original maintainer) | Writes the YAML, runs the sample runs, sets the verification status honestly, runs the checks, opens the PR, and verifies the deploy |
+  | **Reviewer** | Any other maintainer | Reviews the PR against the Quality Checks (Section 8), with special attention to status inflation, and approves or requests changes |
+  | **Contributor** (T1 only) | Issue author | Supplies the agent idea and prompt, and ideally a real example input and output. Answers follow-up questions on the issue. |
+
+  ---
+
+  ## 4. Inputs
+
+  Gather these before you start:
+
+  - [ ] The accepted issue link (T1) or the name of the existing agent to promote (T2)
+  - [ ] A proposed **slug** (kebab-case, unique)
+  - [ ] The agent's **prompt**, plus a description of its inputs and outputs
+  - [ ] At least one **real input** you can use for sample runs (at least two if you're aiming for `tested` or `expert`)
+  - [ ] Access to at least one AI tool to run the agent in a fresh chat
+  - [ ] The current category list in `src/data/taxonomy.ts`
+  - [ ] A local clone with dependencies installed, so `npm run …` commands work **[A1]**
+  - [ ] Push access to the repo, or a fork, plus the ability to open PRs **[A2]**
+
+  ---
+
+  ## 5. Outputs
+
+  - `content/agents/<slug>.yaml`, complete with install fields (`installTargets`, `runbook`, `evaluation`)
+  - Optionally, edits to `src/data/starter-packs.ts` and/or `src/data/workflows.ts`
+  - A merged PR titled `feat(content): add <slug> agent` that links the issue
+  - Live pages:
+    - `/en/agents/<slug>`
+    - `/ko/agents/<slug>`
+    - `https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`, which must return HTTP 200
+
+  ---
+
+  ## 6. Procedure (with checkpoints)
+
+  ### Step 1: Create a branch
+  ```bash
+  git checkout main && git pull
+  git checkout -b content/<slug>
+  ```
+  **Checkpoint 1:** You're on `content/<slug>`, branched from an up-to-date `main`.
+
+  ### Step 2: Create or open the agent file
+  - **T1 (new):** copy the template.
+    ```bash
+    cp content/agents/_template.yaml content/agents/<slug>.yaml
+    ```
+  - **T2 (promote):** open the existing `content/agents/<slug>.yaml`.
+
+  Slug rules: kebab-case (`lowercase-words-with-hyphens`) and unique. Check for an existing file first:
+  ```bash
+  ls content/agents/ | grep <slug>
+  ```
+  **Checkpoint 2:** The file exists, the filename slug is kebab-case, and no other agent uses that slug. `check:data` fails on duplicates.
+
+  ### Step 3: Fill in the core metadata
+  Fill in every field: `name`, `summary`, `description`, `roles`, `categories`, `tags`, `tools`, `difficulty`, `automationLevel`, `prompt`, `inputs`, `outputs`, `exampleInput`, `limitations`, `updatedAt`.
+
+  Watch these fields in particular:
+  - **`categories`**: copy each slug **exactly** from `src/data/taxonomy.ts`. Don't type them from memory. Typos are the most common mistake.
+  - **`automationLevel`**: an integer from 1 to 5.
+  - **`updatedAt`**: **today's date** in `YYYY-MM-DD` format. Replace the template date. Update it for T2 promotions too.
+
+  **Checkpoint 3:** No template placeholder values remain. Every category exists in `taxonomy.ts`. `updatedAt` is today's date.
+
+  ### Step 4: Add the install fields (what makes it "project-ready")
+  - **`installTargets`**: `codex`, `claude`, `cursor`, whichever apply
+  - **`runbook`**: context to prepare, a good input example, a bad input example, and an output checklist
+  - **`evaluation`**: criteria, `qualityScore` (1–5), known weaknesses, and `sampleRuns` (filled in during Step 5)
+
+  **Checkpoint 4:** All three blocks are present and not empty. Only `sampleRuns` may be pending at this point.
+
+  ### Step 5: Run the sample runs and record them
+  For each run:
+  1. Open a **fresh** chat in the AI tool. Don't reuse a conversation.
+  2. Paste the agent's `prompt` and a **real** input.
+  3. Record the input, an output summary, and a verdict in `evaluation.sampleRuns`.
+
+  Aim for **at least 2** runs, with different inputs where possible. **[A3]**
+
+  **Checkpoint 5:** Every recorded sample run actually happened, and each has an input, an output summary, and a verdict.
+
+  ### Step 6: Set `verifiedStatus` (the honesty gate)
+  Pick the **highest level your evidence supports, and no higher**:
+
+  | Status | Requirement |
+  |---|---|
+  | `unverified` | Default. Nothing has been run. |
+  | `community` | Run by the contributor with at least one AI tool, **and** the example output is real |
+  | `tested` / `expert` | An evaluation with **at least 2 recorded sample runs**. `check:data` rejects anything less. |
+
+  Rules:
+  - **Never** set the status or `qualityScore` higher than what was actually tested.
+  - If you only managed 1 sample run, the status can't be `tested`. Use `community` if the contributor's criteria are met, otherwise `unverified`.
+  - `qualityScore` should reflect what the sample runs showed, not what you expect the agent could do.
+
+  **Checkpoint 6:** The status matches the evidence in the file, and the score is justified by the sample runs.
+
+  ### Step 7: Add Korean `realUseCases` (optional)
+  Add them if you can. Skipping this doesn't block the PR.
+
+  ### Step 8: Add to a starter pack or workflow (only if relevant)
+  Edit `src/data/starter-packs.ts` or `src/data/workflows.ts` and reference the agent by its exact slug.
+
+  **Checkpoint 8:** Any reference you added uses the exact slug from Step 2.
+
+  ### Step 9: Run the local checks
+  Run all five, in order:
+  ```bash
+  npm run check:data
+  npm run lint
+  npm run typecheck
+  npm test
+  npm run build
+  ```
+  `npm run content` (bundling) runs automatically before build, typecheck, and test. You don't need to run it yourself.
+
+  **Never edit `src/data/generated/agents.ts` by hand.** It's build output. If it shows up as changed in `git status`, leave it for the build to regenerate. Don't hand-fix it. **[A4]**
+
+  **Checkpoint 9:** All five commands pass with no errors. Don't open the PR until they do.
+
+  ### Step 10: Open the PR
+  - Title: `feat(content): add <slug> agent`
+  - Body: link the issue (for example, `Closes #<issue>` for T1), say which status you chose and why (for example, "2 sample runs in Claude, see evaluation.sampleRuns"), and list any starter pack or workflow edits.
+  - Request a review from another maintainer.
+
+  **Checkpoint 10:** CI is green on the PR, and the reviewer has approved it against Section 8.
+
+  ### Step 11: Merge and verify the deploy
+  1. Merge the PR.
+  2. Wait for CI on `main`. The Deploy workflow publishes to GitHub Pages **only if CI passes on `main`**.
+  3. Once the deploy finishes, check these URLs **[A5]**:
+     - `https://yohan-work.github.io/agentive/en/agents/<slug>`
+     - `https://yohan-work.github.io/agentive/ko/agents/<slug>`
+     - `https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`
+
+     Confirm the kit URL returns 200:
+     ```bash
+     curl -s -o /dev/null -w "%{http_code}\n" https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md
+     ```
+  4. For T1, close the issue (if the PR didn't close it automatically) with a link to the live page.
+
+  **Checkpoint 11:** Both locale pages render, the kit URL returns 200, and the issue is closed.
+
+  ---
+
+  ## 7. Exceptions
+
+  | # | Situation | What to do |
+  |---|---|---|
+  | **E1** | You can't get 2 real sample runs | Ship with `community` (if the contributor's criteria are met) or `unverified`. Note in the PR that it can be upgraded later. Don't inflate. |
+  | **E2** | Contributor information is incomplete (no real input or output, vague prompt) | Ask on the issue. Pause the SOP until they answer. Don't invent example outputs. |
+  | **E3** | The agent needs a category that doesn't exist in `taxonomy.ts` | Stop. That's a taxonomy change, which is out of scope. Raise it with a maintainer, or pick the closest existing category. **[A6]** |
+  | **E4** | The change needs a new UI string or a code change | Out of scope for this SOP. If you do add a UI string, add it to **both** the `en` and `ko` dictionaries. Forgetting `ko` is a known mistake. |
+  | **E5** | `check:data` fails | Read the error. Usual causes: a duplicate slug, a category typo, `tested`/`expert` with fewer than 2 sample runs, or a missing required field. Fix the YAML, not the generated file. |
+  | **E6** | CI passes on the PR but fails on `main` after the merge | Nothing deploys. Fix it forward with a follow-up PR, or revert (Section 9). |
+  | **E7** | The deploy finishes but a kit URL returns 404, or a page is missing | Check that `installTargets` and `runbook` are present, that the slug matches the filename, and that the Deploy workflow actually ran. If you can't find the cause quickly, revert. |
+  | **E8** | Slug collision found late (after the PR is open) | Rename the file and every reference (starter packs, workflows) to a new unique slug. Update the PR title and branch name if that helps clarity. |
+
+  ---
+
+  ## 8. Quality checks (reviewer checklist)
+
+  The reviewer confirms each item before approving:
+
+  - [ ] The filename slug is kebab-case, unique, and matches all references
+  - [ ] Every `categories` entry exists in `src/data/taxonomy.ts`
+  - [ ] `updatedAt` is the PR date, not the template date
+  - [ ] `automationLevel` is 1–5 and `qualityScore` is 1–5
+  - [ ] `installTargets`, `runbook`, and `evaluation` are all present and substantive
+  - [ ] **No status inflation:** the `verifiedStatus` and `qualityScore` are supported by the recorded `sampleRuns`, and there are at least 2 runs for `tested`/`expert`
+  - [ ] The sample runs look real (specific inputs and honest verdicts, including weaknesses)
+  - [ ] `src/data/generated/agents.ts` was not edited by hand
+  - [ ] If UI strings changed, both `en` and `ko` were updated
+  - [ ] The PR title follows `feat(content): add <slug> agent` and links the issue
+  - [ ] CI is green (all five commands)
+
+  **Definition of done:** all five commands pass locally and in CI, the kit URLs return 200, and there's no status inflation.
+
+  ---
+
+  ## 9. Rollback
+
+  **When:** a broken page, a kit URL returning 404 or wrong content, a status or score found to be inflated, or a failing `main`.
+
+  1. Open the merged PR on GitHub and click **Revert** (or run `git revert <merge-commit>` on a branch).
+  2. Open the revert PR with the title `revert: add <slug> agent` and a one-line reason.
+  3. Get it reviewed and merged. **[A7]**
+  4. GitHub Pages redeploys on the **next green CI run on `main`**. Confirm the agent pages and kit URL are gone, or back to their previous state for a T2 promotion.
+  5. Comment on the original issue explaining the revert and what's needed to re-land it.
+
+  **Faster alternative for status inflation only:** instead of a full revert, open a small fix PR that lowers `verifiedStatus` or `qualityScore` to what the evidence supports.
+
+  ---
+
+  ## 10. Assumptions
+
+  | # | Assumption | Please confirm |
+  |---|---|---|
+  | A1 | Seoyeon has a working local environment (Node and npm) and has run `npm install` | Is there a required Node version? |
+  | A2 | Seoyeon has (or will get) write access to create `content/*` branches and merge PRs | Does `main` have branch protection or a required-reviewer rule? |
+  | A3 | Two sample runs is a good default for every project-ready agent, even when targeting `community` | Or is one run acceptable for `community`? |
+  | A4 | The generated file is either gitignored or regenerated by the build, so it shouldn't appear in PR diffs | Should it ever be committed? |
+  | A5 | Agent pages live under the same Pages base URL as the kits (`/agentive/en/agents/<slug>`) | Is that the right URL shape? |
+  | A6 | Taxonomy changes need separate maintainer approval | Who approves new categories? |
+  | A7 | A revert PR goes through the same review as any other PR | Can the owner self-merge reverts in an emergency? |
+
+  Also worth confirming: whether any kit files besides `AGENTS.md` should be checked for 200. Your notes mention only `AGENTS.md`.
+
+  ---
+
+  ## 11. Recommendations
+
+  1. **Add a PR template** for content PRs that embeds the Section 8 checklist. The reviewer then has nothing to remember.
+  2. **Script the post-deploy check.** A small script that curls all three URLs for a slug turns Step 11 into one command.
+  3. **Pair on the first one.** Have Seoyeon run this SOP on her first agent while you review live. On the second, she runs it alone and you review only the PR.
+  4. **Keep a record of the sample-run prompts and inputs** (for example, in the PR description). Later status upgrades or audits can then be reproduced.
+  5. **Add a "copy categories from taxonomy.ts" note** to `_template.yaml`, so the most common mistake is prevented at the source.
+
+  ---
+
+  ## 12. Risks
+
+  | Risk | Impact | Mitigation |
+  |---|---|---|
+  | Status or score inflation | Users trust an agent more than the evidence supports, which damages the archive's credibility | The Step 6 gate, the reviewer checklist, and `check:data` enforcement for `tested`/`expert` |
+  | Fabricated or non-fresh sample runs | Same as above, and harder to detect | Require fresh chats and real inputs. The reviewer spot-checks for specificity. |
+  | New owner unfamiliar with the codebase | Hand-editing generated files, or wandering out of scope into code | Explicit "never edit generated" rule and out-of-scope exceptions (E3, E4) |
+  | A single reviewer pool | PRs stall if no other maintainer is available | Agree on a review turnaround target (for example, 3 business days) and a backup reviewer |
+  | A deploy silently not happening (CI red on `main`) | The agent merges but never goes live | Checkpoint 11 requires checking the live URLs, not just that the merge happened |
+
+  ---
+
+  ## 13. Next actions
+
+  | # | Action | Owner |
+  |---|---|---|
+  | 1 | Confirm or correct assumptions A1–A7 | You (current maintainer) |
+  | 2 | Grant Seoyeon repo permissions and confirm the branch protection settings | You |
+  | 3 | Walk Seoyeon through `content/agents/_template.yaml`, `src/data/taxonomy.ts`, and the verification levels in CONTRIBUTING.md (about 30 minutes) | You and Seoyeon |
+  | 4 | Seoyeon runs the SOP on the next `accepted` issue, paired with you | Seoyeon |
+  | 5 | Add a content PR template with the Section 8 checklist | Either maintainer |
+  | 6 | Revise this SOP after Seoyeon's first two agents, based on where she got stuck | Seoyeon |
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -152,9 +457,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Documenting repeatable workflows so another teammate can execute them consistently
     - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
@@ -164,30 +467,433 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Needs real exceptions and handoff points to avoid overly linear procedures
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Output is long even for its purpose: the strong run has 13 sections plus a preamble, and the Recommendations and Risks tables partly repeat points already covered in Exceptions and Quality checks."
+    - It fills gaps with plausible but unsourced troubleshooting advice. For example, strong-run E7 tells the reader to check installTargets/runbook when a kit URL 404s, which the input never said causes that failure.
+    - "Its handling of the promotion path (T2) is incomplete: Step 10 and the reviewer checklist still require the PR title 'feat(content): add <slug> agent' even for promoting an existing agent, where 'add' does not fit."
+    - In the boundary run, the placeholder skeleton contains concrete-looking rules that are not bracketed as assumptions, such as 'send one reminder after 48 hours of no response' and specific steps like data migration. A rushed user could adopt these without noticing they are generic.
+    - It asks 7 required questions for a vague request. The questions are prioritized, but that is at the upper edge of 'ask only for missing information that is required'.
   evaluationCriteria:
     - Defines trigger, owner, steps, inputs, outputs, exceptions, and quality checks
     - Produces SOP document in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Operations SOP Agent strong-context run
-      input: Write an SOP for installing and validating project agent kits.
-      expectedOutputSummary: A usable SOP document with project-specific assumptions, risks, and next steps.
-      sampleOutput: "SOP document: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: SOP for adding a project-ready agent to the archive
+      input: |-
+        Please write an SOP so a second maintainer can add project-ready agents to Agent Archive without me.
+
+        Process: adding a new "project-ready" agent (one with install kits) to https://github.com/yohan-work/agentive.
+        Trigger: a contributor's "New agent" GitHub issue gets the label `accepted`, or a maintainer decides to promote an existing agent. Roughly 2–4 per month.
+        Owner: content maintainer (currently me; handing off to Seoyeon Lee, who knows git but not the codebase). Reviewer: any other maintainer.
+
+        How it works today (my notes):
+        1. Create a branch `content/<slug>`.
+        2. Copy content/agents/_template.yaml to content/agents/<slug>.yaml. Slug is kebab-case and must be unique; check:data fails on duplicates.
+        3. Fill metadata: name, summary, description, roles, categories (must exist in src/data/taxonomy.ts), tags, tools, difficulty, automationLevel 1–5, prompt, inputs, outputs, exampleInput, limitations, updatedAt (today, YYYY-MM-DD).
+        4. To be installable, add installTargets (codex, claude, cursor), runbook (context to prepare, good input, bad input, output checklist), and evaluation (criteria, qualityScore 1–5, known weaknesses, sampleRuns).
+        5. verifiedStatus rules (CONTRIBUTING.md): "unverified" by default; "community" = run by the contributor with at least one AI tool, example output is real; "tested" or "expert" requires an evaluation with at least 2 recorded sample runs — check:data rejects it otherwise. Never set status or scores higher than what was actually tested.
+        6. Run sample runs: paste prompt + a real input into a fresh chat, record input/output summary/verdict in sampleRuns.
+        7. Add Korean realUseCases if possible (optional).
+        8. If the agent belongs in a starter pack or workflow, edit src/data/starter-packs.ts or src/data/workflows.ts.
+        9. Run `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`. Content bundling (`npm run content`) runs automatically before build/typecheck/test.
+        10. Open a PR with Conventional Commit title `feat(content): add <slug> agent`, link the issue.
+        11. After merge, CI runs; Deploy workflow publishes to GitHub Pages only if CI passes on main. Check /en/agents/<slug>, /ko/agents/<slug>, and https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md.
+
+        Common mistakes I've seen: category slug typo, updatedAt left as template date, "tested" with only 1 sample run, editing src/data/generated/agents.ts by hand (it's build output), forgetting the ko dictionary when a new UI string is added.
+
+        Rollback: revert the PR; Pages redeploys on the next green CI.
+
+        Quality bar: all five commands pass locally and in CI; kit URLs return 200; no status inflation.
+
+        Please produce the SOP with trigger, roles, inputs, outputs, steps with checkpoints, exceptions, quality checks, and rollback.
+      expectedOutputSummary: A pasteable SOP for adding a project-ready agent to the agentive repo that uses the user's 11 steps, both triggers, the owner/reviewer roles (Seoyeon Lee handoff), the verifiedStatus rules, the five npm commands, the listed common mistakes, the kit URL checks, and revert-based rollback, with assumptions, risks, and next actions kept in separate sections.
+      sampleOutput: |-
+        # SOP: Adding a Project-Ready Agent to Agent Archive
+
+        **Repository:** https://github.com/yohan-work/agentive
+        **Process owner:** Content maintainer (handing over to Seoyeon Lee)
+        **Reviewer:** Any other maintainer
+        **Expected volume:** 2–4 agents per month
+        **Version:** 1.0 (draft for handover)
+
+        You gave me enough to write the full SOP without asking anything first. A few gaps I filled with assumptions. They're marked **[A#]** and collected in the Assumptions section, so you can confirm or fix them before Seoyeon uses this on her own.
+
+        ---
+
+        ## 1. Purpose and scope
+
+        This SOP lets a second maintainer add a **project-ready** agent to Agent Archive and take it through to a verified live deployment without the original maintainer's help. A project-ready agent is one that ships install kits.
+
+        **In scope:** new agent YAML files, promoting an existing agent to project-ready, optional starter-pack and workflow membership, PR, deploy verification, and rollback.
+        **Out of scope:** UI or code changes, taxonomy changes (adding new categories), and schema changes. If any of these is needed, see Exceptions (E3, E4).
+
+        ---
+
+        ## 2. Trigger
+
+        Start this SOP when either of these happens:
+
+        | Trigger | Source | Starting point |
+        |---|---|---|
+        | **T1**: A "New agent" GitHub issue gets the label `accepted` | Contributor issue | Create a new YAML file from the template |
+        | **T2**: A maintainer decides to promote an existing agent to project-ready | Maintainer decision | Edit the existing `content/agents/<slug>.yaml` file. Do **not** recopy the template. |
+
+        ---
+
+        ## 3. Roles
+
+        | Role | Who | Responsibilities |
+        |---|---|---|
+        | **Content maintainer (Owner)** | Seoyeon Lee (currently the original maintainer) | Writes the YAML, runs the sample runs, sets the verification status honestly, runs the checks, opens the PR, and verifies the deploy |
+        | **Reviewer** | Any other maintainer | Reviews the PR against the Quality Checks (Section 8), with special attention to status inflation, and approves or requests changes |
+        | **Contributor** (T1 only) | Issue author | Supplies the agent idea and prompt, and ideally a real example input and output. Answers follow-up questions on the issue. |
+
+        ---
+
+        ## 4. Inputs
+
+        Gather these before you start:
+
+        - [ ] The accepted issue link (T1) or the name of the existing agent to promote (T2)
+        - [ ] A proposed **slug** (kebab-case, unique)
+        - [ ] The agent's **prompt**, plus a description of its inputs and outputs
+        - [ ] At least one **real input** you can use for sample runs (at least two if you're aiming for `tested` or `expert`)
+        - [ ] Access to at least one AI tool to run the agent in a fresh chat
+        - [ ] The current category list in `src/data/taxonomy.ts`
+        - [ ] A local clone with dependencies installed, so `npm run …` commands work **[A1]**
+        - [ ] Push access to the repo, or a fork, plus the ability to open PRs **[A2]**
+
+        ---
+
+        ## 5. Outputs
+
+        - `content/agents/<slug>.yaml`, complete with install fields (`installTargets`, `runbook`, `evaluation`)
+        - Optionally, edits to `src/data/starter-packs.ts` and/or `src/data/workflows.ts`
+        - A merged PR titled `feat(content): add <slug> agent` that links the issue
+        - Live pages:
+          - `/en/agents/<slug>`
+          - `/ko/agents/<slug>`
+          - `https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`, which must return HTTP 200
+
+        ---
+
+        ## 6. Procedure (with checkpoints)
+
+        ### Step 1: Create a branch
+        ```bash
+        git checkout main && git pull
+        git checkout -b content/<slug>
+        ```
+        **Checkpoint 1:** You're on `content/<slug>`, branched from an up-to-date `main`.
+
+        ### Step 2: Create or open the agent file
+        - **T1 (new):** copy the template.
+          ```bash
+          cp content/agents/_template.yaml content/agents/<slug>.yaml
+          ```
+        - **T2 (promote):** open the existing `content/agents/<slug>.yaml`.
+
+        Slug rules: kebab-case (`lowercase-words-with-hyphens`) and unique. Check for an existing file first:
+        ```bash
+        ls content/agents/ | grep <slug>
+        ```
+        **Checkpoint 2:** The file exists, the filename slug is kebab-case, and no other agent uses that slug. `check:data` fails on duplicates.
+
+        ### Step 3: Fill in the core metadata
+        Fill in every field: `name`, `summary`, `description`, `roles`, `categories`, `tags`, `tools`, `difficulty`, `automationLevel`, `prompt`, `inputs`, `outputs`, `exampleInput`, `limitations`, `updatedAt`.
+
+        Watch these fields in particular:
+        - **`categories`**: copy each slug **exactly** from `src/data/taxonomy.ts`. Don't type them from memory. Typos are the most common mistake.
+        - **`automationLevel`**: an integer from 1 to 5.
+        - **`updatedAt`**: **today's date** in `YYYY-MM-DD` format. Replace the template date. Update it for T2 promotions too.
+
+        **Checkpoint 3:** No template placeholder values remain. Every category exists in `taxonomy.ts`. `updatedAt` is today's date.
+
+        ### Step 4: Add the install fields (what makes it "project-ready")
+        - **`installTargets`**: `codex`, `claude`, `cursor`, whichever apply
+        - **`runbook`**: context to prepare, a good input example, a bad input example, and an output checklist
+        - **`evaluation`**: criteria, `qualityScore` (1–5), known weaknesses, and `sampleRuns` (filled in during Step 5)
+
+        **Checkpoint 4:** All three blocks are present and not empty. Only `sampleRuns` may be pending at this point.
+
+        ### Step 5: Run the sample runs and record them
+        For each run:
+        1. Open a **fresh** chat in the AI tool. Don't reuse a conversation.
+        2. Paste the agent's `prompt` and a **real** input.
+        3. Record the input, an output summary, and a verdict in `evaluation.sampleRuns`.
+
+        Aim for **at least 2** runs, with different inputs where possible. **[A3]**
+
+        **Checkpoint 5:** Every recorded sample run actually happened, and each has an input, an output summary, and a verdict.
+
+        ### Step 6: Set `verifiedStatus` (the honesty gate)
+        Pick the **highest level your evidence supports, and no higher**:
+
+        | Status | Requirement |
+        |---|---|
+        | `unverified` | Default. Nothing has been run. |
+        | `community` | Run by the contributor with at least one AI tool, **and** the example output is real |
+        | `tested` / `expert` | An evaluation with **at least 2 recorded sample runs**. `check:data` rejects anything less. |
+
+        Rules:
+        - **Never** set the status or `qualityScore` higher than what was actually tested.
+        - If you only managed 1 sample run, the status can't be `tested`. Use `community` if the contributor's criteria are met, otherwise `unverified`.
+        - `qualityScore` should reflect what the sample runs showed, not what you expect the agent could do.
+
+        **Checkpoint 6:** The status matches the evidence in the file, and the score is justified by the sample runs.
+
+        ### Step 7: Add Korean `realUseCases` (optional)
+        Add them if you can. Skipping this doesn't block the PR.
+
+        ### Step 8: Add to a starter pack or workflow (only if relevant)
+        Edit `src/data/starter-packs.ts` or `src/data/workflows.ts` and reference the agent by its exact slug.
+
+        **Checkpoint 8:** Any reference you added uses the exact slug from Step 2.
+
+        ### Step 9: Run the local checks
+        Run all five, in order:
+        ```bash
+        npm run check:data
+        npm run lint
+        npm run typecheck
+        npm test
+        npm run build
+        ```
+        `npm run content` (bundling) runs automatically before build, typecheck, and test. You don't need to run it yourself.
+
+        **Never edit `src/data/generated/agents.ts` by hand.** It's build output. If it shows up as changed in `git status`, leave it for the build to regenerate. Don't hand-fix it. **[A4]**
+
+        **Checkpoint 9:** All five commands pass with no errors. Don't open the PR until they do.
+
+        ### Step 10: Open the PR
+        - Title: `feat(content): add <slug> agent`
+        - Body: link the issue (for example, `Closes #<issue>` for T1), say which status you chose and why (for example, "2 sample runs in Claude, see evaluation.sampleRuns"), and list any starter pack or workflow edits.
+        - Request a review from another maintainer.
+
+        **Checkpoint 10:** CI is green on the PR, and the reviewer has approved it against Section 8.
+
+        ### Step 11: Merge and verify the deploy
+        1. Merge the PR.
+        2. Wait for CI on `main`. The Deploy workflow publishes to GitHub Pages **only if CI passes on `main`**.
+        3. Once the deploy finishes, check these URLs **[A5]**:
+           - `https://yohan-work.github.io/agentive/en/agents/<slug>`
+           - `https://yohan-work.github.io/agentive/ko/agents/<slug>`
+           - `https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md`
+
+           Confirm the kit URL returns 200:
+           ```bash
+           curl -s -o /dev/null -w "%{http_code}\n" https://yohan-work.github.io/agentive/kits/<slug>/AGENTS.md
+           ```
+        4. For T1, close the issue (if the PR didn't close it automatically) with a link to the live page.
+
+        **Checkpoint 11:** Both locale pages render, the kit URL returns 200, and the issue is closed.
+
+        ---
+
+        ## 7. Exceptions
+
+        | # | Situation | What to do |
+        |---|---|---|
+        | **E1** | You can't get 2 real sample runs | Ship with `community` (if the contributor's criteria are met) or `unverified`. Note in the PR that it can be upgraded later. Don't inflate. |
+        | **E2** | Contributor information is incomplete (no real input or output, vague prompt) | Ask on the issue. Pause the SOP until they answer. Don't invent example outputs. |
+        | **E3** | The agent needs a category that doesn't exist in `taxonomy.ts` | Stop. That's a taxonomy change, which is out of scope. Raise it with a maintainer, or pick the closest existing category. **[A6]** |
+        | **E4** | The change needs a new UI string or a code change | Out of scope for this SOP. If you do add a UI string, add it to **both** the `en` and `ko` dictionaries. Forgetting `ko` is a known mistake. |
+        | **E5** | `check:data` fails | Read the error. Usual causes: a duplicate slug, a category typo, `tested`/`expert` with fewer than 2 sample runs, or a missing required field. Fix the YAML, not the generated file. |
+        | **E6** | CI passes on the PR but fails on `main` after the merge | Nothing deploys. Fix it forward with a follow-up PR, or revert (Section 9). |
+        | **E7** | The deploy finishes but a kit URL returns 404, or a page is missing | Check that `installTargets` and `runbook` are present, that the slug matches the filename, and that the Deploy workflow actually ran. If you can't find the cause quickly, revert. |
+        | **E8** | Slug collision found late (after the PR is open) | Rename the file and every reference (starter packs, workflows) to a new unique slug. Update the PR title and branch name if that helps clarity. |
+
+        ---
+
+        ## 8. Quality checks (reviewer checklist)
+
+        The reviewer confirms each item before approving:
+
+        - [ ] The filename slug is kebab-case, unique, and matches all references
+        - [ ] Every `categories` entry exists in `src/data/taxonomy.ts`
+        - [ ] `updatedAt` is the PR date, not the template date
+        - [ ] `automationLevel` is 1–5 and `qualityScore` is 1–5
+        - [ ] `installTargets`, `runbook`, and `evaluation` are all present and substantive
+        - [ ] **No status inflation:** the `verifiedStatus` and `qualityScore` are supported by the recorded `sampleRuns`, and there are at least 2 runs for `tested`/`expert`
+        - [ ] The sample runs look real (specific inputs and honest verdicts, including weaknesses)
+        - [ ] `src/data/generated/agents.ts` was not edited by hand
+        - [ ] If UI strings changed, both `en` and `ko` were updated
+        - [ ] The PR title follows `feat(content): add <slug> agent` and links the issue
+        - [ ] CI is green (all five commands)
+
+        **Definition of done:** all five commands pass locally and in CI, the kit URLs return 200, and there's no status inflation.
+
+        ---
+
+        ## 9. Rollback
+
+        **When:** a broken page, a kit URL returning 404 or wrong content, a status or score found to be inflated, or a failing `main`.
+
+        1. Open the merged PR on GitHub and click **Revert** (or run `git revert <merge-commit>` on a branch).
+        2. Open the revert PR with the title `revert: add <slug> agent` and a one-line reason.
+        3. Get it reviewed and merged. **[A7]**
+        4. GitHub Pages redeploys on the **next green CI run on `main`**. Confirm the agent pages and kit URL are gone, or back to their previous state for a T2 promotion.
+        5. Comment on the original issue explaining the revert and what's needed to re-land it.
+
+        **Faster alternative for status inflation only:** instead of a full revert, open a small fix PR that lowers `verifiedStatus` or `qualityScore` to what the evidence supports.
+
+        ---
+
+        ## 10. Assumptions
+
+        | # | Assumption | Please confirm |
+        |---|---|---|
+        | A1 | Seoyeon has a working local environment (Node and npm) and has run `npm install` | Is there a required Node version? |
+        | A2 | Seoyeon has (or will get) write access to create `content/*` branches and merge PRs | Does `main` have branch protection or a required-reviewer rule? |
+        | A3 | Two sample runs is a good default for every project-ready agent, even when targeting `community` | Or is one run acceptable for `community`? |
+        | A4 | The generated file is either gitignored or regenerated by the build, so it shouldn't appear in PR diffs | Should it ever be committed? |
+        | A5 | Agent pages live under the same Pages base URL as the kits (`/agentive/en/agents/<slug>`) | Is that the right URL shape? |
+        | A6 | Taxonomy changes need separate maintainer approval | Who approves new categories? |
+        | A7 | A revert PR goes through the same review as any other PR | Can the owner self-merge reverts in an emergency? |
+
+        Also worth confirming: whether any kit files besides `AGENTS.md` should be checked for 200. Your notes mention only `AGENTS.md`.
+
+        ---
+
+        ## 11. Recommendations
+
+        1. **Add a PR template** for content PRs that embeds the Section 8 checklist. The reviewer then has nothing to remember.
+        2. **Script the post-deploy check.** A small script that curls all three URLs for a slug turns Step 11 into one command.
+        3. **Pair on the first one.** Have Seoyeon run this SOP on her first agent while you review live. On the second, she runs it alone and you review only the PR.
+        4. **Keep a record of the sample-run prompts and inputs** (for example, in the PR description). Later status upgrades or audits can then be reproduced.
+        5. **Add a "copy categories from taxonomy.ts" note** to `_template.yaml`, so the most common mistake is prevented at the source.
+
+        ---
+
+        ## 12. Risks
+
+        | Risk | Impact | Mitigation |
+        |---|---|---|
+        | Status or score inflation | Users trust an agent more than the evidence supports, which damages the archive's credibility | The Step 6 gate, the reviewer checklist, and `check:data` enforcement for `tested`/`expert` |
+        | Fabricated or non-fresh sample runs | Same as above, and harder to detect | Require fresh chats and real inputs. The reviewer spot-checks for specificity. |
+        | New owner unfamiliar with the codebase | Hand-editing generated files, or wandering out of scope into code | Explicit "never edit generated" rule and out-of-scope exceptions (E3, E4) |
+        | A single reviewer pool | PRs stall if no other maintainer is available | Agree on a review turnaround target (for example, 3 business days) and a backup reviewer |
+        | A deploy silently not happening (CI red on `main`) | The agent merges but never goes live | Checkpoint 11 requires checking the live URLs, not just that the merge happened |
+
+        ---
+
+        ## 13. Next actions
+
+        | # | Action | Owner |
+        |---|---|---|
+        | 1 | Confirm or correct assumptions A1–A7 | You (current maintainer) |
+        | 2 | Grant Seoyeon repo permissions and confirm the branch protection settings | You |
+        | 3 | Walk Seoyeon through `content/agents/_template.yaml`, `src/data/taxonomy.ts`, and the verification levels in CONTRIBUTING.md (about 30 minutes) | You and Seoyeon |
+        | 4 | Seoyeon runs the SOP on the next `accepted` issue, paired with you | Seoyeon |
+        | 5 | Add a content PR template with the Section 8 checklist | Either maintainer |
+        | 6 | Revise this SOP after Seoyeon's first two agents, based on where she got stuck | Seoyeon |
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Operations SOP Agent boundary run
-      input: Standardize a new process nobody has performed yet.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - Covers every criterion explicitly. It has a Trigger table (T1 accepted-label issue, T2 promotion), Roles, Inputs, Outputs, 11 steps each ending in a numbered Checkpoint, Exceptions E1-E8, a reviewer Quality checklist, and Rollback, with Assumptions/Recommendations/Risks/Next actions each in its own section.
+        - "Uses the input's facts faithfully: the branch name content/<slug>, categories from src/data/taxonomy.ts, the rule that 'tested'/'expert' needs at least 2 sample runs and check:data rejects it otherwise, the five commands with automatic 'npm run content', the ban on hand-editing src/data/generated/agents.ts, the PR title 'feat(content): add <slug> agent', and deploy only on green CI on main."
+        - Turns every item in the user's 'common mistakes' list into a guard at the right step. The category typo is covered in Step 3, the stale updatedAt in Checkpoint 3, 'tested' with 1 run in Step 6 and E1, the generated file in Step 9, and the missing ko dictionary in E4.
+        - Honestly tags inferred details as [A1]-[A7], including the Pages URL shape for /en/agents/<slug> (A5) and whether 1 run is enough for 'community' (A3), rather than stating them as given.
+        - "Minor defects: E7's diagnosis of a kit 404 (check that installTargets/runbook are present) is speculative, the T2 promotion still uses an 'add <slug> agent' PR title, and the document is long for a 2-4/month process, though the length is mostly justified by the handoff to someone new to the codebase."
+    - title: SOP for onboarding with no process details and an impossible scope
+      input: 반복되는 고객 온보딩 작업을 SOP로 만들어 주세요. 신입이 내일부터 혼자 할 수 있게, 모든 예외 상황까지 다 포함해서요.
+      expectedOutputSummary: Should point out that the request has no process details (product, trigger, steps, tools, escalation) and that 'all exceptions, solo from tomorrow' is unrealistic, ask a small set of required questions, and still deliver a clearly marked provisional SOP skeleton with an unknown-situation escalation rule and a safer rollout recommendation.
+      sampleOutput: |-
+        좋습니다. 다만 먼저 솔직하게 말씀드릴 부분이 두 가지 있습니다.
+
+        1. **지금 주신 정보만으로는 실제로 쓸 수 있는 SOP를 만들 수 없습니다.** 어떤 서비스인지, 고객이 누구인지, 어떤 시스템을 쓰는지, 온보딩이 어디서 시작해서 어디서 끝나는지가 없으면 제가 쓰는 절차는 전부 추측입니다. 추측으로 쓴 SOP를 신입이 혼자 따라 하면 오히려 사고가 납니다.
+        2. **"모든 예외 상황"을 문서 하나에 다 담는 것은 불가능합니다.** 문서에 담을 수 있는 건 *알려진* 예외입니다. 그래서 좋은 SOP는 예외 목록과 함께 "목록에 없는 상황이면 멈추고 누구에게 넘긴다"는 규칙을 둡니다. 신입이 내일부터 혼자 한다면 이 규칙이 제일 중요합니다.
+
+        그래서 아래와 같이 진행하겠습니다. **필수 질문**에 답해 주시면 완성본을 만들어 드리고, 그 전에 바로 채워 넣을 수 있는 **초안 골격**을 먼저 드립니다.
+
+        ---
+
+        ## 1. 꼭 필요한 정보 (이것만 답해 주시면 됩니다)
+
+        | # | 질문 | 왜 필요한가 |
+        |---|---|---|
+        | 1 | 어떤 제품/서비스의 온보딩인가요? (예: B2B SaaS 계정 개설, 금융 계좌 개설, 에이전시 신규 클라이언트) | 절차와 규제 수준이 완전히 달라집니다 |
+        | 2 | 온보딩의 **시작 신호**와 **완료 기준**은 무엇인가요? (예: 계약서 서명 → 첫 로그인 및 킥오프 미팅 완료) | 범위를 정합니다 |
+        | 3 | 현재 담당자가 실제로 하는 단계를 순서대로 적어 주세요. 대충이어도 됩니다. | SOP의 뼈대입니다. 없으면 제가 지어내게 됩니다 |
+        | 4 | 사용하는 시스템/도구는요? (CRM, 결제, 계정 관리자 화면, 이메일 템플릿 등) | 각 단계가 "어디서 무엇을 클릭하는지"까지 내려가야 신입이 혼자 할 수 있습니다 |
+        | 5 | 지금까지 실제로 겪은 예외 상황이나 자주 틀리는 부분은요? | 예외 섹션의 실제 내용입니다 |
+        | 6 | 신입이 **혼자 결정하면 안 되는 것**은 무엇이고, 막히면 누구에게 넘기나요? (이름/채널/응답 기대 시간) | 에스컬레이션 경로가 없으면 "혼자 하기"가 성립하지 않습니다 |
+        | 7 | 개인정보, 결제, 계약, 법적 확인(KYC 등)이 포함되나요? | 포함되면 첫 주는 반드시 검수가 필요합니다 |
+
+        ---
+
+        ## 2. SOP 초안 골격 (정보를 받으면 채워 넣을 틀)
+
+        > 아래 `[ ]` 부분은 모두 가정이거나 빈칸입니다. 이 상태로 신입에게 전달하지 마세요.
+
+        ### 고객 온보딩 SOP — v0.1 (초안)
+
+        **목적**: 계약한 신규 고객이 `[완료 기준]`에 도달하도록 매번 같은 방식으로 온보딩한다.
+        **담당**: `[직무]` / **승인자·에스컬레이션**: `[이름, 채널]`
+        **소요 시간 목표**: 고객당 `[ ]`일 이내
+
+        #### A. 시작 전 체크 (트리거)
+        - [ ] `[시스템]`에 신규 고객 건이 생성되었는가
+        - [ ] 계약/결제 상태가 `[확정]`인가 → 아니면 **E1**로
+        - [ ] 필수 고객 정보(담당자 이름, 이메일, 회사명, `[ ]`)가 모두 있는가 → 누락 시 **E2**로
+
+        #### B. 표준 절차
+        | 단계 | 할 일 | 도구 | 완료 확인 방법 |
+        |---|---|---|---|
+        | 1 | 환영 메일 발송 (템플릿 `[이름]`) | `[ ]` | 발송 기록 남김 |
+        | 2 | 계정/권한 생성 | `[ ]` | 테스트 로그인 성공 |
+        | 3 | 필요 자료 수집 요청 | `[ ]` | 체크리스트 전 항목 수령 |
+        | 4 | 설정/데이터 이관 | `[ ]` | `[ ]` |
+        | 5 | 킥오프 미팅 또는 안내 콜 | `[ ]` | 회의록 CRM 저장 |
+        | 6 | 완료 처리 및 담당 부서 인계 | `[ ]` | 상태를 `[완료]`로 변경 |
+
+        #### C. 예외 처리 (알려진 예외)
+        | 코드 | 상황 | 신입이 할 일 | 혼자 해결 가능? |
+        |---|---|---|---|
+        | E1 | 결제/계약 미확정 | 진행 중단, `[영업 담당]`에게 확인 요청 | 아니오 |
+        | E2 | 고객 정보 누락·오류 | 템플릿 `[ ]`로 고객에게 요청, 48시간 무응답 시 1회 리마인드 | 예 |
+        | E3 | 고객이 `[ ]`일 이상 무응답 | 리마인드 2회 후 `[담당자]`에게 보고 | 부분 |
+        | E4 | 계정 생성/시스템 오류 | 스크린샷 + 시간 기록 후 `[기술 채널]`에 전달 | 아니오 |
+        | E5 | 고객이 계약 범위 밖 요청 | 약속하지 말고 "확인 후 회신" 안내, `[담당자]`에게 전달 | 아니오 |
+        | E6 | 고객 불만/해지 언급 | 즉시 `[매니저]`에게 에스컬레이션 | 아니오 |
+        | E7 | 개인정보를 잘못된 곳에 보냄 | 즉시 중단, `[보안 담당]`에게 보고 | 아니오 |
+        | `[ ]` | *(실제 과거 사례로 채울 부분)* | | |
+
+        #### D. 목록에 없는 상황 규칙 (가장 중요)
+        1. 확신이 없으면 **진행하지 않고 멈춥니다.**
+        2. 고객에게는 "확인 후 `[시간]` 내 회신드리겠습니다"라고만 답합니다.
+        3. `[채널]`에 상황·고객명·지금까지 한 일을 적어 에스컬레이션합니다.
+        4. 해결 후 이 SOP의 예외 표에 한 줄 추가합니다.
+
+        ---
+
+        ## 3. 가정
+        - 온보딩은 계약 이후에 시작하고, 영업·기술·매니저가 따로 있다고 가정했습니다.
+        - 고객은 B2B이고 이메일로 주로 소통한다고 가정했습니다.
+        - 위 E1–E7은 **일반적인 온보딩에서 흔한 예외**일 뿐, 귀사에서 실제로 일어나는 것을 반영한 것은 아닙니다.
+
+        ## 4. 권장 사항
+        - **"내일부터 혼자"보다 "내일부터 SOP로, 첫 3–5건은 검수받으며"**를 권합니다. 신입이 처음 몇 건을 하고 선임이 확인하면, 그 과정에서 SOP의 빈틈이 드러납니다.
+        - 첫 건은 선임이 하는 것을 신입이 SOP를 들고 **따라 보며 체크**하게 하세요. SOP가 실제와 다른 부분을 가장 빨리 찾는 방법입니다.
+        - 각 단계에 "완료 확인 방법"을 반드시 두세요. 신입은 "했다"와 "제대로 됐다"를 구분하기 어렵습니다.
+        - 가능하면 화면 캡처를 단계마다 붙이세요.
+
+        ## 5. 리스크
+        - **정보 없이 만든 SOP를 그대로 쓰는 것**: 실제 절차와 어긋나 고객 경험이나 데이터에 문제가 생길 수 있습니다.
+        - **"모든 예외를 포함했다"는 믿음**: 신입이 목록에 없는 상황을 억지로 비슷한 항목에 끼워 맞춰 처리할 수 있습니다. D 섹션 규칙으로 막아야 합니다.
+        - **에스컬레이션 담당자가 응답하지 않는 경우**: 신입이 혼자 판단하게 됩니다. 백업 담당자를 명시하세요.
+        - **개인정보·결제가 포함되는 경우**: 첫 주 무검수 단독 처리는 사고 시 영향이 큽니다.
+
+        ## 6. 다음 할 일
+        1. 위 **1번 섹션의 질문 7개**에 답해 주세요 (특히 3, 5, 6번). 현재 담당자가 쓰던 메모나 체크리스트가 있다면 그대로 붙여 넣어 주셔도 됩니다.
+        2. 답을 주시면 완성본 v1.0을 만들어 드립니다. 단계별 도구, 템플릿 문구, 예외 표까지 채워서요.
+        3. 오늘 중 선임이 초안을 한 번 읽고 틀린 부분을 표시합니다.
+        4. 내일 신입의 첫 건은 선임 검수와 함께 진행하고, 발견된 빈틈을 SOP에 반영합니다.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Directly challenges the impossible scope: it says that including every exception is not possible and substitutes a 'D. 목록에 없는 상황 규칙' stop-and-escalate rule, which is the right structural answer."
+        - "Asks 7 focused questions, each with a reason, and prioritizes #3, #5, and #6 under Next actions. That is useful, but it is at the high end for 'ask only what is required'."
+        - Moves the work forward with a v0.1 skeleton covering the trigger check, a 6-step table with a completion check per step, and an exception table E1-E7. It includes an explicit warning (이 상태로 신입에게 전달하지 마세요) and a separate Assumptions section saying the exceptions are generic and not company-specific.
+        - Some specifics are not marked as placeholders, such as the '48시간 무응답 시 1회 리마인드' rule and steps like data migration. These could be taken as real policy.
+        - The recommendation to have the new hire work solo from tomorrow but with review on the first 3-5 cases is a concrete, sensible alternative to the unrealistic request. Risks and Next actions are specific and properly separated.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Documenting repeatable workflows so another teammate can execute them consistently
@@ -195,6 +901,6 @@ decisionGuide:
     guidance: The process is experimental and changes every time it is performed
   - question: What should I run next?
     guidance: After this agent produces a draft, use a planning, documentation, or QA agent to turn it into a team-ready handoff.
-verifiedStatus: tested
+verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

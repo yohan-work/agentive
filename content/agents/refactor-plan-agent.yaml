@@ -33,8 +33,207 @@ outputs:
   - Risks
   - Recommended next actions
 prompt: You are Refactor Plan Agent. Convert the user's context into a practical refactor plan. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
-exampleInput: 거대한 컴포넌트를 여러 모듈로 나누려는 상황
-exampleOutput: A structured refactor plan with practical recommendations, tradeoffs, and next steps.
+exampleInput: |-
+  리팩터링 계획을 세워 주세요. PR 여러 개로 나눠서 안전하게 진행하고 싶습니다.
+
+  프로젝트: Agent Archive (Next.js 16 + TypeScript, 정적 export → GitHub Pages). 검증 명령: `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`(node:test + tsx, 현재 20개 통과), `npm run build`. CI가 이 다섯 개를 모두 돌립니다.
+
+  대상: src/lib/agent-install-kit.ts (298줄). 한 파일에 다 들어 있는 export 함수들:
+  - `isInstallable(agent)`, `getInstallKitPath(slug, name)`, `getInstallKitUrl(slug, name)`(basePath `/agentive`와 사이트 URL 반영), `getInstallKitCommand(slug)` — curl 명령 생성(`mkdir -p ... && (cd ... && curl -fsSL --remote-name-all "...{a,b,c}")`).
+  - 파일별 본문 생성: `toCodexAgentFile`, `toClaudeProjectFile`, `toCursorRuleFile`, `toInstallManifest`(agent.json), `toInstallReadme`, `toRunbookFile`(60줄), `toEvaluationFile`(60줄). 모두 markdown을 문자열 템플릿으로 직접 조립. 내부 헬퍼 `agentInstructions`, `list`, `getAgentPageUrl`가 섞여 있고, 공통 헤더/출처 문구가 여러 함수에 복붙돼 있음.
+  - `getInstallKitFiles(agent)` → 7개 `{ name, content, mimeType }` 배열(AGENTS.md, CLAUDE.md, cursor-rule.mdc, agent.json, README.md, RUNBOOK.md, EVALUATION.md).
+
+  이 모듈을 쓰는 곳:
+  - src/app/kits/[slug]/[file]/route.ts — generateStaticParams와 GET에서 getInstallKitFiles 사용(빌드 시 out/kits/<slug>/<file> 생성).
+  - src/components/agents/agent-export-panel.tsx — 다운로드 버튼, curl 명령 표시, 파일별 링크.
+  - tests/agent-install-kit.test.ts — 파일 7개 이름, URL, curl 명령 문자열을 검사하는 테스트.
+
+  목표:
+  - 파일 종류별로 모듈 분리(예: src/lib/install-kit/ 아래), 공통 헤더/푸터 한 곳으로.
+  - 출력은 바이트 단위로 동일해야 함(외부 사용자들이 curl로 받아 AGENTS.md에 붙이고 있어서 diff가 생기면 안 됨).
+  - 공개 API(`getInstallKitFiles`, URL/curl 헬퍼 이름)는 유지.
+
+  제약: 새 의존성 금지. 한 PR은 리뷰어가 20분 안에 볼 수 있는 크기. 기능 추가 없음. 이 작업 중에도 다른 사람이 에이전트 YAML을 계속 추가함.
+
+  원하는 결과: 단계별 PR 순서, 각 단계에서 동작 보존을 확인하는 방법(구체적 명령 포함), 롤백 방법, 가정, 리스크, 다음 액션.
+exampleOutput: |-
+  # `agent-install-kit.ts` 리팩터링 계획
+
+  ## 1. 요약
+
+  핵심 원칙은 **"먼저 출력을 고정하고, 그다음에 옮긴다"**입니다.
+
+  - 첫 PR은 코드를 건드리지 않습니다. 현재 출력을 바이트 단위로 고정하는 골든(characterization) 테스트만 추가합니다.
+  - 이후 PR은 **순수 이동**과 **중복 제거**를 절대 섞지 않습니다. 바이트가 바뀔 위험은 거의 전부 "공통 헤더/푸터 통합" 단계에 몰려 있으므로, 그 단계는 파일 종류별로 쪼갭니다.
+  - 모든 PR은 같은 두 가지 게이트를 통과해야 합니다. (1) 골든 테스트 통과, (2) `origin/main` 빌드와 브랜치 빌드의 `out/kits/` 비교 결과 차이 없음.
+
+  ## 2. 가정
+
+  아래 중 틀린 것이 있으면 알려 주세요. 계획의 해당 부분만 조정하면 됩니다.
+
+  1. **출력이 결정적(deterministic)입니다.** 생성 파일에 빌드 시각, `Date.now()`, 랜덤 값, 환경별로 달라지는 값이 없습니다. `updatedAt` 같은 값은 YAML에서만 옵니다. 이 가정이 틀리면 비교 전에 해당 줄을 정규화해야 합니다.
+  2. **사이트 URL은 환경 변수나 상수 하나로 정해지고**, 비교용 두 빌드에 같은 값을 넣을 수 있습니다.
+  3. **`src/lib/agent-install-kit.ts` 경로 자체도 공개 API로 취급합니다.** 이 파일은 끝까지 re-export 배럴로 남기고, 내부 import만 새 경로로 바꿉니다.
+  4. `mimeType`, 파일 순서(7개 배열 순서), `generateStaticParams`가 만드는 경로 목록도 "출력"에 포함되며 바뀌면 안 됩니다.
+  5. Node 버전은 `node:test`와 `tsx`가 이미 도는 버전 그대로이고, 스냅샷 기능은 Node 내장 API 대신 파일 비교로 직접 구현합니다(새 의존성 금지).
+
+  ## 3. PR 순서
+
+  | PR | 내용 | 예상 diff | 바이트 변경 위험 |
+  |---|---|---|---|
+  | 0 | 골든 테스트 + 비교 스크립트 | +150줄 안팎(픽스처 제외) | 없음(코드 무변경) |
+  | 1 | `install-kit/` 디렉터리로 통째 이동, 기존 파일은 배럴 | 이동 위주 | 매우 낮음 |
+  | 2 | URL/경로/curl 헬퍼와 내부 헬퍼 분리 | ~100줄 이동 | 낮음 |
+  | 3 | 파일 생성기 분리 (작은 5개) | ~120줄 이동 | 낮음 |
+  | 4 | 파일 생성기 분리 (`RUNBOOK`, `EVALUATION`) | ~120줄 이동 | 낮음 |
+  | 5a–5c | 공통 헤더/푸터 통합, 파일 종류별로 쪼개서 | 각 수십 줄 | **높음** |
+  | 6 | 소비처 import 경로 정리, 배럴에 주석 | 소규모 | 없음 |
+
+  ### PR 0: 동작 고정 (`test: add golden snapshots for install kit output`)
+
+  **추가할 것**
+
+  - `tests/fixtures/install-kit/agents/*.ts`: 실제 `content/agents`와 독립된 **고정 픽스처 에이전트** 4–6개. 경계 케이스를 포함합니다.
+    - 모든 선택 필드가 채워진 에이전트
+    - 선택 필드가 비어 있거나 없는 에이전트(`list()`의 빈 배열 처리 확인)
+    - 한글, 백틱, `$`, `{}`, 따옴표, 마크다운 특수문자가 들어간 에이전트
+    - `isInstallable`이 `false`인 에이전트
+  - `tests/fixtures/install-kit/golden/<slug>/<파일명>`: 현재 코드로 생성한 7개 파일 원본과 `manifest.json`(파일 이름, `mimeType`, 순서).
+  - `tests/install-kit-golden.test.ts`: 픽스처마다 `getInstallKitFiles()`를 호출하고 `assert.strictEqual(content, readFileSync(golden, "utf8"))`로 비교합니다. 추가로 `getInstallKitPath/Url/Command`와 `isInstallable` 결과도 골든 JSON과 비교합니다.
+  - `UPDATE_GOLDEN=1 npm test`로만 골든을 재생성하게 하고, 재생성 스크립트는 **PR 0에서만** 씁니다.
+  - `.gitattributes`에 `tests/fixtures/install-kit/golden/** -text`를 넣어 줄바꿈 변환을 막습니다.
+  - `scripts/compare-kits.sh`: 실제 전체 에이전트 출력을 비교하는 스크립트입니다(아래 4장).
+
+  **왜 픽스처를 따로 두나:** 작업 중에도 다른 사람이 YAML을 추가하므로 실제 콘텐츠로 골든을 만들면 매번 깨집니다. 픽스처 골든은 "코드가 같은 입력에 같은 출력을 내는가"만 검증하고, 실제 콘텐츠 전체는 빌드 비교(4장)로 검증합니다.
+
+  **리뷰 포인트:** 골든 파일이 현재 main 출력과 같은지 확인합니다. 리뷰어가 로컬에서 `UPDATE_GOLDEN=1 npm test && git status`를 돌려 변경이 없으면 됩니다.
+
+  ### PR 1: 디렉터리 이동 (`refactor: move install kit into src/lib/install-kit`)
+
+  - `src/lib/agent-install-kit.ts`의 내용을 **한 글자도 바꾸지 않고** `src/lib/install-kit/index.ts`로 옮깁니다(`git mv` 후 새 파일 생성).
+  - `src/lib/agent-install-kit.ts`는 `export * from "./install-kit";`만 남깁니다.
+  - 소비처(route, 패널, 테스트)는 아직 건드리지 않습니다.
+  - 리뷰는 `git diff -M --stat`로 rename 인식 여부만 보면 됩니다.
+
+  ### PR 2: 헬퍼 분리 (`refactor: split install kit url and shared helpers`)
+
+  - `install-kit/urls.ts`: `isInstallable`, `getInstallKitPath`, `getInstallKitUrl`, `getInstallKitCommand`
+  - `install-kit/shared.ts`: `agentInstructions`, `list`, `getAgentPageUrl` (export는 하되 `index.ts`에서 re-export하지 않아 공개 API가 늘지 않게 합니다)
+  - `index.ts`는 re-export와 아직 남은 생성기만 갖습니다.
+  - 순환 import 금지: `shared.ts` → `urls.ts` 방향만 허용합니다.
+
+  ### PR 3: 작은 생성기 분리 (`refactor: split small install kit file generators`)
+
+  - `install-kit/files/codex.ts` (`toCodexAgentFile`), `claude.ts`, `cursor.ts`, `manifest.ts` (`toInstallManifest`), `readme.ts`
+  - **템플릿 리터럴은 복사-붙여넣기만 합니다.** 들여쓰기가 다른 위치로 옮기더라도 여러 줄 템플릿 안의 공백은 그대로 둡니다. 에디터의 자동 들여쓰기, 포매터, trailing whitespace 제거를 이 PR에서는 끄고 작업합니다.
+
+  ### PR 4: 큰 생성기 분리 (`refactor: split runbook and evaluation generators`)
+
+  - `files/runbook.ts`, `files/evaluation.ts`. 각 60줄이라 PR 3과 합치면 20분을 넘기기 쉬워서 따로 뺐습니다.
+  - `getInstallKitFiles`는 `install-kit/index.ts`에서 7개 생성기를 **기존과 같은 순서로** 조립합니다.
+
+  ### PR 5a–5c: 공통 헤더/푸터 통합 (`refactor: share install kit header and footer`)
+
+  바이트가 바뀔 수 있는 유일한 단계입니다. 한 PR에 한 묶음씩만 바꿉니다.
+
+  - 5a: `install-kit/sections.ts`에 공통 헤더/출처 문구 함수를 만들고, **Markdown 3종**(`AGENTS.md`, `CLAUDE.md`, `README.md`)에만 적용
+  - 5b: `RUNBOOK.md`, `EVALUATION.md`에 적용
+  - 5c: `cursor-rule.mdc`(frontmatter가 있어 헤더 위치가 다를 수 있음)에 적용
+  - `agent.json`은 통합 대상에서 제외합니다. 문구 공유 이득은 작고, 키 순서가 바뀌면 바이트가 바뀝니다.
+
+  **규칙:**
+  - 복붙된 문구들이 사실은 미세하게 다를 수 있습니다(끝 공백, 마침표, 빈 줄 개수). 통합 전에 각 복사본을 `diff`로 비교하고, **다른 부분은 파라미터로 남깁니다.** 억지로 하나로 합치지 않습니다.
+  - 헬퍼는 "줄 배열 → `join("\n")`" 방식보다 기존 템플릿 조각을 그대로 반환하는 방식을 우선합니다. 끝 개행 처리가 가장 흔한 사고 지점이기 때문입니다.
+
+  ### PR 6: import 정리 (`refactor: import install kit from new path`)
+
+  - `route.ts`, `agent-export-panel.tsx`, 기존 테스트의 import를 `@/lib/install-kit`로 바꿉니다.
+  - `src/lib/agent-install-kit.ts` 배럴은 유지하고, 새 경로를 쓰라는 주석만 답니다(가정 3). 삭제는 이 계획 범위 밖입니다.
+
+  ## 4. 단계마다 동작 보존 확인하기
+
+  ### 4.1 모든 PR 공통 (CI와 동일)
+
+  ```bash
+  npm run check:data && npm run lint && npm run typecheck && npm test && npm run build
+  ```
+
+  골든 테스트가 `npm test`에 들어 있으므로 CI가 자동으로 막아 줍니다. 기존 20개 테스트 수와 새 골든 테스트 수가 줄지 않았는지도 확인합니다.
+
+  ### 4.2 실제 전체 콘텐츠 빌드 비교 (`scripts/compare-kits.sh`)
+
+  YAML이 계속 추가되므로 **main 최신에 rebase한 뒤** 비교합니다. 그러면 두 빌드의 콘텐츠가 같고 코드만 다릅니다.
+
+  ```bash
+  git fetch origin && git rebase origin/main
+
+  # 기준 빌드 (origin/main)
+  rm -rf /tmp/kit-base && git worktree add /tmp/kit-base origin/main
+  (cd /tmp/kit-base && npm ci && npm run build)
+
+  # 브랜치 빌드 (사이트 URL 등 환경 변수는 두 빌드에 동일하게)
+  npm run build
+
+  # 1) 파일 목록이 같은지 (generateStaticParams 결과 포함)
+  diff <(cd /tmp/kit-base/out/kits && find . -type f | sort) \
+       <(cd out/kits && find . -type f | sort)
+
+  # 2) 내용이 바이트 단위로 같은지
+  diff -r /tmp/kit-base/out/kits out/kits && echo "KITS IDENTICAL"
+
+  # 3) 해시 요약 (PR 본문에 붙이기용)
+  (cd out/kits && find . -type f -print0 | sort -z | xargs -0 shasum -a 256) | shasum -a 256
+
+  git worktree remove /tmp/kit-base
+  ```
+
+  `diff -r`는 끝 개행, CRLF, 공백 차이도 잡아냅니다. PR 본문에 "`KITS IDENTICAL`, 파일 N개, 해시 xxx"를 적는 것을 머지 조건으로 합니다.
+
+  ### 4.3 UI 쪽 확인 (PR 2, 6)
+
+  `agent-export-panel.tsx`는 curl 명령과 링크를 화면에 보여 주므로 빌드된 HTML에서도 확인합니다.
+
+  ```bash
+  diff <(grep -rho 'curl -fsSL[^<]*' /tmp/kit-base/out | sort -u) \
+       <(grep -rho 'curl -fsSL[^<]*' out | sort -u)
+  ```
+
+  ## 5. 롤백
+
+  - **PR 단위로 되돌릴 수 있습니다.** 모든 PR은 동작을 보존하므로 `git revert <merge-commit>`(merge commit이면 `-m 1`)로 되돌리고 main에 푸시하면 GitHub Pages가 이전 출력으로 다시 배포됩니다.
+  - 이후 PR이 이전 PR의 구조에 의존하므로 **역순으로만** 되돌립니다(예: PR 4를 되돌리려면 5a–5c를 먼저 되돌림).
+  - 배포 후 출력 차이가 발견되면(외부 사용자 신고 등) 원인 분석보다 **먼저 revert**합니다. 원인은 revert된 main에서 4.2 스크립트로 재현합니다.
+  - 골든 픽스처는 모든 단계에서 유지하므로 revert 뒤에도 테스트가 그대로 통과해야 합니다. 통과하지 않으면 revert가 불완전하다는 신호입니다.
+  - PR 5 이전 단계까지만 머지하고 멈춰도 코드베이스는 일관된 상태입니다. 중간에 중단해도 됩니다.
+
+  ## 6. 리스크와 대응
+
+  | 리스크 | 가능성 | 대응 |
+  |---|---|---|
+  | 템플릿 리터럴을 옮기면서 들여쓰기나 공백이 바뀜 | 높음 | 순수 이동 PR에서는 포매터 끄기, 골든 + `diff -r` |
+  | 에디터가 trailing whitespace를 제거함(Markdown 두 칸 줄바꿈 등) | 중간 | `.editorconfig`/에디터 설정 확인, 골든 파일은 `-text` |
+  | 복붙된 헤더가 미세하게 달라서 통합하면 바이트가 바뀜 | 높음 | 5단계 전에 복사본끼리 `diff`, 다른 부분은 파라미터로 |
+  | `agent.json` 키 순서가 바뀜 | 중간 | 통합 대상에서 제외, 객체 리터럴 순서 유지 |
+  | 콘텐츠가 계속 추가돼 비교 기준이 흔들림 | 높음 | 코드 검증은 고정 픽스처로, 전체 비교는 rebase 후 같은 콘텐츠로 |
+  | 다른 사람의 YAML에 픽스처가 다루지 않는 필드 조합이 있음 | 중간 | 4.2 전체 빌드 비교가 보완. 새 경계 케이스가 보이면 PR 0 픽스처에 추가 |
+  | 순환 import나 번들 경계 문제로 클라이언트 번들이 커짐(패널이 클라이언트 컴포넌트라면) | 낮음 | `shared.ts`/`urls.ts`에 Node 전용 import 금지, 빌드 로그의 번들 크기 비교 |
+  | 머지 대기 중인 다른 PR이 `agent-install-kit.ts`를 수정 | 낮음–중간 | 작업 시작 전 공지, 배럴 유지로 import 충돌 최소화 |
+  | 환경 변수(사이트 URL) 차이로 비교가 거짓 양성 | 중간 | 두 빌드에 같은 env 명시, 스크립트에 고정값 박기 |
+
+  ## 7. 권장 사항
+
+  - PR 0은 반드시 먼저, 단독으로 머지합니다. 이게 없으면 나머지 PR의 "바이트 동일" 주장을 검증할 수 없습니다.
+  - PR 템플릿에 체크박스를 추가합니다: `[ ] npm test 통과`, `[ ] compare-kits: KITS IDENTICAL`, `[ ] 이 PR은 이동만 / 통합만 포함`.
+  - 기능 추가 금지 원칙대로, 리팩터링 중 발견한 오타나 문구 개선은 **고치지 말고** 이슈로만 남깁니다. 고치면 외부 사용자 쪽에 diff가 생깁니다.
+  - (선택) 4.2 비교를 CI job으로 만들면 PR 5 이후에도 회귀를 막을 수 있습니다. 다만 CI 시간이 두 배가 되므로 이번 범위에서는 로컬 스크립트와 PR 본문 증빙으로 충분합니다.
+
+  ## 8. 다음 액션
+
+  1. 가정 1–3을 확인해 주세요. 특히 생성 파일에 날짜나 환경 의존 값이 있는지, `agent-install-kit.ts` 경로를 외부에서도 import하는지 확인이 필요합니다.
+  2. 현재 `agent-install-kit.ts`에서 복붙된 헤더/출처 문구 블록을 모두 찾아 서로 `diff`해 두세요(PR 5 범위 결정용).
+  3. PR 0 작성: 픽스처 4–6개 선정, 골든 생성, `scripts/compare-kits.sh` 추가.
+  4. 팀에 "이 파일은 N주간 리팩터링 중, 기능 변경은 보류" 공지.
+  5. PR 0 머지 후 PR 1–4를 순서대로 진행하고, 매 PR 본문에 4.2 결과를 첨부합니다.
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -151,9 +350,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Breaking risky code cleanup into reviewable steps with validation after each step
     - "Teams with the required inputs ready: Current context, Goal, Audience or stakeholder"
@@ -163,30 +360,320 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Needs concrete module boundaries to avoid abstract refactor advice
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - It makes technical claims about file moves that don't hold. The strong run says to move agent-install-kit.ts into src/lib/install-kit/index.ts 'without changing a single character', but the file's relative imports (./agent-export, ./site, ./utils) would break one directory deeper.
+    - It misses shared internal state when splitting modules. The KIT_FILE_NAMES constant is used by getInstallKitCommand, the README generator, and getInstallKitFiles, yet the plan never says which new module owns it, even though it spells out import directions.
+    - It plans heavily around the user's description (three sub-PRs, 5a-5c, for header/footer consolidation) and only checks later whether the duplication is real. In the actual file, most shared text already sits in agentInstructions().
+    - Both outputs are long, with tables, eight to nine sections, and repeated rationale. A reviewer needs to trim them before pasting into a ticket.
+    - The boundary plan is stack-agnostic boilerplate (Strangler Fig, the boy-scout rule, a 20% sprint cap) and cannot name any concrete verification commands until the user answers.
   evaluationCriteria:
     - Sequences small changes, preserves behavior, and names verification commands
     - Produces refactor plan in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Refactor Plan Agent strong-context run
-      input: Plan extraction of agent export formatting into smaller helpers without changing output.
-      expectedOutputSummary: A usable refactor plan with project-specific assumptions, risks, and next steps.
-      sampleOutput: "refactor plan: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Korean plan to split the 298-line install-kit generator
+      input: |-
+        리팩터링 계획을 세워 주세요. PR 여러 개로 나눠서 안전하게 진행하고 싶습니다.
+
+        프로젝트: Agent Archive (Next.js 16 + TypeScript, 정적 export → GitHub Pages). 검증 명령: `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`(node:test + tsx, 현재 20개 통과), `npm run build`. CI가 이 다섯 개를 모두 돌립니다.
+
+        대상: src/lib/agent-install-kit.ts (298줄). 한 파일에 다 들어 있는 export 함수들:
+        - `isInstallable(agent)`, `getInstallKitPath(slug, name)`, `getInstallKitUrl(slug, name)`(basePath `/agentive`와 사이트 URL 반영), `getInstallKitCommand(slug)` — curl 명령 생성(`mkdir -p ... && (cd ... && curl -fsSL --remote-name-all "...{a,b,c}")`).
+        - 파일별 본문 생성: `toCodexAgentFile`, `toClaudeProjectFile`, `toCursorRuleFile`, `toInstallManifest`(agent.json), `toInstallReadme`, `toRunbookFile`(60줄), `toEvaluationFile`(60줄). 모두 markdown을 문자열 템플릿으로 직접 조립. 내부 헬퍼 `agentInstructions`, `list`, `getAgentPageUrl`가 섞여 있고, 공통 헤더/출처 문구가 여러 함수에 복붙돼 있음.
+        - `getInstallKitFiles(agent)` → 7개 `{ name, content, mimeType }` 배열(AGENTS.md, CLAUDE.md, cursor-rule.mdc, agent.json, README.md, RUNBOOK.md, EVALUATION.md).
+
+        이 모듈을 쓰는 곳:
+        - src/app/kits/[slug]/[file]/route.ts — generateStaticParams와 GET에서 getInstallKitFiles 사용(빌드 시 out/kits/<slug>/<file> 생성).
+        - src/components/agents/agent-export-panel.tsx — 다운로드 버튼, curl 명령 표시, 파일별 링크.
+        - tests/agent-install-kit.test.ts — 파일 7개 이름, URL, curl 명령 문자열을 검사하는 테스트.
+
+        목표:
+        - 파일 종류별로 모듈 분리(예: src/lib/install-kit/ 아래), 공통 헤더/푸터 한 곳으로.
+        - 출력은 바이트 단위로 동일해야 함(외부 사용자들이 curl로 받아 AGENTS.md에 붙이고 있어서 diff가 생기면 안 됨).
+        - 공개 API(`getInstallKitFiles`, URL/curl 헬퍼 이름)는 유지.
+
+        제약: 새 의존성 금지. 한 PR은 리뷰어가 20분 안에 볼 수 있는 크기. 기능 추가 없음. 이 작업 중에도 다른 사람이 에이전트 YAML을 계속 추가함.
+
+        원하는 결과: 단계별 PR 순서, 각 단계에서 동작 보존을 확인하는 방법(구체적 명령 포함), 롤백 방법, 가정, 리스크, 다음 액션.
+      expectedOutputSummary: A good answer orders PRs so that a characterization/golden test comes first, then pure moves of the URL/curl helpers and each generator into src/lib/install-kit/, and only then header/footer consolidation. It must keep the public API through a re-export, prove byte-identical kit output with specific commands (the five CI commands plus an out/kits diff against main), keep each PR reviewable in 20 minutes, and handle YAML files being added concurrently. It should also cover rollback, assumptions, risks, and next actions.
+      sampleOutput: |-
+        # `agent-install-kit.ts` 리팩터링 계획
+
+        ## 1. 요약
+
+        핵심 원칙은 **"먼저 출력을 고정하고, 그다음에 옮긴다"**입니다.
+
+        - 첫 PR은 코드를 건드리지 않습니다. 현재 출력을 바이트 단위로 고정하는 골든(characterization) 테스트만 추가합니다.
+        - 이후 PR은 **순수 이동**과 **중복 제거**를 절대 섞지 않습니다. 바이트가 바뀔 위험은 거의 전부 "공통 헤더/푸터 통합" 단계에 몰려 있으므로, 그 단계는 파일 종류별로 쪼갭니다.
+        - 모든 PR은 같은 두 가지 게이트를 통과해야 합니다. (1) 골든 테스트 통과, (2) `origin/main` 빌드와 브랜치 빌드의 `out/kits/` 비교 결과 차이 없음.
+
+        ## 2. 가정
+
+        아래 중 틀린 것이 있으면 알려 주세요. 계획의 해당 부분만 조정하면 됩니다.
+
+        1. **출력이 결정적(deterministic)입니다.** 생성 파일에 빌드 시각, `Date.now()`, 랜덤 값, 환경별로 달라지는 값이 없습니다. `updatedAt` 같은 값은 YAML에서만 옵니다. 이 가정이 틀리면 비교 전에 해당 줄을 정규화해야 합니다.
+        2. **사이트 URL은 환경 변수나 상수 하나로 정해지고**, 비교용 두 빌드에 같은 값을 넣을 수 있습니다.
+        3. **`src/lib/agent-install-kit.ts` 경로 자체도 공개 API로 취급합니다.** 이 파일은 끝까지 re-export 배럴로 남기고, 내부 import만 새 경로로 바꿉니다.
+        4. `mimeType`, 파일 순서(7개 배열 순서), `generateStaticParams`가 만드는 경로 목록도 "출력"에 포함되며 바뀌면 안 됩니다.
+        5. Node 버전은 `node:test`와 `tsx`가 이미 도는 버전 그대로이고, 스냅샷 기능은 Node 내장 API 대신 파일 비교로 직접 구현합니다(새 의존성 금지).
+
+        ## 3. PR 순서
+
+        | PR | 내용 | 예상 diff | 바이트 변경 위험 |
+        |---|---|---|---|
+        | 0 | 골든 테스트 + 비교 스크립트 | +150줄 안팎(픽스처 제외) | 없음(코드 무변경) |
+        | 1 | `install-kit/` 디렉터리로 통째 이동, 기존 파일은 배럴 | 이동 위주 | 매우 낮음 |
+        | 2 | URL/경로/curl 헬퍼와 내부 헬퍼 분리 | ~100줄 이동 | 낮음 |
+        | 3 | 파일 생성기 분리 (작은 5개) | ~120줄 이동 | 낮음 |
+        | 4 | 파일 생성기 분리 (`RUNBOOK`, `EVALUATION`) | ~120줄 이동 | 낮음 |
+        | 5a–5c | 공통 헤더/푸터 통합, 파일 종류별로 쪼개서 | 각 수십 줄 | **높음** |
+        | 6 | 소비처 import 경로 정리, 배럴에 주석 | 소규모 | 없음 |
+
+        ### PR 0: 동작 고정 (`test: add golden snapshots for install kit output`)
+
+        **추가할 것**
+
+        - `tests/fixtures/install-kit/agents/*.ts`: 실제 `content/agents`와 독립된 **고정 픽스처 에이전트** 4–6개. 경계 케이스를 포함합니다.
+          - 모든 선택 필드가 채워진 에이전트
+          - 선택 필드가 비어 있거나 없는 에이전트(`list()`의 빈 배열 처리 확인)
+          - 한글, 백틱, `$`, `{}`, 따옴표, 마크다운 특수문자가 들어간 에이전트
+          - `isInstallable`이 `false`인 에이전트
+        - `tests/fixtures/install-kit/golden/<slug>/<파일명>`: 현재 코드로 생성한 7개 파일 원본과 `manifest.json`(파일 이름, `mimeType`, 순서).
+        - `tests/install-kit-golden.test.ts`: 픽스처마다 `getInstallKitFiles()`를 호출하고 `assert.strictEqual(content, readFileSync(golden, "utf8"))`로 비교합니다. 추가로 `getInstallKitPath/Url/Command`와 `isInstallable` 결과도 골든 JSON과 비교합니다.
+        - `UPDATE_GOLDEN=1 npm test`로만 골든을 재생성하게 하고, 재생성 스크립트는 **PR 0에서만** 씁니다.
+        - `.gitattributes`에 `tests/fixtures/install-kit/golden/** -text`를 넣어 줄바꿈 변환을 막습니다.
+        - `scripts/compare-kits.sh`: 실제 전체 에이전트 출력을 비교하는 스크립트입니다(아래 4장).
+
+        **왜 픽스처를 따로 두나:** 작업 중에도 다른 사람이 YAML을 추가하므로 실제 콘텐츠로 골든을 만들면 매번 깨집니다. 픽스처 골든은 "코드가 같은 입력에 같은 출력을 내는가"만 검증하고, 실제 콘텐츠 전체는 빌드 비교(4장)로 검증합니다.
+
+        **리뷰 포인트:** 골든 파일이 현재 main 출력과 같은지 확인합니다. 리뷰어가 로컬에서 `UPDATE_GOLDEN=1 npm test && git status`를 돌려 변경이 없으면 됩니다.
+
+        ### PR 1: 디렉터리 이동 (`refactor: move install kit into src/lib/install-kit`)
+
+        - `src/lib/agent-install-kit.ts`의 내용을 **한 글자도 바꾸지 않고** `src/lib/install-kit/index.ts`로 옮깁니다(`git mv` 후 새 파일 생성).
+        - `src/lib/agent-install-kit.ts`는 `export * from "./install-kit";`만 남깁니다.
+        - 소비처(route, 패널, 테스트)는 아직 건드리지 않습니다.
+        - 리뷰는 `git diff -M --stat`로 rename 인식 여부만 보면 됩니다.
+
+        ### PR 2: 헬퍼 분리 (`refactor: split install kit url and shared helpers`)
+
+        - `install-kit/urls.ts`: `isInstallable`, `getInstallKitPath`, `getInstallKitUrl`, `getInstallKitCommand`
+        - `install-kit/shared.ts`: `agentInstructions`, `list`, `getAgentPageUrl` (export는 하되 `index.ts`에서 re-export하지 않아 공개 API가 늘지 않게 합니다)
+        - `index.ts`는 re-export와 아직 남은 생성기만 갖습니다.
+        - 순환 import 금지: `shared.ts` → `urls.ts` 방향만 허용합니다.
+
+        ### PR 3: 작은 생성기 분리 (`refactor: split small install kit file generators`)
+
+        - `install-kit/files/codex.ts` (`toCodexAgentFile`), `claude.ts`, `cursor.ts`, `manifest.ts` (`toInstallManifest`), `readme.ts`
+        - **템플릿 리터럴은 복사-붙여넣기만 합니다.** 들여쓰기가 다른 위치로 옮기더라도 여러 줄 템플릿 안의 공백은 그대로 둡니다. 에디터의 자동 들여쓰기, 포매터, trailing whitespace 제거를 이 PR에서는 끄고 작업합니다.
+
+        ### PR 4: 큰 생성기 분리 (`refactor: split runbook and evaluation generators`)
+
+        - `files/runbook.ts`, `files/evaluation.ts`. 각 60줄이라 PR 3과 합치면 20분을 넘기기 쉬워서 따로 뺐습니다.
+        - `getInstallKitFiles`는 `install-kit/index.ts`에서 7개 생성기를 **기존과 같은 순서로** 조립합니다.
+
+        ### PR 5a–5c: 공통 헤더/푸터 통합 (`refactor: share install kit header and footer`)
+
+        바이트가 바뀔 수 있는 유일한 단계입니다. 한 PR에 한 묶음씩만 바꿉니다.
+
+        - 5a: `install-kit/sections.ts`에 공통 헤더/출처 문구 함수를 만들고, **Markdown 3종**(`AGENTS.md`, `CLAUDE.md`, `README.md`)에만 적용
+        - 5b: `RUNBOOK.md`, `EVALUATION.md`에 적용
+        - 5c: `cursor-rule.mdc`(frontmatter가 있어 헤더 위치가 다를 수 있음)에 적용
+        - `agent.json`은 통합 대상에서 제외합니다. 문구 공유 이득은 작고, 키 순서가 바뀌면 바이트가 바뀝니다.
+
+        **규칙:**
+        - 복붙된 문구들이 사실은 미세하게 다를 수 있습니다(끝 공백, 마침표, 빈 줄 개수). 통합 전에 각 복사본을 `diff`로 비교하고, **다른 부분은 파라미터로 남깁니다.** 억지로 하나로 합치지 않습니다.
+        - 헬퍼는 "줄 배열 → `join("\n")`" 방식보다 기존 템플릿 조각을 그대로 반환하는 방식을 우선합니다. 끝 개행 처리가 가장 흔한 사고 지점이기 때문입니다.
+
+        ### PR 6: import 정리 (`refactor: import install kit from new path`)
+
+        - `route.ts`, `agent-export-panel.tsx`, 기존 테스트의 import를 `@/lib/install-kit`로 바꿉니다.
+        - `src/lib/agent-install-kit.ts` 배럴은 유지하고, 새 경로를 쓰라는 주석만 답니다(가정 3). 삭제는 이 계획 범위 밖입니다.
+
+        ## 4. 단계마다 동작 보존 확인하기
+
+        ### 4.1 모든 PR 공통 (CI와 동일)
+
+        ```bash
+        npm run check:data && npm run lint && npm run typecheck && npm test && npm run build
+        ```
+
+        골든 테스트가 `npm test`에 들어 있으므로 CI가 자동으로 막아 줍니다. 기존 20개 테스트 수와 새 골든 테스트 수가 줄지 않았는지도 확인합니다.
+
+        ### 4.2 실제 전체 콘텐츠 빌드 비교 (`scripts/compare-kits.sh`)
+
+        YAML이 계속 추가되므로 **main 최신에 rebase한 뒤** 비교합니다. 그러면 두 빌드의 콘텐츠가 같고 코드만 다릅니다.
+
+        ```bash
+        git fetch origin && git rebase origin/main
+
+        # 기준 빌드 (origin/main)
+        rm -rf /tmp/kit-base && git worktree add /tmp/kit-base origin/main
+        (cd /tmp/kit-base && npm ci && npm run build)
+
+        # 브랜치 빌드 (사이트 URL 등 환경 변수는 두 빌드에 동일하게)
+        npm run build
+
+        # 1) 파일 목록이 같은지 (generateStaticParams 결과 포함)
+        diff <(cd /tmp/kit-base/out/kits && find . -type f | sort) \
+             <(cd out/kits && find . -type f | sort)
+
+        # 2) 내용이 바이트 단위로 같은지
+        diff -r /tmp/kit-base/out/kits out/kits && echo "KITS IDENTICAL"
+
+        # 3) 해시 요약 (PR 본문에 붙이기용)
+        (cd out/kits && find . -type f -print0 | sort -z | xargs -0 shasum -a 256) | shasum -a 256
+
+        git worktree remove /tmp/kit-base
+        ```
+
+        `diff -r`는 끝 개행, CRLF, 공백 차이도 잡아냅니다. PR 본문에 "`KITS IDENTICAL`, 파일 N개, 해시 xxx"를 적는 것을 머지 조건으로 합니다.
+
+        ### 4.3 UI 쪽 확인 (PR 2, 6)
+
+        `agent-export-panel.tsx`는 curl 명령과 링크를 화면에 보여 주므로 빌드된 HTML에서도 확인합니다.
+
+        ```bash
+        diff <(grep -rho 'curl -fsSL[^<]*' /tmp/kit-base/out | sort -u) \
+             <(grep -rho 'curl -fsSL[^<]*' out | sort -u)
+        ```
+
+        ## 5. 롤백
+
+        - **PR 단위로 되돌릴 수 있습니다.** 모든 PR은 동작을 보존하므로 `git revert <merge-commit>`(merge commit이면 `-m 1`)로 되돌리고 main에 푸시하면 GitHub Pages가 이전 출력으로 다시 배포됩니다.
+        - 이후 PR이 이전 PR의 구조에 의존하므로 **역순으로만** 되돌립니다(예: PR 4를 되돌리려면 5a–5c를 먼저 되돌림).
+        - 배포 후 출력 차이가 발견되면(외부 사용자 신고 등) 원인 분석보다 **먼저 revert**합니다. 원인은 revert된 main에서 4.2 스크립트로 재현합니다.
+        - 골든 픽스처는 모든 단계에서 유지하므로 revert 뒤에도 테스트가 그대로 통과해야 합니다. 통과하지 않으면 revert가 불완전하다는 신호입니다.
+        - PR 5 이전 단계까지만 머지하고 멈춰도 코드베이스는 일관된 상태입니다. 중간에 중단해도 됩니다.
+
+        ## 6. 리스크와 대응
+
+        | 리스크 | 가능성 | 대응 |
+        |---|---|---|
+        | 템플릿 리터럴을 옮기면서 들여쓰기나 공백이 바뀜 | 높음 | 순수 이동 PR에서는 포매터 끄기, 골든 + `diff -r` |
+        | 에디터가 trailing whitespace를 제거함(Markdown 두 칸 줄바꿈 등) | 중간 | `.editorconfig`/에디터 설정 확인, 골든 파일은 `-text` |
+        | 복붙된 헤더가 미세하게 달라서 통합하면 바이트가 바뀜 | 높음 | 5단계 전에 복사본끼리 `diff`, 다른 부분은 파라미터로 |
+        | `agent.json` 키 순서가 바뀜 | 중간 | 통합 대상에서 제외, 객체 리터럴 순서 유지 |
+        | 콘텐츠가 계속 추가돼 비교 기준이 흔들림 | 높음 | 코드 검증은 고정 픽스처로, 전체 비교는 rebase 후 같은 콘텐츠로 |
+        | 다른 사람의 YAML에 픽스처가 다루지 않는 필드 조합이 있음 | 중간 | 4.2 전체 빌드 비교가 보완. 새 경계 케이스가 보이면 PR 0 픽스처에 추가 |
+        | 순환 import나 번들 경계 문제로 클라이언트 번들이 커짐(패널이 클라이언트 컴포넌트라면) | 낮음 | `shared.ts`/`urls.ts`에 Node 전용 import 금지, 빌드 로그의 번들 크기 비교 |
+        | 머지 대기 중인 다른 PR이 `agent-install-kit.ts`를 수정 | 낮음–중간 | 작업 시작 전 공지, 배럴 유지로 import 충돌 최소화 |
+        | 환경 변수(사이트 URL) 차이로 비교가 거짓 양성 | 중간 | 두 빌드에 같은 env 명시, 스크립트에 고정값 박기 |
+
+        ## 7. 권장 사항
+
+        - PR 0은 반드시 먼저, 단독으로 머지합니다. 이게 없으면 나머지 PR의 "바이트 동일" 주장을 검증할 수 없습니다.
+        - PR 템플릿에 체크박스를 추가합니다: `[ ] npm test 통과`, `[ ] compare-kits: KITS IDENTICAL`, `[ ] 이 PR은 이동만 / 통합만 포함`.
+        - 기능 추가 금지 원칙대로, 리팩터링 중 발견한 오타나 문구 개선은 **고치지 말고** 이슈로만 남깁니다. 고치면 외부 사용자 쪽에 diff가 생깁니다.
+        - (선택) 4.2 비교를 CI job으로 만들면 PR 5 이후에도 회귀를 막을 수 있습니다. 다만 CI 시간이 두 배가 되므로 이번 범위에서는 로컬 스크립트와 PR 본문 증빙으로 충분합니다.
+
+        ## 8. 다음 액션
+
+        1. 가정 1–3을 확인해 주세요. 특히 생성 파일에 날짜나 환경 의존 값이 있는지, `agent-install-kit.ts` 경로를 외부에서도 import하는지 확인이 필요합니다.
+        2. 현재 `agent-install-kit.ts`에서 복붙된 헤더/출처 문구 블록을 모두 찾아 서로 `diff`해 두세요(PR 5 범위 결정용).
+        3. PR 0 작성: 픽스처 4–6개 선정, 골든 생성, `scripts/compare-kits.sh` 추가.
+        4. 팀에 "이 파일은 N주간 리팩터링 중, 기능 변경은 보류" 공지.
+        5. PR 0 머지 후 PR 1–4를 순서대로 진행하고, 매 PR 본문에 4.2 결과를 첨부합니다.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Refactor Plan Agent boundary run
-      input: Redesign the whole app architecture from a single component name.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Strength: PR 0 adds golden tests built from fixed fixture agents rather than live content/agents. It explicitly says why: 'other people keep adding YAML, so golden files built from real content would break every time'. Section 4.2 then covers the real content with a rebase plus a git worktree build of origin/main and diff -r on out/kits. Together these directly address the byte-identical requirement and the concurrent-YAML constraint."
+        - "Strength: it names the exact verification chain 'npm run check:data && npm run lint && npm run typecheck && npm test && npm run build', a file-list diff that checks generateStaticParams, a sha256 summary for the PR body, and a curl-string diff of the built HTML for agent-export-panel.tsx."
+        - "Defect: PR 1 says to move the file to install-kit/index.ts 'without changing a single character'. The real file imports './agent-export', './site' and './utils', which must become '../…' after the move. typecheck would catch this, but the instruction as written is wrong."
+        - "Gap: PR 2 moves getInstallKitCommand to urls.ts and fixes the import direction as shared.ts -> urls.ts. It doesn't say where KIT_FILE_NAMES (and the KIT_FILES map) will live, although urls.ts, readme.ts and index.ts all need it."
+        - "Strength and verbosity: the rollback section (revert in reverse order, revert first when an external diff is reported, stopping safely after PR 4) and the risk table (formatter or trailing-whitespace changes, near-identical copied headers, env URL false positives) are concrete and useful. However, the header work split into 5a-5c and the separate PR 6 are over-segmented relative to how little duplication the real file has."
+    - title: Rewrite-everything request with no code or constraints
+      input: 레거시 코드가 너무 지저분해서 전부 리팩터링하고 싶어요. 테스트는 거의 없고요. 한 번에 싹 갈아엎는 계획 짜주세요. 다음 주 배포 전에 끝내야 합니다.
+      expectedOutputSummary: "A good answer pushes back on a one-shot rewrite of untested legacy code a week before a deploy. It should ask a few focused questions (what ships next week, the stack and size, the pain points, team capacity), state its assumptions, and still give a provisional plan: protect the deploy, add characterization/smoke tests, then refactor incrementally with rollback."
+      sampleOutput: |-
+        요청하신 "다음 주 배포 전에 한 번에 싹 갈아엎는" 계획은 그대로 짜 드리기 어렵습니다. 테스트가 거의 없는 레거시를 일주일 안에 전면 재작성하면, 배포 직전에 기존 동작이 깨졌는지 확인할 방법이 없습니다. 그러면 버그가 배포에 그대로 실려 나갈 가능성이 매우 높습니다. 그래서 **이번 배포는 지키고, 전면 리팩터링은 배포 뒤에 단계적으로 진행하는 계획**을 제안드립니다. 결과적으로 "깨끗한 코드"라는 목표에는 이 방식이 더 빨리, 더 안전하게 도달합니다.
+
+        ---
+
+        ## 1. 먼저 여쭤볼 것 (계획을 구체화하는 데 꼭 필요한 정보)
+
+        1. **다음 주 배포에 무엇이 들어가나요?** 리팩터링 자체가 배포 목표인지, 아니면 신규 기능 배포가 있는데 그 전에 코드를 정리하고 싶으신 건지에 따라 계획이 크게 달라집니다.
+        2. **규모와 스택:** 대략적인 코드 규모(파일 수·라인 수), 언어·프레임워크, 모놀리스인지 서비스가 여러 개인지 알려 주세요.
+        3. **가장 괴로운 지점:** "지저분하다"는 게 구체적으로 무엇인가요? 거대한 파일·함수, 중복 코드, 뒤엉킨 의존성, 전역 상태, 이름 문제 가운데 어떤 건지, 또 어느 모듈에서 버그와 수정이 가장 잦은지 알려 주세요.
+        4. **투입 인원:** 이번 주에 리팩터링에 쓸 수 있는 인원과 시간은 어느 정도인가요?
+
+        아래 계획은 이 정보가 없다는 전제에서 쓴 일반안입니다. 답을 주시면 구체적인 모듈 단위 계획으로 바꿔 드리겠습니다.
+
+        ---
+
+        ## 2. 가정
+
+        - 다음 주 배포는 날짜가 고정되어 있고, 운영 중인 서비스에 나갑니다.
+        - 자동화 테스트가 거의 없고, 현재 동작을 문서화한 사양도 충분하지 않습니다.
+        - 코드는 현재 운영에서 "대체로 동작"하고 있고, 그 동작을 사용자가 기대하고 있습니다.
+        - 소수 인원(1~3명)이 기존 업무와 병행합니다.
+
+        ---
+
+        ## 3. 핵심 권고: 빅뱅 재작성 대신 "안전망 → 점진적 개선"
+
+        | 구분 | 한 번에 전면 재작성 | 단계적 리팩터링 (권장) |
+        |---|---|---|
+        | 회귀 버그 위험 | 매우 높음 (검증 수단 없음) | 낮음 (작은 단위로 검증) |
+        | 배포 일정 영향 | 일정 초과나 배포 연기 가능성 큼 | 배포는 그대로, 개선은 병행 |
+        | 롤백 | 사실상 불가능 | 변경 단위별로 가능 |
+        | 숨은 비즈니스 규칙 | 재작성하면서 유실되기 쉬움 | 테스트로 먼저 고정한 뒤 보존 |
+
+        레거시 코드의 "지저분함" 안에는 문서화되지 않은 예외 처리와 버그 수정이 섞여 있는 경우가 많습니다. 테스트 없이 갈아엎으면 이런 규칙이 조용히 사라집니다.
+
+        ---
+
+        ## 4. 실행 계획
+
+        ### 0단계: 이번 주, 배포 전 (목표는 배포를 안전하게 내보내는 것)
+        - **코드 동결 수준 정하기:** 배포 브랜치에는 배포에 필요한 변경만 넣고, 대규모 구조 변경은 넣지 않습니다.
+        - **핵심 흐름 스모크 테스트 작성:** 로그인, 결제, 핵심 조회·저장처럼 매출과 사용자에 직결되는 흐름 3~5개를 E2E나 API 수준에서 자동화합니다. 이번 배포의 안전망이면서 리팩터링의 출발점이 됩니다.
+        - **부담 없는 정리만 허용:** 포매터와 린터 적용, 명백한 죽은 코드 삭제처럼 동작이 바뀌지 않는 변경만 넣습니다. 포매터 변경은 별도 커밋으로 분리합니다.
+        - **리팩터링 백로그 작성:** "지저분한 곳" 목록을 만들고, 각 항목을 변경 빈도 × 버그 빈도 × 비즈니스 중요도로 점수를 매깁니다.
+        - **롤백 절차 확인:** 이전 버전으로 되돌리는 방법을 배포 전에 한 번 리허설합니다.
+
+        ### 1단계: 배포 후 1~2주 (안전망 구축)
+        - 우선순위 상위 모듈에 **특성 테스트(characterization test)**를 붙입니다. "올바른 동작"이 아니라 "현재 동작"을 그대로 기록하는 테스트입니다. 입출력 스냅샷이나 골든 파일 방식이 효율적입니다.
+        - CI에서 테스트, 린트, 빌드를 자동으로 실행하도록 설정합니다.
+        - 필요하면 에러 모니터링과 로그를 보강해 리팩터링 뒤 이상 징후를 빨리 잡을 수 있게 합니다.
+
+        ### 2단계: 이후 스프린트마다 (점진적 리팩터링)
+        - **보이 스카우트 규칙:** 기능 작업으로 건드리는 파일은 조금씩 정리합니다.
+        - **작은 PR 원칙:** 리팩터링 PR과 기능 PR을 섞지 않고, PR 하나에는 한 종류의 구조 변경만 담습니다.
+        - **Strangler Fig 패턴:** 크게 갈아엎어야 하는 모듈은 새 구현을 옆에 만들고, 기능 플래그나 라우팅으로 트래픽을 조금씩 옮긴 뒤 기존 코드를 제거합니다.
+        - **주요 기법 순서:** 이름 정리 → 긴 함수 분리 → 중복 제거 → 의존성 분리(인터페이스·주입) → 모듈 경계 재설계 순서로 진행합니다. 위험이 낮은 것부터 합니다.
+
+        ### 3단계: 마무리와 유지
+        - 테스트 커버리지와 핵심 모듈의 복잡도를 추적해 개선이 실제로 이루어지는지 확인합니다.
+        - 코딩 컨벤션과 아키텍처 원칙을 짧게 문서화해 다시 지저분해지는 것을 막습니다.
+
+        ---
+
+        ## 5. 리스크와 대응
+
+        | 리스크 | 영향 | 대응 |
+        |---|---|---|
+        | 배포 전 구조 변경으로 회귀 버그 발생 | 운영 장애 | 배포 브랜치에는 구조 변경 금지, 스모크 테스트 필수 |
+        | 숨은 비즈니스 규칙 유실 | 조용한 데이터·로직 오류 | 특성 테스트로 현재 동작을 먼저 고정 |
+        | 리팩터링이 끝없이 길어짐 | 기능 개발 지연 | 백로그 우선순위와 스프린트당 시간 상한(예: 20%) 설정 |
+        | 대형 PR로 리뷰 품질 저하 | 버그가 리뷰를 통과 | PR 크기 제한, 구조 변경과 동작 변경 분리 |
+        | 팀 내 합의 부족 | 방향이 흔들림 | 목표 구조와 원칙을 짧게 합의한 뒤 시작 |
+
+        ---
+
+        ## 6. 다음 행동 (오늘~내일)
+
+        1. 위 1번의 질문 네 가지에 답해 주세요. 특히 **다음 주 배포에 무엇이 들어가는지**가 가장 중요합니다.
+        2. 배포에 꼭 필요한 변경과 "하고 싶은 정리"를 나눠 목록으로 만드세요.
+        3. 반드시 깨지면 안 되는 핵심 사용자 흐름 3~5개를 고르세요. 이 흐름부터 스모크 테스트를 만듭니다.
+        4. 가장 자주 수정되거나 버그가 많은 파일·모듈 상위 5개를 알려 주세요. git 로그의 변경 빈도로 쉽게 뽑을 수 있습니다.
+
+        이 정보를 주시면 모듈별 순서, 예상 소요 시간, PR 단위까지 나눈 구체적인 일정표로 바로 만들어 드리겠습니다. 그래도 이번 주 안에 반드시 구조 변경을 넣어야 하는 사정이 있다면 그 이유도 알려 주세요. 위험을 최소화하는 범위 한정안을 따로 짜 드리겠습니다.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Strength: the opening paragraph clearly refuses the big-bang premise and explains why ('there's no way to verify whether existing behavior broke'). It proposes 'protect this deploy, then refactor in stages after it' instead of silently complying."
+        - "Strength: it asks exactly four focused questions and ranks 'what goes into next week's deploy' as the most important. It lists assumptions separately and labels the plan as a general draft to be made specific once the answers arrive."
+        - "Strength: it still moves the work forward with a concrete stage 0 for this week: a freeze on the deploy branch, 3-5 smoke tests on critical flows, formatter changes in separate commits, a backlog scored by change frequency x bug frequency, and a rehearsed rollback."
+        - "Weakness: most of stages 2-3 is generic refactoring advice (boy-scout rule, Strangler Fig, ordered techniques, a 20% cap) that would fit any codebase. Nothing here is a verification command, though that follows unavoidably from the missing stack."
+        - "Minor: the closing offer of a 'scoped-down plan if a structural change must go in this week' is only offered, not sketched. A one-line version of it would have served a user who really is bound by the deadline."
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Breaking risky code cleanup into reviewable steps with validation after each step
@@ -196,4 +683,4 @@ decisionGuide:
     guidance: After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests.
 verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-07-01
+updatedAt: 2026-09-29

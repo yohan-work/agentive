@@ -35,8 +35,184 @@ outputs:
   - Severity
   - Fix recommendations
 prompt: You are a product design QA reviewer. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical design QA report with clear sections, assumptions, risks, and next actions.
-exampleInput: Review a dark documentation layout on mobile and desktop.
-exampleOutput: Spacing, contrast, overflow, hierarchy, and interaction findings.
+exampleInput: |-
+  Please do a design QA pass. I can't attach images in this tool, so here's a precise description of the two screenshots plus the design requirements.
+
+  Product: Agent Archive, dark documentation-style UI (Tailwind tokens: canvas #0b0d12 background, panel #11141b, line #1f2430 borders, primary text #e6e8ee, secondary #a3a9b7, muted #6b7280, accent sky-400 #38bdf8, success emerald, warning amber). Font: Inter 14px body.
+
+  Design requirements:
+  - 8px spacing grid; card padding 20px; grid gap 16px.
+  - Body text contrast >= 4.5:1, small labels >= 4.5:1, interactive targets >= 44x44px on touch.
+  - Filter chips must show selected state with more than color alone.
+  - Max 2 lines for card summaries on desktop, no truncation mid-word.
+  - Korean (/ko) must fit without wrapping badges onto 3+ lines.
+
+  Breakpoints: 375px (mobile), 768px (md, grid becomes 2 columns), 1440px desktop with left sidebar (240px) and right table of contents (200px).
+
+  Screenshot 1 — /ko/agents at 1440px:
+  - Header: eyebrow "에이전트 라이브러리" in 12px uppercase sky-400, H1 "에이전트" 36px, description 14px secondary.
+  - Search input 48px tall, placeholder "이름, 역할, 작업, 태그, 도구로 검색..." in muted #6b7280 on panel #11141b.
+  - "설치 가능만 보기" checkbox is 16x16px with the label 14px.
+  - 6 filter groups (역할, 카테고리, 난이도, 자동화, 도구, 검증). Group titles 12px uppercase muted #6b7280 with 0.16em tracking. Chips are 24px tall (px-2.5 py-1, 12px text). Selected chip: border sky-400 at 40% opacity, bg sky-400 at 15%, text sky-200. Unselected: border #1f2430, bg #161a22, text secondary.
+  - The tool filter row has 49 chips and wraps to 7 lines.
+  - Result bar: "100개 중 100개 표시" left, "모두 지우기" right as sky-200 text link, 14px, no underline.
+  - Card grid 2 columns. Card top row: status badge "검증됨", difficulty badge "중급", "설치 가능" badge, "품질 4/5" badge, and a bookmark icon button 28x28px at the right. On some cards the four badges wrap to a second line and push the bookmark icon down so it is no longer top-aligned.
+  - Card summary text is clamped with min-height 48px but not line-clamped; two cards show a 3-line summary so cards in the same row have different heights up to the footer.
+
+  Screenshot 2 — /en/agents at 375px:
+  - Sidebar hidden; right TOC hidden. Search input full width.
+  - Filter groups stacked; the whole filter area is ~1100px tall before the first card appears.
+  - Chips 24px tall with 8px gap.
+  - Cards single column. "View agent →" link 14px at card bottom, tap area is text-only (~20px tall).
+  - The bookmark icon button is 28x28px.
+  - Horizontal scroll: none.
+
+  Please give QA findings with severity and concrete fix recommendations.
+exampleOutput: |-
+  # Design QA Report: Agent Archive, `/agents` list page
+
+  **Scope:** Screenshot 1 (`/ko/agents` @ 1440px), Screenshot 2 (`/en/agents` @ 375px), checked against your stated requirements and tokens.
+  **Severity scale:** **High** = breaks a stated requirement or blocks a core task · **Medium** = measurable usability or accessibility problem · **Low** = polish or consistency.
+
+  ---
+
+  ## 1. Summary
+
+  | # | Finding | Severity | Requirement |
+  |---|---|---|---|
+  | 1 | Muted text `#6b7280` fails 4.5:1 (group titles, placeholder) | High | Contrast |
+  | 2 | Selected chip state uses color only | High | Chips |
+  | 3 | Card summaries run to 3 lines, so cards in a row have unequal heights | High | 2-line max |
+  | 4 | Touch targets under 44px: chips (24px), bookmark (28px), "View agent →" (~20px) | High | 44×44 |
+  | 5 | Mobile filter area is ~1100px tall before the first result | High | Usability |
+  | 6 | When badges wrap, the bookmark gets pushed out of top alignment | Medium | Layout |
+  | 7 | Tool filter shows 49 chips on 7 lines at desktop | Medium | Usability |
+  | 8 | Korean badge wrapping is unverified at 768px and 375px, where the risk is highest | Medium | /ko fit |
+  | 9 | "모두 지우기" link relies on color alone, with no underline or button affordance | Low–Medium | Affordance |
+  | 10 | Spec conflict: 20px card padding and 10px chip padding are off the 8px grid | Low | Spacing |
+  | 11 | Uppercase + 0.16em tracking applied to Hangul labels | Low | /ko typography |
+  | 12 | 16×16 checkbox; hit area depends on the label | Low (desktop) / Medium (touch) | 44×44 |
+
+  **Passing:** body text in secondary `#a3a9b7` (~7.8:1 on panel, ~7.4:1 on chip bg), sky-400 eyebrow (~9:1), sky-200 chip text on the selected tint, 48px search input, and no horizontal scroll at 375px.
+
+  ---
+
+  ## 2. Findings and fixes
+
+  ### 1. Muted text fails contrast (High)
+  Calculated WCAG ratios for `#6b7280`:
+  - On panel `#11141b`: **~3.8:1** (fail)
+  - On canvas `#0b0d12`: **~4.0:1** (fail)
+
+  Affected: the 12px filter group titles (역할, 카테고리…) and the search placeholder. The titles fall under your "small labels ≥ 4.5:1" rule. The placeholder is the only hint for what the search covers, so it should pass too.
+
+  **Fix:** Pick one:
+  - Use `secondary` (#a3a9b7, ~7.4–7.8:1) for group titles and the placeholder.
+  - Or lighten the `muted` token itself. `#7c8494` measures about **4.9:1 on panel, 5.2:1 on canvas, and 4.6:1 on #161a22**. Change it at the token level in `tailwind.config`, then re-check anything else that uses `muted` as text.
+
+  ### 2. Selected chip is color-only (High)
+  The selected and unselected states differ only in border, background, and text color. That fails your requirement directly and is hard to see for users with color-vision deficiencies or on low-quality displays.
+
+  **Fix:**
+  - Add a leading check icon (12px, `aria-hidden`) to selected chips. Reserve its width, or accept a small width shift.
+  - Optionally make selected text `font-medium` too.
+  - Expose the state: `aria-pressed="true"` on toggle buttons, or real checkbox semantics.
+  - Add a visible `focus-visible` ring (sky-400, 2px, offset against canvas).
+
+  ### 3. Card summaries exceed 2 lines, so heights are uneven (High)
+  The summary has `min-height: 48px` but no clamp, so long summaries grow to 3 lines. That breaks the 2-line rule and pushes card footers out of alignment within a row.
+
+  **Fix:**
+  - Apply `line-clamp-2` together with the min-height. Tie the min-height to the line height (for example, `leading-6` × 2 = 48px).
+  - Make the card `flex flex-col h-full` and the footer `mt-auto` so footers align even if other content varies.
+  - **Mid-word truncation:** `line-clamp` can cut a word at the ellipsis. For `/ko`, add `word-break: keep-all` (`break-keep`) so Hangul breaks at spaces. Treat the clamp as a safety net, not the main control: set a length budget for summaries (a rough starting point is ~90 chars EN / ~45 chars KO at desktop card width) and enforce it in your content validation. That way authored text fits in 2 lines and never gets cut.
+
+  ### 4. Touch targets under 44×44 (High, mobile)
+  | Element | Current | Required |
+  |---|---|---|
+  | Filter chips | 24px tall, 8px gap | 44px |
+  | Bookmark button | 28×28 | 44×44 |
+  | "View agent →" | text only, ~20px | 44px tall |
+  | "설치 가능만 보기" checkbox | 16×16 | 44px row |
+
+  **Fix:**
+  - **Chips:** on coarse pointers, use `min-h-11` (44px). Alternatively, keep the 24px visual chip and add an invisible hit-area extension with a pseudo-element, making sure the gap still prevents overlapping hit areas. The filter-drawer approach in finding 5 makes taller chips affordable.
+  - **Bookmark:** keep the 28px visual size and wrap it in a 44×44 button (`size-11`, icon centered). A negative margin keeps the visual alignment unchanged.
+  - **View agent:** make the link `inline-flex min-h-11 items-center`, or make the whole card clickable (stretched link on the title, with the bookmark button layered above it via `relative z-10`).
+  - **Checkbox:** wrap the input in the `<label>` and give the row `min-h-11` on touch.
+
+  ### 5. Mobile filter area is ~1100px before the first card (High, UX)
+  At 375px, users scroll roughly 1.5 screens of filters before seeing any results. The result count and the list itself sit below the fold.
+
+  **Fix:**
+  - At < md, collapse filters behind a **"Filters" button** that shows an active count, e.g. "Filters (3)". Open it as a bottom sheet or full-screen drawer with "Show 42 results" and "Clear" actions.
+  - Keep search, the result count, and active-filter chips (each removable with ×) above the list.
+  - Target: the first card starts within the first viewport (~≤ 600px from the top).
+
+  ### 6. Badge wrap pushes the bookmark down (Medium)
+  When the four badges wrap, the bookmark stops being top-aligned, so the icon's position varies from card to card.
+
+  **Fix:** In the top row, use `flex items-start justify-between gap-2`. The badge group gets `flex flex-wrap gap-1.5 min-w-0 flex-1`, and the bookmark gets `shrink-0 self-start`. Or position the bookmark `absolute top-5 right-5` and reserve padding-right on the badge row.
+
+  ### 7. Tool filter: 49 chips across 7 lines (Medium)
+  This group alone takes up much of the desktop filter area and is hard to scan.
+
+  **Fix:** Show the ~8–10 most-used tools, then a "+39 더 보기 / Show all" toggle. For better scale, use a searchable multi-select (combobox) for tools. Keep selected tools pinned and visible even when the list is collapsed.
+
+  ### 8. Korean badge fit is unverified where it matters (Medium, risk)
+  At 1440px the badges wrap to **2** lines, which is within your "no 3+ lines" rule. But the card is at its widest there. At **768px (2 columns, narrower cards)** and **375px /ko**, 3 lines are likely. Neither view was provided.
+
+  **Fix (preventive):**
+  - Make badges more compact: `품질 4/5` → `★ 4/5` with an aria-label, and `설치 가능` as an icon + short label or a tooltip.
+  - Or move lower-priority badges (quality, installable) to the card footer and keep status + difficulty in the top row.
+  - Add `/ko` at 768px and 375px to the QA matrix (see next actions).
+
+  ### 9. "모두 지우기" affordance (Low–Medium)
+  The sky-200 text with no underline reads like a label, and it's an action, not navigation.
+
+  **Fix:** Render it as a `<button>` with ghost-button styling (hover bg, focus ring), or add `underline underline-offset-4` on hover and focus. Hide or disable it when no filters are active. Also make the "100개 중 100개 표시" count `aria-live="polite"` so screen-reader users hear filter results update.
+
+  ### 10. Spacing spec conflicts with the 8px grid (Low)
+  - Card padding **20px** is not a multiple of 8.
+  - Chip horizontal padding `px-2.5` = **10px** is not a multiple of 4.
+  - Grid gap 16px, chip height 24px, and chip gap 8px all fit the grid.
+
+  **Fix:** Decide the rule. Either allow 4px half-steps (then use `px-3` = 12px for chips and keep 20px padding) or use strict 8px (then card padding becomes 16px or 24px). Update the written spec to match, so QA has one source of truth.
+
+  ### 11. Uppercase and wide tracking on Hangul (Low)
+  `uppercase` has no effect on Hangul, and 0.16em tracking makes Korean labels look loose and less legible.
+
+  **Fix:** Use `tracking-normal` for `/ko` group titles and the eyebrow, via a `lang`-scoped style (`:lang(ko)`) or a locale class. Consider `font-medium` there to keep the hierarchy.
+
+  ### 12. Checkbox size (Low on desktop)
+  16×16 is acceptable on a mouse-driven desktop if the whole label is clickable. On touch devices, see finding 4.
+
+  ---
+
+  ## 3. Assumptions
+
+  - Group titles sit on canvas or panel. Both fail, so the finding holds either way.
+  - The selected chip tint is sky-400 at 15% over a dark surface. Sky-200 text on it comfortably exceeds 4.5:1.
+  - Card padding (20px) and grid gap (16px) weren't measured in the description. **Not verified.**
+  - 375px is treated as a touch context. 1440px is treated as pointer-first, though touch laptops and tablets exist.
+  - Contrast ratios are calculated with the WCAG 2.x relative-luminance formula from the hex values given (rounded).
+
+  ## 4. Risks and gaps
+
+  - **Not covered:** 768px (both locales), `/ko` at 375px, `/en` at 1440px, hover/focus/active states, empty state (0 results), loading state, and long agent names.
+  - Changing the `muted` token affects every page that uses it. Needs a sweep.
+  - Clamping summaries without a content length budget will still produce awkward cuts, especially in `/ko`.
+  - A filter drawer on mobile changes the interaction model. Confirm that URL and query-string filter state survives opening and closing it.
+
+  ## 5. Next actions (priority order)
+
+  1. **Token fix:** replace or lighten `muted` for text (finding 1). A quick global win.
+  2. **Chip selected state:** add a check icon, `aria-pressed`, and a focus ring (finding 2).
+  3. **Card layout:** add `line-clamp-2`, `break-keep`, a flex-col footer with `mt-auto`, a non-wrapping bookmark column, and a summary length check in content validation (findings 3 and 6).
+  4. **Touch targets:** 44px hit areas for the bookmark, the "View agent" link or whole card, chips, and the checkbox row (finding 4).
+  5. **Mobile filters:** drawer or bottom sheet plus an active-filter summary (finding 5), and a collapsible tool list (finding 7).
+  6. **Re-QA matrix:** {en, ko} × {375, 768, 1440}, including focus states, the 0-results state, and the longest Korean badge set.
+  7. **Spec cleanup:** settle the 8px vs. 4px-half-step rule (finding 10) and Hangul tracking (finding 11).
 limitations:
   - Needs visual evidence for specific UI findings.
 bestPractices:
@@ -147,9 +323,7 @@ runbook:
 evaluation:
   qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Checking implemented screens against design intent, responsive behavior, and visual polish
     - "Teams with the required inputs ready: Screenshots, Design requirements, Breakpoints"
@@ -159,30 +333,245 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Can miss interaction details if only static screenshots are provided
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "The strong report is long: 12 findings plus a summary table, and the touch-target and chip-height fixes appear in several places (findings 4, 5, 7). Some of that could be merged."
+    - It rates concerns outside the stated requirements as High, for example the ~1100px mobile filter area. It also adds its own heuristics, such as the ~90 EN / ~45 KO character summary budget. These are labeled as rough, but they could be read as part of the spec.
+    - In the boundary case it stops at a list of requests. It offers no checkout-specific QA checklist or self-check the user could run before resending, even though the prompt says to keep work moving.
+    - It sometimes assumes structure the user never gave, such as listing the checkout steps as cart, shipping, payment, review, confirmation. These are framed as examples, not facts.
   evaluationCriteria:
     - Finds layout, hierarchy, state, copy, and responsive issues with concrete fixes
     - Produces QA findings in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Design QA Agent strong-context run
-      input: QA the mobile navigation overlay and agent detail page spacing.
-      expectedOutputSummary: A usable QA findings with project-specific assumptions, risks, and next steps.
-      sampleOutput: "QA findings: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Design QA of agents list page from a written screen description
+      input: |-
+        Please do a design QA pass. I can't attach images in this tool, so here's a precise description of the two screenshots plus the design requirements.
+
+        Product: Agent Archive, dark documentation-style UI (Tailwind tokens: canvas #0b0d12 background, panel #11141b, line #1f2430 borders, primary text #e6e8ee, secondary #a3a9b7, muted #6b7280, accent sky-400 #38bdf8, success emerald, warning amber). Font: Inter 14px body.
+
+        Design requirements:
+        - 8px spacing grid; card padding 20px; grid gap 16px.
+        - Body text contrast >= 4.5:1, small labels >= 4.5:1, interactive targets >= 44x44px on touch.
+        - Filter chips must show selected state with more than color alone.
+        - Max 2 lines for card summaries on desktop, no truncation mid-word.
+        - Korean (/ko) must fit without wrapping badges onto 3+ lines.
+
+        Breakpoints: 375px (mobile), 768px (md, grid becomes 2 columns), 1440px desktop with left sidebar (240px) and right table of contents (200px).
+
+        Screenshot 1 — /ko/agents at 1440px:
+        - Header: eyebrow "에이전트 라이브러리" in 12px uppercase sky-400, H1 "에이전트" 36px, description 14px secondary.
+        - Search input 48px tall, placeholder "이름, 역할, 작업, 태그, 도구로 검색..." in muted #6b7280 on panel #11141b.
+        - "설치 가능만 보기" checkbox is 16x16px with the label 14px.
+        - 6 filter groups (역할, 카테고리, 난이도, 자동화, 도구, 검증). Group titles 12px uppercase muted #6b7280 with 0.16em tracking. Chips are 24px tall (px-2.5 py-1, 12px text). Selected chip: border sky-400 at 40% opacity, bg sky-400 at 15%, text sky-200. Unselected: border #1f2430, bg #161a22, text secondary.
+        - The tool filter row has 49 chips and wraps to 7 lines.
+        - Result bar: "100개 중 100개 표시" left, "모두 지우기" right as sky-200 text link, 14px, no underline.
+        - Card grid 2 columns. Card top row: status badge "검증됨", difficulty badge "중급", "설치 가능" badge, "품질 4/5" badge, and a bookmark icon button 28x28px at the right. On some cards the four badges wrap to a second line and push the bookmark icon down so it is no longer top-aligned.
+        - Card summary text is clamped with min-height 48px but not line-clamped; two cards show a 3-line summary so cards in the same row have different heights up to the footer.
+
+        Screenshot 2 — /en/agents at 375px:
+        - Sidebar hidden; right TOC hidden. Search input full width.
+        - Filter groups stacked; the whole filter area is ~1100px tall before the first card appears.
+        - Chips 24px tall with 8px gap.
+        - Cards single column. "View agent →" link 14px at card bottom, tap area is text-only (~20px tall).
+        - The bookmark icon button is 28x28px.
+        - Horizontal scroll: none.
+
+        Please give QA findings with severity and concrete fix recommendations.
+      expectedOutputSummary: "A severity-ranked QA report tied to the given tokens and requirements. It should compute that muted #6b7280 fails 4.5:1, flag the color-only selected chips, the 3-line summaries and uneven card heights, the 24/28/~20px targets under 44px, the badge wrap misaligning the bookmark, the tall mobile filter area and 49-chip tool row, and the untested /ko breakpoints, with concrete Tailwind-level fixes."
+      sampleOutput: |-
+        # Design QA Report: Agent Archive, `/agents` list page
+
+        **Scope:** Screenshot 1 (`/ko/agents` @ 1440px), Screenshot 2 (`/en/agents` @ 375px), checked against your stated requirements and tokens.
+        **Severity scale:** **High** = breaks a stated requirement or blocks a core task · **Medium** = measurable usability or accessibility problem · **Low** = polish or consistency.
+
+        ---
+
+        ## 1. Summary
+
+        | # | Finding | Severity | Requirement |
+        |---|---|---|---|
+        | 1 | Muted text `#6b7280` fails 4.5:1 (group titles, placeholder) | High | Contrast |
+        | 2 | Selected chip state uses color only | High | Chips |
+        | 3 | Card summaries run to 3 lines, so cards in a row have unequal heights | High | 2-line max |
+        | 4 | Touch targets under 44px: chips (24px), bookmark (28px), "View agent →" (~20px) | High | 44×44 |
+        | 5 | Mobile filter area is ~1100px tall before the first result | High | Usability |
+        | 6 | When badges wrap, the bookmark gets pushed out of top alignment | Medium | Layout |
+        | 7 | Tool filter shows 49 chips on 7 lines at desktop | Medium | Usability |
+        | 8 | Korean badge wrapping is unverified at 768px and 375px, where the risk is highest | Medium | /ko fit |
+        | 9 | "모두 지우기" link relies on color alone, with no underline or button affordance | Low–Medium | Affordance |
+        | 10 | Spec conflict: 20px card padding and 10px chip padding are off the 8px grid | Low | Spacing |
+        | 11 | Uppercase + 0.16em tracking applied to Hangul labels | Low | /ko typography |
+        | 12 | 16×16 checkbox; hit area depends on the label | Low (desktop) / Medium (touch) | 44×44 |
+
+        **Passing:** body text in secondary `#a3a9b7` (~7.8:1 on panel, ~7.4:1 on chip bg), sky-400 eyebrow (~9:1), sky-200 chip text on the selected tint, 48px search input, and no horizontal scroll at 375px.
+
+        ---
+
+        ## 2. Findings and fixes
+
+        ### 1. Muted text fails contrast (High)
+        Calculated WCAG ratios for `#6b7280`:
+        - On panel `#11141b`: **~3.8:1** (fail)
+        - On canvas `#0b0d12`: **~4.0:1** (fail)
+
+        Affected: the 12px filter group titles (역할, 카테고리…) and the search placeholder. The titles fall under your "small labels ≥ 4.5:1" rule. The placeholder is the only hint for what the search covers, so it should pass too.
+
+        **Fix:** Pick one:
+        - Use `secondary` (#a3a9b7, ~7.4–7.8:1) for group titles and the placeholder.
+        - Or lighten the `muted` token itself. `#7c8494` measures about **4.9:1 on panel, 5.2:1 on canvas, and 4.6:1 on #161a22**. Change it at the token level in `tailwind.config`, then re-check anything else that uses `muted` as text.
+
+        ### 2. Selected chip is color-only (High)
+        The selected and unselected states differ only in border, background, and text color. That fails your requirement directly and is hard to see for users with color-vision deficiencies or on low-quality displays.
+
+        **Fix:**
+        - Add a leading check icon (12px, `aria-hidden`) to selected chips. Reserve its width, or accept a small width shift.
+        - Optionally make selected text `font-medium` too.
+        - Expose the state: `aria-pressed="true"` on toggle buttons, or real checkbox semantics.
+        - Add a visible `focus-visible` ring (sky-400, 2px, offset against canvas).
+
+        ### 3. Card summaries exceed 2 lines, so heights are uneven (High)
+        The summary has `min-height: 48px` but no clamp, so long summaries grow to 3 lines. That breaks the 2-line rule and pushes card footers out of alignment within a row.
+
+        **Fix:**
+        - Apply `line-clamp-2` together with the min-height. Tie the min-height to the line height (for example, `leading-6` × 2 = 48px).
+        - Make the card `flex flex-col h-full` and the footer `mt-auto` so footers align even if other content varies.
+        - **Mid-word truncation:** `line-clamp` can cut a word at the ellipsis. For `/ko`, add `word-break: keep-all` (`break-keep`) so Hangul breaks at spaces. Treat the clamp as a safety net, not the main control: set a length budget for summaries (a rough starting point is ~90 chars EN / ~45 chars KO at desktop card width) and enforce it in your content validation. That way authored text fits in 2 lines and never gets cut.
+
+        ### 4. Touch targets under 44×44 (High, mobile)
+        | Element | Current | Required |
+        |---|---|---|
+        | Filter chips | 24px tall, 8px gap | 44px |
+        | Bookmark button | 28×28 | 44×44 |
+        | "View agent →" | text only, ~20px | 44px tall |
+        | "설치 가능만 보기" checkbox | 16×16 | 44px row |
+
+        **Fix:**
+        - **Chips:** on coarse pointers, use `min-h-11` (44px). Alternatively, keep the 24px visual chip and add an invisible hit-area extension with a pseudo-element, making sure the gap still prevents overlapping hit areas. The filter-drawer approach in finding 5 makes taller chips affordable.
+        - **Bookmark:** keep the 28px visual size and wrap it in a 44×44 button (`size-11`, icon centered). A negative margin keeps the visual alignment unchanged.
+        - **View agent:** make the link `inline-flex min-h-11 items-center`, or make the whole card clickable (stretched link on the title, with the bookmark button layered above it via `relative z-10`).
+        - **Checkbox:** wrap the input in the `<label>` and give the row `min-h-11` on touch.
+
+        ### 5. Mobile filter area is ~1100px before the first card (High, UX)
+        At 375px, users scroll roughly 1.5 screens of filters before seeing any results. The result count and the list itself sit below the fold.
+
+        **Fix:**
+        - At < md, collapse filters behind a **"Filters" button** that shows an active count, e.g. "Filters (3)". Open it as a bottom sheet or full-screen drawer with "Show 42 results" and "Clear" actions.
+        - Keep search, the result count, and active-filter chips (each removable with ×) above the list.
+        - Target: the first card starts within the first viewport (~≤ 600px from the top).
+
+        ### 6. Badge wrap pushes the bookmark down (Medium)
+        When the four badges wrap, the bookmark stops being top-aligned, so the icon's position varies from card to card.
+
+        **Fix:** In the top row, use `flex items-start justify-between gap-2`. The badge group gets `flex flex-wrap gap-1.5 min-w-0 flex-1`, and the bookmark gets `shrink-0 self-start`. Or position the bookmark `absolute top-5 right-5` and reserve padding-right on the badge row.
+
+        ### 7. Tool filter: 49 chips across 7 lines (Medium)
+        This group alone takes up much of the desktop filter area and is hard to scan.
+
+        **Fix:** Show the ~8–10 most-used tools, then a "+39 더 보기 / Show all" toggle. For better scale, use a searchable multi-select (combobox) for tools. Keep selected tools pinned and visible even when the list is collapsed.
+
+        ### 8. Korean badge fit is unverified where it matters (Medium, risk)
+        At 1440px the badges wrap to **2** lines, which is within your "no 3+ lines" rule. But the card is at its widest there. At **768px (2 columns, narrower cards)** and **375px /ko**, 3 lines are likely. Neither view was provided.
+
+        **Fix (preventive):**
+        - Make badges more compact: `품질 4/5` → `★ 4/5` with an aria-label, and `설치 가능` as an icon + short label or a tooltip.
+        - Or move lower-priority badges (quality, installable) to the card footer and keep status + difficulty in the top row.
+        - Add `/ko` at 768px and 375px to the QA matrix (see next actions).
+
+        ### 9. "모두 지우기" affordance (Low–Medium)
+        The sky-200 text with no underline reads like a label, and it's an action, not navigation.
+
+        **Fix:** Render it as a `<button>` with ghost-button styling (hover bg, focus ring), or add `underline underline-offset-4` on hover and focus. Hide or disable it when no filters are active. Also make the "100개 중 100개 표시" count `aria-live="polite"` so screen-reader users hear filter results update.
+
+        ### 10. Spacing spec conflicts with the 8px grid (Low)
+        - Card padding **20px** is not a multiple of 8.
+        - Chip horizontal padding `px-2.5` = **10px** is not a multiple of 4.
+        - Grid gap 16px, chip height 24px, and chip gap 8px all fit the grid.
+
+        **Fix:** Decide the rule. Either allow 4px half-steps (then use `px-3` = 12px for chips and keep 20px padding) or use strict 8px (then card padding becomes 16px or 24px). Update the written spec to match, so QA has one source of truth.
+
+        ### 11. Uppercase and wide tracking on Hangul (Low)
+        `uppercase` has no effect on Hangul, and 0.16em tracking makes Korean labels look loose and less legible.
+
+        **Fix:** Use `tracking-normal` for `/ko` group titles and the eyebrow, via a `lang`-scoped style (`:lang(ko)`) or a locale class. Consider `font-medium` there to keep the hierarchy.
+
+        ### 12. Checkbox size (Low on desktop)
+        16×16 is acceptable on a mouse-driven desktop if the whole label is clickable. On touch devices, see finding 4.
+
+        ---
+
+        ## 3. Assumptions
+
+        - Group titles sit on canvas or panel. Both fail, so the finding holds either way.
+        - The selected chip tint is sky-400 at 15% over a dark surface. Sky-200 text on it comfortably exceeds 4.5:1.
+        - Card padding (20px) and grid gap (16px) weren't measured in the description. **Not verified.**
+        - 375px is treated as a touch context. 1440px is treated as pointer-first, though touch laptops and tablets exist.
+        - Contrast ratios are calculated with the WCAG 2.x relative-luminance formula from the hex values given (rounded).
+
+        ## 4. Risks and gaps
+
+        - **Not covered:** 768px (both locales), `/ko` at 375px, `/en` at 1440px, hover/focus/active states, empty state (0 results), loading state, and long agent names.
+        - Changing the `muted` token affects every page that uses it. Needs a sweep.
+        - Clamping summaries without a content length budget will still produce awkward cuts, especially in `/ko`.
+        - A filter drawer on mobile changes the interaction model. Confirm that URL and query-string filter state survives opening and closing it.
+
+        ## 5. Next actions (priority order)
+
+        1. **Token fix:** replace or lighten `muted` for text (finding 1). A quick global win.
+        2. **Chip selected state:** add a check icon, `aria-pressed`, and a focus ring (finding 2).
+        3. **Card layout:** add `line-clamp-2`, `break-keep`, a flex-col footer with `mt-auto`, a non-wrapping bookmark column, and a summary length check in content validation (findings 3 and 6).
+        4. **Touch targets:** 44px hit areas for the bookmark, the "View agent" link or whole card, chips, and the checkbox row (finding 4).
+        5. **Mobile filters:** drawer or bottom sheet plus an active-filter summary (finding 5), and a collapsible tool list (finding 7).
+        6. **Re-QA matrix:** {en, ko} × {375, 768, 1440}, including focus states, the 0-results state, and the longest Korean badge set.
+        7. **Spec cleanup:** settle the 8px vs. 4px-half-step rule (finding 10) and Hangul tracking (finding 11).
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Design QA Agent boundary run
-      input: Evaluate brand direction without seeing the interface.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "The contrast figures check out against the WCAG formula: #6b7280 is 3.81:1 on panel and 4.02:1 on canvas, #a3a9b7 is 7.82:1 and 7.4:1, sky-400 is 9.07:1, and the proposed #7c8494 is 4.9:1, 5.17:1 and 4.64:1. No wrong technical claims."
+        - "Every stated requirement maps to a finding: color-only chips (2), 2-line clamp and mid-word truncation with break-keep for Hangul (3), 44x44 targets as a table of chip, bookmark, View agent and checkbox (4), and Korean badge fit (8). It correctly notes that 1440px wraps to only 2 lines, so the risk is at the unprovided 768px and 375px views."
+        - "The fixes are concrete and paste into a PR: line-clamp-2 with flex-col/mt-auto, the bookmark as shrink-0 self-start or absolute top-5 right-5, a size-11 wrapper, aria-pressed, and aria-live on the result count."
+        - "It catches a spec conflict that was not asked about: 20px card padding and px-2.5 (10px) are off the 8px grid. It also flags uppercase with 0.16em tracking on Hangul labels."
+        - "Assumptions, Risks and gaps, and Next actions are separate sections, as the criteria ask. The main defect is length: some fixes repeat across findings 4, 5 and 7, and the mobile-filter finding is rated High although it is not a stated requirement."
+    - title: Design QA request referencing screenshots that were never provided
+      input: |-
+        Here are the screenshots of the new checkout flow (mobile + desktop). Please QA them against our design system and tell me what's wrong.
+
+        [screenshots]
+      expectedOutputSummary: Note that the screenshots and design-system reference are missing, ask a small set of focused questions for what is needed, avoid inventing any findings, and still move the work forward with a concrete plan or provisional checklist.
+      sampleOutput: |-
+        I can't see any screenshots yet. Your message only has the placeholder text "[screenshots]", so the images didn't upload. I also don't have your design system, so I have nothing to check the screens against. I won't guess at problems I can't see.
+
+        **What I need to run the QA**
+
+        1. **The screenshots.** Please send every checkout step for both mobile and desktop: cart, shipping, payment, review, and confirmation. Include error, empty, and loading states if you have them. It helps to name each file by step and breakpoint (e.g. `payment-mobile.png`).
+        2. **Your design system reference.** Any of these works:
+           - A link to the Figma library or documentation site
+           - Screenshots or exports of the tokens: colors, type scale, spacing, radii, shadows
+           - The component specs for buttons, inputs, selects, checkboxes, alerts, and steppers
+        3. **A few details about the context** (optional, but they make the review sharper):
+           - The breakpoints you designed for (e.g. 375 and 1440)
+           - The accessibility level you target (e.g. WCAG 2.2 AA)
+           - Whether this is a first pass or a pre-handoff review, so I know how strict to be
+
+        **What you'll get back**
+
+        Once I have these, I'll send a report with these sections:
+
+        - **Summary:** overall readiness and the most important issues
+        - **Findings table:** each finding with its screen and breakpoint, the element, what's wrong, the design system rule it breaks, a severity (Blocker, Major, Minor, or Nit), and a suggested fix
+        - **What I'll check:**
+          - Token use: off-palette colors, type sizes outside the scale, spacing that doesn't fit the grid
+          - Components: detached or modified components, wrong variants or states
+          - Consistency between mobile and desktop
+          - Checkout-specific UX: CTA hierarchy, form field patterns, error messaging, price and total clarity, trust signals
+          - Accessibility you can judge from a static image: contrast, tap target size, labels, whether meaning depends on color alone
+        - **Assumptions and limits:** static screenshots can't show interactions, focus order, or responsive behavior between breakpoints, so I'll mark anything I couldn't verify
+        - **Risks and next actions:** what to fix before handoff, and what to confirm in a prototype or build
+
+        Send the screenshots and design system reference, and I'll start.
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - It correctly spots that '[screenshots]' is only a placeholder and that no design system was provided. It says it won't guess at problems it can't see, so nothing is fabricated.
+        - "The requests are focused and prioritized: screenshots per step and breakpoint with a file-naming tip, design-system tokens or component specs, and optional details (breakpoints, WCAG level, pass type)."
+        - It describes the report format and what it will check, including checkout-specific points like CTA hierarchy, price and total clarity, and trust signals. It also states the limits of static screenshots. This sets clear expectations.
+        - It produces nothing the user can use yet, such as a checkout QA checklist to self-check or run as soon as images arrive. The next step depends entirely on the user resending files.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Checking implemented screens against design intent, responsive behavior, and visual polish
@@ -195,5 +584,5 @@ decisionGuide:
 relatedAgents:
   - qa-checklist-agent
   - wireframe-text-planner
-verifiedStatus: expert
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29

@@ -37,8 +37,182 @@ outputs:
   - Test plan
   - Risks
 prompt: You are a senior engineering task planner for Codex. Ask concise clarifying questions only when required. Use the user's context, constraints, audience, and success criteria. Return a practical coding-agent-ready task brief with clear sections, assumptions, risks, and next actions.
-exampleInput: Implement localStorage bookmarks in a Next.js app.
-exampleOutput: A scoped implementation brief with files, state model, edge cases, and tests.
+exampleInput: |-
+  Write a task brief I can hand to Codex.
+
+  Repo: Agent Archive (github.com/yohan-work/agentive). Next.js 16 App Router + TypeScript + Tailwind, `output: "export"` static build deployed to GitHub Pages. No middleware, no server-side searchParams — query strings must be read on the client with useSearchParams. Pages live under src/app/[locale]/ (en, ko).
+
+  Goal: persist the /agents page filters in the URL so a filtered view can be shared and survives reload. Today only `?query=` is read (seeded once into the search box); role, category, difficulty, automation level, tool, verified status, and "installable only" live in React state and are lost on reload.
+
+  Files involved:
+  - src/components/agents/agent-search-panel.tsx — client component, holds `query` and `filters` (type AgentFilters) in useState; exports AgentSearchPanel and AgentSearchPanelFromUrl (the latter reads `?query=` via useSearchParams and passes initialQuery).
+  - src/lib/search.ts — `AgentFilters` type, `searchAgents`, `filterAgents`, `getUniqueTools`.
+  - src/app/[locale]/agents/page.tsx — renders `<Suspense fallback={<AgentSearchPanel .../>}><AgentSearchPanelFromUrl .../></Suspense>`.
+  - src/components/layout/top-nav.tsx — the header search navigates to /agents?query=...
+  - tests/search.test.ts — node:test suite run with `npm test` (tsx loader).
+  - src/i18n/dictionaries.ts — any new UI string needs both en and ko.
+
+  Constraints:
+  - Keep the static export working (`npm run build` must still produce out/ with no dynamic server usage).
+  - Use router.replace (no new history entry per click) and don't scroll to top on filter change.
+  - Unknown or invalid param values (e.g. ?difficulty=expertish, ?automation=9) must be ignored, not crash.
+  - The top-nav search must keep working and must not wipe other active filters.
+  - No new dependencies.
+
+  Acceptance criteria:
+  - Selecting filters updates the URL, e.g. /en/agents?role=developer&difficulty=advanced&installable=1
+  - Loading that URL directly shows the same filtered result and highlighted chips.
+  - "Clear all" removes all params; "Clear filters only" keeps ?query=.
+  - Unit tests cover parse/serialize of filters, including invalid values.
+  - `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` all pass.
+
+  Non-goals: saving filters to localStorage, changing the search ranking, adding new filter types.
+exampleOutput: |-
+  You gave me enough to write this without questions. Where I had to guess, I wrote the guess down under **Assumptions** so Codex checks it first. Everything from here down is the brief, ready to paste.
+
+  ---
+
+  # Task: Keep /agents filters in the URL
+
+  ## 1. Objective
+  Store every filter on the `/[locale]/agents` page in the URL query string. That way a filtered view can be shared as a link and still shows up after a reload. Today only `?query=` is read, and only once. Role, category, difficulty, automation level, tool, verified status and "installable only" live in React state and are lost on reload.
+
+  ## 2. Context (read these first)
+  - **Stack:** Next.js 16 App Router, TypeScript and Tailwind. `output: "export"` produces a static build that is deployed to GitHub Pages.
+  - **Static-export rules:** there is no middleware, no `headers()` and no server-side `searchParams`. Read query strings only on the client with `useSearchParams`, and keep it inside a `<Suspense>` boundary.
+  - **Locales:** pages live under `src/app/[locale]/` (`en`, `ko`).
+  - **Files:**
+    - `src/components/agents/agent-search-panel.tsx`: a client component that holds `query` and `filters: AgentFilters` in `useState`. It exports `AgentSearchPanel` and `AgentSearchPanelFromUrl`. Today `AgentSearchPanelFromUrl` reads `?query=` and passes it in as `initialQuery`.
+    - `src/lib/search.ts`: `AgentFilters`, `searchAgents`, `filterAgents`, `getUniqueTools`.
+    - `src/app/[locale]/agents/page.tsx`: renders `<Suspense fallback={<AgentSearchPanel/>}><AgentSearchPanelFromUrl/></Suspense>`.
+    - `src/components/layout/top-nav.tsx`: the header search, which navigates to `/agents?query=...`.
+    - `tests/search.test.ts`: the `node:test` suite, run by `npm test` through the tsx loader.
+    - `src/i18n/dictionaries.ts`: every new UI string needs both `en` and `ko`.
+
+  ## 3. Scope
+
+  **In scope**
+  - A pure, unit-tested module that parses URL params into `{ query, filters }` and turns them back into a query string.
+  - Two-way sync between the panel state and the URL, using `router.replace` without scrolling.
+  - Making the top-nav search keep any filters that are already active.
+  - Unit tests for parsing and serializing.
+
+  **Non-goals (do not do these)**
+  - Saving filters to localStorage.
+  - Any change to search ranking or to `searchAgents` / `filterAgents` behavior.
+  - New filter types.
+  - New dependencies.
+
+  ## 4. URL contract
+
+  | Filter | Param | Example | Valid values |
+  |---|---|---|---|
+  | free-text search | `query` | `query=review` | any non-empty trimmed string |
+  | role | `role` | `role=developer` | known role ids |
+  | category | `category` | `category=testing` | known category ids |
+  | difficulty | `difficulty` | `difficulty=advanced` | members of the difficulty union |
+  | automation level | `automation` | `automation=2` | members of the automation union |
+  | tool | `tool` | `tool=github` | tools returned by `getUniqueTools(agents)` |
+  | verified status | `verified` | `verified=tested` | members of the verified-status union |
+  | installable only | `installable` | `installable=1` | `1` (also accept `true` when reading, always write `1`) |
+
+  **Rules**
+  - Use the same field names and value types as `AgentFilters`. Do not invent a second vocabulary. If a field in `AgentFilters` is an array (multi-select), write it as a comma-separated list (`role=developer,designer`) and drop any unknown entries one by one.
+  - Leave out empty, default and `false` values. An unfiltered page has a bare URL with no `?`.
+  - Write params in a fixed order: `query, role, category, difficulty, automation, tool, verified, installable`. This keeps URLs stable and makes them easy to compare in tests.
+  - **Invalid values are ignored silently.** For example, `?difficulty=expertish`, `?automation=9`, repeated keys and garbage strings all resolve to "no filter" for that field. They never throw, and the other valid params still apply.
+  - Keep unrelated params when writing (for example `utm_*`). Only rewrite the keys listed above.
+
+  ## 5. Implementation plan
+
+  **Step 1: pure helpers, with no React and no Next imports**
+
+  Create `src/lib/agent-filter-params.ts`. Putting it in `search.ts` is also fine if that fits the file better.
+
+  ```ts
+  export interface FilterParamOptions {
+    roles: readonly string[];
+    categories: readonly string[];
+    tools: readonly string[];
+    // difficulty / automation / verified come from the type-level unions (export const arrays if they don't exist)
+  }
+
+  export function parseAgentFilterParams(
+    params: URLSearchParams | string,
+    options: FilterParamOptions,
+  ): { query: string; filters: AgentFilters };
+
+  export function serializeAgentFilterParams(
+    state: { query: string; filters: AgentFilters },
+    base?: URLSearchParams, // preserved unrelated keys
+  ): string; // "" or "a=b&c=d" (no leading "?")
+  ```
+
+  - If the allowed-value lists for difficulty, automation level and verified status exist only as TypeScript types, export them as `as const` arrays next to the types. Derive the type from the array so there is one source of truth.
+  - Take the role and category ids from the existing taxonomy in `src/data/`. Take tools from `getUniqueTools(agents)`.
+  - The property you must keep is the round trip: `parse(serialize(x))` must equal `x` for every valid `x`.
+
+  **Step 2: sync the panel with the URL** (`agent-search-panel.tsx`)
+  - Replace the `initialQuery` prop with a full initial state. `AgentSearchPanelFromUrl` should build it with `parseAgentFilterParams(useSearchParams(), options)` and pass it down as `initialState`. `AgentSearchPanel` (the Suspense fallback) keeps working with no URL, meaning empty filters.
+  - When `query` or `filters` changes:
+    1. Compute `next = serializeAgentFilterParams(...)`.
+    2. If `next` differs from the current `searchParams.toString()`, call `router.replace(next ? \`${pathname}?${next}\` : pathname, { scroll: false })`.
+  - Get `pathname` from `usePathname()` so the locale prefix and the GitHub Pages `basePath` are handled for you. Do not hard-code `/en/agents`.
+  - Debounce URL writes caused by typing in the search box (about 250–300 ms). Chip clicks can write immediately. Filtering itself stays instant because it runs off React state.
+  - **External URL changes:** examples are the top-nav search submitted while already on `/agents`, and browser back/forward. When `useSearchParams().toString()` changes to a value that is not the last one this component wrote, re-parse it and reset state. Track the last written string in a ref so the component does not loop.
+  - **"Clear all"** resets `query` and `filters`, which gives a bare pathname. **"Clear filters only"** resets `filters` and keeps `query`, which leaves only `?query=...`. If either button does not exist yet, add it and put its label in `dictionaries.ts` for both `en` and `ko`.
+
+  **Step 3: top-nav search** (`top-nav.tsx`)
+  - When the user is already on the agents page, build the target by setting `query` on the current params (`new URLSearchParams(window.location.search)`, read at submit time) and keep every other key. When the user is on any other page, navigate to `/[locale]/agents?query=...` as today.
+  - Read `window.location.search` inside the submit handler rather than calling `useSearchParams()` in the nav. The nav appears on every page, and `useSearchParams` there would need a Suspense boundary on every page or the static build fails.
+  - An empty submit removes `query` and leaves the filters as they are.
+
+  **Step 4: tests** (`tests/agent-filter-params.test.ts`, or extend `tests/search.test.ts`)
+
+  The cases below need a fixed set of options. Make sure `npm test` picks up the new file. If the test glob only covers `search.test.ts`, either widen the glob or put the tests there.
+  - An empty string gives an empty query and default filters. Serializing defaults gives `""`.
+  - `role=developer&difficulty=advanced&installable=1` parses to the expected filters.
+  - Round trip: `parse(serialize(x))` deep-equals `x` for a fully populated state.
+  - Serializing uses the fixed param order no matter the order in which keys were set.
+  - Invalid values are ignored and the valid ones still apply. Cases: `difficulty=expertish`, `automation=9`, `verified=nope`, `role=` (empty), `tool=unknown-tool`, `installable=yes`.
+  - Repeated keys such as `difficulty=a&difficulty=b` behave predictably (document it: first valid value wins).
+  - Unrelated params are kept by `serialize` when `base` is given.
+  - `query` is trimmed. Special characters (`&`, `#`, spaces and Korean text) survive the round trip.
+
+  ## 6. Acceptance criteria
+  - [ ] Selecting filters updates the URL, for example `/en/agents?role=developer&difficulty=advanced&installable=1`, with no new history entry per click and no scroll jump.
+  - [ ] Loading that URL directly (including after a hard reload) shows the same result list and highlights the same chips. Check this on `/en/` and `/ko/`.
+  - [ ] Invalid params such as `?difficulty=expertish&automation=9` load without errors. They are ignored, and any valid params next to them still apply.
+  - [ ] "Clear all" removes every filter param. "Clear filters only" keeps `?query=`.
+  - [ ] The top-nav search from another page lands on `/agents?query=...`. Run from `/agents` with filters active, it updates `query` and keeps the filters.
+  - [ ] Browser back/forward from a filtered view restores the right state.
+  - [ ] The new unit tests cover parsing and serializing, including invalid values.
+  - [ ] `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test` and `npm run build` all pass, and `out/` contains the static `agents` pages for both locales.
+
+  ## 7. Assumptions (check these first and adjust if one is wrong)
+  1. Each field in `AgentFilters` is either a single value or an array. Match whichever it is and use the comma-separated form for arrays.
+  2. The allowed difficulty, automation and verified values are defined somewhere in the types or the taxonomy. If they are not, export them as `as const` arrays.
+  3. The "Clear all" and "Clear filters only" controls already exist. If they do not, add them with en/ko strings.
+  4. The agents list can be imported on the client (it already is, because `getUniqueTools` feeds the panel), so tool validation can use it.
+  5. `npm test` runs every file in `tests/*.test.ts`.
+
+  ## 8. Risks and mitigations
+
+  | Risk | Mitigation |
+  |---|---|
+  | `useSearchParams` outside Suspense breaks `next build` under `output: "export"` | Call it only inside `AgentSearchPanelFromUrl`, which is already wrapped. Use `window.location` in top-nav at submit time. |
+  | Infinite loop between state and URL | Compare the serialized strings before calling `replace`, and use a ref for the last written value. |
+  | The static HTML (the Suspense fallback) renders unfiltered, then flashes to the filtered view when it hydrates | This comes with static export and is acceptable. Keep the fallback's layout stable so there is no layout shift. |
+  | Hard-coded paths break the GitHub Pages `basePath` or locale | Always build URLs from `usePathname()`. |
+  | Keystroke-rate `router.replace` causes jank | Debounce query writes only. |
+  | Too-strict validation drops a legitimate value (for example, a tool name with different casing) | Validate against the real data sets. Compare tools case-insensitively if the data is mixed-case, but always write the canonical value. |
+
+  ## 9. Next actions for Codex
+  1. Read the five files listed in §2 and confirm or correct the assumptions in §7.
+  2. Build the pure parse and serialize helpers and their tests (§5 steps 1 and 4). Get `npm test` passing before touching any UI.
+  3. Wire up the panel sync (step 2), then the top-nav change (step 3).
+  4. Go through the §6 checklist by hand in `npm run dev`, including hard reloads, back/forward, invalid params and `/ko/`.
+  5. Run all five commands. Commit as `feat: persist agent filters in the URL` and list any assumption that turned out wrong in the PR description.
 limitations:
   - Needs accurate repo context.
 bestPractices:
@@ -150,11 +324,9 @@ runbook:
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 5
+  qualityScore: 4
   testedWith:
-    - codex
     - claude
-    - cursor
   recommendedFor:
     - Turning a scoped product or engineering request into a coding-agent handoff
     - "Teams with the required inputs ready: Goal, Repo context, Files involved"
@@ -164,30 +336,283 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - Can become overly broad if the user asks it to define product strategy and implementation scope in one pass
-    - Output quality drops when constraints, source material, or target audience are omitted
-    - Final decisions still need review by the project owner
+    - "Contradicts itself on edge-case rules: the strong brief's URL contract says repeated keys 'resolve to \"no filter\"' while its test plan says 'first valid value wins'."
+    - Adds requirements the user did not ask for and presents them as the contract (preserve utm_* params, debounce query writes, accept installable=true, back/forward acceptance criterion, empty top-nav submit clears query), which widens the task Codex is told to deliver.
+    - "Ignores the 'quick' framing: the dark-mode brief asks for token migration, a three-way toggle, a no-flash head script, hard-coded color cleanup, WCAG AA checks, and screenshots."
+    - "Runs long: the strong brief is about 9 sections with two tables, and some content restates the input verbatim, so it is heavier than a ticket usually needs."
+    - In the boundary run it commits to a web and CSS-specific plan before asking whether the app is even web (the platform question comes last).
   evaluationCriteria:
     - Names files, constraints, acceptance checks, and explicit non-goals before implementation begins
     - Produces Task brief in a format that can be pasted into a ticket, PR, document, or handoff
     - States assumptions, missing context, risks, and concrete next actions separately
   sampleRuns:
-    - title: Codex Task Brief strong-context run
-      input: Create a Codex brief for adding saved filters to a Next.js agent directory using localStorage only.
-      expectedOutputSummary: A usable Task brief with project-specific assumptions, risks, and next steps.
-      sampleOutput: "Task brief: a structured response grounded in the supplied scenario, with explicit constraints, review checkpoints, and owner-ready next actions."
+    - title: Brief for URL-persisted filters on the /agents page
+      input: |-
+        Write a task brief I can hand to Codex.
+
+        Repo: Agent Archive (github.com/yohan-work/agentive). Next.js 16 App Router + TypeScript + Tailwind, `output: "export"` static build deployed to GitHub Pages. No middleware, no server-side searchParams — query strings must be read on the client with useSearchParams. Pages live under src/app/[locale]/ (en, ko).
+
+        Goal: persist the /agents page filters in the URL so a filtered view can be shared and survives reload. Today only `?query=` is read (seeded once into the search box); role, category, difficulty, automation level, tool, verified status, and "installable only" live in React state and are lost on reload.
+
+        Files involved:
+        - src/components/agents/agent-search-panel.tsx — client component, holds `query` and `filters` (type AgentFilters) in useState; exports AgentSearchPanel and AgentSearchPanelFromUrl (the latter reads `?query=` via useSearchParams and passes initialQuery).
+        - src/lib/search.ts — `AgentFilters` type, `searchAgents`, `filterAgents`, `getUniqueTools`.
+        - src/app/[locale]/agents/page.tsx — renders `<Suspense fallback={<AgentSearchPanel .../>}><AgentSearchPanelFromUrl .../></Suspense>`.
+        - src/components/layout/top-nav.tsx — the header search navigates to /agents?query=...
+        - tests/search.test.ts — node:test suite run with `npm test` (tsx loader).
+        - src/i18n/dictionaries.ts — any new UI string needs both en and ko.
+
+        Constraints:
+        - Keep the static export working (`npm run build` must still produce out/ with no dynamic server usage).
+        - Use router.replace (no new history entry per click) and don't scroll to top on filter change.
+        - Unknown or invalid param values (e.g. ?difficulty=expertish, ?automation=9) must be ignored, not crash.
+        - The top-nav search must keep working and must not wipe other active filters.
+        - No new dependencies.
+
+        Acceptance criteria:
+        - Selecting filters updates the URL, e.g. /en/agents?role=developer&difficulty=advanced&installable=1
+        - Loading that URL directly shows the same filtered result and highlighted chips.
+        - "Clear all" removes all params; "Clear filters only" keeps ?query=.
+        - Unit tests cover parse/serialize of filters, including invalid values.
+        - `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` all pass.
+
+        Non-goals: saving filters to localStorage, changing the search ranking, adding new filter types.
+      expectedOutputSummary: A paste-ready Codex brief for URL-persisted /agents filters that names the six files, keeps the static-export/useSearchParams/router.replace/no-scroll/no-deps constraints, defines a param contract with invalid-value handling, preserves top-nav behavior, lists the given acceptance criteria and non-goals, and separates assumptions, risks, and next steps.
+      sampleOutput: |-
+        You gave me enough to write this without questions. Where I had to guess, I wrote the guess down under **Assumptions** so Codex checks it first. Everything from here down is the brief, ready to paste.
+
+        ---
+
+        # Task: Keep /agents filters in the URL
+
+        ## 1. Objective
+        Store every filter on the `/[locale]/agents` page in the URL query string. That way a filtered view can be shared as a link and still shows up after a reload. Today only `?query=` is read, and only once. Role, category, difficulty, automation level, tool, verified status and "installable only" live in React state and are lost on reload.
+
+        ## 2. Context (read these first)
+        - **Stack:** Next.js 16 App Router, TypeScript and Tailwind. `output: "export"` produces a static build that is deployed to GitHub Pages.
+        - **Static-export rules:** there is no middleware, no `headers()` and no server-side `searchParams`. Read query strings only on the client with `useSearchParams`, and keep it inside a `<Suspense>` boundary.
+        - **Locales:** pages live under `src/app/[locale]/` (`en`, `ko`).
+        - **Files:**
+          - `src/components/agents/agent-search-panel.tsx`: a client component that holds `query` and `filters: AgentFilters` in `useState`. It exports `AgentSearchPanel` and `AgentSearchPanelFromUrl`. Today `AgentSearchPanelFromUrl` reads `?query=` and passes it in as `initialQuery`.
+          - `src/lib/search.ts`: `AgentFilters`, `searchAgents`, `filterAgents`, `getUniqueTools`.
+          - `src/app/[locale]/agents/page.tsx`: renders `<Suspense fallback={<AgentSearchPanel/>}><AgentSearchPanelFromUrl/></Suspense>`.
+          - `src/components/layout/top-nav.tsx`: the header search, which navigates to `/agents?query=...`.
+          - `tests/search.test.ts`: the `node:test` suite, run by `npm test` through the tsx loader.
+          - `src/i18n/dictionaries.ts`: every new UI string needs both `en` and `ko`.
+
+        ## 3. Scope
+
+        **In scope**
+        - A pure, unit-tested module that parses URL params into `{ query, filters }` and turns them back into a query string.
+        - Two-way sync between the panel state and the URL, using `router.replace` without scrolling.
+        - Making the top-nav search keep any filters that are already active.
+        - Unit tests for parsing and serializing.
+
+        **Non-goals (do not do these)**
+        - Saving filters to localStorage.
+        - Any change to search ranking or to `searchAgents` / `filterAgents` behavior.
+        - New filter types.
+        - New dependencies.
+
+        ## 4. URL contract
+
+        | Filter | Param | Example | Valid values |
+        |---|---|---|---|
+        | free-text search | `query` | `query=review` | any non-empty trimmed string |
+        | role | `role` | `role=developer` | known role ids |
+        | category | `category` | `category=testing` | known category ids |
+        | difficulty | `difficulty` | `difficulty=advanced` | members of the difficulty union |
+        | automation level | `automation` | `automation=2` | members of the automation union |
+        | tool | `tool` | `tool=github` | tools returned by `getUniqueTools(agents)` |
+        | verified status | `verified` | `verified=tested` | members of the verified-status union |
+        | installable only | `installable` | `installable=1` | `1` (also accept `true` when reading, always write `1`) |
+
+        **Rules**
+        - Use the same field names and value types as `AgentFilters`. Do not invent a second vocabulary. If a field in `AgentFilters` is an array (multi-select), write it as a comma-separated list (`role=developer,designer`) and drop any unknown entries one by one.
+        - Leave out empty, default and `false` values. An unfiltered page has a bare URL with no `?`.
+        - Write params in a fixed order: `query, role, category, difficulty, automation, tool, verified, installable`. This keeps URLs stable and makes them easy to compare in tests.
+        - **Invalid values are ignored silently.** For example, `?difficulty=expertish`, `?automation=9`, repeated keys and garbage strings all resolve to "no filter" for that field. They never throw, and the other valid params still apply.
+        - Keep unrelated params when writing (for example `utm_*`). Only rewrite the keys listed above.
+
+        ## 5. Implementation plan
+
+        **Step 1: pure helpers, with no React and no Next imports**
+
+        Create `src/lib/agent-filter-params.ts`. Putting it in `search.ts` is also fine if that fits the file better.
+
+        ```ts
+        export interface FilterParamOptions {
+          roles: readonly string[];
+          categories: readonly string[];
+          tools: readonly string[];
+          // difficulty / automation / verified come from the type-level unions (export const arrays if they don't exist)
+        }
+
+        export function parseAgentFilterParams(
+          params: URLSearchParams | string,
+          options: FilterParamOptions,
+        ): { query: string; filters: AgentFilters };
+
+        export function serializeAgentFilterParams(
+          state: { query: string; filters: AgentFilters },
+          base?: URLSearchParams, // preserved unrelated keys
+        ): string; // "" or "a=b&c=d" (no leading "?")
+        ```
+
+        - If the allowed-value lists for difficulty, automation level and verified status exist only as TypeScript types, export them as `as const` arrays next to the types. Derive the type from the array so there is one source of truth.
+        - Take the role and category ids from the existing taxonomy in `src/data/`. Take tools from `getUniqueTools(agents)`.
+        - The property you must keep is the round trip: `parse(serialize(x))` must equal `x` for every valid `x`.
+
+        **Step 2: sync the panel with the URL** (`agent-search-panel.tsx`)
+        - Replace the `initialQuery` prop with a full initial state. `AgentSearchPanelFromUrl` should build it with `parseAgentFilterParams(useSearchParams(), options)` and pass it down as `initialState`. `AgentSearchPanel` (the Suspense fallback) keeps working with no URL, meaning empty filters.
+        - When `query` or `filters` changes:
+          1. Compute `next = serializeAgentFilterParams(...)`.
+          2. If `next` differs from the current `searchParams.toString()`, call `router.replace(next ? \`${pathname}?${next}\` : pathname, { scroll: false })`.
+        - Get `pathname` from `usePathname()` so the locale prefix and the GitHub Pages `basePath` are handled for you. Do not hard-code `/en/agents`.
+        - Debounce URL writes caused by typing in the search box (about 250–300 ms). Chip clicks can write immediately. Filtering itself stays instant because it runs off React state.
+        - **External URL changes:** examples are the top-nav search submitted while already on `/agents`, and browser back/forward. When `useSearchParams().toString()` changes to a value that is not the last one this component wrote, re-parse it and reset state. Track the last written string in a ref so the component does not loop.
+        - **"Clear all"** resets `query` and `filters`, which gives a bare pathname. **"Clear filters only"** resets `filters` and keeps `query`, which leaves only `?query=...`. If either button does not exist yet, add it and put its label in `dictionaries.ts` for both `en` and `ko`.
+
+        **Step 3: top-nav search** (`top-nav.tsx`)
+        - When the user is already on the agents page, build the target by setting `query` on the current params (`new URLSearchParams(window.location.search)`, read at submit time) and keep every other key. When the user is on any other page, navigate to `/[locale]/agents?query=...` as today.
+        - Read `window.location.search` inside the submit handler rather than calling `useSearchParams()` in the nav. The nav appears on every page, and `useSearchParams` there would need a Suspense boundary on every page or the static build fails.
+        - An empty submit removes `query` and leaves the filters as they are.
+
+        **Step 4: tests** (`tests/agent-filter-params.test.ts`, or extend `tests/search.test.ts`)
+
+        The cases below need a fixed set of options. Make sure `npm test` picks up the new file. If the test glob only covers `search.test.ts`, either widen the glob or put the tests there.
+        - An empty string gives an empty query and default filters. Serializing defaults gives `""`.
+        - `role=developer&difficulty=advanced&installable=1` parses to the expected filters.
+        - Round trip: `parse(serialize(x))` deep-equals `x` for a fully populated state.
+        - Serializing uses the fixed param order no matter the order in which keys were set.
+        - Invalid values are ignored and the valid ones still apply. Cases: `difficulty=expertish`, `automation=9`, `verified=nope`, `role=` (empty), `tool=unknown-tool`, `installable=yes`.
+        - Repeated keys such as `difficulty=a&difficulty=b` behave predictably (document it: first valid value wins).
+        - Unrelated params are kept by `serialize` when `base` is given.
+        - `query` is trimmed. Special characters (`&`, `#`, spaces and Korean text) survive the round trip.
+
+        ## 6. Acceptance criteria
+        - [ ] Selecting filters updates the URL, for example `/en/agents?role=developer&difficulty=advanced&installable=1`, with no new history entry per click and no scroll jump.
+        - [ ] Loading that URL directly (including after a hard reload) shows the same result list and highlights the same chips. Check this on `/en/` and `/ko/`.
+        - [ ] Invalid params such as `?difficulty=expertish&automation=9` load without errors. They are ignored, and any valid params next to them still apply.
+        - [ ] "Clear all" removes every filter param. "Clear filters only" keeps `?query=`.
+        - [ ] The top-nav search from another page lands on `/agents?query=...`. Run from `/agents` with filters active, it updates `query` and keeps the filters.
+        - [ ] Browser back/forward from a filtered view restores the right state.
+        - [ ] The new unit tests cover parsing and serializing, including invalid values.
+        - [ ] `npm run check:data`, `npm run lint`, `npm run typecheck`, `npm test` and `npm run build` all pass, and `out/` contains the static `agents` pages for both locales.
+
+        ## 7. Assumptions (check these first and adjust if one is wrong)
+        1. Each field in `AgentFilters` is either a single value or an array. Match whichever it is and use the comma-separated form for arrays.
+        2. The allowed difficulty, automation and verified values are defined somewhere in the types or the taxonomy. If they are not, export them as `as const` arrays.
+        3. The "Clear all" and "Clear filters only" controls already exist. If they do not, add them with en/ko strings.
+        4. The agents list can be imported on the client (it already is, because `getUniqueTools` feeds the panel), so tool validation can use it.
+        5. `npm test` runs every file in `tests/*.test.ts`.
+
+        ## 8. Risks and mitigations
+
+        | Risk | Mitigation |
+        |---|---|
+        | `useSearchParams` outside Suspense breaks `next build` under `output: "export"` | Call it only inside `AgentSearchPanelFromUrl`, which is already wrapped. Use `window.location` in top-nav at submit time. |
+        | Infinite loop between state and URL | Compare the serialized strings before calling `replace`, and use a ref for the last written value. |
+        | The static HTML (the Suspense fallback) renders unfiltered, then flashes to the filtered view when it hydrates | This comes with static export and is acceptable. Keep the fallback's layout stable so there is no layout shift. |
+        | Hard-coded paths break the GitHub Pages `basePath` or locale | Always build URLs from `usePathname()`. |
+        | Keystroke-rate `router.replace` causes jank | Debounce query writes only. |
+        | Too-strict validation drops a legitimate value (for example, a tool name with different casing) | Validate against the real data sets. Compare tools case-insensitively if the data is mixed-case, but always write the canonical value. |
+
+        ## 9. Next actions for Codex
+        1. Read the five files listed in §2 and confirm or correct the assumptions in §7.
+        2. Build the pure parse and serialize helpers and their tests (§5 steps 1 and 4). Get `npm test` passing before touching any UI.
+        3. Wire up the panel sync (step 2), then the top-nav change (step 3).
+        4. Go through the §6 checklist by hand in `npm run dev`, including hard reloads, back/forward, invalid params and `/ko/`.
+        5. Run all five commands. Commit as `feat: persist agent filters in the URL` and list any assumption that turned out wrong in the PR description.
       reviewNotes:
-        - Confirm the output references the supplied scenario instead of generic advice.
-        - Check that assumptions and missing context are separated from confirmed facts.
-        - Verify the result can be reused in the project artifact named by the request.
-    - title: Codex Task Brief boundary run
-      input: Plan a vague redesign request where the user only says the agents page should feel better.
-      expectedOutputSummary: A cautious response that narrows scope, asks for missing required context, and avoids pretending the task is fully specified.
-      sampleOutput: The agent should identify missing inputs, explain why the request is under-specified, propose a tighter next prompt, and avoid final claims that require unavailable evidence.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - 'Strength: it uses every given file and constraint accurately, for example keeping useSearchParams inside the existing Suspense-wrapped AgentSearchPanelFromUrl and reading window.location.search in top-nav at submit time so the static build does not need a Suspense boundary on every page. That is a correct and non-obvious risk for output: "export".'
+        - "Strength: the assumptions section hedges correctly on things it could not see. The actual AgentFilters holds single optional strings plus installableOnly:boolean, the Clear all and Clear filters controls already exist, and the test script globs tests/*.test.ts. All of these match assumptions 1, 3 and 5 or are handled safely by them."
+        - "Defect: §4 says repeated keys 'resolve to \"no filter\" for that field', but §5 step 4 says 'first valid value wins'. Codex would get two different specs for the same case."
+        - "Scope creep: it presents several unrequested behaviors as rules, including keeping unrelated utm_* params, a 250-300 ms debounce, accepting installable=true, a back/forward acceptance criterion, and an empty top-nav submit that removes query. None are in the input, and they add implementation and test surface."
+        - Explicit non-goals, the acceptance checklist (including /ko/ and out/ verification), the risk table, and the ordered next actions (helpers and tests before UI) are all usable as-is. The brief is long but mostly substantive.
+    - title: Codex brief request with no repo details
+      input: Can you write a Codex task brief for adding dark mode to our app? It should be quick for Codex to do. Thanks.
+      expectedOutputSummary: Acknowledge that stack, platform, existing theming, and toggle and default preferences are unknown; state assumptions explicitly; give a small provisional dark-mode brief that tells Codex to discover the repo specifics; and ask a few focused questions, without inventing repo facts.
+      sampleOutput: |-
+        I don't know your stack yet, so I wrote this brief to work on most web frontends. Codex starts by reading the repo and fills in the specifics. The scope is kept small so it's a quick task. Fill in the three `[bracketed]` lines before you hand it over if you can. If you can't, the defaults will work.
+
+        ---
+
+        ## Codex Task Brief: Add Dark Mode
+
+        **Stack:** `[e.g. React + Tailwind / Next.js / Vue + plain CSS]`. If this is left blank, find out from the repo.
+        **Default theme:** `[follow the OS setting]`
+        **Toggle location:** `[header / settings page]`
+
+        ### Goal
+        Add a dark theme that the user can switch on and that stays set after a reload. By default it should follow the OS setting (`prefers-color-scheme`). All existing screens must stay readable in both themes.
+
+        ### Scope (in)
+        1. **Theme tokens.** Put the app's colors (background, surface, text, muted text, border, primary, accent) into CSS custom properties or the framework's existing theme/token system. Define values for light and for dark.
+        2. **Theme switching.** Switch themes with a class or attribute on `<html>`, such as `class="dark"` or `data-theme="dark"`. If a styling framework is already in use (for example Tailwind's `darkMode: "class"`), use its built-in approach.
+        3. **Toggle.** Add one control with three options: Light, Dark, System. Put it in the header or on the settings page, and give it an accessible label.
+        4. **Persistence.** Save the user's choice in `localStorage`. "System" means nothing is stored and the OS setting is followed.
+        5. **No flash of the wrong theme.** Add a small inline script in `<head>` that sets the theme before first paint.
+        6. **Fix hard-coded colors.** Replace hard-coded hex, rgb, or named colors in components with tokens wherever they would break in dark mode.
+
+        ### Scope (out)
+        - No redesign, new palette work, or brand changes. Dark values should be straightforward inversions of the current palette.
+        - No per-user theme saved on the server or in the database.
+        - No new UI or theming libraries unless the project already uses one.
+        - Don't rework images, illustrations, or charts beyond making sure they're still visible.
+
+        ### Implementation notes
+        - Start by finding where colors are defined today: global CSS, the Tailwind config, a theme file, or inline styles. Build on that. Don't create a second parallel system.
+        - Keep the theme logic in one small module or hook, such as `useTheme` or `theme.ts`, with `getTheme`, `setTheme`, and a listener for OS changes when set to "System".
+        - Set `color-scheme: light dark` (or the matching value) so native form controls and scrollbars match the theme.
+        - If the app renders on the server, the stored theme isn't available to the server. Use the inline head script and suppress the hydration warning on `<html>` rather than reading the theme on the server.
+
+        ### Acceptance criteria
+        - [ ] The toggle switches between Light, Dark, and System, and the page updates without a reload.
+        - [ ] The choice survives a reload. "System" follows the OS setting and updates when the OS setting changes.
+        - [ ] Reloading in dark mode shows no light flash.
+        - [ ] Main text and interactive elements meet WCAG AA contrast (4.5:1 for body text) in both themes.
+        - [ ] Focus rings, borders, form inputs, and modals are visible in dark mode.
+        - [ ] The existing lint, typecheck, test, and build commands all pass.
+        - [ ] The PR description lists every component that still has hard-coded colors, if any are left.
+
+        ### Assumptions
+        - This is a web frontend with a single root layout where the head script and the `<html>` attribute can go.
+        - No theming system exists yet. If one does, extend it rather than adding another.
+        - Only a few components have hard-coded colors. If there are many, see the risks below.
+
+        ### Risks
+        | Risk | Mitigation |
+        |---|---|
+        | Many hard-coded colors turn a quick task into a long one | Codex converts the shared components and layouts first and lists the rest in the PR instead of fixing everything |
+        | Flash of the wrong theme on load, or hydration mismatch with server rendering | Inline head script plus a hydration-warning suppression on `<html>` |
+        | Third-party widgets (embeds, date pickers, charts) ignore the theme | Note them in the PR and don't patch vendor styles |
+        | Low contrast in dark mode | Check the main screens with a contrast tool or browser devtools |
+
+        ### Deliverables
+        - One PR titled `feat: add dark mode with light/dark/system toggle`.
+        - Before and after screenshots of 2 or 3 key screens in both themes.
+        - A short PR note listing where the tokens live and how to add a new color.
+
+        ### Next actions
+        1. **You:** fill in the stack, default theme, and toggle location. Paste the brief into Codex.
+        2. **Codex:** read the repo and report where colors are defined. Then make the changes in scope, run the checks, and open the PR.
+        3. **You:** check the main screens in both themes, then merge or ask for contrast fixes.
+
+        ---
+
+        Three quick answers would make this more precise:
+        1. What framework and styling approach does the app use (for example React + Tailwind, or Vue + SCSS)?
+        2. Is it a web app, or mobile/desktop (React Native, Electron, and so on)? If it isn't web, the brief needs different theming instructions.
+        3. Do you have a design system or brand colors for dark mode, or should Codex choose sensible dark values?
       reviewNotes:
-        - The agent should not invent project facts to fill missing context.
-        - The response should make the next user action clear.
-        - A strong output refuses false certainty while still moving the work forward.
+        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Strength: it moves the work forward with a provisional brief, bracketed fill-ins for stack, default theme and toggle location with defaults, an explicit Assumptions section, and just three focused questions at the end. This is a good balance between asking and producing."
+        - "Strength: it invents no repo facts. It tells Codex to 'find where colors are defined today' and 'don't create a second parallel system', and it treats framework choices conditionally (for example Tailwind darkMode: \"class\" only 'if already in use')."
+        - "Weakness: it ignores the user's request that the task be 'quick'. The scope includes a token migration, a Light/Dark/System toggle, a no-flash inline head script, hard-coded color cleanup, WCAG AA contrast checks, and before/after screenshots. The risk table admits this could become long but does not trim the scope to match."
+        - "Weakness: the whole brief assumes a web frontend (<html> attribute, localStorage, head script), yet the web vs. mobile/desktop question only comes last. That question could invalidate most of the brief, so it should be asked or flagged first."
+        - "Minor: 'dark values should be straightforward inversions of the current palette' is questionable design guidance presented as a scope rule."
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Turning a scoped product or engineering request into a coding-agent handoff
@@ -200,5 +625,5 @@ decisionGuide:
 relatedAgents:
   - feature-requirements-analyst
   - qa-checklist-agent
-verifiedStatus: expert
-updatedAt: 2026-07-01
+verifiedStatus: community
+updatedAt: 2026-09-29
