@@ -25,7 +25,7 @@ export default function OpenGraphImage() {
         <div style={{ fontSize: 28, letterSpacing: 6, textTransform: "uppercase", color: "#60a5fa" }}>Open-source agent library</div>
         <div style={{ marginTop: 24, fontSize: 88, fontWeight: 700 }}>{siteConfig.name}</div>
         <div style={{ marginTop: 24, fontSize: 36, lineHeight: 1.4, color: "#a1a1aa", maxWidth: 960 }}>
-          Curated AI agents with prompts, runbooks, evaluations, and install kits for Codex, Claude, and Cursor.
+          {siteConfig.tagline}
         </div>
       </div>
     ),

@@ -21,24 +21,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/categories", label: dictionary.nav.categories, icon: Boxes },
     { href: "/roles", label: dictionary.nav.roles, icon: Users }
   ];
-  const groups = [
-    {
-      title: dictionary.nav.forUsers,
-      links: [
-        { href: "/install", label: dictionary.nav.gettingStarted },
-        { href: "/cases", label: dictionary.nav.howToUseAgents },
-        { href: "/agents", label: dictionary.nav.promptTemplates },
-        { href: "/workflows", label: dictionary.nav.workflowPacks }
-      ]
-    },
-    {
-      title: dictionary.nav.forCreators,
-      links: [{ href: "/submit", label: dictionary.nav.submitAgent }]
-    }
-  ];
 
   return (
-    <nav className="space-y-7">
+    <nav>
       <div className="space-y-1">
         {primary.map((item) => {
           const Icon = item.icon;
@@ -92,24 +77,6 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
           {dictionary.nav.about}
         </Link>
       </div>
-
-      {groups.map((group) => (
-        <div key={group.title}>
-          <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted">{group.title}</p>
-          <div className="space-y-1">
-            {group.links.map((link) => (
-              <Link
-                key={link.href}
-                href={withLocale(link.href, locale)}
-                onClick={onNavigate}
-                className="block rounded-md px-3 py-1.5 text-sm text-secondary transition hover:bg-elevated/70 hover:text-primary"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))}
     </nav>
   );
 }

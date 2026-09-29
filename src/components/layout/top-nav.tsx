@@ -39,7 +39,7 @@ export function TopNav() {
             <span className="flex h-8 w-8 items-center justify-center rounded-md border border-accent/25 bg-accent/12 text-sky-200">
               <Bot className="h-4 w-4" />
             </span>
-            Agent Archive
+            {siteConfig.name}
           </Link>
           <form onSubmit={onSubmit} className="mx-1 hidden flex-1 md:block">
             <label className="relative block">

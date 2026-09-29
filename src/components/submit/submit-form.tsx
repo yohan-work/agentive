@@ -22,18 +22,58 @@ const fields = [
 const inputClassName =
   "w-full rounded-lg border border-line bg-panel px-3 text-sm text-primary outline-none transition placeholder:text-muted focus:border-accent/55 focus:ring-2 focus:ring-accent/20";
 
-function buildSubmissionIssueUrl(values: Record<string, string>) {
-  const name = values["Agent name"]?.trim() || "New agent";
-  const body = fields
-    .map(([label]) => `### ${label}\n\n${values[label]?.trim() || "_No response_"}`)
-    .join("\n\n");
-  const params = new URLSearchParams({
-    title: `[Agent]: ${name}`,
-    labels: "new-agent",
-    body
-  });
+// GitHub rejects very long /issues/new URLs, so long fields are trimmed and the submitter
+// is asked to paste the full text into the issue.
+const MAX_ISSUE_URL_LENGTH = 7000;
+const CODE_FIELDS = new Set<string>(["Example input", "Example output", "Prompt"]);
 
+function formatField(label: string, value: string) {
+  if (!value) {
+    return `### ${label}\n\n_No response_`;
+  }
+
+  if (CODE_FIELDS.has(label)) {
+    const fence = value.includes("```") ? "~~~~" : "```";
+    return `### ${label}\n\n${fence}text\n${value}\n${fence}`;
+  }
+
+  return `### ${label}\n\n${value}`;
+}
+
+function buildIssueUrl(title: string, values: Record<string, string>) {
+  const body = fields.map(([label]) => formatField(label, values[label] ?? "")).join("\n\n");
+  const params = new URLSearchParams({ title, labels: "new-agent", body });
   return `${siteConfig.repoUrl}/issues/new?${params.toString()}`;
+}
+
+function buildSubmissionIssueUrl(rawValues: Record<string, string>) {
+  const values = Object.fromEntries(Object.entries(rawValues).map(([label, value]) => [label, value.trim()]));
+  const title = `[Agent]: ${(values["Agent name"] || "New agent").slice(0, 120)}`;
+  const truncated = new Set<string>();
+  const render = () =>
+    buildIssueUrl(
+      title,
+      Object.fromEntries(
+        Object.entries(values).map(([label, value]) => [
+          label,
+          truncated.has(label) ? `${value}\n[truncated — paste the full ${label.toLowerCase()} here]` : value
+        ])
+      )
+    );
+
+  // Shrink the longest field until the URL fits; truncated fields ask the submitter to paste the rest.
+  let url = render();
+  while (url.length > MAX_ISSUE_URL_LENGTH) {
+    const [label, value] = Object.entries(values).sort((a, b) => b[1].length - a[1].length)[0];
+    if (value.length < 40) {
+      break;
+    }
+    values[label] = value.slice(0, Math.floor(value.length * 0.7));
+    truncated.add(label);
+    url = render();
+  }
+
+  return url;
 }
 
 export function SubmitForm() {
