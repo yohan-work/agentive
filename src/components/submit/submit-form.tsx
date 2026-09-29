@@ -67,7 +67,7 @@ function buildSubmissionIssueUrl(rawValues: Record<string, string>) {
     // Rank by encoded size: non-ASCII text grows far more than ASCII once URL-encoded.
     const encodedLength = (text: string) => encodeURIComponent(text).length;
     const [label, value] = Object.entries(values).sort((a, b) => encodedLength(b[1]) - encodedLength(a[1]))[0];
-    if (value.length < 40) {
+    if (encodedLength(value) < 120) {
       break;
     }
     values[label] = value.slice(0, Math.floor(value.length * 0.7));
