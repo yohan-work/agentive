@@ -64,7 +64,9 @@ function buildSubmissionIssueUrl(rawValues: Record<string, string>) {
   // Shrink the longest field until the URL fits; truncated fields ask the submitter to paste the rest.
   let url = render();
   while (url.length > MAX_ISSUE_URL_LENGTH) {
-    const [label, value] = Object.entries(values).sort((a, b) => b[1].length - a[1].length)[0];
+    // Rank by encoded size: non-ASCII text grows far more than ASCII once URL-encoded.
+    const encodedLength = (text: string) => encodeURIComponent(text).length;
+    const [label, value] = Object.entries(values).sort((a, b) => encodedLength(b[1]) - encodedLength(a[1]))[0];
     if (value.length < 40) {
       break;
     }
