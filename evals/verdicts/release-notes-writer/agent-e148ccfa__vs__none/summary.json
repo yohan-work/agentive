@@ -1,0 +1,87 @@
+{
+  "slug": "release-notes-writer",
+  "variants": [
+    "agent-e148ccfa",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-e148ccfa",
+      "order2": "agent-e148ccfa",
+      "result": "agent-e148ccfa"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-e148ccfa",
+      "order2": "agent-e148ccfa",
+      "result": "agent-e148ccfa"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-e148ccfa",
+      "order2": "agent-e148ccfa",
+      "result": "agent-e148ccfa"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-e148ccfa",
+      "order2": "agent-e148ccfa",
+      "result": "agent-e148ccfa"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-e148ccfa",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-e148ccfa",
+      "order2": "agent-e148ccfa",
+      "result": "agent-e148ccfa"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-e148ccfa",
+        "agent-e148ccfa"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-e148ccfa",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-e148ccfa",
+        "agent-e148ccfa"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-e148ccfa": 5,
+    "none": 0
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

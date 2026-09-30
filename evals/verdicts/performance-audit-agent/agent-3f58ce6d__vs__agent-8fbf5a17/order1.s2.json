@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies correctly identify the props over-serialization, the useSearchParams Suspense bailout, and the sync grid render, and both propose the same no-dependency fixes (list-item projection, deferred value plus memo, content-visibility) while rejecting pagination and virtualization for SEO reasons. Reply A ties every recommendation to a specific measured symptom and gives an explicit pass criterion tied to the stated targets (LCP median under 2.5s over 5 runs, RSC at most 350KB, INP max under 200ms), with runnable snippets for LCP and Event Timing. It also catches that a 640ms long task contributes only about 590ms of TBT and separates measured facts from ASSUMPTION tags, with a numbered assumption list. Reply B is also strong, with a useful D0 diagnostic phase and an issue table, but its validation and effect estimates are less tied to the target thresholds (R4 and R6 give no quantified effect), and it is longer with more process material. A is somewhat more actionable for the symptom-to-validation criterion.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no information, so both replies correctly refuse to guess and ask for specifics. Reply A asks three focused questions and gives a good measurement protocol (CrUX, Lighthouse, waterfall, interaction trace), but it defers all diagnosis until data arrives. Reply B asks equally relevant questions and also gives a 15-minute triage that maps observed symptoms (long TTFB, fast HTML but late paint, single slow API, janky interaction) to likely cause areas, plus a common-causes table with signals for each and clear caveats that these are hypotheses. It states its assumptions explicitly and warns against fixing without measuring. B better satisfies the symptom-to-cause-to-validation criterion while staying honest, so it is slightly more useful as-is.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly decline to write a fabricated 92 score with invented metrics, explain why, and offer an honest report section, which is the right handling. Both give a sound audit that maps the 6x1.8MB carousel to LCP, head scripts to TBT and FCP, and the client-side grid to CLS. Reply A ties each recommendation to a specific Lighthouse audit for confirming the assumption, gives quantified expected effects with reasoning, and adds a per-recommendation Verify step with numeric pass criteria, plus a full measurement protocol (5 runs, median, same conditions). It also honestly says 70-90 is realistic and 92 cannot be promised. Reply B has a good honest report and timeline but its effects are largely qualitative and it lacks per-fix verification, which is what the criteria require. A is clearly stronger on the criterion.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies correctly identify the oversized RSC payload, the useSearchParams Suspense bailout, and the search-path cost, and both respect the static-export and SEO constraints. Reply A ties each recommendation to a specific measured symptom, for example FCP 1.9s versus LCP 3.8s pointing to a replaced H1, and 640ms minus 50ms giving 590ms of the TBT. It then gives numeric expected-effect ranges with reasoning, explicit pass thresholds per recommendation (for example a max long task of 400ms or less and an RSC payload of 300KB or less), and runnable console and grep verification snippets. Reply B has a good symptom, cause, action, effect, validation structure, but its expected effects are qualitative (\"수백 ms 줄어듭니다\", \"가능성이 높습니다\") and its validations list metrics to look at rather than pass criteria. A is long, but the extra length is mostly the concrete verification and measurement detail the criterion asks for. It also labels assumptions clearly.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no data, so both replies correctly refuse to guess and ask focused questions instead of inventing causes. Reply A asks well-prioritised questions and gives a precise measurement checklist (CrUX, LCP element, TTFB, long tasks), but it only promises linking recommendations to symptoms later. Reply B asks for the URL and symptom type, and also gives a symptom, threshold, suspected-area table that already links measurable symptoms to likely causes. It also includes assumptions, risks such as measuring before fixing and saving a baseline, and next steps. That table addresses the criterion more directly, while A is slightly more thorough on data collection. B's generic thresholds and its \"experience says images first\" prior are stated with appropriate hedging. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to fabricate a 92 score and metrics, and both offer a fill-in-the-blank honest report section with real measured baselines. Reply A links each recommendation to a specific metric, gives an explicit verification method (Lighthouse audits named, 5-run median) and a pass threshold, and sizes the effects with caveats. It also catches that 1.8MB at Lighthouse's simulated 1.6Mbps would take about 9s, which conflicts with the 6.8s LCP, and tells the user to confirm the LCP element before assuming the hero is it. That is a careful, grounded observation. A also includes a full measurement protocol and a candid view on whether 90+ is reachable by Friday. Reply B is good and concise, but its expected effects are vaguer (\"often several seconds\", \"300 to 800ms\" for chat widgets, unsourced), and most fixes lack a per-item validation method or pass criterion.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

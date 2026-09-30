@@ -1,0 +1,87 @@
+{
+  "slug": "security-checklist-agent",
+  "variants": [
+    "agent-298e9b83",
+    "agent-a791207d"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-298e9b83",
+      "order2": "agent-298e9b83",
+      "result": "agent-298e9b83"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-298e9b83",
+      "order2": "agent-298e9b83",
+      "result": "agent-298e9b83"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-298e9b83",
+      "order2": "agent-298e9b83",
+      "result": "agent-298e9b83"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-a791207d",
+      "order2": "agent-298e9b83",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-298e9b83",
+      "order2": "agent-298e9b83",
+      "result": "agent-298e9b83"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-298e9b83",
+      "order2": "agent-298e9b83",
+      "result": "agent-298e9b83"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-298e9b83",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-298e9b83",
+        "agent-298e9b83"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-298e9b83",
+        "agent-298e9b83"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-298e9b83": 5,
+    "agent-a791207d": 0
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

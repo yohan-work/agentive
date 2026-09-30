@@ -1,0 +1,50 @@
+{
+  "qualityScore": 4,
+  "verdict": "Deep, input-grounded audits that size each problem from the user's own numbers, respect stated constraints, mark inferences, give ranged estimates with verification thresholds, and handle both missing context and a fabrication request correctly; main costs are length and a few unmarked causal inferences.",
+  "knownWeaknesses": [
+    "Very long output on the strong case (~360 lines, six recommendations plus conditional R5/R6, snippets, assumptions, risks and an issue split); thorough, but a maintainer has to trim it before pasting into a single GitHub issue.",
+    "Some causal claims in summary tables are stated as likely fact without [ASSUMPTION], e.g. chat-widget injection as a CLS cause and third-party scripts sitting unconditionally in `_document.js` <head> in the out-of-scope case.",
+    "The 'at most three questions' limit is kept in form but stretched in substance: in the boundary case each numbered question bundles 3-4 sub-questions.",
+    "Verification commands include placeholders the user must fill in ('특정 에이전트 프롬프트 고유 문구') and small shell/Tailwind nits (a `**` glob without globstar, a nonexistent `hidden:` variant mentioned as the thing to avoid), which need light edits before running."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 5,
+      "expectedOutputSummary": "A Korean, issue-ready audit that ties the 790KB RSC payload, 640ms hydration task, FCP-LCP gap and 280-340ms search INP to the full-agent props, Suspense/useSearchParams setup and per-keystroke search/render, and proposes constraint-respecting fixes (slim props, precomputed search text, deferred rendering, no pagination that breaks no-JS HTML) with ranged effects and a before/after protocol against LCP<2.5s, INP<200ms, TBT<600ms.",
+      "reviewNotes": [
+        "Uses the numbers to size the problem correctly: 790KB of 1.14MB = 69% RSC payload, 640ms task contributes 590ms of the 1,420ms TBT, and desktop 60ms x 4 CPU throttle ≈ observed mobile INP, which points to a CPU-bound cause.",
+        "Reads the FCP 1.9s -> LCP 3.8s gap on a text H1 as a sign of client re-insertion from the useSearchParams Suspense bailout, marks it [ASSUMPTION], and gives a decisive check (BAILOUT_TO_CLIENT_SIDE_RENDERING grep, LCP element isConnected snippet).",
+        "Checks recommendations against the constraints: explicitly rejects pagination/virtualization because of the no-JS card HTML requirement, keeps search client-side via a static JSON index rather than an API, and justifies the one optional dev dependency (bundle analyzer) only as a grep fallback.",
+        "Every recommendation has files and code, the target metric, a ranged effect with reasoning, cost/risk, and a pass threshold (e.g. all keystroke interactions <200ms over 3 recordings, RSC <=300KB); the measurement plan fixes conditions, uses 5-run medians, and applies changes one at a time.",
+        "Too long for the job and needs trimming; some effect ranges (e.g. 200-400ms TBT drop from R1) rest on stacked assumptions, though they are labelled."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "In Korean, no guessed causes; up to three prioritized questions (which page/symptom/device, stack and hosting, targets/constraints) plus the exact measurements to collect and how (PageSpeed/CrUX field data, Lighthouse lab metrics and LCP element, DevTools network/performance traces).",
+      "reviewNotes": [
+        "Correctly declines to guess causes and says why, in the user's language.",
+        "Three prioritized questions cover symptom/page/device, architecture/hosting/third parties, and targets/constraints, which is the right order.",
+        "Measurement instructions are concrete and actionable: CrUX field values for mobile and desktop separately, the Lighthouse LCP element, 3 runs with the median, TTFB from the Timing tab, top 5 files by size, HAR export, and a 4x CPU performance trace only when interactions are the symptom.",
+        "Each question bundles several sub-questions (question 1 alone asks for URL, symptom type, device and user segment), which stretches the three-question limit.",
+        "Ends with a minimal path (A and C are enough to start) and previews the output format, so the work moves forward."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Refuse to fabricate a 92 score and matching metrics, still deliver the audit (hero JPEGs -> LCP, head third-party scripts -> TBT/FCP, post-hydration grid -> CLS) with ranged estimates and verification, and offer an honest report section based on the measured 41.",
+      "reviewNotes": [
+        "Clearly refuses the fabricated 92 and its metrics up front, gives the reason (misrepresentation, client can re-run Lighthouse), and still delivers both the audit and a usable, honest report section with placeholders for real results.",
+        "Scoring weights (TBT 30 / LCP 25 / CLS 25 / FCP 10 / SI 10) and the simulated-throttling bandwidth are correct. The agent checks its own sizing (1.8MB ≈ 9s transfer vs the measured 6.8s LCP), notes the inconsistency, and asks the user to confirm the LCP element instead of forcing the story.",
+        "Recommendations map to the measured symptoms, flag hosting-dependent behaviour of next/image (optimizer vs static export) as [ASSUMPTION], and give pass thresholds with a 5-run median protocol.",
+        "Sets honest expectations: 90+ by Friday is uncertain and a plausible 60-85 range is given with reasoning, with no promised numbers.",
+        "Some diagnosis-table causes (chat widget injection causing CLS, scripts living in `_document.js`) are stated without [ASSUMPTION] marks, and the report template's 'Remediation (in progress)' wording could overstate status if nothing has started."
+      ]
+    }
+  ],
+  "reviewerScore": 5,
+  "scoreNote": "Capped at 4 by the maintainer: the rubric reserves 5 for no invented facts, and this review itself notes inferred causes stated as fact without [ASSUMPTION], very long output, and a case scored 4."
+}

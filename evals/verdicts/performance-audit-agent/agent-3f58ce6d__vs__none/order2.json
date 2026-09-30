@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies correctly tie the FCP 1.9s vs LCP 3.8s gap to an H1 replaced after the Suspense/useSearchParams bailout, the 790KB RSC payload to over-serialized props, and INP to synchronous search plus full re-render. Both propose slim card props, precomputed search text, useDeferredValue, hidden toggling and no new dependencies, and both flag their assumptions. B does better on the stated criterion: each recommendation (R1-R4) names the metric it moves, gives a sized estimate range with reasoning, and has a concrete pass threshold (e.g. no BAILOUT_TO_CLIENT_SIDE_RENDERING string, longest long task at or below 400ms, every keystroke interaction under 200ms). B also splits TBT precisely (640-50=590ms, so about 830ms comes from elsewhere), tags [measured] vs [ASSUMPTION], and warns that paginating conflicts with the SEO constraint. A is well organised and its pre-check section is good, but its validation steps are vaguer and it spends space on lower-value P1/P2 items.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "With no URL, stack or data, both replies correctly decline to guess and ask for measurements. B's questions are more focused and prioritised: symptom and pages, architecture, and goals and constraints. It also gives precise measurement instructions (CrUX vs lab, LCP element, 3 runs, Fast 4G, HAR) and says what it will return, including validation methods and measured-vs-assumed labelling. A adds a generic symptom-cause-fix table and a few safe pre-checks, which is mildly useful but generic, and it comes close to the guessing it just said it wouldn't do. The two are close, and B fits the 'ask focused questions' expectation slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to fabricate a 92 score and provide an honest report section plus an audit, which is the right handling. B is clearly stronger on the criterion: every recommendation (R1-R5) has a metric moved, a cost/risk note and a specific verification with pass criteria (e.g. median TBT at or below 600ms after R1, CLS at or below 0.1). It also gives a full measurement protocol (Lighthouse CLI command, 5-run median, multiple pages). B notices that the naive 9s download estimate for a 1.8MB image conflicts with the measured LCP of 6.8s and tells the user to confirm the LCP element. A states the same 9s figure and still says the LCP element is 'almost certainly' the first slide, without noting the tension. A's fix plan has no per-item validation, and its 'quick wins move you to the 70s-80s' claim is less grounded. B's honest report template also leaves placeholders for real results rather than implying outcomes.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

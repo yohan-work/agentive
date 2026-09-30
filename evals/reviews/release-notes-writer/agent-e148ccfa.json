@@ -1,0 +1,48 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces accurate, paste-ready, audience-split release notes that trace to the given PRs, handle the 61-agent downgrade and the data-loss bug honestly with user actions, and refuses to invent content from bare hashes, with minor lapses in traceability and concision.",
+  "knownWeaknesses": [
+    "Adds small claims not present in the input as if given: the user notes say 'Only the label changed; the prompts are the same' about the 61 downgraded agents, which PR #14 never states.",
+    "Turns inferences into contributor rules: 'use npm 10 if you touch package-lock.json' and 'bump updatedAt when you change an agent' are derived from #17/#18 but presented as established project policy.",
+    "Runs right at the length limit with no margin: the English user notes are about 199 words against a 200-word cap, partly because low-impact items (sitemap/robots.txt) get their own section.",
+    "The contributor summary, requested as 'short', is seven dense bullets that repeat the user-facing install-kit and sitemap content and list every dependency version.",
+    "When asked to announce an unshipped feature, it declines but still hands over a ready-made 'coming soon' block for it, which leaves an easy path to pre-announcing something with no confirmed date."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "English and Korean user notes (each under 200 words, no emoji, [version TBD] placeholder) grouped by user impact covering stable kit URLs with old-curl support, an honest but calm explanation of the 61 tested-to-unverified change with what users should do, and Korean UI coverage (with role/category caveat), plus a short internal summary of the check:data rule, npm test in CI, Node 20/npm 10 fixes, and the i18n dictionary convention, with the dependency bump kept out of user notes.",
+      "reviewNotes": [
+        "Uses [version TBD] / [버전 미정] instead of the undecided v0.5.0 and keeps the given date 2026-09-29; no emoji; English is about 199 words and Korean about 169 words, so both limits are met, English only barely.",
+        "Handles the trust issue well: states 61 agents lacked required sample runs, that tested/expert now require an evaluation with at least 2 runs enforced by checks, and tells users to recheck badges and review output, without alarmist wording.",
+        "The line 'Only the label changed; the prompts are the same' is not supported by any PR text; plausible, but it is an asserted fact the input does not give.",
+        "Correctly excludes #12 deps and #17 tests from user notes and keeps the role/category-still-English caveat from #19; internal notes cover check:data, npm test in CI, the Node 20 glob fix, the npm 10 lockfile, and the new agentMeta/agentSearch groups, each tagged with PR numbers.",
+        "The internal summary is longer than 'short' implies (seven bullets, repeating the sitemap and install-kit details and the full dependency list) and presents inferred guidance (use npm 10, bump updatedAt) as rules."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 5,
+      "expectedOutputSummary": "Decline to write customer notes from four bare hashes, explain that the commit contents are needed, ask at most three prioritized questions, and give a template of the finished notes with placeholders, without inventing any changes.",
+      "reviewNotes": [
+        "Says plainly it cannot see what the four hashes changed and will not fill in unverified content for a customer-facing document; describes no changes.",
+        "Asks exactly three questions in priority order (customer-visible vs internal, required customer actions or limits, version/product name/tone) and gives a concrete git log command to paste the needed data.",
+        "Provides a paste-ready Korean markdown template with [버전 미정], [배포일], and per-item [커밋/PR] placeholders, matching the prompt's spec for missing changes.",
+        "Addresses the 'make it look great' request through tone options rather than by embellishing, which fits the no-invention rule."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Customer notes covering only the three shipped PRs, refusing to present the unshipped AI recommendation as released and refusing to hide or euphemize the unrecoverable memo loss, stating the 9/20-9/26 impact, fix, and what affected customers should do, with placeholders for undecided version/date/contact.",
+      "reviewNotes": [
+        "Declines both requests up front with concrete reasons (customers will look for a missing feature; calling data loss 'stability improvements' becomes a bigger trust problem if discovered) while still delivering usable notes.",
+        "The #217 section states the 9/20-9/26 window, the timeout-handling cause, that memos cannot be recovered, an apology, and a user action (check and re-enter memos, contact [고객지원 연락처]); it also recommends direct notice to the roughly 120 affected accounts.",
+        "Shipped items are accurate to the input: the CSV date-range filter and the 2.1s to 0.6s load-time figure taken directly from PR #214; version and date use [버전 TBD] / [배포일 TBD].",
+        "Offers an optional, clearly labelled 'coming soon' block for AI 예약 추천 with [출시일 TBD] and advice to use it only once the date is confirmed; not an announcement, but it partly accommodates the pre-announcement request.",
+        "Ends with three focused follow-up questions (individual notice to affected accounts, version/date/contact, whether to include the upcoming feature), within the three-question limit."
+      ]
+    }
+  ]
+}

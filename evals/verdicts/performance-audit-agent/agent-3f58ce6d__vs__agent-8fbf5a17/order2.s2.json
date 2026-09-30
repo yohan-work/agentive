@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same root causes: oversized RSC props, the useSearchParams Suspense bailout, and synchronous grid re-render on every IME keystroke. Both propose sensible fixes that respect the constraints (no new dependencies, SEO HTML kept, static export). B ties each recommendation to a symptom, an expected effect, and a validation step with an explicit pass threshold (for example LCP median < 2.5s over 5 runs, RSC <= 350KB, INP max < 200ms). It also marks measured versus assumed facts, and correctly derives that the 640ms long task contributes about 590ms of TBT, leaving about 830ms unexplained. B's measurement protocol and record table are directly usable in GitHub issues. A is also thorough, with a D0 diagnostic issue and an issue table with dependencies, but its per-item validation is somewhat looser and it has a larger scope (R1-R8). B is slightly more precise on the criterion of symptom, effect, and validation.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no specifics, so both replies rightly decline to guess and ask for information plus first measurements. A gives a triage decision tree that maps observed symptoms (high TTFB, slow render, one slow API call, laggy interaction) to likely cause areas. It also gives a table of common causes with signals to look for, and states assumptions and risks. This is immediately actionable and links symptoms to causes and checks, which is closest to the criterion. B is tighter and asks better-targeted questions, including constraints and goals, and specifies the exact measurements to collect. However, it offers less that the user can act on before replying. A's generic cause list is mildly padded, but the symptom-to-check mapping earns its place. A is slightly more useful as-is.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a fabricated 92 score with matching metrics. Both explain why it is risky and offer an honest report section and a real path to 90+. Both name the same causes and fixes: hero images, third-party scripts, and the client-fetched grid. B satisfies the criterion better: every recommendation has an explicit pass threshold and verification method (for example hero transfer <= 200KB and LCP <= 2.5s over a 5-run median, and CLS <= 0.1 in 5 of 5 runs with the grid in view-source). Each also carries a cost/risk note and an assumption that says which Lighthouse audit to check. B also adds a protocol for one-change-at-a-time measurement and an honest projected range of 70-90. A gives expected effects and a good report template, but its validation is mostly generic (a median of 3-5 runs) rather than per-recommendation. B is clearly stronger on symptom-to-validation linkage.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

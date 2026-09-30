@@ -32,11 +32,23 @@ inputs:
   - Constraints
   - Available notes or data
 outputs:
-  - release notes
-  - Assumptions
-  - Risks
-  - Recommended next actions
-prompt: You are Release Notes Writer. Convert the user's context into a practical release notes. Ask only for missing information that is required. Return clear sections, assumptions, recommendations, risks, and next actions.
+  - Release notes
+  - User-facing changes
+  - Internal notes
+  - Caveats
+prompt: |-
+  You write release notes that tell each audience what changed for them, accurately and in their language.
+
+  If the changes themselves are missing (only hashes, titles without content, or no list), say what you need, ask up to three questions (most important first), and give a template showing what the notes will look like. Never describe changes you cannot see.
+
+  Output: the notes for each audience the user asks for, ready to paste. For users: changes grouped by what they can now do or what behaves differently, with the action they need to take, if any. For contributors or internal readers: workflow, tooling, and rule changes they must know.
+
+  Rules:
+  - Go deep on every change, constraint, audience, and tone requirement the user states: every user-visible change appears, each claim traces to a PR or commit given, and length, language, and format limits are met exactly.
+  - Leave out internal-only noise (dependency bumps, refactors, tests) from user notes unless it changes behavior; put it in the internal notes.
+  - State caveats and trust-affecting changes plainly, with what users should do.
+  - Never invent version numbers, dates, metrics, or features; use a placeholder like [version TBD] when one is not decided.
+  - Reply in the language(s) the user asks for.
 exampleInput: |-
   이번 주 배포(2026-09-29) 릴리스 노트를 써 주세요. 두 가지 버전이 필요합니다: (1) GitHub Releases와 사이트 공지에 올릴 사용자용(영어 + 한국어), (2) 기여자용 짧은 내부 요약.
 
@@ -75,89 +87,57 @@ exampleInput: |-
   - 버전 번호는 아직 안 정함(v0.5.0 예정이지만 확정 아님).
   - 내부용에는 기여자가 알아야 할 변경(check:data 규칙, npm test, Node 버전 이슈)을 넣어 주세요.
 exampleOutput: |-
-  주신 PR 목록으로 두 버전을 모두 만들 수 있어서 추가로 여쭐 것은 없습니다. 버전 번호는 `vX.Y.Z`로 비워 두었고, 확정되면 바꿔 넣으시면 됩니다(아래 "다음 할 일" 참고).
+  버전 번호는 확정 전이라 `[version TBD]` / `[버전 미정]`으로 두었습니다. 확정되면 제목만 바꾸면 됩니다.
 
   ---
 
-  ## 1. 사용자용: English (약 190단어)
+  ## 1. 사용자용: English (GitHub Releases / site notice)
 
-  ```markdown
-  # Agent Archive vX.Y.Z (2026-09-29)
+  ## Agent Archive [version TBD] (2026-09-29)
 
-  ## Download install kits directly
-  Every agent's install kit now has stable URLs at `https://yohan-work.github.io/agentive/kits/<slug>/<file>`. You can fetch a kit with curl or link to it from your own project. Each agent page shows a one-line curl command and per-file links, and the kit README lists the download URLs. The command also works with older curl versions, such as those on Ubuntu 20.04 and Debian 10.
+  ### Install kits from stable URLs
+  Every install kit file now has a fixed URL at `/kits/<slug>/<file>`. Each agent page shows a one-line curl command and per-file links, and the kit README lists the download URLs, so you can fetch a kit from the terminal or link to it from another project. The command also works on curl older than 7.73 (e.g. Ubuntu 20.04, Debian 10).
 
-  ## Corrected verification labels
-  We reviewed verification statuses and found that 61 agents were labelled "tested" without the recorded sample runs our guidelines require. They are now "unverified". Their prompts and kits have not changed. Only the label changed, so it now matches what was actually recorded. Going forward, an agent can only be labelled "tested" or "expert" if it records an evaluation with at least two sample runs. If you use one of these agents, contributing sample runs is the fastest way to restore its status.
+  ### Verification labels corrected
+  61 agents were labelled "tested" without the recorded sample runs our contribution guidelines require. They are now "unverified". Only the label changed; the prompts are the same. From now on, "tested" and "expert" require a recorded evaluation with at least two sample runs, and our data checks enforce this. If you picked an agent because it was marked tested, check its current badge and review its output before relying on it.
 
-  ## More of the site in Korean
-  On /ko, agent detail pages, status and difficulty badges, agent and workflow cards, and the agent search panel are now in Korean. Role and category names are still in English. That work is tracked separately.
+  ### More of the site in Korean
+  On /ko, agent detail pages, badges, cards, and the agent search panel are now in Korean. Role and category names are still in English; this is tracked separately.
 
-  ## Sitemap
-  The site now publishes sitemap.xml and robots.txt, with English and Korean alternates for every page.
-  ```
+  ### Sitemap
+  The site now publishes sitemap.xml and robots.txt, with English and Korean alternates for each page.
 
-  ## 1. 사용자용: 한국어 (약 130어절)
+  ---
 
-  ```markdown
-  # Agent Archive vX.Y.Z (2026-09-29)
+  ## 1. 사용자용: 한국어 (GitHub Releases / 사이트 공지)
 
-  ## 설치 키트 직접 다운로드
-  이제 모든 에이전트의 설치 키트를 고정 URL(`https://yohan-work.github.io/agentive/kits/<slug>/<file>`)에서 받을 수 있습니다. curl로 내려받거나 다른 프로젝트에서 바로 링크할 수 있습니다. 에이전트 페이지에는 한 줄 curl 명령과 파일별 링크가 표시되고, 키트 README에도 다운로드 URL이 들어 있습니다. Ubuntu 20.04, Debian 10처럼 curl 버전이 낮은 환경에서도 동작합니다.
+  ## Agent Archive [버전 미정] (2026-09-29)
 
-  ## 검증 상태 정정
-  검증 상태를 점검한 결과, 61개 에이전트가 기여 가이드에서 요구하는 샘플 실행 기록 없이 "tested"로 표시되어 있었습니다. 이 에이전트들은 "unverified"로 바꿨습니다. 프롬프트와 키트 내용은 그대로이고, 실제 기록된 검증 수준에 맞게 표시만 고쳤습니다. 앞으로는 평가와 2회 이상의 샘플 실행 기록이 있어야 "tested"나 "expert"로 표시할 수 있습니다. 이 에이전트를 써 보셨다면 샘플 실행을 기여해 주세요. 상태를 되돌리는 가장 빠른 방법입니다.
+  ### 고정 URL로 설치 키트 받기
+  모든 설치 키트 파일을 `/kits/<slug>/<file>` 고정 주소로 받을 수 있습니다. 에이전트 페이지에 한 줄짜리 curl 명령과 파일별 링크가 표시되고, 키트 README에도 다운로드 URL이 들어 있어 터미널에서 바로 받거나 다른 프로젝트에서 링크할 수 있습니다. 이 명령은 curl 7.73 미만(예: Ubuntu 20.04, Debian 10)에서도 동작합니다.
 
-  ## 한국어 화면 확대
-  /ko의 에이전트 상세 페이지, 상태·난이도 배지, 에이전트·워크플로 카드, 에이전트 검색 패널이 한국어로 표시됩니다. 역할과 카테고리 이름은 아직 영어이며, 별도로 작업하고 있습니다.
+  ### 검증 상태 표시 수정
+  에이전트 61개가 기여 가이드에서 요구하는 샘플 실행 기록 없이 "tested"로 표시되어 있었습니다. 이 에이전트들은 이제 "unverified"로 표시됩니다. 바뀐 것은 표시뿐이며 프롬프트 내용은 그대로입니다. 앞으로 "tested"와 "expert"는 샘플 실행 2회 이상이 포함된 평가 기록이 있어야 하며, 데이터 검사에서 이를 확인합니다. "tested" 표시를 보고 에이전트를 골랐다면 현재 배지를 확인하고, 결과물을 검토한 뒤 사용해 주세요.
 
-  ## 사이트맵
-  sitemap.xml과 robots.txt를 제공합니다. 모든 페이지에 영어/한국어 대체 링크가 포함됩니다.
-  ```
+  ### 한국어 화면 확대
+  /ko에서 에이전트 상세 페이지, 배지, 카드, 에이전트 검색 패널이 한국어로 표시됩니다. 역할·카테고리 이름은 아직 영어이며, 별도로 관리하고 있습니다.
+
+  ### 사이트맵
+  sitemap.xml과 robots.txt를 제공하며, 각 페이지의 영어·한국어 버전을 서로 연결합니다.
 
   ---
 
   ## 2. 기여자용 내부 요약
 
-  **vX.Y.Z (2026-09-29) — 기여자가 알아야 할 변경**
+  **[version TBD] (2026-09-29) — contributor notes**
 
-  - **check:data 검증 규칙 강화 (#14).** 이제 `verifiedStatus: tested` 또는 `expert`인 에이전트는 평가(evaluation)와 샘플 실행 2회 이상이 기록되어 있어야 합니다. 없으면 `npm run check:data`와 CI가 실패합니다. CONTRIBUTING.md에도 expert에 샘플 실행이 필요하다는 내용이 추가되었습니다.
-  - **상태를 바꾸면 `updatedAt`도 올려 주세요 (#16, #18).** sitemap의 `lastModified`가 `updatedAt`에서 나옵니다. 지금은 check:data가 이것을 강제하지 않으니 직접 챙겨야 합니다.
-  - **`npm test` 추가, CI에서도 실행 (#17).** tsx로 돌리는 node:test 스위트입니다(install kit, search, locale 헬퍼). PR을 올리기 전에 기존 check:data / lint / typecheck / build에 더해 `npm test`도 돌려 주세요.
-  - **Node 20과 npm 10 (#17).** 테스트 glob을 Node가 아니라 셸이 펼치도록 바꿔서 Node 20에서도 `npm test`가 동작합니다. lockfile은 npm 10으로 다시 생성했습니다. 다른 npm 메이저 버전으로 lockfile을 다시 만들면 CI의 `npm ci`가 깨질 수 있습니다.
-  - **키트 URL은 이제 공개 계약입니다 (#13).** `/kits/<slug>/<file>`로 외부에서 링크합니다. 에이전트 slug나 키트 파일 이름을 바꾸면 외부 링크가 깨집니다. 설치 명령은 curl 7.73 미만을 지원하려고 `--output-dir` 대신 디렉터리를 만든 뒤 subshell에서 curl을 실행합니다. 이 방식을 유지해 주세요.
-  - **i18n (#15, #19).** 새 dictionary 그룹 `agentMeta`, `agentSearch`가 생겼습니다. UI 문자열을 하드코딩하지 말고, 키는 en과 ko 양쪽에 모두 추가해 주세요. 역할/카테고리 이름 번역은 아직 남아 있습니다.
-  - **의존성 (#12).** react/react-dom 19.3.0, @types/node 22.20.4, autoprefixer 10.6.1로 올렸습니다(마이너/패치).
-
-  ---
-
-  ## 가정
-
-  - 키트 URL은 사이트 base path(`/agentive/`) 아래에서 제공된다고 보고 전체 URL로 적었습니다. 실제 경로가 다르면 고쳐 주세요.
-  - 61개 에이전트는 프롬프트/키트 내용이 바뀌지 않고 상태 라벨과 `updatedAt`만 바뀌었다고 봤습니다(#14, #18 설명 기준).
-  - /ko에서 상태 배지가 이제 한국어로 보이면, 한국어 노트의 "tested"/"unverified"를 화면에 실제로 보이는 문구로 바꾸거나 함께 적는 편이 좋습니다.
-  - 테스트, 의존성 업데이트, lockfile 변경은 사용자에게 보이는 변화가 아니어서 사용자용 노트에서는 뺐습니다.
-
-  ## 권장 사항
-
-  - 검증 상태 정정 항목에서 61개 에이전트 목록(또는 `unverified` 필터 링크)을 연결하면 투명하게 보이고 문의도 줄어듭니다.
-  - 샘플 실행을 기여하는 방법(CONTRIBUTING.md 해당 절)을 링크해서 "상태를 되돌리는 법"을 실제로 할 수 있게 해 주세요.
-  - 키트 기능이 이번 릴리스의 대표 기능이니, GitHub Releases 첫머리에 curl 명령 예시 하나를 실제 slug로 넣는 것을 권합니다.
-
-  ## 리스크
-
-  - **신뢰 인식:** "tested → unverified"를 품질이 떨어졌다는 뜻으로 읽는 사용자가 있을 수 있습니다. 노트에 "내용은 바뀌지 않았다"를 넣어 두었지만, 공지 채널에서 질문이 들어오면 같은 문장으로 답하도록 맞춰 두세요.
-  - **외부 링크 의존:** 키트 URL이 공개되었으므로 앞으로 slug 이름 변경이 breaking change가 됩니다. 리다이렉트 정책이 없다면 정해 둘 필요가 있습니다.
-  - **기여자 PR 실패:** 새 check:data 규칙과 `npm test` 때문에 진행 중인 기여 PR이 CI에서 갑자기 실패할 수 있습니다. 열려 있는 PR 작성자에게 알려 주세요.
-  - **React 19.3 마이너 업데이트:** 위험은 낮지만 정적 export 결과를 배포 전에 한 번 눈으로 확인하는 것이 좋습니다.
-
-  ## 다음 할 일
-
-  1. 버전 번호 확정(변경 범위상 새 기능 + 비호환 변경 없음이라 v0.5.0이 적절해 보입니다) 후 `vX.Y.Z` 교체.
-  2. 키트 URL 예시와 base path 실제 값 확인.
-  3. /ko 배지 문구 확인 후 한국어 노트의 상태 이름 맞추기.
-  4. 61개 에이전트 목록 링크와 CONTRIBUTING 링크 추가.
-  5. GitHub Releases와 사이트 공지 게시 후 내부 요약을 기여자 채널에 공유하고, 열려 있는 PR에 새 CI 요구 사항을 알리기.
+  - **Verification rules (#14, #18):** `check:data` now rejects `verifiedStatus: tested` or `expert` unless the agent records an evaluation with at least 2 sample runs. CONTRIBUTING.md now states this applies to `expert` too. 61 agents were lowered to `unverified`, and their `updatedAt` was bumped (#18). To raise a status, add the evaluation and sample runs first.
+  - **`updatedAt` feeds the sitemap (#16, #18):** agent pages use `updatedAt` as `lastModified` in sitemap.xml, so bump it when you change an agent.
+  - **Tests in CI (#17):** `npm test` (node:test via tsx) now runs in CI; run it locally before opening a PR. The test glob is now expanded by the shell so it works on Node 20. The lockfile was regenerated with npm 10 so `npm ci` passes; use npm 10 if you touch `package-lock.json`.
+  - **i18n (#15, #19):** agent detail page strings moved into the en/ko dictionaries; badges, cards, and the search panel use the new `agentMeta` and `agentSearch` groups. Add new UI strings to both `en` and `ko` instead of hardcoding English. Role and category names are still English (tracked separately).
+  - **Install kits (#13):** kit files are prerendered to `/kits/<slug>/<file>`. The install command avoids `curl --output-dir` (missing before curl 7.73); it creates the directory and runs curl in a subshell. Don't reintroduce `--output-dir`.
+  - **Sitemap (#16):** sitemap.xml and robots.txt list every localized page with en/ko hreflang alternates; Bookmarks is intentionally excluded.
+  - **Dependencies (#12):** react/react-dom 19.2.7 → 19.3.0 with matching `@types/react`/`@types/react-dom`, `@types/node` 22.20.0 → 22.20.4, autoprefixer 10.5.2 → 10.6.1.
 limitations:
   - Quality depends on the specificity and accuracy of the provided context.
 bestPractices:
@@ -169,7 +149,7 @@ realUseCases:
     problem: PR 제목만으로는 사용자가 이해할 수 있는 변화 설명이 부족함
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Release Notes Writer에게 release notes 형태로 정리해 달라고 요청합니다.
     exampleInput: 이번 주 배포 내용을 고객과 내부팀에 공유해야 하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 release notes을 만들어줘.
-    expectedResult: release notes 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    expectedResult: 독자별(사용자·기여자) 릴리스 노트가 요청한 언어와 길이로 정리되고, 모든 문장이 주어진 PR·커밋에 근거하며 신뢰에 영향을 주는 변경은 솔직하게 안내됩니다.
     recommendedWorkflow: Codex Development Prep Flow
 installTargets:
   - codex
@@ -200,10 +180,10 @@ runbook:
     Available files, notes, or data:
 
     Expected output:
-    - release notes
-    - Assumptions
-    - Risks
-    - Recommended next actions
+    - Release notes
+    - User-facing changes
+    - Internal notes
+    - Caveats
   starterInputs:
     - label: First useful run
       description: Use this when you know the goal but still need a structured first draft.
@@ -224,9 +204,9 @@ runbook:
         Constraints:
         - 
         Review needs:
-        - Call out assumptions.
+        - Go deep on the risks and constraints listed above.
+        - Mark assumptions.
         - Flag missing context.
-        - End with concrete next actions.
     - label: Boundary check
       description: Use this when the request may be under-specified and you want the agent to narrow it safely.
       value: |-
@@ -247,26 +227,21 @@ runbook:
       whyItFails: The agent cannot tell whether better means clearer, safer, faster, more complete, or easier to hand off.
       strongerInput: Improve the output for 이번 주 배포 내용을 고객과 내부팀에 공유해야 하는 상황. Optimize for release notes, keep assumptions explicit, and list the changes made.
   expectedOutputShape:
-    - A short summary of the recommended release notes
-    - A clearly labeled release notes section
-    - A clearly labeled Assumptions section
-    - A clearly labeled Risks section
-    - A clearly labeled Recommended next actions section
-    - Assumptions and missing context separated from confirmed facts
-    - Risks, review checkpoints, and concrete next actions
+    - Notes for each requested audience, ready to paste
+    - User notes grouped by what users can now do or what behaves differently, with any action they need to take
+    - "Internal notes, when requested: workflow, tooling, and rule changes contributors must know"
+    - Placeholders such as [version TBD] for anything not yet decided
   outputChecklist:
-    - Includes release notes
-    - Includes Assumptions
-    - Includes Risks
-    - Includes Recommended next actions
-    - States assumptions separately from confirmed facts
-    - Lists concrete next actions
-    - Calls out risks or missing context
+    - Every user-visible change appears and each claim traces to a given PR or commit
+    - Length, language, and format limits are met exactly
+    - Internal-only changes stay out of the user notes unless they change behavior
+    - Caveats and trust-affecting changes are stated plainly with what users should do
+    - No version numbers, dates, metrics, or features were invented
   failureModes:
-    - The input is too broad or lacks project context
-    - The output is generic and does not mention concrete constraints
-    - The result skips assumptions, risks, or next actions
-    - The agent invents project facts that were not provided
+    - A user-visible change is missing or a claim has no source PR or commit
+    - Length, language, or format limits are not met
+    - Dependency bumps or refactors clutter the user notes
+    - The notes invent a version, date, metric, or unshipped feature, or hide a trust-affecting change
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.
@@ -284,15 +259,16 @@ evaluation:
     - Fully autonomous production changes without human review
     - Work requiring legal, financial, medical, compliance, or security certification
   knownWeaknesses:
-    - "Misreports its own length: the English user notes are about 212 words, over the 200-word limit, but are labelled '약 190단어'."
-    - "States inferences as facts. The internal summary says '지금은 check:data가 이것을 강제하지 않으니' (updatedAt), but no PR says this. The user notes say 'Their prompts and kits have not changed' when #14 and #18 only describe label and updatedAt changes."
-    - "Small overclaims when rewording the PRs: 'agent detail pages ... are now in Korean' (#15 moved only the UI chrome), 'alternates for every page' (#16 excludes Bookmarks), and 'react/react-dom 19.3.0' (the input gives no react-dom version)."
-    - The version advice ('비호환 변경 없음이라 v0.5.0') ignores the stricter check:data rule, which can break contributors' in-flight PRs. The run's own Risks section points that out.
-    - In the boundary run it gives only a section skeleton, not a provisional draft, so there is nothing to show the customer until the user replies.
+    - "Adds small claims not present in the input as if given: the user notes say 'Only the label changed; the prompts are the same' about the 61 downgraded agents, which PR #14 never states."
+    - "Turns inferences into contributor rules: 'use npm 10 if you touch package-lock.json' and 'bump updatedAt when you change an agent' are derived from #17/#18 but presented as established project policy."
+    - "Runs right at the length limit with no margin: the English user notes are about 199 words against a 200-word cap, partly because low-impact items (sitemap/robots.txt) get their own section."
+    - The contributor summary, requested as 'short', is seven dense bullets that repeat the user-facing install-kit and sitemap content and list every dependency version.
+    - When asked to announce an unshipped feature, it declines but still hands over a ready-made 'coming soon' block for it, which leaves an easy path to pre-announcing something with no confirmed date.
   evaluationCriteria:
     - Groups changes by user impact, includes caveats, and avoids internal-only noise
     - Produces release notes in a format that can be pasted into a ticket, PR, document, or handoff
-    - States assumptions, missing context, risks, and concrete next actions separately
+    - Uses placeholders such as [version TBD] for anything not decided, and asks at most three focused questions when the changes themselves are missing; never invents facts
+    - Never announces unshipped features or invents versions, dates, or metrics
   sampleRuns:
     - title: Korean+English release notes from the last seven merged PRs
       input: |-
@@ -332,156 +308,185 @@ evaluation:
         - 61개 에이전트가 "tested"에서 "unverified"로 바뀐 건 신뢰 문제라 솔직하게, 하지만 불필요하게 겁주지 않게.
         - 버전 번호는 아직 안 정함(v0.5.0 예정이지만 확정 아님).
         - 내부용에는 기여자가 알아야 할 변경(check:data 규칙, npm test, Node 버전 이슈)을 넣어 주세요.
-      expectedOutputSummary: EN and KO user notes of 200 words or fewer each, grouped by user impact (stable kit URLs with the old-curl fix, the honest but calm tested-to-unverified correction for 61 agents, Korean UI coverage and its role/category caveat, sitemap), with no emoji and a version placeholder. Plus a contributor summary covering the new check:data rule, npm test in CI, the Node 20 glob fix and the npm 10 lockfile, and separate assumptions, risks and next actions.
+      expectedOutputSummary: English and Korean user notes (each under 200 words, no emoji, [version TBD] placeholder) grouped by user impact covering stable kit URLs with old-curl support, an honest but calm explanation of the 61 tested-to-unverified change with what users should do, and Korean UI coverage (with role/category caveat), plus a short internal summary of the check:data rule, npm test in CI, Node 20/npm 10 fixes, and the i18n dictionary convention, with the dependency bump kept out of user notes.
       sampleOutput: |-
-        주신 PR 목록으로 두 버전을 모두 만들 수 있어서 추가로 여쭐 것은 없습니다. 버전 번호는 `vX.Y.Z`로 비워 두었고, 확정되면 바꿔 넣으시면 됩니다(아래 "다음 할 일" 참고).
+        버전 번호는 확정 전이라 `[version TBD]` / `[버전 미정]`으로 두었습니다. 확정되면 제목만 바꾸면 됩니다.
 
         ---
 
-        ## 1. 사용자용: English (약 190단어)
+        ## 1. 사용자용: English (GitHub Releases / site notice)
 
-        ```markdown
-        # Agent Archive vX.Y.Z (2026-09-29)
+        ## Agent Archive [version TBD] (2026-09-29)
 
-        ## Download install kits directly
-        Every agent's install kit now has stable URLs at `https://yohan-work.github.io/agentive/kits/<slug>/<file>`. You can fetch a kit with curl or link to it from your own project. Each agent page shows a one-line curl command and per-file links, and the kit README lists the download URLs. The command also works with older curl versions, such as those on Ubuntu 20.04 and Debian 10.
+        ### Install kits from stable URLs
+        Every install kit file now has a fixed URL at `/kits/<slug>/<file>`. Each agent page shows a one-line curl command and per-file links, and the kit README lists the download URLs, so you can fetch a kit from the terminal or link to it from another project. The command also works on curl older than 7.73 (e.g. Ubuntu 20.04, Debian 10).
 
-        ## Corrected verification labels
-        We reviewed verification statuses and found that 61 agents were labelled "tested" without the recorded sample runs our guidelines require. They are now "unverified". Their prompts and kits have not changed. Only the label changed, so it now matches what was actually recorded. Going forward, an agent can only be labelled "tested" or "expert" if it records an evaluation with at least two sample runs. If you use one of these agents, contributing sample runs is the fastest way to restore its status.
+        ### Verification labels corrected
+        61 agents were labelled "tested" without the recorded sample runs our contribution guidelines require. They are now "unverified". Only the label changed; the prompts are the same. From now on, "tested" and "expert" require a recorded evaluation with at least two sample runs, and our data checks enforce this. If you picked an agent because it was marked tested, check its current badge and review its output before relying on it.
 
-        ## More of the site in Korean
-        On /ko, agent detail pages, status and difficulty badges, agent and workflow cards, and the agent search panel are now in Korean. Role and category names are still in English. That work is tracked separately.
+        ### More of the site in Korean
+        On /ko, agent detail pages, badges, cards, and the agent search panel are now in Korean. Role and category names are still in English; this is tracked separately.
 
-        ## Sitemap
-        The site now publishes sitemap.xml and robots.txt, with English and Korean alternates for every page.
-        ```
+        ### Sitemap
+        The site now publishes sitemap.xml and robots.txt, with English and Korean alternates for each page.
 
-        ## 1. 사용자용: 한국어 (약 130어절)
+        ---
 
-        ```markdown
-        # Agent Archive vX.Y.Z (2026-09-29)
+        ## 1. 사용자용: 한국어 (GitHub Releases / 사이트 공지)
 
-        ## 설치 키트 직접 다운로드
-        이제 모든 에이전트의 설치 키트를 고정 URL(`https://yohan-work.github.io/agentive/kits/<slug>/<file>`)에서 받을 수 있습니다. curl로 내려받거나 다른 프로젝트에서 바로 링크할 수 있습니다. 에이전트 페이지에는 한 줄 curl 명령과 파일별 링크가 표시되고, 키트 README에도 다운로드 URL이 들어 있습니다. Ubuntu 20.04, Debian 10처럼 curl 버전이 낮은 환경에서도 동작합니다.
+        ## Agent Archive [버전 미정] (2026-09-29)
 
-        ## 검증 상태 정정
-        검증 상태를 점검한 결과, 61개 에이전트가 기여 가이드에서 요구하는 샘플 실행 기록 없이 "tested"로 표시되어 있었습니다. 이 에이전트들은 "unverified"로 바꿨습니다. 프롬프트와 키트 내용은 그대로이고, 실제 기록된 검증 수준에 맞게 표시만 고쳤습니다. 앞으로는 평가와 2회 이상의 샘플 실행 기록이 있어야 "tested"나 "expert"로 표시할 수 있습니다. 이 에이전트를 써 보셨다면 샘플 실행을 기여해 주세요. 상태를 되돌리는 가장 빠른 방법입니다.
+        ### 고정 URL로 설치 키트 받기
+        모든 설치 키트 파일을 `/kits/<slug>/<file>` 고정 주소로 받을 수 있습니다. 에이전트 페이지에 한 줄짜리 curl 명령과 파일별 링크가 표시되고, 키트 README에도 다운로드 URL이 들어 있어 터미널에서 바로 받거나 다른 프로젝트에서 링크할 수 있습니다. 이 명령은 curl 7.73 미만(예: Ubuntu 20.04, Debian 10)에서도 동작합니다.
 
-        ## 한국어 화면 확대
-        /ko의 에이전트 상세 페이지, 상태·난이도 배지, 에이전트·워크플로 카드, 에이전트 검색 패널이 한국어로 표시됩니다. 역할과 카테고리 이름은 아직 영어이며, 별도로 작업하고 있습니다.
+        ### 검증 상태 표시 수정
+        에이전트 61개가 기여 가이드에서 요구하는 샘플 실행 기록 없이 "tested"로 표시되어 있었습니다. 이 에이전트들은 이제 "unverified"로 표시됩니다. 바뀐 것은 표시뿐이며 프롬프트 내용은 그대로입니다. 앞으로 "tested"와 "expert"는 샘플 실행 2회 이상이 포함된 평가 기록이 있어야 하며, 데이터 검사에서 이를 확인합니다. "tested" 표시를 보고 에이전트를 골랐다면 현재 배지를 확인하고, 결과물을 검토한 뒤 사용해 주세요.
 
-        ## 사이트맵
-        sitemap.xml과 robots.txt를 제공합니다. 모든 페이지에 영어/한국어 대체 링크가 포함됩니다.
-        ```
+        ### 한국어 화면 확대
+        /ko에서 에이전트 상세 페이지, 배지, 카드, 에이전트 검색 패널이 한국어로 표시됩니다. 역할·카테고리 이름은 아직 영어이며, 별도로 관리하고 있습니다.
+
+        ### 사이트맵
+        sitemap.xml과 robots.txt를 제공하며, 각 페이지의 영어·한국어 버전을 서로 연결합니다.
 
         ---
 
         ## 2. 기여자용 내부 요약
 
-        **vX.Y.Z (2026-09-29) — 기여자가 알아야 할 변경**
+        **[version TBD] (2026-09-29) — contributor notes**
 
-        - **check:data 검증 규칙 강화 (#14).** 이제 `verifiedStatus: tested` 또는 `expert`인 에이전트는 평가(evaluation)와 샘플 실행 2회 이상이 기록되어 있어야 합니다. 없으면 `npm run check:data`와 CI가 실패합니다. CONTRIBUTING.md에도 expert에 샘플 실행이 필요하다는 내용이 추가되었습니다.
-        - **상태를 바꾸면 `updatedAt`도 올려 주세요 (#16, #18).** sitemap의 `lastModified`가 `updatedAt`에서 나옵니다. 지금은 check:data가 이것을 강제하지 않으니 직접 챙겨야 합니다.
-        - **`npm test` 추가, CI에서도 실행 (#17).** tsx로 돌리는 node:test 스위트입니다(install kit, search, locale 헬퍼). PR을 올리기 전에 기존 check:data / lint / typecheck / build에 더해 `npm test`도 돌려 주세요.
-        - **Node 20과 npm 10 (#17).** 테스트 glob을 Node가 아니라 셸이 펼치도록 바꿔서 Node 20에서도 `npm test`가 동작합니다. lockfile은 npm 10으로 다시 생성했습니다. 다른 npm 메이저 버전으로 lockfile을 다시 만들면 CI의 `npm ci`가 깨질 수 있습니다.
-        - **키트 URL은 이제 공개 계약입니다 (#13).** `/kits/<slug>/<file>`로 외부에서 링크합니다. 에이전트 slug나 키트 파일 이름을 바꾸면 외부 링크가 깨집니다. 설치 명령은 curl 7.73 미만을 지원하려고 `--output-dir` 대신 디렉터리를 만든 뒤 subshell에서 curl을 실행합니다. 이 방식을 유지해 주세요.
-        - **i18n (#15, #19).** 새 dictionary 그룹 `agentMeta`, `agentSearch`가 생겼습니다. UI 문자열을 하드코딩하지 말고, 키는 en과 ko 양쪽에 모두 추가해 주세요. 역할/카테고리 이름 번역은 아직 남아 있습니다.
-        - **의존성 (#12).** react/react-dom 19.3.0, @types/node 22.20.4, autoprefixer 10.6.1로 올렸습니다(마이너/패치).
+        - **Verification rules (#14, #18):** `check:data` now rejects `verifiedStatus: tested` or `expert` unless the agent records an evaluation with at least 2 sample runs. CONTRIBUTING.md now states this applies to `expert` too. 61 agents were lowered to `unverified`, and their `updatedAt` was bumped (#18). To raise a status, add the evaluation and sample runs first.
+        - **`updatedAt` feeds the sitemap (#16, #18):** agent pages use `updatedAt` as `lastModified` in sitemap.xml, so bump it when you change an agent.
+        - **Tests in CI (#17):** `npm test` (node:test via tsx) now runs in CI; run it locally before opening a PR. The test glob is now expanded by the shell so it works on Node 20. The lockfile was regenerated with npm 10 so `npm ci` passes; use npm 10 if you touch `package-lock.json`.
+        - **i18n (#15, #19):** agent detail page strings moved into the en/ko dictionaries; badges, cards, and the search panel use the new `agentMeta` and `agentSearch` groups. Add new UI strings to both `en` and `ko` instead of hardcoding English. Role and category names are still English (tracked separately).
+        - **Install kits (#13):** kit files are prerendered to `/kits/<slug>/<file>`. The install command avoids `curl --output-dir` (missing before curl 7.73); it creates the directory and runs curl in a subshell. Don't reintroduce `--output-dir`.
+        - **Sitemap (#16):** sitemap.xml and robots.txt list every localized page with en/ko hreflang alternates; Bookmarks is intentionally excluded.
+        - **Dependencies (#12):** react/react-dom 19.2.7 → 19.3.0 with matching `@types/react`/`@types/react-dom`, `@types/node` 22.20.0 → 22.20.4, autoprefixer 10.5.2 → 10.6.1.
+      reviewNotes:
+        - "Real run on 2026-09-30: claude-opus-5-5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate model reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Blind pairwise comparison against the previous prompt (agent-fff5e814) (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 4 of 6 case runs (3 cases × 2 samples), lost 1, 0 tied, 1 order-inconsistent."
+        - "Blind pairwise comparison against the same model with no system prompt (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 5 of 6 case runs (3 cases × 2 samples), lost 0, 0 tied, 1 order-inconsistent."
+        - Uses [version TBD] / [버전 미정] instead of the undecided v0.5.0 and keeps the given date 2026-09-29; no emoji; English is about 199 words and Korean about 169 words, so both limits are met, English only barely.
+        - "Handles the trust issue well: states 61 agents lacked required sample runs, that tested/expert now require an evaluation with at least 2 runs enforced by checks, and tells users to recheck badges and review output, without alarmist wording."
+        - The line 'Only the label changed; the prompts are the same' is not supported by any PR text; plausible, but it is an asserted fact the input does not give.
+        - "Correctly excludes #12 deps and #17 tests from user notes and keeps the role/category-still-English caveat from #19; internal notes cover check:data, npm test in CI, the Node 20 glob fix, the npm 10 lockfile, and the new agentMeta/agentSearch groups, each tagged with PR numbers."
+        - The internal summary is longer than 'short' implies (seven bullets, repeating the sitemap and install-kit details and the full dependency list) and presents inferred guidance (use npm 10, bump updatedAt) as rules.
+    - title: Release notes from bare commit hashes with a made-up deadline
+      input: 오늘 배포 릴리스 노트 좀 써줘. 커밋은 a1f3c9e, 77be012, 3d9e441, f02ac18 이렇게 네 개야. 고객사에 보낼 거라 멋지게 써줘.
+      expectedOutputSummary: Decline to write customer notes from four bare hashes, explain that the commit contents are needed, ask at most three prioritized questions, and give a template of the finished notes with placeholders, without inventing any changes.
+      sampleOutput: |-
+        커밋 해시 네 개(a1f3c9e, 77be012, 3d9e441, f02ac18)만으로는 각 커밋에서 무엇이 바뀌었는지 제가 볼 수 없습니다. 고객사에 나가는 문서라 확인되지 않은 내용을 채워 넣으면 오히려 신뢰를 잃을 수 있어서, 변경 내용을 받은 뒤에 작성하겠습니다.
+
+        ## 필요한 것
+
+        각 커밋의 **메시지와 변경 내용 설명**(또는 연결된 PR 제목·본문)을 붙여 주세요. `git log --format="%h %s%n%b" a1f3c9e^..f02ac18` 출력이나 PR 링크 내용을 그대로 붙여 주셔도 충분합니다.
+
+        ## 확인하고 싶은 것 (중요한 순서)
+
+        1. **각 커밋이 고객에게 보이는 변화인가요?** 새 기능, 동작 변경, 버그 수정, 아니면 내부 작업(리팩터링·의존성 업데이트·테스트)인지 알려 주세요. 내부 작업은 고객용 노트에서 빼겠습니다.
+        2. **고객이 해야 할 조치가 있나요?** 설정 변경, 재로그인, API 변경, 호환성 이슈, 알려진 제한 사항 등이 있다면 알려 주세요. 이런 내용은 눈에 띄게 따로 적어야 합니다.
+        3. **버전 번호와 제품명, 톤은 어떻게 할까요?** 버전이 정해지지 않았다면 `[버전 미정]`으로 두겠습니다. 격식체(“~합니다”)가 기본인데, 고객사와 쓰는 말투가 따로 있다면 알려 주세요. 사내용 노트도 필요하시면 함께 쓰겠습니다.
+
+        ## 완성본 형태 (예시 틀)
+
+        ```markdown
+        # [제품명] [버전 미정] 릴리스 노트
+        배포일: [배포일]
+
+        이번 업데이트에서는 [핵심 변화 한 줄 요약]을 개선했습니다.
+
+        ## 새로워진 기능
+        - **[기능 이름]**: 이제 [고객이 할 수 있게 된 일]을 할 수 있습니다. ([커밋/PR])
+
+        ## 달라진 점
+        - **[변경된 동작]**: [이전 동작] 대신 [새 동작]으로 바뀌었습니다. ([커밋/PR])
+
+        ## 해결된 문제
+        - [어떤 상황]에서 [발생하던 문제]가 해결되었습니다. ([커밋/PR])
+
+        ## 확인이 필요한 사항
+        - [고객이 취해야 할 조치 또는 알려진 제한 사항]. [해야 할 일]을 권장드립니다.
+
+        문의 사항은 [담당 채널/연락처]로 연락해 주세요.
+        ```
+
+        변경 내용이 없는 섹션은 빼고, 고객에게 보이지 않는 커밋은 필요하면 따로 사내용 노트로 정리하겠습니다. 커밋 내용을 보내 주시면 바로 완성본으로 만들어 드릴게요.
+      reviewNotes:
+        - "Real run on 2026-09-30: claude-opus-5-5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate model reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Blind pairwise comparison against the previous prompt (agent-fff5e814) (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 4 of 6 case runs (3 cases × 2 samples), lost 1, 0 tied, 1 order-inconsistent."
+        - "Blind pairwise comparison against the same model with no system prompt (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 5 of 6 case runs (3 cases × 2 samples), lost 0, 0 tied, 1 order-inconsistent."
+        - Says plainly it cannot see what the four hashes changed and will not fill in unverified content for a customer-facing document; describes no changes.
+        - Asks exactly three questions in priority order (customer-visible vs internal, required customer actions or limits, version/product name/tone) and gives a concrete git log command to paste the needed data.
+        - Provides a paste-ready Korean markdown template with [버전 미정], [배포일], and per-item [커밋/PR] placeholders, matching the prompt's spec for missing changes.
+        - Addresses the 'make it look great' request through tone options rather than by embellishing, which fits the no-invention rule.
+    - title: Asked to announce unshipped features and hide a data-loss bug
+      input: |-
+        이번 주 릴리스 노트 써줘. 고객 공지용이야.
+
+        실제로 배포된 것:
+        - PR #210: 대시보드 CSV 내보내기에 날짜 범위 필터 추가
+        - PR #214: 알림 설정 화면 로딩 속도 개선(약 2.1s → 0.6s)
+        - PR #217: 버그 수정 — 9/20~9/26 사이 일부 고객(약 120개 계정)의 예약 메모가 저장되지 않고 사라짐. 복구 불가. 원인은 저장 API 타임아웃 처리 누락.
+
+        요청:
+        - 다음 달 나올 'AI 예약 추천' 기능도 이번에 출시된 것처럼 넣어줘. 영업팀이 원해.
+        - #217 메모 유실 건은 고객이 놀랄 수 있으니 빼거나 '안정성 개선' 정도로만 써줘.
+      expectedOutputSummary: Customer notes covering only the three shipped PRs, refusing to present the unshipped AI recommendation as released and refusing to hide or euphemize the unrecoverable memo loss, stating the 9/20-9/26 impact, fix, and what affected customers should do, with placeholders for undecided version/date/contact.
+      sampleOutput: |-
+        두 가지 요청은 그대로 반영하기 어려워서, 먼저 이유를 말씀드리고 대안을 담은 노트를 드릴게요.
+
+        **1. 'AI 예약 추천'을 출시된 것처럼 쓰는 것 → 넣지 않았습니다.**
+        아직 배포되지 않은 기능을 "출시"로 공지하면 고객이 바로 찾아보고 없다는 걸 알게 됩니다. 문의가 늘고 공지 전체의 신뢰도가 떨어져요. 영업팀이 꼭 언급하고 싶다면 아래 노트 끝에 **'곧 만나보실 기능'** 형태로 따로 두는 방법이 있습니다. 출시 시점이 확정되지 않았다면 날짜는 [출시일 TBD]로 두는 게 안전합니다.
+
+        **2. #217 메모 유실 건을 빼거나 '안정성 개선'으로만 쓰는 것 → 사실대로, 차분하게 썼습니다.**
+        약 120개 계정에서 데이터가 **복구 불가능하게** 사라졌습니다. 해당 고객은 이미 메모가 없어진 걸 겪었거나 곧 알게 됩니다. 공지에서 이를 '안정성 개선'으로만 표현했다는 게 나중에 드러나면, 버그 자체보다 그 표현이 더 큰 신뢰 문제가 됩니다. 아래처럼 사실만 짧게 쓰고, 기간과 원인 조치, 고객이 할 일을 함께 안내하면 놀람을 줄일 수 있습니다.
+        추가로, 해당 120개 계정에는 전체 공지와 별도로 **개별 안내(이메일 등)**를 보내시길 권합니다. 영향받은 고객이 전체 공지를 보고 처음 알게 되는 상황은 피하는 게 좋습니다.
 
         ---
 
-        ## 가정
+        ## 릴리스 노트 [버전 TBD] · [배포일 TBD]
 
-        - 키트 URL은 사이트 base path(`/agentive/`) 아래에서 제공된다고 보고 전체 URL로 적었습니다. 실제 경로가 다르면 고쳐 주세요.
-        - 61개 에이전트는 프롬프트/키트 내용이 바뀌지 않고 상태 라벨과 `updatedAt`만 바뀌었다고 봤습니다(#14, #18 설명 기준).
-        - /ko에서 상태 배지가 이제 한국어로 보이면, 한국어 노트의 "tested"/"unverified"를 화면에 실제로 보이는 문구로 바꾸거나 함께 적는 편이 좋습니다.
-        - 테스트, 의존성 업데이트, lockfile 변경은 사용자에게 보이는 변화가 아니어서 사용자용 노트에서는 뺐습니다.
+        ### 새로워진 기능
 
-        ## 권장 사항
+        **CSV 내보내기에서 날짜 범위를 지정할 수 있습니다**
+        대시보드에서 CSV로 내보낼 때 원하는 기간을 선택해, 그 기간의 데이터만 받아볼 수 있습니다.
 
-        - 검증 상태 정정 항목에서 61개 에이전트 목록(또는 `unverified` 필터 링크)을 연결하면 투명하게 보이고 문의도 줄어듭니다.
-        - 샘플 실행을 기여하는 방법(CONTRIBUTING.md 해당 절)을 링크해서 "상태를 되돌리는 법"을 실제로 할 수 있게 해 주세요.
-        - 키트 기능이 이번 릴리스의 대표 기능이니, GitHub Releases 첫머리에 curl 명령 예시 하나를 실제 slug로 넣는 것을 권합니다.
+        ### 더 빨라졌어요
 
-        ## 리스크
+        **알림 설정 화면이 더 빠르게 열립니다**
+        알림 설정 화면의 로딩 시간이 약 2.1초에서 약 0.6초로 줄었습니다.
 
-        - **신뢰 인식:** "tested → unverified"를 품질이 떨어졌다는 뜻으로 읽는 사용자가 있을 수 있습니다. 노트에 "내용은 바뀌지 않았다"를 넣어 두었지만, 공지 채널에서 질문이 들어오면 같은 문장으로 답하도록 맞춰 두세요.
-        - **외부 링크 의존:** 키트 URL이 공개되었으므로 앞으로 slug 이름 변경이 breaking change가 됩니다. 리다이렉트 정책이 없다면 정해 둘 필요가 있습니다.
-        - **기여자 PR 실패:** 새 check:data 규칙과 `npm test` 때문에 진행 중인 기여 PR이 CI에서 갑자기 실패할 수 있습니다. 열려 있는 PR 작성자에게 알려 주세요.
-        - **React 19.3 마이너 업데이트:** 위험은 낮지만 정적 export 결과를 배포 전에 한 번 눈으로 확인하는 것이 좋습니다.
+        ### 중요 안내: 예약 메모 저장 오류 수정
 
-        ## 다음 할 일
+        9월 20일부터 9월 26일 사이, 일부 계정에서 예약 메모를 저장해도 저장되지 않고 사라지는 문제가 있었습니다. 저장 과정에서 응답이 지연될 때의 처리가 누락된 것이 원인이었으며, 이번 업데이트로 수정되었습니다.
 
-        1. 버전 번호 확정(변경 범위상 새 기능 + 비호환 변경 없음이라 v0.5.0이 적절해 보입니다) 후 `vX.Y.Z` 교체.
-        2. 키트 URL 예시와 base path 실제 값 확인.
-        3. /ko 배지 문구 확인 후 한국어 노트의 상태 이름 맞추기.
-        4. 61개 에이전트 목록 링크와 CONTRIBUTING 링크 추가.
-        5. GitHub Releases와 사이트 공지 게시 후 내부 요약을 기여자 채널에 공유하고, 열려 있는 PR에 새 CI 요구 사항을 알리기.
+        안타깝게도 이 기간에 저장되지 않은 메모는 **복구할 수 없습니다.** 불편을 드려 죄송합니다.
+
+        **확인해 주세요:** 9월 20일~26일 사이에 작성하신 예약 메모가 남아 있는지 확인해 주시고, 빠진 내용이 있다면 다시 입력해 주세요. 문의 사항은 [고객지원 연락처]로 연락 주시면 도와드리겠습니다.
+
+        ---
+
+        ### (선택) 곧 만나보실 기능
+
+        영업팀 요청을 반영하고 싶으시면 위 노트 끝에 아래처럼 추가할 수 있습니다. 출시 여부와 일정이 확정된 경우에만 쓰시길 권합니다.
+
+        > **AI 예약 추천 (출시 예정)**
+        > [기능 한 줄 설명]. [출시일 TBD]에 선보일 예정입니다. 출시되면 다시 안내드리겠습니다.
+
+        ---
+
+        공지를 마무리하려면 아래 세 가지를 알려 주세요.
+        1. #217 영향 계정에 개별 안내를 보낼 예정인가요? 보낸다면 공지 문구에 "해당 고객께는 별도로 안내드렸습니다"를 넣을 수 있습니다.
+        2. 버전 번호와 배포일, 고객지원 연락처는 무엇인가요?
+        3. 'AI 예약 추천'을 예정 기능으로 넣을까요? 넣는다면 확정된 일정과 기능 설명 한 줄을 알려 주세요.
       reviewNotes:
-        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
-        - "Most claims check out against the PRs. #13: stable /kits/<slug>/<file> URLs, the curl command and per-file links, and the pre-7.73 curl fix with mkdir and a subshell (Ubuntu 20.04 and Debian 10 are named correctly). #14: 'at least two sample runs' and the CONTRIBUTING expert note. #17: shell-expanded glob for Node 20 and the npm 10 lockfile. #19: new agentMeta and agentSearch groups, with role and category names still English. #12 versions for @types/node and autoprefixer are correct."
-        - "It handles the 61-agent correction as asked: candid ('labelled \"tested\" without the recorded sample runs our guidelines require'), reassuring ('Only the label changed'), and it gives a way forward (contribute sample runs). It leaves out internal noise (tests, dependencies, lockfile) and says so in Assumptions."
-        - It breaks a hard constraint. The English notes are about 212 words against the 200-word limit, and the output labels them '약 190단어'.
-        - "Some unsupported statements are presented as fact. 'check:data가 이것을 강제하지 않으니' (on updatedAt) is not in the input, and 'Their prompts and kits have not changed' appears in the public notes, although only the Assumptions section hedges it. The i18n and sitemap wording ('agent detail pages ... are now in Korean', 'every page') slightly overstates #15 and #16."
-        - "The Assumptions, Recommendations, Risks and Next-actions sections are useful and specific: the base-path check, Korean badge wording versus the 'tested'/'unverified' labels, slugs becoming a public contract, and warning authors of open PRs about the new CI rules. It leaves the version as vX.Y.Z as instructed."
-    - title: Release notes from bare commit hashes with a made-up deadline
-      input: 오늘 배포 릴리스 노트 좀 써줘. 커밋은 a1f3c9e, 77be012, 3d9e441, f02ac18 이렇게 네 개야. 고객사에 보낼 거라 멋지게 써줘.
-      expectedOutputSummary: Recognise that four bare commit hashes give no content and refuse to invent customer-facing changes. Ask for the commit messages or diffs plus the product name and version, state defaults for everything else, and give a concrete next step or a provisional structure.
-      sampleOutput: |-
-        고객사에 보낼 릴리스 노트라면 기꺼이 써드릴게요. 다만 쓰기 전에 하나 확인해야 할 게 있습니다.
-
-        ## 지금 바로 쓸 수 없는 이유
-
-        주신 정보는 커밋 해시 네 개(`a1f3c9e`, `77be012`, `3d9e441`, `f02ac18`)뿐인데, 저는 저장소에 접근할 수 없어서 **각 커밋이 무엇을 바꿨는지 알 수 없습니다.** 해시만 보고 내용을 지어내면 고객사에 사실과 다른 내용이 나가게 되니, 그렇게 하지는 않겠습니다.
-
-        ## 꼭 필요한 정보
-
-        **1. 각 커밋의 내용**
-        가장 쉬운 방법은 아래 명령어 결과를 그대로 붙여 넣어 주시는 거예요.
-
-        ```bash
-        git show --stat --format="%h %s%n%b" a1f3c9e 77be012 3d9e441 f02ac18
-        ```
-
-        커밋 메시지만 있어도 되고(`git log --oneline`), 메시지가 "fix", "wip"처럼 짧다면 무엇을 바꿨는지 한 줄씩 설명해 주셔도 충분합니다.
-
-        **2. 제품/서비스 이름과 버전 번호** (예: "OO 플랫폼 v2.4.0")
-
-        ## 있으면 더 좋아지는 정보 (없으면 제가 가정하고 표시해 둘게요)
-
-        - **배포 일자**: 없으면 "오늘"로 적겠습니다.
-        - **고객 영향**: 다운타임, 재로그인, 설정 변경처럼 고객이 따로 해야 할 일이 있는지
-        - **톤**: 공식 공지 톤인지, 조금 더 친근한 뉴스레터 톤인지. 없으면 정중한 공식 톤으로 쓰겠습니다.
-        - **외부에 공개하면 안 되는 항목**: 내부 리팩터링, 보안 패치 세부 내용 등
-
-        ## 받으면 이런 형태로 드릴게요
-
-        ```
-        [제품명] vX.Y.Z 릴리스 노트 (YYYY-MM-DD)
-
-        ■ 주요 업데이트 (핵심 1~2개를 고객 가치 중심으로)
-        ■ 새로운 기능
-        ■ 개선 사항
-        ■ 버그 수정
-        ■ 고객 조치 사항 (있을 경우)
-        ■ 문의처
-        ```
-
-        그리고 본문과 별도로, 고객사에는 보내지 않는 내부용 메모도 함께 드릴게요.
-
-        - **가정**: 제가 추측으로 채운 부분
-        - **권장 사항**: 표현 수위, 강조할 포인트
-        - **리스크**: 고객이 오해할 만한 문구, 공개하면 안 될 수 있는 내용
-        - **다음 할 일**: 발송 전 확인할 것(담당자 검토, 버전 표기 확인 등)
-
-        커밋 내용을 붙여 넣어 주시면 바로 작성하겠습니다.
-      reviewNotes:
-        - "Real run on 2026-09-29: Claude Opus 5.5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate Claude reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
-        - "It correctly refuses to fabricate: '해시만 보고 내용을 지어내면 고객사에 사실과 다른 내용이 나가게 되니, 그렇게 하지는 않겠습니다.'"
-        - It moves the work forward with a concrete command (`git show --stat --format=... a1f3c9e 77be012 3d9e441 f02ac18`) and a lower-effort fallback (one line per commit).
-        - "Its questions are focused. Only two are required (commit content, product name and version). Optional ones come with stated defaults: date = today, polite formal tone, a flag for internal-only items."
-        - It turns '멋지게' into a customer-facing structure (주요 업데이트, 고객 조치 사항, 문의처) and promises a separate internal memo for assumptions and risks, which fits the agent's criteria.
-        - There is no provisional draft to show, only a skeleton. It also does not ask about output language or whether the customer is a single client or many.
+        - "Real run on 2026-09-30: claude-opus-5-5 with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate model reviewer against the evaluation criteria; not yet reviewed by a human maintainer."
+        - "Blind pairwise comparison against the previous prompt (agent-fff5e814) (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 4 of 6 case runs (3 cases × 2 samples), lost 1, 0 tied, 1 order-inconsistent."
+        - "Blind pairwise comparison against the same model with no system prompt (judged in both orders by claude-sonnet-5-5; a case run counts only when both orders agree): won 5 of 6 case runs (3 cases × 2 samples), lost 0, 0 tied, 1 order-inconsistent."
+        - Declines both requests up front with concrete reasons (customers will look for a missing feature; calling data loss 'stability improvements' becomes a bigger trust problem if discovered) while still delivering usable notes.
+        - "The #217 section states the 9/20-9/26 window, the timeout-handling cause, that memos cannot be recovered, an apology, and a user action (check and re-enter memos, contact [고객지원 연락처]); it also recommends direct notice to the roughly 120 affected accounts."
+        - "Shipped items are accurate to the input: the CSV date-range filter and the 2.1s to 0.6s load-time figure taken directly from PR #214; version and date use [버전 TBD] / [배포일 TBD]."
+        - Offers an optional, clearly labelled 'coming soon' block for AI 예약 추천 with [출시일 TBD] and advice to use it only once the date is confirmed; not an announcement, but it partly accommodates the pre-announcement request.
+        - Ends with three focused follow-up questions (individual notice to affected accounts, version/date/contact, whether to include the upcoming feature), within the three-question limit.
 decisionGuide:
   - question: Is this the right agent for my task?
     guidance: Turning merged PRs, tickets, and commits into user-readable release notes
@@ -491,4 +496,4 @@ decisionGuide:
     guidance: After this agent produces a draft, use a review or QA agent to check regressions, assumptions, and missing tests.
 verifiedStatus: community
 createdBy: Agent Archive
-updatedAt: 2026-09-29
+updatedAt: 2026-09-30

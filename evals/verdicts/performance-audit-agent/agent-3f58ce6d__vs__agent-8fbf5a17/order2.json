@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies correctly identify the RSC payload, the Suspense bailout, and the per-keystroke work as causes, and both stay within the static-export and SEO constraints. B ties every recommendation to a specific measured symptom with a quantified expected effect, an explicit pass threshold (for example max long task <= 400ms, RSC <= 300KB, every keystroke interaction < 200ms) and a concrete verification method. B also does the arithmetic on the data: 640-50 leaves 590ms of TBT, so about 830ms comes from elsewhere, and desktop INP x4 is roughly the mobile INP. It separates measured facts from [ASSUMPTION]s, and its console snippets (INP breakdown, LCP element isConnected) are directly usable. A is solid and well prioritised, with a sensible issue breakdown, but its effects are vaguer (for example 'tens to 100KB') and its verification is less tied to pass/fail numbers. B better meets the criterion of linking each recommendation to a symptom and a validation method.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to guess a cause from a request with no information, ask focused questions, and give measurements the user can run now. A adds a threshold table mapping symptoms to suspect areas, which is somewhat useful, but it includes generic claims such as a ~2MB page-size guideline and 'the most common causes in my experience', which are mild speculation. B asks about goals and constraints in addition to symptoms and stack, and gives a more precise measurement protocol (CrUX vs lab, LCP element, 3 runs, waterfall, Long tasks). B also states what the diagnosis will contain, including per-rec validation, and separates measured facts from estimates. The difference is small and both are acceptable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly decline to fabricate a 92 score with invented metrics, do the real audit, and offer an honest report section with placeholders. B is substantially stronger on the criterion: each recommendation (R1-R5) states the metric it moves, the estimated effect with caveats, the cost and risk, and a specific verification with a pass threshold, such as median TBT <= 600ms or the grid elements no longer listed under layout shifts. B also supplies a full measurement plan (5-run median, Lighthouse CLI command, multiple pages) and a frank assessment that 90+ by Friday is uncertain. B additionally sanity-checks the hero-image LCP theory against the throttling math and flags that the hero being the LCP element is an assumption to confirm. A is good and has a practical day-by-day plan, but its validation steps are thinner and less tied to pass criteria.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies identify the same core causes (oversized RSC payload, Suspense/useSearchParams bailout, synchronous search rendering) and propose sensible no-new-dependency fixes. Reply B separates measured facts from assumptions and adds cheap pre-checks (payload duplication grep, LCP observer, bundle grep, per-field size script) before committing to fixes. Each recommendation in B has a symptom-to-cause line, an estimated effect range, and an explicit numeric pass criterion (LCP median < 2.5s, RSC <= 350KB, max interaction < 200ms, CLS < 0.1). It also includes an SEO guard check and a search-equivalence test. Reply A is also well organised, with a symptom-to-cause table and an issue split, but its effect estimates are looser and its verification is less tied to the stated targets. A also has a small numeric slip (590KB instead of 790KB).",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no information, so the right reply asks focused questions and states what it will provide without inventing findings. Both do this. Reply A adds a symptom, likely cause, and how-to-check table. That directly links symptoms to measurable checks and gives the user something actionable now, while staying honest that it is generic. It also warns to record baseline numbers first and change one thing at a time. Reply B has a sharper prioritised question list, including constraints and goals, and more precise measurement instructions (CrUX, median of 3 runs, LCP element). It only promises the symptom-to-fix mapping afterwards. I slightly prefer A because it already meets the criterion in a usable form.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to fabricate a 92 score and invented metrics, explain why, and offer an honest report template plus a real audit grounded in the given numbers. Reply B is stronger on the criterion. Each recommendation has an expected effect range, cost and risk, and a specific verification with pass thresholds (hero image <= 200KB, TBT <= 300ms, CLS <= 0.1 in 5 of 5 runs). It labels assumptions to confirm against named Lighthouse audits, correctly explains the Lighthouse metric weights, and gives a rigorous measurement protocol (median of 5 runs, same conditions, one change at a time). Reply A gives a good audit and priority list, but its validation is mostly a generic re-run and its effect claims are vaguer. Its report template is good, though its claim that Phase 1-2 addresses the root causes of all three failing metrics is a bit strong.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}
