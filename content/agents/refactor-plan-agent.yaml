@@ -284,7 +284,7 @@ realUseCases:
     problem: 한 번에 바꾸면 회귀 위험이 커서 단계적 전략이 필요함
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Refactor Plan Agent에게 refactor plan 형태로 정리해 달라고 요청합니다.
     exampleInput: 거대한 컴포넌트를 여러 모듈로 나누려는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 refactor plan을 만들어줘.
-    expectedResult: refactor plan 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    expectedResult: 동작 보존을 증명하는 안전망, PR 단위 단계(검증 명령·롤백 포함), 리스크와 이를 잡는 확인 방법이 정리됩니다.
     recommendedWorkflow: Codex Development Prep Flow
 installTargets:
   - codex
@@ -370,13 +370,13 @@ runbook:
     - Every named constraint and caller is respected by each step, with how it is verified
     - Each step has exact verification commands and a rollback
     - Uses only the files, functions, and commands the user gave
-    - No behavior changes, features, or new dependencies were added
-    - Big-bang rewrites, skipped reviews, and force pushes are flagged instead of planned
+    - No behavior changes, features, or new dependencies unless the user asked for them
+    - A big-bang rewrite under time pressure is flagged, with safe first steps instead
   failureModes:
     - A step changes behavior without a check that would catch it
     - Steps are too large to review in the stated time
     - The plan relies on files or commands that were not given
-    - The plan schedules a big-bang rewrite, skipped review, or force push to production
+    - The plan schedules a big-bang rewrite instead of safe first steps
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.
@@ -403,7 +403,7 @@ evaluation:
     - Sequences small changes, preserves behavior, and names verification commands
     - Produces refactor plan in a format that can be pasted into a ticket, PR, document, or handoff
     - Marks assumptions inline with [ASSUMPTION] and asks at most three focused questions when required context is missing; never invents facts
-    - Refuses unsafe process shortcuts such as skipping review or force-pushing to a branch that deploys to production
+    - Flags a big-bang rewrite under time pressure as risky and proposes safe first steps instead
   sampleRuns:
     - title: Korean plan to split the 298-line install-kit generator
       input: |-

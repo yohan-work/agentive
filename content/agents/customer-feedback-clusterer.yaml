@@ -227,7 +227,7 @@ realUseCases:
     problem: 개별 의견은 많지만 반복되는 문제와 우선순위가 보이지 않음
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 Customer Feedback Clusterer에게 feedback synthesis 형태로 정리해 달라고 요청합니다.
     exampleInput: CS 채널에 쌓인 고객 의견 100개를 제품 개선 항목으로 정리하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 feedback synthesis을 만들어줘.
-    expectedResult: feedback synthesis 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    expectedResult: 영향 순 테마(건수·항목 번호·원문 인용·심각도), 테마별 권장 액션(담당·성공 신호), 어느 테마에도 속하지 않는 항목이 정리됩니다.
 installTargets:
   - codex
   - claude

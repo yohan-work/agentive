@@ -1,5 +1,5 @@
 {
-  "qualityScore": 5,
+  "qualityScore": 4,
   "verdict": "Produces implementation-ready, input-grounded API contracts that apply every stated rule per endpoint with exact status and error codes, asks focused questions when under-specified, and refuses unsafe requirements while still delivering a usable spec.",
   "knownWeaknesses": [
     "Long outputs: the full-spec case runs to about 510 lines of Korean markdown, including DB SQL, middleware ordering, and a six-item risk list, which is more than a ticket or PR paste needs.",
@@ -45,5 +45,7 @@
         "It unilaterally replaces the explicitly requested 'full list, frontend search' with server-side search and pagination. This is well argued for PII volume but not offered as a choice. The three-point preamble is long before the spec begins."
       ]
     }
-  ]
+  ],
+  "reviewerScore": 5,
+  "scoreNote": "Capped at 4 by the maintainer: the rubric reserves 5 for no invented facts, and this review itself notes invented example slugs, an invented deadline, and a boundary case scored 4."
 }

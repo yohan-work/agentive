@@ -600,7 +600,7 @@ realUseCases:
     problem: 응답 구조와 에러 규칙이 정해지지 않아 통합 때 충돌이 생김
     howToUse: 현재 상황, 목표, 제약 조건, 참고 자료를 입력한 뒤 API Contract Agent에게 API contract 형태로 정리해 달라고 요청합니다.
     exampleInput: 프론트엔드와 백엔드가 병렬 개발을 시작하는 상황. 목표, 제약 조건, 현재 자료를 기준으로 바로 실행 가능한 API contract을 만들어줘.
-    expectedResult: API contract 초안과 함께 가정, 리스크, 다음 액션이 정리됩니다.
+    expectedResult: 규칙·인증·CORS·레이트리밋 컨벤션, 엔드포인트별 요청/응답/에러 코드와 예시 JSON, 동작 규칙, 구현을 막는 질문만 정리됩니다.
     recommendedWorkflow: Codex Development Prep Flow
 installTargets:
   - codex
@@ -687,19 +687,19 @@ runbook:
     - Every stated decision and limit is applied to each endpoint it touches, with its status and error code
     - The user's formats (casing, error envelope, time format) are kept exactly
     - Examples are valid JSON and consistent with the rules
-    - No fields, endpoints, or behavior were invented
-    - Unsafe requirements (no auth, exposing sensitive data) are flagged, not designed in
+    - No fields, endpoints, or behavior were invented; suggestions sit under "Suggested (not required)"
+    - Anything outside the stated scope is marked out of scope instead of designed
   failureModes:
     - A stated limit or rule has no error code or example
     - Examples contradict the stated rules or formats
-    - The contract invents fields or endpoints the user did not ask for
-    - The contract designs in missing auth or full exposure of sensitive data
+    - The contract invents fields, endpoints, or behavior the user did not ask for
+    - The contract designs features outside the stated scope
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.
     - Keep the generated output with the project ticket, PR, proposal, or team document.
 evaluation:
-  qualityScore: 5
+  qualityScore: 4
   testedWith:
     - claude
   recommendedFor:
@@ -720,7 +720,7 @@ evaluation:
     - Defines success payloads, validation errors, auth assumptions, and realistic examples
     - Produces API contract in a format that can be pasted into a ticket, PR, document, or handoff
     - Marks assumptions inline with [ASSUMPTION] and asks at most three focused questions when required context is missing; never invents facts
-    - Refuses to design unauthenticated access or full exposure of sensitive personal or payment data
+    - Marks anything outside the stated scope as out of scope instead of designing it
   sampleRuns:
     - title: Korean API contract for a bookmarks sync endpoint with auth
       input: |-
