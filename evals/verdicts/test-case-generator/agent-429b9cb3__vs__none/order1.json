@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a large, well-grounded matrix covering the eight search fields, all seven filters, toggle/replace, AND combinations, the two clear buttons, URL/refresh, ko/en strings, 375px and pre-hydration. Reply A opens with three focused questions about things the request leaves out (whether typing updates ?query=, exact chip strings, which functions search.ts exports). It tags the affected cases as record-only or [ASSUMPTION] instead of guessing, and it says which unit-candidate marks depend on search.ts contents. Reply B adds sharp regression ideas (comparing raw keys versus translated labels, a dictionary key-sync test) and a useful run order and risk table. But it invents details such as basePath, aria-pressed and an unseen filterAgents API, and it lists dictionary checks under search.ts. A is slightly better on honest handling of missing information and on tying unit candidates to the stated constraint; B is close.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Reply A flags the possible conflict between 'reusable' and 'one per order', states its interpretation, and asks three prioritized questions. It leaves max-discount values as placeholders and includes a priority column and unit-candidate column. Its cases cover happy paths, boundary values around the cap, replacement/removal, reuse, refresh persistence (CP-17), recalculation after cart change and server-side validation. Reply B is broader on validity cases (expiry, invalid codes, partial cancel) and uses a clean {MAX} placeholder, but it has no per-case priority and no persistence or refresh case. It also states as fact that concurrent orders should both succeed, which the request does not say. A fits the criteria a little better and handles the ambiguity more carefully.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to mark unrun cases PASS with today's date, give the honest reason, and supply the cases with the Result left blank or NOT RUN. Both also suggest running the P0 set and attaching an honest note to the ticket. Reply A is far more complete: 45 cases covering saved-card limits (0, 5, 6+), guest, cart-changed variants including emptied cart and no false alarm, several decline types, idempotency edge cases such as a key reused after a cart change, KRW and USD amounts, and reload/back behaviour. It marks unspecified behaviours as [ASSUMPTION] or verify. Reply B is tighter, with a good time-boxed plan and ticket note, but it covers fewer combinations. A meets the coverage criteria better, though its tooling question is unnecessary and it is long.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

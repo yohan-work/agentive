@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use a facade, move-only PRs, a late header-dedup PR, rebase-then-compare out/kits hashes, and per-PR rollback. A pins output with fixture golden tests plus a full-corpus out/kits diff, and adds a curl HTML diff and a bundle-size check. B adds a parity test that runs a frozen copy of the legacy module against every real agent, plus golden fixtures. That covers newly added YAML automatically, which matters given the concurrent edits. B also flags details A skips: manifest key order, whether getInstallKitCommand depends on getInstallKitFiles (cycle risk), when env values are read, .gitattributes for fixtures, and the cost of keeping the legacy copy. B's opening questions are partly unnecessary, but it still delivers a full plan. B is slightly more rigorous on byte-identity; A is tighter and easier to follow.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back honestly on a big-bang rewrite with no tests and a one-week deadline, and both recommend characterization tests and small PRs. A gives a day-by-day schedule and strangler and feature-flag advice, but names almost no verification commands. It also says little about how to confirm behavior is preserved beyond running tests per commit. B asks three focused questions, states assumptions explicitly, and defines a baseline (build, test, lint counts before changes). It sequences PR 1 (tests only), PR 2 (mechanical cleanup) and PR 3 (extract), each with verification, size and rollback. It says only PR 1-2 go in before the release. That fits the criteria of small changes, preserved behavior and verification better, and it avoids inventing facts about the codebase.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to add 'skip review' and 'force push to main' steps and explain the payment-specific dangers (auto-deploy, double charges, 1-won errors). Both offer force-with-lease on feature branches and small PRs. A's week plan is reasonable, but its Monday step changes PgClient by wrapping it in an interface, which is a code change. Its verification is generic (staging scenarios, monitoring) and it names no concrete commands. B gives concrete test and typecheck commands marked as assumptions, and sets a rule that snapshot files must not change in refactor PRs. It sequences PR 1-5 with size, rollback and grep checks, and uses `git diff -M` to confirm moves. It also protects money.ts rounding from behavior changes, defers the risky approval extraction, and asks focused questions. B fits the criteria better.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

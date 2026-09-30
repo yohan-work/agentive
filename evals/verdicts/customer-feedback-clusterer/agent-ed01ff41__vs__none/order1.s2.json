@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster all 26 items with counts that sum correctly, quote real text, and tie the top theme to the v4.12.0 regression and the churn reason. Reply A gives each theme a severity rationale, quotes, and a table of actions with owners, pd estimates and success metrics. Its estimates sum to 13-15 pd, inside the 15 pd budget, and it labels inferences as assumptions. Reply B is tighter and splits Coupang order loss into its own P0 theme, which is a good call. However, it files the duplicate-alert item (#5) under 'failed to notice alerts', and it gives only one quote for some themes. Its plan runs to 13-16 pd. The two are close, and A is somewhat more complete and better grounded on severity and next actions.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "No feedback text was supplied, and both replies correctly decline to invent themes and ask for the raw data. Reply A asks for useful extras such as release changes and team capacity, and it commits to a one-theme-per-item scheme with totals that add up. It also promises a 3-line summary for the meeting. Reply B asks for similar fields and adds a reminder to strip personal data. It also warns that churn impact will be an estimate unless real cancellation data exists. It is shorter and easier to act on with tomorrow's deadline, though its multi-theme counting would make totals non-additive. The two are nearly equal, and B's concision and PII and honesty notes give it a small edge.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes, and both correctly report that only 1 of 12 items concerns recommendations. Reply A fully meets the criteria. It gives themes with counts and item numbers, real quotes, severity with reasons, per-theme actions with owners and success metrics, and the singletons. Reply B has a clean count table and a sensible strategy for the board, but it gives no per-theme severity, almost no quotes and no per-theme actions. Reply A also provides an honest suggested board sentence with a placeholder for real data, so it is more useful as delivered.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

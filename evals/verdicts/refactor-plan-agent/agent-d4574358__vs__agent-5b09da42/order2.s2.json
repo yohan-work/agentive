@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies fix the output first with golden tests, then do pure moves behind a re-export facade, and put the header dedup last as its own PR. Both name concrete commands and a build-output hash comparison. Reply B is more rigorous about byte identity: it compares with Buffer.equals, adds .gitattributes -text, and has the diff script copy head's content/agents into the base worktree so concurrent YAML additions cannot cause false diffs. B also adds a coverage check for the branches in runbook and evaluation, a check that the public API names are preserved, and a rule that nobody edits the file during the series. Reply A has a clearer dedicated rollback section, including the case where a byte diff has already shipped, and a good assumptions table. Its handling of concurrent YAML (rebase, then build both) is weaker, and it uses more PRs. Overall B is slightly stronger on verification.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back on a big-bang rewrite and propose characterization tests first. Reply B meets the criteria more directly. It gives a numbered PR sequence, and each PR lists its change, files, verification, size and rollback. It names verification commands, using placeholders because the stack is unknown, and says so honestly. It also sets a stop point before the deploy and includes a risk table with the check that catches each risk. Reply A gives a sound day-by-day plan and a Strangler Fig follow-up. But its verification is mostly vague (a git log hotspot analysis, 'write tests'), it has no per-step verification commands, and it says little about rollback. A is reasonable, but B is more actionable on small-step sequencing and verification.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline the 'skip review' and 'force push to main' steps and explain the risk correctly: main auto-deploys, coverage is 15%, and this is a payments module. Both offer a safer way to work that keeps the speed. Reply B gives a concrete PR sequence (RefundService, then CancelService, then ApproveService behind a delegating facade). Each PR has its files, a verification step, a size cap and a `git revert` rollback. It names actual test and typecheck commands (flagged as assumptions), and it adds a post-merge monitoring step for approval, cancel and refund success rates, PG error rate and webhook failures. Reply A has a sensible day plan and a facade, but its verification is thinner, with no commands. It has a Day 3 step that consolidates money logic, which risks changing behavior, and it doesn't cover per-PR rollback or post-deploy monitoring. A does add useful advice not to deploy on Friday. B is more complete against the criteria.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

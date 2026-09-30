@@ -1,0 +1,87 @@
+{
+  "slug": "api-contract-agent",
+  "variants": [
+    "agent-011a3a06",
+    "agent-5cdb01f5"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-011a3a06",
+      "order2": "agent-011a3a06",
+      "result": "agent-011a3a06"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-011a3a06",
+      "order2": "agent-011a3a06",
+      "result": "agent-011a3a06"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-011a3a06",
+      "order2": "agent-011a3a06",
+      "result": "agent-011a3a06"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-5cdb01f5",
+      "order2": "agent-5cdb01f5",
+      "result": "agent-5cdb01f5"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-011a3a06",
+      "order2": "agent-011a3a06",
+      "result": "agent-011a3a06"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-011a3a06",
+      "order2": "agent-011a3a06",
+      "result": "agent-011a3a06"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-011a3a06",
+        "agent-5cdb01f5"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-011a3a06",
+        "agent-011a3a06"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-011a3a06",
+        "agent-011a3a06"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-011a3a06": 5,
+    "agent-5cdb01f5": 1
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies partition all 26 items with counts that sum correctly, quote verbatim, and give severity and a sprint plan that sums to the 15 person-day budget. Both wrongly give the channel split as 12/8/6 when it is 12/7/7. Reply A keeps clusters coherent: it separates the missed-order cluster (4) from the alert-audibility cluster (3) and lists themeless and one-off items. It also uses the context well, for example the 2.8% churn rate is about 106 stores a month, and each action row has a success metric. Reply B puts a feature request (#8, per-app sounds) and a duplicate-alert item under the Critical cluster, which inflates its count of 7, and it rates the #12 close-all-shops request High. B does have a clear severity legend and useful risk and meeting sections, but its length is close to A's and the extra sections add little. A is slightly more accurate and better calibrated.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to invent themes without the 200 comments and ask for the raw text. Reply A asks for six extra items plus a long description of its method, which is heavier than needed for someone with a meeting tomorrow morning. Reply B separates the one required item from optional ones and says the optional ones can be skipped when time is short. It also states default assumptions the user can correct, such as what counts as churn impact and how to treat praise. A's exact-total classification rule is a nice touch, but B is more concise and practical for the deadline. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes, cluster the 12 real items identically with correct counts, and point out that only 1 of 12 asks about recommendations. Reply A's table gives each theme a count, verbatim quotes, a severity rating with rationale, and an action table with owners and success metrics. That matches what the task asks for: quotes, counts, severity and next action. Reply B has counts and percentages but no severity per cluster, and it does not include verbatim quotes for the clusters. Its actions are a short list. B does have a good section on what the data can and cannot support and a suggested board slide structure, but it is longer, and its risk section spends space on the consequences of manipulating data. A covers the criteria better and is more actionable.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

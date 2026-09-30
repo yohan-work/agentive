@@ -91,6 +91,12 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - `design-qa-agent` v3 beat the baseline 3–1 (two inconsistent) and the current prompt 3–0 (three inconsistent). Adopted, with thin margins.
   - `readme-generator` v3 beat the baseline 3–2 (one inconsistent) and the current prompt 4–1 (one inconsistent). Adopted, but the baseline won the fully specified case in both samples; the wins come from the under-specified and out-of-scope cases.
   - `policy-doc-writer` v3 lost to the baseline 0–4 (two inconsistent) and to the current prompt 0–3 (three inconsistent). Not adopted. The judges' reasons were consistent: the "[TBD] instead of inventing" rule plus the up-front questions left the policy full of blanks and less ready to publish, even where the request gave enough to fill them (or asked for one page). For documents meant to be published as-is, "never invent" needs a counterweight: fill what the request supports, and mark only genuinely missing facts.
+- **2026-09-30, depth rule on four more agents (batch 3).** Same recipe and protocol.
+  - `refactor-plan-agent` v3 beat the baseline 6–0 and the current prompt 6–0, with no inconsistent cases. Adopted.
+  - `api-contract-agent` v3 beat the baseline 6–0 and the current prompt 5–1. Adopted; the current prompt won the fully specified case in one sample.
+  - `customer-feedback-clusterer` v3 beat the baseline 4–1 (one inconsistent) and the current prompt 3–0 (three inconsistent). Adopted.
+  - `test-case-generator` v3 beat the baseline 5–1 but only tied the current prompt 2–2 (two inconsistent). Not adopted. The current prompt won the fully specified and under-specified cases in the first sample: judges preferred building the matrix straight away with a placeholder over v3's "list contradictions and ask first".
+  - Judging note: a different session judged six of these pairs with a GPT model while this batch was paused. Those verdicts were set aside and every pair was re-judged with the same Sonnet judge, so all recorded verdicts come from one judge model.
 
 ## Known limits
 

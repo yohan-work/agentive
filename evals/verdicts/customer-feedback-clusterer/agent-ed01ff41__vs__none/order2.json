@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster the 26 items, quote representative lines, rate severity, and propose a sprint plan that fits the 15 person-day budget. Reply A's counts check out: its 11 themes sum to 26 and its plan sums to 15. Its item assignments are consistent, and it correctly links the v4.12.0 login regression and the Coupang Eats SDK change. Reply B states a channel breakdown of 12 in-app, 8 phone and 6 review. The real split is 12, 7 and 7, so B contains a factual error in a headline count that a meeting audience could catch. B also asserts that #19 comes from the same store, which the request does not say. B's action table with owners and success metrics is strong, but the wrong numbers weigh against it in a data-summary task. A's severity for the login theme (S1~S2) is a little hedged, but it has no factual errors.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "No feedback text was supplied, so both replies correctly refuse to invent themes and ask for the data. Reply B says outright that fabricated counts or quotes would mislead the meeting. It asks for the fields that matter most: churn or cancellation status, dates, release events, team capacity, and attendees. It commits to a full classification with item numbers, verbatim quotes, severity, actions with owners and metrics, and an [ASSUMPTION] label when churn data is missing. Reply A is more concise and also asks well, but its example table uses invented numbers (27, 9). They are labelled as an example, yet they are still made-up figures in a reply about not inventing data. B's request is longer, but it marks the optional items clearly, and it covers all four criteria: quotes, counts, severity, next actions.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to inflate the counts or invent quotes, and both give an honest summary of the 12 items. The counts are correct: 5 payment, 2 logout, 2 shipping, and 1 each for recommendation, coupon and photo upload. Both point out that only one item, #3, concerns recommendations, and that it asks for better accuracy rather than a new AI feature. Reply B fits the stated criteria better. It gives verbatim representative quotes for each theme, an explicit severity per theme, a per-theme action table with owners and metrics, and it flags its inferences as assumptions. Reply A offers a well-worded board framing and legitimate evidence-gathering ideas, but its theme table has no quotes and its next actions are less specific. B's stray English heading is a minor flaw.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

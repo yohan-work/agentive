@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies put a byte-level safety net in the first PR, do pure moves before the header dedup, and warn that the copy-pasted headers may differ slightly. A supplies a complete diff-install-kits.sh script that overwrites base content/agents with head's, so concurrent YAML additions cannot cause false positives. It also gives a node coverage command for branch coverage, uses color-moved-ws=no to expose whitespace changes, and states expected outputs for each check. B correctly notes that the existing 20 tests do not check bodies, and it has a good deployed-diff rollback scenario. However, its verification is less concrete, since the dump script is not shown and the build comparison is only sketched. A's claim that the header PR can be reverted independently of the earlier PRs is slightly loose, and its export-list diff command is clumsy. Overall A is somewhat more actionable on verification.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back honestly on a big-bang rewrite with little test coverage and offer an incremental plan. A structures the work as PRs, each with its change, files, verification, size and rollback. It also names a stop point before the release and a risk table with the checks that catch each risk. Its commands are placeholders, which is honest because the stack is unknown. B gives a useful day-by-day schedule with hotspot finding via git log, feature flags and Strangler Fig. But it names almost no verification commands and does not separate the changes into PRs with per-step behavior checks. A fits the criteria of small sequenced changes, behavior preservation and verification commands better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline the no-review and force-push-to-main steps for sound reasons and redirect to small PRs and branch protection. A gives per-PR verification (a test command, a typecheck command and a coverage command, explicitly marked as assumptions), a rollback via git revert, and a step order of safety net, then extract refund, cancel and approve. It also has post-merge monitoring gates and a realistic Friday scope check. B has a good day-by-day schedule and a review SLA idea. But it lacks concrete verification commands, and its Tuesday step to consolidate the PgClient error mapping is a behavior-risky change under 15% coverage. It also asserts a schedule of 1-3 PRs per day without asking about the CI commands. A is more disciplined about preserving behavior and naming verification.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

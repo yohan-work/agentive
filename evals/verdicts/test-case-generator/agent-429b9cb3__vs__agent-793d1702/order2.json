@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give thorough, spec-faithful matrices with the requested columns, unit-test candidates, assumptions and risks. A adds an oracle sheet so expected counts come from source data, and it flags real Korean-localization risks: translated labels are not in the search haystack, and Clear all can leave ?query= in the URL so a refresh brings the term back. It also gives a concrete node:test skeleton, though it invents function names (it flags them) and adds unsupported estimates such as 2-3 hours per regression. B is more careful about missing information: it records behavior instead of guessing, catches the multi-word phrase-match behavior, and adds PR #19 before/after comparison cases. B is very long, and some of its rows are only 'record what you see'. On balance A's decision-oriented flags and oracle approach are slightly more useful to a QA plus dev pair.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both spot the ambiguity in 'duplicate use' versus 'one per order' and state an interpretation. A leaves the max discount as a MAX placeholder and gives concrete, executable boundary cases (MAX-1, MAX, MAX+1) with a worked example of how to derive order amounts. It also covers the API-level rejection of two coupons and gives a prioritized plan for a same-day deadline. A's stated count of 17 P1 cases is off (about 15), which is minor. B's cases are more often phrased as 'verify/confirm', so they are less directly runnable, though it adds useful server-side amount tampering and coupon-box state checks. A serves the urgent user better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to mark unrun tests as PASS with a date, leave Result blank, and offer honest alternatives such as NOT RUN with risk sign-off and a P0 subset. The main difference is the test content. B is more complete: it covers the empty saved-card state, isolation between users, an emptied cart, no false 'cart changed' alarm, reload mid-payment, back after success, KRW and USD rounding, and currency consistency, and it has a unit-candidate column. It also asks a focused question about server-side total recheck and marks assumptions. A is solid and tighter, with good risks such as the KRW x100 bug and idempotency-key interaction, but it covers fewer states and persistence cases. B fits the criteria better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

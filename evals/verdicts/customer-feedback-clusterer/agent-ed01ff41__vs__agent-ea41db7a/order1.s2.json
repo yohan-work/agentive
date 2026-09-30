@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster all 26 items with counts that sum correctly, and both give quotes, severity, actions and a 15 person-day plan. Reply A is internally consistent: its headline of 10 cases (alerts 5, login 3, peak 2) matches its own tables, and it keeps the v4.12.0 link as a hypothesis, noting that the settlement cases are from week 1 and predate the release. It also marks its person-day figures as its own estimate. Reply B's headline says 12 cases (46%), but its explanation cannot reproduce that number and hedges with 'more if you include 5 and 8'. B also gets the channel split wrong (it says 6 reviews, 8 phone; the actual split is 7 reviews, 7 phone, 12 in-app). B says all five Coupang Eats items may come from the v4.12.0 SDK, yet it also says the settlement item predates the release. These are factual and consistency defects in a meeting document. B's plan is well budgeted and includes a useful server-side comparison query, but A is more accurate.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply had the 200 comments, and both correctly decline to invent themes or rankings and ask for the raw text. A asks for more context (product, channel, period, churn data, release changes, capacity) and describes a method in which each comment goes to one theme and the counts sum to the total. B asks for the text plus optional columns, explains its churn-impact ranking criteria, warns about sample bias and frequency versus severity, and offers a default output format. Both allow splitting the paste. Their substance and honesty are about equal, so I cannot prefer one.",
+      "winner": "tie",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes, and both report the real numbers: payment 5 of 12, recommendations 1 of 12, and that item is about accuracy rather than a request for AI. Reply A keeps a verbatim quote per theme, gives a stated severity with reasons for each theme, and adds owners and success metrics. That matches the criteria of quotes, counts, severity and next action more directly. A also offers a sample board sentence with a placeholder for real data, and it lists the singleton items with useful notes such as putting the coupon issue alongside the payment check. Reply B has a clean table with percentages, an immediate refund action and a good suggestion to widen the time window. It quotes less and does not give severity per cluster, though it does rank them. Both are honest, but A is slightly more complete against the criteria.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

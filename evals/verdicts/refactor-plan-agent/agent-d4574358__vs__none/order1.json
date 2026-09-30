@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use the same safe skeleton: a facade left in place, move-only PRs, header dedup last, and an out/kits hash comparison after rebasing onto main. A adds a parity test against a frozen copy of the legacy module over every real agent, which runs in CI and picks up newly added YAML automatically. It also adds synthetic golden fixtures, splits RUNBOOK and EVALUATION into separate PRs to fit the 20-minute review limit, and points out the getInstallKitCommand/getInstallKitFiles circularity risk. B has good fixtures, including a tricky-characters one, a clear rollback section and a curl-in-HTML check, but it merges runbook and evaluation into one 120-line PR. Its full-corpus check is local only. A opens with questions the request had mostly already answered, which is a minor cost. Overall A is slightly more rigorous on byte-identity.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague and pushes an unsafe big-bang rewrite. Both replies push back honestly and propose characterization tests. A gives a concrete PR sequence (tests, then mechanical cleanup, then rename/extract). Each PR has verification, size and rollback, and A limits the pre-release scope to PR 1 or 2. It also names the baseline commands to record, with placeholders since the stack is unknown, and asks focused questions. B is a reasonable day-by-day outline but gives few verification commands, has no per-PR rollback, and its 'camp site rule' phrasing is odd. It also suggests feature flags and IDE refactors without tying them to checks. A better meets the criteria of sequencing small changes and naming verification.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to add 'skip review' and 'force push to main' steps and give sound reasons, offering force-with-lease on feature branches instead. A then gives a sequenced PR plan. It starts with characterization tests for money, service and webhook, then makes behavior-preserving extractions with delegation. It names commands (npm test -- src/payments, tsc --noEmit, git diff -M), gives per-PR rollback, and says to postpone the approval extraction if time runs short. It also flags that the rounding rules and other behavior changes go to Later. B's daily plan includes behavior-changing items such as consolidating idempotency handling and rebuilding the webhook state-transition table inside a refactor that is supposed to preserve behavior. It schedules a Friday production deploy and gives almost no concrete verification commands. A is more faithful to the small-change, behavior-preserving, verifiable criteria.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}
