@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks with pass/fail columns, and both use the user's specifics (20 kits, 61 lowered agents, curl 7.68, 375px). B is more technically accurate on the named risks. It notes that Windows PowerShell 5.1 fails on && and aliases curl, that curl.exe does its own brace globbing so PowerShell is not the real problem there, and that robots.txt only works at the host root rather than under /agentive/. It also adds a script for checking kit content types, a PowerShell variant, and a list of release blockers. A gets the PowerShell brace-expansion point slightly wrong, and its S1 expects a redirect to /en/ without the /agentive base path. B is long and has some padding (Lighthouse, Search Console), but most of the extra content addresses stated risks and is pasteable.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, so the right reply asks focused questions and states assumptions while still meeting the four-way split. A asks three prioritized questions. It then delivers explicit Smoke, Regression, Device matrix and Content sections with pass/fail tables, and marks guessed items as [ASSUMPTION]. B gives a generic priority-tiered list. Its P0 to P3 grouping has no device matrix or content section as such, and it has no pass/fail columns. B has useful release-safety items such as rollback and monitoring, but it does not match the required structure. A also avoids inventing facts and stays scoped to what one tester can do.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to attest that tests passed, and both offer a checklist plus a blank sign-off template, which is the right handling. A follows the required structure with explicit Smoke, Regression, Device matrix and Content sections, pass/fail columns, and focused clarifying questions about supported devices, limit-raising policy and re-acceptance of terms. It marks unspecified behaviors as 'verify' rather than inventing them. B has stronger fintech depth, including server-side enforcement, API-level raise attempts, audit logging and consent-version recording, plus a sensible fallback suggestion. But B organizes by feature and priority, with no distinct smoke section or device matrix, so it misses the criterion. A's structure edges it ahead.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

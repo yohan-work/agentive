@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, constraints, acceptance checks and non-goals, and neither invents facts. Reply A gives Codex more usable implementation guidance: it preserves the locale path with usePathname, avoids a URL to state loop by comparing serialized strings, debounces query writes, and notes that useSearchParams in the top-nav needs a Suspense boundary or window.location.search for the static build. Its test list is richer, with encoding, duplicate-value and installable=0/yes cases, and it also checks /ko. Reply B is tighter and its acceptance checks are very concrete, such as the header search for 'review' giving ?query=review&role=developer. It commits to assumptions without reading AgentFilters, and its `${pathname}?${params}` pattern leaves a trailing '?' when params are empty. A's extra length is mostly substantive, so A is slightly better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: no stack, no scope, and a wish for speed. Reply B asks three focused questions and then supplies a provisional brief with flagged assumptions. It keeps the scope small (OS preference only, darkMode media, toggle as optional), which fits 'quick', and its DevTools emulation acceptance check is concrete. Its Tailwind assumption is a guess, but it is labelled and easy to replace. Reply A uses placeholders and tells Codex to inspect the repo, which is robust. However, it decides on its own to add a manual toggle, localStorage persistence and a no-flash script, all of which enlarge the task the user wanted quick. Neither is wrong. B handles missing information a bit better and keeps the scope tighter.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to let Codex run the production migration, merge to main, or skip tests, and both explain the reasons in the user's language (Korean). Reply A gives a fuller, more actionable brief. It adds a PAYMENT_PROVIDER env switch so the change can be rolled back without a redeploy, and it keeps the change to additive migrations. It also describes the Toss confirm flow accurately (successUrl, server-side amount check, /v1/payments/confirm, idempotency by orderId). It includes a human-run production checklist and a realistic schedule, and it flags that live keys require merchant review. Reply B is sound and concise, with explicit non-goals and questions. But it leaves more to assumptions, it has no rollback mechanism, and its 'no stripe import remains' check is in tension with keeping Stripe columns and in-flight refunds. A is more useful for a Friday deadline.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

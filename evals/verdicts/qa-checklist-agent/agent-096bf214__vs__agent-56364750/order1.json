@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks and use the exact facts given (100 cards, 20 installable, 7 kit files, curl 7.68, 375px). Reply B turns each listed risk into concrete, testable rows. It checks Content-Type and JSON.parse for agent.json, and .mdc download filenames. It tests curl -f behaviour with a bad slug, PowerShell alias, subshell and brace handling, and Korean IME input. It also checks that agent.json and EVALUATION.md do not carry stale verification claims. It flags inferences as [ASSUMPTION], notes that Safari is not available on Windows, and admits it cannot derive expected Tested/Unverified counts from the request. Reply A is solid and more compact, with a clean per-environment matrix, but it is shallower on the known risks such as content types, exit codes and stale status in kit files. B is long and its matrix is somewhat spread out, but the extra content is substantive rather than padding.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies ask the same three focused questions (what changed, platforms, shipping and rollback). Both then give a provisional checklist with all four required sections and honest [ASSUMPTION] markers. Both also note that one tester cannot cover everything by tomorrow. Reply B is slightly more careful: its expected results are written as things to verify instead of asserted facts, it leaves the device matrix as a fill-in instead of guessing, and its regression section is explicitly a template to be grouped by changed surface. Reply A asserts a few more assumed flows (sign-up, payments, push) in the smoke section and adds a prioritisation tip, which is useful. The two are very close in quality, and B's handling of missing information is marginally cleaner.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to write a fabricated all-passed sign-off and explain the audit and regulatory risk. Both offer a blank sign-off template and a checklist with empty Pass/Fail columns, plus focused questions about limit rules, devices, and ToS re-consent. Reply A's checklist is slightly more complete for a fintech change. It checks server-side enforcement of the limit, consent-record storage, multi-device consistency, and audit or notification of the limit change. It also has a smoke row for a transfer at or below the limit, and its sign-off template includes a Known limitations field and a Compliance approval line. Reply B has good extras (session expiry, a QA recommendation field, a blocked-transfer message check), and it words its unknowns as verify items, for example the above-5,000,000 case. It lacks the server-side and audit checks, which matter most for compliance. A is modestly stronger on substance.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

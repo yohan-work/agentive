@@ -1,0 +1,87 @@
+{
+  "slug": "codex-task-brief",
+  "variants": [
+    "agent-053218d8",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-053218d8",
+      "order2": "agent-053218d8",
+      "result": "agent-053218d8"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-053218d8",
+      "order2": "agent-053218d8",
+      "result": "agent-053218d8"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-053218d8",
+      "order2": "agent-053218d8",
+      "result": "agent-053218d8"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-053218d8",
+        "none"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-053218d8",
+        "agent-053218d8"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-053218d8": 3,
+    "none": 3
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

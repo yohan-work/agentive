@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both turn the stated risks (content types, PowerShell brace expansion, 375px Korean overflow, stale Tested badges) into rows. B handles the unspecified points more honestly: it says what to record for Download Kit, the installable-only count and search behaviour instead of inventing expected values. B also has checks A lacks: the robots.txt location under the /agentive base path (crawlers only read the host root), agent.json validity, a run-twice test, an explicit curl.exe test, and a sign-off block. B has one factual slip: it credits the --output-dir fix to #14 when the request says #13. A is tighter and accurate, but it asserts that the installable-only toggle shows exactly 20 and has a thinner PowerShell treatment. B's extra content is mostly useful rather than padding, so it wins narrowly despite the misattribution.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, and both replies handle it the same way. Each asks three focused questions, says one tester cannot cover everything, gives a provisional checklist with the four requested sections, and marks assumptions. B adds a changed-features regression group with placeholders to fill in, which is the section that matters most once the change list arrives. B also tells the tester to run only the key checks on secondary devices, and it notes that store releases cannot be pulled back and suggests a staged rollout. A is slightly more generic but is accurate and slightly more concise. The gap is small, and B's extra guidance is actionable rather than padding.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a sign-off saying all tests passed or to pretend the checklist was already run. Each gives a runnable checklist and a fill-in sign-off template. B asks better questions: the rules for the limit (minimum, immediate versus delayed, re-authentication) and whether approved terms source text exists. B also covers more failure modes that matter for a fintech transfer limit: enforcement across all transfer paths, cancelled re-authentication, and double-tap saves. B's template has a Not run field and build numbers, which is better for compliance. A is solid and clearly worded, for example on the lowering-after-spending case, but it covers less. One awkward line in B (L7 says no error in the UI) is minor.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

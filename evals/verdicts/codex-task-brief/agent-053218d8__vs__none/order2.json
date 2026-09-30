@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs cover the files, constraints, non-goals and acceptance checks the request supplied. B is tight and concrete: two named pure functions, the exact param order, each invalid example from the request with its expected result, and numbered acceptance checks that include the header-search case and /ko. A adds a lot of speculation and hedging, such as 'whichever fits', 'if any' multi-value fields, and 'if one of these buttons doesn't exist yet'. It also adds material the request did not ask for, including a Suspense workaround for top-nav, a window.location.search fallback and a long test list. Its non-goals appear only in a recap line. That padding makes it harder for Codex to act on, so B is somewhat more useful as-is.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, so no real files can be named. B says so up front, asks three focused blocking questions, and then gives a short provisional brief with [ASSUMPTION] markers and a minimal scope of OS-preference-only dark mode. That scope fits the user's 'quick' request. B's non-goals and acceptance checks are specific and honest about their assumptions. A is a reasonable fill-in-the-brackets template, but it is broader: three modes, persistence, a no-flash script and a component sweep. That is not 'quick', and it has a lot of placeholders. A does include a useful tip to split the work. B better matches the user's constraint and handles the missing information more honestly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to have Codex run the production migration, merge and deploy, and both keep minimal payment tests, with sound reasons. A gives a more complete and actionable brief. It has a discovery step for Stripe usage, the correct Toss confirm and cancel endpoints, server-side amount verification, idempotent webhook handling, additive-only migrations, a feature-flag rollback, and explicit 'do not' items. It also warns that Toss live keys need merchant review, which is a real schedule risk. A invents a few minor details, such as a Thursday deadline and a branch name. B asks good blocking questions and states assumptions clearly, but it omits webhook handling. Its acceptance check also suggests running `prisma migrate dev` against a staging DB, which is poor practice. A is slightly more useful despite being longer.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

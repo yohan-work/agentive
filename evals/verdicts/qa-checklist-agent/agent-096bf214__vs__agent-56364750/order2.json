@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks and use the request's specifics (100 cards, 20 installable, 7 files, curl < 7.73, PowerShell). A goes deeper on the stated risks: it checks Content-Type and JSON.parse for agent.json, runs a bad-slug curl -f test, checks the PowerShell alias and brace expansion separately, tests IME input on /ko, and checks that sitemap URLs use the /agentive base and that hreflang targets load. It also has pass/notes columns and a browser-by-check matrix. It flags Safari on Windows and the robots.txt location caveat honestly, and asks the owner for totals instead of inventing them. B is concise and correct, but several rows are vague (S7 spot-check, R8 and R9 without concrete counts), and its device matrix is coarser. A is long and has some low-value rows, but most of the extra content is targeted at the request's known risks.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies handle the vague request the same way: three focused questions, a provisional checklist with assumptions labelled, and the four requested sections. Neither invents facts about the app, and both say honestly that the checklist can't cover everything. A has a slightly richer smoke set (build number check, upgrade with data, production config) and a small content section. B adds concrete regression rows such as re-testing each fixed bug, denied permissions, and placeholder text checks. B also gives a practical prioritisation tip for limited time. The differences are small and offset each other, so I can't prefer one.",
+      "winner": "tie",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a statement that all tests passed, explain the audit risk, and offer a blank sign-off template and a checklist instead. Both ask the same key questions about limit rules, devices, and ToS re-consent. A's checklist is thorough, with cross-platform limit consistency, session expiry, and double-tap checks. It also gives a good pointer to tell compliance before the ticket closes if there isn't time. B's template is stronger for compliance use: it records failed or not-run checks with disposition and approver, and it lists known limitations of the test pass. B also adds server-side enforcement, an audit or notification record of the limit change, and consent-version storage. B is also somewhat tighter, and its smoke checks are more focused on money movement. The edge is small.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, constraints, non-goals and acceptance checks the request supplied, and both cover URL sync, invalid-value handling, clear-all versus clear-filters-only, and top-nav preservation. Reply A turns them into numbered, testable requirements with concrete acceptance checks, such as the exact URLs for /en and /ko, the reload check, and the header-search check that keeps role=developer. It adds only one optional item, debouncing. Reply B has good specifics, including the ref guard against loops and reading window.location in the nav to avoid a Suspense problem. But it pads the brief with a risks table, next actions and a list of assumptions about things Codex can read straight from the repo, for example whether the Clear buttons exist and whether fields are arrays. It also says to keep unrelated params such as utm_*, which sits awkwardly with the requirement that Clear all removes all params. A is tighter and more directly actionable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague and asks for something quick, with no stack or files given. Reply A handles the missing information honestly by asking three focused blocking questions, then giving a short provisional brief with assumptions marked. It keeps the scope minimal (OS-preference dark mode, with the toggle only as an optional extra), and the non-goals and acceptance checks are clear. Reply B invents a much larger scope that the user did not ask for: a three-way toggle, localStorage persistence, a head script to prevent flash, hydration handling, a PR template and screenshots. That contradicts 'quick for Codex to do'. It also spends a lot of length on assumptions and risks, and only asks its questions at the end. A better fits the request and is more honest about what it does not know.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on the same unsafe parts (running the migration on the production DB, merging and deploying, skipping tests), in Korean, and both keep Codex to a PR. Reply B gives a fuller brief that Codex can act on immediately. It has a PaymentProvider abstraction with an env-var rollback, server-side amount verification before calling the confirm API, idempotent webhook handling, additive-only migrations, a concrete four-test minimum, and a PR checklist. Reply A is honest and asks good questions, but its brief is thinner and leans on assumptions. It also drops automated tests in favour of manual test-key runs. B has minor weaknesses: an invented Mon-Wed schedule, a 'half a day' claim, and a webhook secret that may not apply. Overall B is more useful and still grounded in the user's stack and deadline, so B wins slightly.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
