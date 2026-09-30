@@ -295,9 +295,9 @@ runbook:
         Constraints:
         - 
         Review needs:
-        - Call out assumptions.
+        - Go deep on the risks and constraints listed above.
+        - Mark assumptions.
         - Flag missing context.
-        - End with concrete next actions.
     - label: Boundary check
       description: Use this when the request may be under-specified and you want the agent to narrow it safely.
       value: |-
@@ -318,26 +318,21 @@ runbook:
       whyItFails: The agent cannot tell whether better means clearer, safer, faster, more complete, or easier to hand off.
       strongerInput: Improve the output for New repo docs. Optimize for README draft, keep assumptions explicit, and list the changes made.
   expectedOutputShape:
-    - A short summary of the recommended README draft
-    - A clearly labeled README draft section
-    - A clearly labeled Getting started section
-    - A clearly labeled Scripts section
-    - A clearly labeled Roadmap section
-    - Assumptions and missing context separated from confirmed facts
-    - Risks, review checkpoints, and concrete next actions
+    - "The README in Markdown, ready to paste: purpose, requirements, install, quick start, commands, configuration, limitations, roadmap, license"
+    - Copy-pasteable usage for every named feature, command, and flag
+    - Known limitations stated plainly; roadmap items not presented as features
+    - "Notes for the author outside the README: assumptions and what to verify"
   outputChecklist:
-    - Includes README draft
-    - Includes Getting started
-    - Includes Scripts
-    - Includes Roadmap
-    - States assumptions separately from confirmed facts
-    - Lists concrete next actions
-    - Calls out risks or missing context
+    - Every feature, command, flag, and limitation the user named is documented with exact usage
+    - Uses only the names, commands, versions, and URLs given
+    - No invented badges, metrics, users, or benchmarks
+    - Length matches what the user asked for
+    - Assumptions are listed under notes for the author
   failureModes:
-    - The input is too broad or lacks project context
-    - The output is generic and does not mention concrete constraints
-    - The result skips assumptions, risks, or next actions
-    - The agent invents project facts that were not provided
+    - The input lacks the project context the agent needs
+    - A risk or constraint the user named gets a generic line instead of a concrete failure mode and check
+    - Unrequested extras crowd out depth on what the user asked for
+    - The agent invents facts, numbers, or approvals that were not provided
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.
@@ -362,7 +357,8 @@ evaluation:
   evaluationCriteria:
     - Documents purpose, features, setup, scripts, validation, and roadmap accurately
     - Produces README draft in a format that can be pasted into a ticket, PR, document, or handoff
-    - States assumptions, missing context, risks, and concrete next actions separately
+    - Uses only facts the user gave, with placeholders for anything missing, and lists assumptions under notes for the author
+    - Refuses invented badges, metrics, adoption claims, benchmarks, or audits
   sampleRuns:
     - title: README for a real CLI companion to the agent archive
       input: |-
