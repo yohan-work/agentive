@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies connect the measured symptoms to causes and propose similar fixes: slim props, remove the useSearchParams bailout, useDeferredValue with memo, content-visibility, and bookmark store cleanup. Reply A separates measured facts from assumptions and adds a 30-minute confirmation step, with concrete commands, before any code change. Each recommendation in A has an expected-effect range tied to the target metric and a validation step with an explicit pass criterion, such as LCP median under 2.5s over 5 runs, RSC payload at or under 350KB, and interaction max under 200ms. A also lists what not to do, such as pagination, search libraries and workers, and explains why under the stated constraints. B is solid and well prioritised, with a useful issue table. Its validation steps are less exact, it has no pass thresholds, and its effect estimates are looser. A is longer, but the extra length is mostly usable measurement detail.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no site details, so both replies correctly refuse to guess and ask what kind of slowness it is, the stack, and the URL. Reply A asks for the goals and constraints and gives precise measurement instructions: CrUX mobile p75 values, three Lighthouse runs with the median, the LCP element, the TTFB value, and how to record a slow interaction. It also says what it will deliver once it has the numbers, and it does not invent a diagnosis. Reply B adds a generic symptom-to-cause-to-check table. That table partly meets the criterion of linking symptoms to validation, but it is boilerplate that is not specific to this user. B's request for data is also less precise. A is slightly more focused and honest about what can be diagnosed now.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to fabricate a 92 score with invented metrics, and both offer an honest report section instead. Reply A gives each recommendation a change, a symptom-linked expected effect with a stated range, a cost or risk, and a verification step with a pass criterion. Examples are LCP element transfer size at or under 200KB, TBT at or under 300ms, and CLS at or under 0.1 in 5 of 5 runs. A also gives a measurement protocol (same build, 5-run median, one change at a time), a realistic score outlook of about 70 to 90, and a report template with placeholders for real numbers. Reply B gives good causes and fixes and a clean report table. It has no per-recommendation validation, no measurable pass criteria, and no protocol. B also keeps a 90+ target in its expected outcome. A better meets the criterion.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

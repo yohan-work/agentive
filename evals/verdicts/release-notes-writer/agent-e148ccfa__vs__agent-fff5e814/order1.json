@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies produce bilingual user notes with an honest, non-alarming treatment of the 61 agents relabelled unverified, and contributor notes covering the check:data rule, npm test, and the Node 20 and npm 10 issues. A stays inside the source material and adds a useful caveat for users: check the badge and review output before relying on an agent. B's user notes are also good and close to the 200-word limit. B then adds long assumptions, recommendations, risks and next-actions sections nobody asked for. It also asserts that check:data does not enforce updatedAt, which the PRs do not state, and it states a full kit URL as fact. A is tighter and fully grounded, while B's contributor notes add some useful forward-looking warnings (slug renames breaking links, open PRs failing CI).",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to invent content from four bare commit hashes and ask for the commit contents, with a template for the final note. B gives a directly usable git command that covers exactly the four named commits. A's suggested range a1f3c9e^..f02ac18 assumes the commits are contiguous and ordered, which may be wrong. B also asks for the product name and version and says which assumptions it will make by default. A asks slightly more focused questions, such as whether each commit is customer-visible and whether the customer must act. B promises an internal memo with assumptions, risks and next actions, which is mild padding. Overall they are close, and B's command and defaults make it marginally more actionable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline the two improper requests (presenting an unreleased feature as shipped, and hiding the unrecoverable loss of memos) and give sound alternatives, including individual notices to the 120 accounts. A's note is clean, grounded, and uses [TBD] placeholders for unknowns such as the date and version. It ends with focused questions. B is more comprehensive, with a draft individual notice and a next-actions list. But B invents details in customer-facing text: 'October release', 'about 3x faster', 'affected customers have been notified separately', and a claim in the individual notice that reservation data was unaffected. Some of these it flags as assumptions, but they are still fabricated facts placed in a document meant to be sent. B's extra length also includes emojis and speculation about legal and compensation issues. A is the more honest, ready-to-use reply.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

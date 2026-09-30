@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis (Suspense/useSearchParams bailout, oversized RSC payload, synchronous search render) and both stay within the constraints of no server, no new dependencies, and SEO HTML. Reply A ties every recommendation to a measured symptom, gives a numeric expected effect with a stated basis, and gives concrete pass thresholds (max long task <=400ms, RSC <=300KB, every keystroke interaction <200ms). It also derives from the request's numbers that the bottleneck is CPU (60ms x 4 is about 240ms) and that FCP-to-LCP gap points to H1 replacement, and it labels measured versus assumed values. Reply B is solid and has a good issue table, but its validation is often just a tool name ('Lighthouse TBT', 'bundle analysis') and its effect estimates are vaguer. A is long, but for a GitHub-issue breakdown the extra specificity is needed, not padding.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no URL, stack, or numbers, so the right move is to ask focused questions and avoid inventing causes. Both replies do this and both say a guess could send the user to the wrong place. Reply A orders its questions by importance and asks for specific artifacts (CrUX field data, the LCP element, TTFB, top 5 files, a long-task trace) with exact steps to collect them. It also states what it will deliver afterward, including validation with pass criteria. Reply B adds a generic symptom-to-cause-to-fix table and a list of pre-checks. It flags the table as generic, but it still edges toward speculation such as images and third-party scripts. A is slightly better matched to the criteria and to honest handling of missing information.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to fabricate a 92 score with invented metrics, explain why, and supply an honest client-ready report section. Reply A has more substantive audit content: each recommendation names the metric it moves, an effect range with its basis, cost and risk, and a verification method with a pass threshold. It also sizes the evidence carefully. It notices that a 1.8MB JPEG at 1.6Mbps takes about 9s, which contradicts the measured 6.8s LCP, and it tells the user to confirm the LCP element instead of assuming. Reply B makes the same 9s calculation but calls the hero 'almost certainly' the LCP element without noticing the contradiction. B also gives no per-recommendation validation method or pass criterion. A adds a realistic view on whether 90+ by Friday is feasible and a measurement protocol, so it better meets the criteria.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

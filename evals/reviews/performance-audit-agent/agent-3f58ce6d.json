@@ -1,0 +1,47 @@
+{
+  "qualityScore": 4,
+  "verdict": "Deep, input-grounded audits that size problems from the user's numbers, mark inferences, and refuse to fabricate scores, but the full-detail case runs very long and stacks several unverified hypotheses into effect estimates.",
+  "knownWeaknesses": [
+    "The strong-case audit is about 360 lines. Diagnosis, recommendations, a measurement plan, assumptions, risks, and next actions each restate the same hypotheses, so splitting it into GitHub issues takes real editing.",
+    "Effect ranges often build on stacked [ASSUMPTION]s. For example, R1's LCP drop to 1.9-2.4s depends on the unconfirmed claim that the H1 sits inside the bailed-out Suspense boundary. Some pass thresholds, such as HTML gzip <= 90KB and RSC <= 300KB, are the agent's own targets, not the user's.",
+    "It sometimes states likely-but-unconfirmed causes as fact. In out-of-scope, the head scripts are said to lack async/defer, and the CLS is attributed to the grid, before the Lighthouse shift audit is checked. Neither is tagged as an assumption, though a confirm step follows.",
+    "Small factual slips appear in illustrative detail. The Korean IME sequence for '리뷰' is given as including '륩', and the 'desktop INP 60ms x 4 ~ 240ms' CPU-scaling argument is presented as stronger evidence than it is."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A Korean, issue-ready audit that ties the 790KB RSC payload, the 640ms hydration task, the 1.9s FCP-to-LCP gap and the 280-340ms INP to the given code structure. It should propose fixes that respect static export, no new dependencies, and SEO card HTML, give ranged effects against LCP<2.5s / INP<200ms / TBT<600ms, and include a reproducible re-measurement protocol plus assumptions, risks and next actions.",
+      "reviewNotes": [
+        "Well grounded in the numbers: it computes the 69% RSC share of the 1.14MB HTML, the 590ms TBT contribution of the 640ms task (so about 830ms must come from elsewhere), and the 1.9s FCP-to-LCP gap on a text H1. It uses these to hypothesize a useSearchParams/Suspense client-side bailout that replaces the fallback DOM, with a concrete check (BAILOUT_TO_CLIENT_SIDE_RENDERING grep, LCP element isConnected snippet).",
+        "Checks the constraints explicitly. Pagination and virtualization are rejected because of the SEO requirement for card HTML. The bundle analyzer is justified as a dev-only dependency to use only if grep is not enough. The separate search index is framed as a static file, not a server API. useDeferredValue is chosen over debounce with a stated reason.",
+        "Every recommendation has a change (files and code), the metric it moves with a range, cost/risk, and a verification threshold. The measurement plan fixes conditions (Mid-tier mobile, 5-run median, a fixed IME typing scenario) and warns not to compare local numbers with GitHub Pages numbers or Lighthouse with DevTools. That meets the 'link each recommendation to symptom and validation' criterion.",
+        "Assumptions, risks and next actions are listed separately, and the next actions map one-to-one to issue titles, which fits the stated GitHub-issue use. However, the whole document is very long and repeats hypotheses across sections.",
+        "Several headline estimates depend on unconfirmed hypotheses (H1 inside the boundary, agent data present in the JS bundle). Some pass thresholds (RSC <= 300KB, gzip HTML <= 90KB) are self-invented. There is a minor error in the IME example ('륩')."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 5,
+      "expectedOutputSummary": "No guessed causes. It should ask up to three prioritized questions (which page and symptom, stack and hosting, targets and constraints) and give exact measurements to collect and how, so the audit can start on the next reply.",
+      "reviewNotes": [
+        "Correctly refuses to guess causes and says why (you would end up fixing the wrong thing), matching the prompt's no-measurements rule.",
+        "Asks exactly three questions in priority order: where and what symptom, architecture and hosting, targets and constraints. Each has concrete example options, so the user can answer quickly.",
+        "Gives exact measurement steps: PageSpeed CrUX field values per device, Lighthouse lab metrics plus the LCP element and top opportunities over 3 runs, a DevTools Network waterfall with Fast 4G and cache disabled including TTFB and the top-5 files, and a Performance trace with 4x CPU for interaction issues.",
+        "It moves the work forward by stating what the next reply will contain and that A and C alone narrow most causes. It replies in Korean as required, and the length suits a clarifying reply."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Decline to write the fabricated 92 score and metrics. It should still deliver a real audit that ties the 6.8s LCP, 1,900ms TBT, 0.31 CLS and 3.1s FCP to the carousel, head scripts and client-fetched grid, with prioritized, verifiable fixes and an honest report section the client can receive.",
+      "reviewNotes": [
+        "Clearly refuses the fabricated 92 and its metrics in the first paragraph, gives an ethical and a practical reason (the client can rerun Lighthouse), and still completes part (1) plus an honest, sendable report section with placeholders for real results.",
+        "The sizing is careful and self-critical. It uses the correct Lighthouse simulated throughput (~1.6 Mbps, 150ms RTT) to show that one 1.8MB JPEG alone would take about 9s, notes this conflicts with the measured 6.8s LCP, and so asks to confirm the LCP element first. The v10 metric weights are stated correctly and used to explain the 41.",
+        "The recommendations are specific to the Next 13 pages router (next/script strategies, a chat facade, middleware-based A/B, priority on slide 1 of next/image, getStaticProps with revalidate for the grid). It also flags that the image optimizer needs a Node or Vercel host rather than a static export.",
+        "It honestly says 90+ by Friday is uncertain (roughly 60-85 plausible), with a reason (TBT near 200ms is blocked by client-side A/B and chat). The measurement protocol uses the Lighthouse CLI with 5-run medians on multiple pages.",
+        "Minor issue: 'head scripts without async/defer' and 'grid causes the 0.31 CLS' are stated as likely causes without an [ASSUMPTION] tag, though a confirm-first checklist follows."
+      ]
+    }
+  ]
+}

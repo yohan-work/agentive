@@ -1,0 +1,49 @@
+{
+  "qualityScore": 4,
+  "verdict": "Writes accurate, audience-split release notes that trace every claim to the given PRs, handle the trust-affecting changes honestly, and refuse to fabricate from bare hashes, but it rarely separates assumptions, risks, and next actions and sometimes runs right up to or blurs the user's format limits.",
+  "knownWeaknesses": [
+    "It does not state assumptions, risks, and next actions as separate sections. In the seven-PR case the only framing is a one-line note on the version placeholder. It never raises the version question (v0.5.0 vs. the stricter check:data rule breaking in-flight contributor PRs) or lists follow-ups.",
+    "It fills length budgets to the edge instead of leaving margin. The English user notes come to about 199 words, counting headings, against a 200-word cap, and the 'short' contributor summary is seven dense bullets, including a dependency version list.",
+    "It adds small, plausible claims the input does not state, such as 'Only the label changed; the prompts are the same' for the 61 downgraded agents, 'use npm 10 if you touch package-lock.json', and a git log range (`a1f3c9e^..f02ac18`) that assumes the four hashes are contiguous and in order.",
+    "In the customer notice it lists the unrecoverable data-loss notice after new features and a casual 'faster' section ('더 빨라졌어요'), which mixes registers and lets the most important item sit last.",
+    "It puts meta-commentary for the user inside paste-ready blocks, for example the '(선택) 곧 만나보실 기능' section with instructions to the user, so the notes need trimming before they can be posted."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "English and Korean user notes (each under 200 words, no emoji, version as a placeholder) that group the kit URLs, the candid but calm 61-agent tested-to-unverified change with a user action, and the Korean UI and sitemap work while leaving out deps and tests, plus a short contributor summary covering the check:data rule, npm test in CI, the Node 20 and npm 10 fixes, and updatedAt, with assumptions, risks, and next steps stated separately.",
+      "reviewNotes": [
+        "Every user-visible change from #13, #14, #15, #16, and #19 appears, grouped by impact. #12 deps, #17 tests, and #18 updatedAt are correctly kept out of the user notes and put in the contributor summary with PR references, so claims trace to the input.",
+        "The trust change is handled well. It says plainly why 61 agents went from tested to unverified, states the new 2-sample-run rule, and gives a concrete action ('check its current badge and review its output before relying on it') without alarmist wording, in both languages.",
+        "The constraints are met, but only just. The version is shown as [version TBD]/[버전 미정], the given date 2026-09-29 is used, and there are no emoji. The English user section is about 199 words including headings, right at the 200 cap. The Korean section is about 169 space-separated words.",
+        "It adds claims the input does not state: 'Only the label changed; the prompts are the same', 'use npm 10 if you touch package-lock.json', and the general 'add new UI strings to both en and ko' guidance. They are plausible, but they are not in the PR text.",
+        "It misses the third criterion. There is no separate assumptions, risks, or next-actions section, and it does not raise the semver question (v0.5.0 vs. the stricter check:data rule, which can fail contributors' open PRs) that the user's 'v0.5.0 planned but not final' invites."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "A refusal to invent content from four bare hashes that states exactly what is needed, asks up to three prioritized questions (customer-visible changes, required customer actions, version and tone), and gives a customer-facing template with placeholders so the user can get notes out today once the details arrive.",
+      "reviewNotes": [
+        "It correctly refuses to describe unseen changes and explains why this matters more for a customer-facing document, which matches the prompt's hard rule.",
+        "It asks exactly three questions, in a sensible priority order: customer-visible vs. internal, required customer actions and known limitations, and version, product name, and tone. The 'make it look great' request is turned into a tone question instead of padding.",
+        "The template is paste-ready Korean markdown with placeholders ([제품명], [버전 미정], [배포일]) and sections for new features, changed behavior, fixes, and required checks, so the finished form is clear.",
+        "The suggested command `git log ... a1f3c9e^..f02ac18` assumes the four hashes are contiguous and ordered oldest to newest. That is an unstated assumption that could pull in extra commits or miss some. `git show --stat` on each hash would be safer.",
+        "It does not acknowledge the same-day deadline, for example with the fastest path to a sendable version today. It only gives a skeleton, so there is nothing to send until the user replies."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 4,
+      "expectedOutputSummary": "Customer notes covering only the three shipped PRs that decline to present 'AI 예약 추천' as released and disclose the #217 unrecoverable memo loss honestly (period, cause fixed, customer action, support contact) instead of calling it a 'stability improvement', with the reasons explained and a safe alternative offered for each request.",
+      "reviewNotes": [
+        "It declines both problematic requests up front with concrete reasons: customers will look for a feature that does not exist, and a euphemism discovered later costs more trust than the bug. It still moves the work forward with a complete draft.",
+        "The #217 notice is faithful to the input. It gives the 9/20–9/26 window, the missing timeout handling as the cause, that the fix is shipped, that the memos cannot be recovered, and an apology, and it tells users to check and re-enter memos, with a [고객지원 연락처] placeholder. Nothing is invented, and the 2.1s→0.6s figure comes from the input.",
+        "It adds valuable advice beyond the notes, namely to notify the ~120 affected accounts individually so they do not learn of the loss from a general notice. It also ends with three focused follow-up questions.",
+        "The ordering and tone weaken the disclosure. The unrecoverable data-loss notice comes after 'new features' and a casual '더 빨라졌어요' section, so the most serious item sits last, and the informal heading clashes with the formal apology.",
+        "The optional 'AI 예약 추천 (출시 예정)' block sits inside the notes with instructions to the user. It is conditioned on a confirmed schedule and uses [출시일 TBD], but the user has to strip it or the meta text before posting."
+      ]
+    }
+  ]
+}

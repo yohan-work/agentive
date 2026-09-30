@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both cover the kit URLs, curl fix, Korean UI, sitemap and the 61-agent relabel. B's relabel wording (\"testing was never recorded, not that they are known to be broken\") is honest without being alarming. A asserts that prompts did not change, which it flags as an assumption, and adds unsupported claims about npm 9 lockfile problems and an engines field. A also puts a dependency/tests \"Maintenance\" line in user notes, which is internal noise, and it pads the reply with risks and next-action sections and an awkward word-count note. B keeps deps and tests internal, gives a compact contributor summary covering check:data, npm test, Node 20 and npm 10, and stays within the limits.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to guess from four bare hashes and ask for commit contents, customer actions and product/version info. A gives a git show command that works for an arbitrary set of hashes. B's git log a1f3c9e^..f02ac18 range assumes the commits are contiguous and ordered, which is not known. B's preview template uses emojis in a customer-facing note, and A's template is plainer. A also states assumptions and defaults (drop internal-only changes, formal tone). A is somewhat longer but its content is useful and accurate.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to present the unreleased AI feature as shipped and to hide the data loss, and both offer a coming-soon section and individual notices to the affected accounts. A writes \"영향받은 고객께는 개별적으로 안내드렸습니다\" as a completed fact, and adds an invented \"10월\" date and \"평균\" for the speed figure. B uses TBD placeholders and makes the individual-notice sentence conditional. B also gives customers a concrete action, which is to check and re-enter memos from 9/20-9/26. A offers extra value with a full individual notice draft and a risks and next-steps list, but is longer and includes some invented specifics. B is tighter and more careful about facts.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

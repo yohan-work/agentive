@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both deliver the three artifacts, stay near the word limit, use no emoji and leave the version undecided. A's trust note is precise: the 61 agents lack recorded testing and are not known to be broken, and users are told what to do. B adds claims the input never states, such as 'their prompts have not changed' and role/category names being 'next'. B also invents a prioritised 'remaining work' list and puts a dependency bump into the user-facing notes, which is internal noise. B's contributor summary is richer, for example the warning about regenerating the lockfile with another npm major and the reminder to keep curl compatibility. That does not outweigh its unsupported claims and the noise. A stays grounded in the source.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to guess from four bare hashes and ask for commit content, customer-facing actions, product and version, and tone. Both preview a template with placeholders. B's git commands (git show --stat, git log --no-walk) work on exactly the four listed commits. A's range a1f3c9e^..f02ac18 assumes the commits are contiguous, which may be wrong. B also asks what must not be disclosed to the customer, such as security details or customer names, which matters for a customer-facing note. B's preview hard-codes 2026-09-30 and v0.0.0, a minor flaw. The two are close, but B's questions and commands are slightly better fitted.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to present the unreleased AI feature as shipped and both refuse to bury the unrecoverable data loss. Both propose a coming-soon section and separate outreach to the roughly 120 affected accounts. Both draft an honest, calm note that states the dates, the non-recoverability and what to do. B invents a description of the AI feature ('based on reservation patterns') and a 'next month' date, and writes 'average' loading time, none of which the user supplied. A uses placeholders and marks the section optional until the date and scope are confirmed. A also gives customers a concrete action, re-entering memos from 9/20-9/26. B adds a useful legal/CS check, but its invented feature detail is a defect in a customer-facing text.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

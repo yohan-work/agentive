@@ -1,0 +1,87 @@
+{
+  "slug": "performance-audit-agent",
+  "variants": [
+    "agent-3f58ce6d",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-3f58ce6d",
+      "order2": "agent-3f58ce6d",
+      "result": "agent-3f58ce6d"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-3f58ce6d",
+      "order2": "agent-3f58ce6d",
+      "result": "agent-3f58ce6d"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-3f58ce6d",
+      "order2": "agent-3f58ce6d",
+      "result": "agent-3f58ce6d"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-3f58ce6d",
+      "order2": "agent-3f58ce6d",
+      "result": "agent-3f58ce6d"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-3f58ce6d",
+      "order2": "none",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-3f58ce6d",
+      "order2": "agent-3f58ce6d",
+      "result": "agent-3f58ce6d"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-3f58ce6d",
+        "agent-3f58ce6d"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-3f58ce6d",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-3f58ce6d",
+        "agent-3f58ce6d"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-3f58ce6d": 5,
+    "none": 0
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

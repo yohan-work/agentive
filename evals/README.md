@@ -96,7 +96,12 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - `api-contract-agent` v3 beat the baseline 6–0 and the current prompt 5–1. Adopted; the current prompt won the fully specified case in one sample.
   - `customer-feedback-clusterer` v3 beat the baseline 4–1 (one inconsistent) and the current prompt 3–0 (three inconsistent). Adopted.
   - `test-case-generator` v3 beat the baseline 5–1 but only tied the current prompt 2–2 (two inconsistent). Not adopted. The current prompt won the fully specified and under-specified cases in the first sample: judges preferred building the matrix straight away with a placeholder over v3's "list contradictions and ask first".
-  - Judging note: a different session judged six of these pairs with a GPT model while this batch was paused. Those verdicts were set aside and every pair was re-judged with the same Sonnet judge, so all recorded verdicts come from one judge model.
+  - Judging note (batch 3): a different session judged six of these pairs with a GPT model while this batch was paused. Those verdicts were set aside and every pair was re-judged with the same Sonnet judge, so all recorded verdicts come from one judge model.
+- **2026-09-30, depth rule on three more agents (batch 4a).** Same recipe and protocol. The prompts now start with the output when the request gives enough detail, instead of opening with questions (the test-case lesson from batch 3).
+  - `security-checklist-agent` v3 beat the baseline 5–1 and the current prompt 5–0 (one inconsistent). Adopted. The reviewer gave 5; capped at 4 because its own notes cite very long output and a case scored 4.
+  - `performance-audit-agent` v3 beat the baseline 5–0 (one inconsistent) and the current prompt 4–1 (one inconsistent). Adopted.
+  - `release-notes-writer` v3 beat the baseline 5–0 (one inconsistent) and the current prompt 4–1 (one inconsistent). Adopted.
+  - The only losses: security lost the fully specified case to the baseline in one sample, and performance and release notes each lost the under-specified case to the current prompt in one sample.
 
 ## Known limits
 
