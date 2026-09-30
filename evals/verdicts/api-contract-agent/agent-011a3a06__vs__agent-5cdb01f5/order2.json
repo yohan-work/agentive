@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies choose PUT /{slug} for idempotent add, keep DELETE idempotent without a catalog check, skip bad merge elements instead of rejecting the batch, and flag the cross-site refresh-cookie risk. B uses the user's stated slug rule (^[a-z0-9-]{3,64}$) as given. A tightens it to disallow leading, trailing and double hyphens, which is labelled an assumption but goes beyond the request. B follows the team error standard closely by always sending details as an object, and it gives full HTTP request and response examples for each endpoint. B also makes the sharp point that the 500 and 200 limits are unreachable with only 100 catalog slugs, so the tests need fixtures. A's extras (TS types, resurrected-bookmark question, IP-based limit on failed auth) are useful but make it longer and spread out five open questions, where B narrows to three blocking ones. Both are strong; B is slightly tighter and more faithful to the given decisions.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is very vague: it doesn't say what member features are needed, the auth method, or the fields. B scopes a small v0 (signup, login, logout, me, patch me), marks every guess as an assumption, lists what is out of scope, and asks three focused questions. For each endpoint it gives request tables with validation rules, concrete success and error examples, and status-code tables. A invents a 13-endpoint system with lockout policy, refresh rotation, withdrawal grace periods and agreements, all on assumptions. A does mark them as assumptions and asks three good questions. But it lists most error codes without payload examples, and it commits the frontend to a lot of unconfirmed surface area. B is more honest about the missing information and more concrete on validation errors and examples, so it serves the criteria better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse full PAN exposure and unauthenticated admin endpoints, and both move to server-side search and pagination. Both propose a minimal token auth that can be added in about 30 minutes, and both suggest soft delete. B is stronger on the required deliverables. It has full field tables, validation rules per parameter, request and response examples for each endpoint including error payloads, and tight behavioral rules such as ILIKE escaping, idempotency, sort tie-break and Cache-Control no-store. A gives useful extras (a working Express middleware, trigram indexes, an audit-log suggestion). But its list example is a placeholder (\"...User\"), it has no error examples, and it adds an unrequested detail endpoint into the main spec. B's facts (PCI first 6 and last 4, 72-hour breach notice) are accurate and it asks focused questions. B better meets the criteria of success payloads, validation errors and realistic examples.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

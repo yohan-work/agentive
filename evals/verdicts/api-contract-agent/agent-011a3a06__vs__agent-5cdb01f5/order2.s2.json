@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies produce nearly the same contract: PUT for idempotent add, POST merge, DELETE returning 204 without a catalog check, 422 for unknown agents, exact-origin CORS, and the cross-site refresh-cookie risk. Both are accurate and grounded in the request. A goes a bit further in ways that help two parallel teams: a /v1 prefix, a suggested frontend merge flow, chunking for more than 200 items, partial success at the 500 limit, D1 schema and atomic-insert SQL, and the risk of deleted bookmarks coming back after a merge. A resolves the ambiguity around the 200-item limit with a stated assumption and a default, so nobody is blocked. B has good per-endpoint HTTP examples and a deterministic check order, and it raises the 200-item and 500-overflow questions honestly. Its all-or-nothing 409 on merge is harsher and leaves the 200-item question open. The two are close, with A slightly more complete and actionable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (\"member API spec, urgent\"). B asks three focused questions and keeps the provisional scope tight: signup, login, refresh, logout, me get/patch, and delete. It marks every invented detail as an assumption. It gives a request and response example for nearly every endpoint, plus concrete validation reasons per field, multi-field error examples, refresh-rotation concurrency notes and a rate-limit example. A invents much more scope: phone, agreements, account lockout with a 423, password reset, and an email-availability check. It also has fewer error examples and less validation detail, and it does not show the validation error responses for individual fields. A's default assumptions table is helpful, but B stays closer to what was asked, is more honest about what is guessed, and is stronger on validation errors and realistic examples.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to return full 16-digit card numbers and to ship without auth, and both give sound reasons (PCI DSS, leaked URLs) and a minimal token alternative. A then rewrites the requested design: it replaces the full list with server-side pagination, masks phone and address in the list, and adds an unrequested detail endpoint. The masking also conflicts with the user's stated need to search on the frontend. A does supply middleware code and useful audit-log and risk notes. B keeps only the two truly unsafe changes and still delivers the requested full-list endpoint. It flags the roughly 14MB payload (correct at 350 bytes x 40,000) and offers pagination and masking as suggestions. B also gives fuller validation rules, error tables and realistic success and error examples for PATCH and DELETE, plus a sensible note on soft delete. B better balances pushback with the user's actual request and covers the criteria more thoroughly.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

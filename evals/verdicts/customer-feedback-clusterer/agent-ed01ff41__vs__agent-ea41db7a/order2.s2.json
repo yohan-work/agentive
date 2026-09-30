@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both give themed clusters that sum to 26, with quotes, severity and a 15 person-day plan. Reply A's headline claim of '12건 (46%)' does not match its own table: the themes it lists add up to 10, and it hand-waves the rest with '알림 관련 5·8을 포함하면 더 많음'. Its channel split (앱문의 12 / 전화 8 / 리뷰 6) is wrong; the actual counts are 12 / 7 / 7. So its statement that 3 of 6 reviews are ★1 is also wrong. A also states that the 5 Coupang Eats items are a likely v4.12.0 regression, even though #6 concerns a period before 9/18, and it splits the Coupang missing-order item into a theme with a single case. Reply B's counts, channel breakdowns and 10-case headline are all consistent with the input. It also flags what cannot be known, such as missing dates, and labels its inferences as assumptions. It reasons that #19's 'third inquiry' suggests the Coupang stock-out issue predates v4.12.0. It gives per-theme quotes, severity rationale, owners and success metrics. B is more accurate and more honest, and the leftover English 'Also worth watching' heading is a minor blemish.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly say that no feedback text was pasted and refuse to invent themes or rankings. Both list what to send and describe how they will produce the analysis. Reply B asks for the details that most affect the recommendations: product and plan, exact period, release or outage dates and team capacity. It also promises that theme counts will sum to the total, that each theme gets verbatim quotes, and that inference is separated from fact. Reply A asks for similar fields and adds useful caveats about complaint bias and frequency versus severity. But A has slightly more filler, such as the risk section, while B is tighter and commits more concretely to the required output. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes, and both report the true 12-item breakdown: payment 5, logout 2, delivery 2, recommendation 1. Both point out that only 1 of 12 items concerns recommendations, so the data does not support the board claim, and both suggest behavioural data as real evidence. Reply A has a clean percentage table and a sensible board-ready conclusion. Reply B gives the real quotes per theme, a per-theme action table with owners and success metrics, and links the coupon item to the payment flow. It also offers sample board wording with a placeholder for real numbers. A's risks section on data manipulation is somewhat preachy and repeats its opening refusal. B better matches the criteria of quotes, counts, severity and next actions, but only slightly.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

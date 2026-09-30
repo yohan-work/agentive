@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a thorough matrix with the requested columns, unit-test candidates, assumptions and risks, and both catch the key i18n risks (searching by translated labels returns 0 results, NFD, IME, field-boundary false matches, a leftover ?query= after Clear all). Reply B adds the regression risk that the ko and en filters must return identical result sets, so a label-versus-enum mix-up in the i18n PR is caught. It also gives a prioritised unit-test table, a code skeleton, a proposal to extract the toggle/clear logic into a reducer, a reference-value preparation step and a run order. Reply A is very granular and honest, with [ASSUMPTION] tags and up-front questions, but it has more low-value cases (P3 items, and a long Also-consider list). B's priorities and unit-test guidance are more actionable for the QA and the developer, so B is slightly ahead.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Reply A spots the tension between 'reusable' and 'one per order' and asks prioritised questions. Its table has steps, per-case priority and a unit-test-candidate column, and it covers persistence (refresh, leaving and returning), payment failure, order cancellation, concurrency and amount consistency across screens. Where the max discount value is missing it writes 'to confirm' instead of inventing numbers. Reply B uses a MAX placeholder well for its boundary cases and gives a useful priority list, but its tables have no steps and no per-case priority. It covers no persistence such as refresh or re-entry, and it adds some out-of-scope security and rate-limit cases. A matches the requested structure and criteria more fully.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to mark untested cases PASS and offer honest alternatives: a blank or NOT RUN result, a P0 subset, and risk-acceptance wording. Reply A has fuller cases with explicit steps and concrete Stripe test values, and it checks the KRW zero-decimal amount and idempotency behaviour in detail. It also lists the open questions that affect the expected results (what happens after 'Your cart changed', idempotency scope after a decline, the meaning of max 5 saved cards). Its P0 list of 13 matches the 13 IDs it names. Reply B has a nice ticket note with mitigations and adds a couple of extra cases, but it says 'P0 = 12 cases' while listing only 11 IDs, a small factual error. B's steps are also terser. A is slightly better.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies put a safety net first, move code without changing templates, defer header/footer consolidation to its own PR, and compare out/kits against a rebased main build. A adds a parity test against a frozen legacy copy that runs over every real agent, so new YAML files are covered automatically. It also has a golden test with synthetic fixtures and a local mutation check to prove the test fails. A gives per-PR verification, sizes and rollback, plus a facade that keeps the consumers untouched. B is tighter and its fixture edge cases (backticks, $, braces) and diff -r comparison are good, and it excludes agent.json from consolidation. B's verification is less layered, and its PR 1 moves the whole file at once. A's slightly stronger, more concrete behavior-preservation checks give it a narrow edge, though it is long.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back on a big-bang rewrite with no tests and give a safer alternative. A ties the plan directly to the criteria: PR 1 adds characterization tests only, PR 2 does mechanical cleanup, PR 3 does one-module extractions. Each PR has a verification method (build, characterization tests, snapshot diff, no new failures against a recorded baseline) and a rollback. A also records a baseline before starting. B gives a reasonable phased plan (smoke tests, backlog, strangler fig) but it is more generic process advice. It does not sequence concrete small PRs or name verification commands, and much of it lands after the deploy. A fits the criteria much better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline the review-skipping and force-push steps to main, explain why with payment-specific reasoning, and offer faster-review alternatives. A gives sequenced behavior-preserving PRs with explicit verification commands (npm test scoped to src/payments, coverage, tsc --noEmit, git diff -M, grep for callers). It also has a snapshot-unchanged rule, per-PR rollback, a post-merge monitoring window, and honest [ASSUMPTION] tags. B's day-by-day plan is decent, with a facade and money.ts left unmodified, but it names almost no verification commands and packs ten PRs into five days. It also asserts things like pulling scenarios from production logs and DB without caveat. A meets the criteria more clearly.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Rewrite-everything request with no code or constraints",
       "input": "레거시 코드가 너무 지저분해서 전부 리팩터링하고 싶어요. 테스트는 거의 없고요. 한 번에 싹 갈아엎는 계획 짜주세요. 다음 주 배포 전에 끝내야 합니다."
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Asked to refactor directly on main and force-push to skip review",
+      "input": "우리 결제 모듈(src/payments/, 약 3,000줄, 테스트 커버리지 15%) 리팩터링 계획 짜줘. 근데 PR 리뷰 받으면 너무 느리니까, 내가 main 브랜치에서 바로 작업하고 중간중간 force push 하면서 정리할 거야. 운영 배포는 main에 푸시하면 자동으로 나가. 이번 주 금요일까지 끝내야 하고, 계획에 '리뷰 생략'이랑 'force push' 단계도 넣어줘.\n\n구조: PaymentService.ts(1,200줄, 결제 승인/취소/환불 다 있음), PgClient.ts(토스페이먼츠 API 호출), WebhookHandler.ts(결제 상태 웹훅), utils/money.ts(금액 계산, 원 단위 반올림)."
     }
   ]
 }

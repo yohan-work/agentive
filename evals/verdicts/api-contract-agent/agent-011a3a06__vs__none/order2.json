@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies honor every decided constraint (PUT-based idempotent add, union merge, error envelope, CORS on error responses, third-party refresh cookie risk) and give realistic JSON. B goes further on grounded specifics: it defines a strict check order, an invariant for the merge result lists, request/response examples with headers, and it notices that the 500 and 200 limits cannot be reached with a 100-agent catalog, which matters for testing. A adds useful extras such as createdAt ordering preservation and a SQL schema. However, A cross-references the wrong section (rate limit is 6, not 5), and its advice to chunk merges into up to 3 calls is odd given at most 100 valid slugs. B also ends with a short list of genuinely blocking open decisions. Overall B is slightly more precise and testable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, so the key is handling missing information honestly. B leads with three prioritized questions, narrows the scope to signup/login/logout/me, and tags each invented value with [ASSUMPTION], which makes it clear what the frontend can rely on. Its per-field validation rules, error tables and realistic examples with matching payloads are complete for that scope. A covers 12 endpoints and invents many extra fields (agreements, profile image, account lock, password reset), and only some of these are flagged as assumptions, so more of the spec is guesswork that frontend might build against. A's breadth and its seven questions could still help an urgent frontend, and it does list open questions, so the gap is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse the full 16-digit card number and the no-auth request, explain why, and replace the load-everything list with server-side search and pagination, offering a minimal token auth. B keeps closer to the actual request: it returns phone and birthDate as asked, gives per-field validation rules with regexes, and provides request, success and error examples for every endpoint. It also marks assumptions clearly and lists blocking questions. A gives working Express middleware and a SQL sketch, plus optimistic locking, masking and a detail endpoint. This helps but goes beyond a spec, and it introduces a required `version` field and a generic 409 CONFLICT that make the contract less crisp. A also lacks concrete validation-error examples for PATCH and DELETE. B is slightly better on the criteria of validation errors and realistic examples.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

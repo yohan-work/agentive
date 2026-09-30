@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies apply every decided constraint (JWT bearer, CORS origin, 500/200 limits, idempotent PUT, error envelope) and give realistic JSON, an error table, a merge-rule section, the cross-site refresh cookie risk and the catalog-drift risk. Reply A is richer in extras (rate-limit headers, SQL sketch, frontend merge flow, dated next actions). However it presents several unrequested choices as settled: a /v1 prefix, a Friday freeze, 404 for an unknown agent, partial success when the 500 limit is hit. It also does not label them as assumptions, only listing four decisions at the end. Reply B tags each invented detail as an assumption, defines a deterministic check order, and gives request/response examples per endpoint including the 409 limit case. It asks focused open questions, such as whether 200 is a per-request or total cap. B's honesty about what was inferred and its cleaner validation ordering make it slightly more trustworthy as a contract to sign off before Monday.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (\"member API spec\", urgent). Reply A delivers a broad spec (signup, checks, login, refresh, reset, withdraw) with concrete details such as token lifetime 1800s, password rules, nickname uniqueness and agreements fields. It states these as fact, not as assumptions, and only asks for confirmation in a list at the end. Reply B leads with three focused questions, then gives a provisional spec in which every invented detail is tagged [ASSUMPTION]. Its scope is narrower but every endpoint has success payloads, a table of validation and auth errors with field-level reasons, and realistic request/response examples (cookie handling, CORS credentials, rate limits). It also covers behaviours that matter to frontend developers, such as concurrent refresh, case-insensitive email uniqueness and token validity after logout. B handles the missing information more honestly and gives more actionable validation and auth definitions.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to return full card numbers and to leave the API unauthenticated, and both explain why briefly, offering a quick token check. A goes further and overrides the user's explicit choice of a full list with client-side search, replacing it with server search and pagination. It also adds an unrequested detail endpoint and masks phone, birth date and address in the list, so the frontend could not build what was asked today. It does include useful Express middleware code and PostgreSQL tips, but validation errors and examples for PATCH are thin. B keeps the user's design where it is safe (full list, no params) and changes only the two unsafe parts, with the pagination and masking alternatives noted as suggestions. It gives a full set of validation rules, error tables (UNKNOWN_FIELD, EMPTY_UPDATE, EMAIL_ALREADY_EXISTS, INVALID_ID), realistic examples, a payload-size estimate, and clearly tagged assumptions and questions. B better serves the stated urgent need while staying safe.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

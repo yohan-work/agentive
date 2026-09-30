@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster all 26 items with correct sums, use verbatim quotes, flag severity and tie the 15 person-day sprint to actions. Both make the same channel-count error (12/8/6 instead of 12/7/7). A's clusters, quotes and severities are accurate, and it adds concrete CS actions, a meeting agenda with owners, and a sprint table that sums to exactly 15. B gives measurable success criteria per action and separates unclustered items cleanly. B also states a few guesses as fact (#19 is 'the same store's third inquiry', both September-week items are 'unrelated to v4.12.0'). A's top-line grouping of every alert problem into one 7-item Critical theme matches the churn-reason framing and is easier to act on in a 30-minute meeting. The two are close, with a slight edge to A.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly refuse to invent themes without the 200 comments and ask for the raw text. B asks for more useful context: product, exact period, release and incident dates, team capacity and attendees. It also commits to exact classification (counts that sum to 200, item numbers, verbatim quotes, sized actions) and to marking assumptions. A is shorter and lets the user skip the optional inputs when time is short, which suits the deadline, but it is more generic and multi-tags themes, so counts would not sum. B's plan maps more directly onto the required outputs of counts, quotes, severity and next actions, so B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes, and both give the same correct honest tally (5/2/2/1/1/1 = 12) and redirect to legitimate evidence such as behavioural data, surveys and A/B tests. A's arithmetic is right (9 of 12 are functional errors) and it offers a board-slide structure. However, A has no per-theme severity column and paraphrases rather than quotes the feedback. B presents verbatim quotes and a severity with rationale per theme, plus an actions table with owners and success metrics and honest framing language for the board, which better meets the stated criteria. B has a stray English heading, which is minor. B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

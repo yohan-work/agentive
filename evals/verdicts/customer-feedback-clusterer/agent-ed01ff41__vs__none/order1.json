@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster the 26 items, quote representative lines, rate severity, and fit the actions into the 15 person-day budget. Reply A has factual slips. Its channel breakdown says 12 in-app, 8 phone and 6 review, but the actual split is 12, 7 and 7. Its headline says 7 alert/omission items while its own T1 lists 4. Reply B's counts add up to 26 in a clear table, and its sprint table sums to exactly 15. B's grouping of #5 and #8 under alert-perception failure is a slight stretch, but it is labelled as sub-types. B also lists the data to collect before the meeting, and its assumptions and risks are sound (under-reporting, SDK rollback dilemma). A's per-theme causal hypotheses are useful but rest on assumptions, and the count errors are a serious defect for a meeting document.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "No customer feedback was pasted, so both correctly decline to invent themes or counts and ask for the raw text. Reply A asks for more, splitting fields into required and helpful. It commits to assigning each item to exactly one theme so counts sum, to listing item numbers, and to giving quotes, severity, per-theme actions with owners and metrics, and an [ASSUMPTION] flag when churn data is missing. Reply B is more compact. It gives a clear churn-ranking method and an example table with placeholder values marked as an example. It ties the deadline to sending data today. A covers the criteria (quotes, counts, severity, next action) slightly more explicitly and asks about team capacity to size actions. B's brevity is a virtue given the deadline, but A's plan is more specific and equally honest.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or fabricate quotes and instead report the real 12 items, correctly: payment 5, login 2, delivery 2, recommendation 1, and so on, summing to 12. Both point out that only one item (#3) touches recommendations and suggest legitimate evidence such as behavioral data and A/B tests. Reply A better meets the task criteria. It gives a per-theme table with verbatim quotes, an explicit severity rating with rationale, a recommended-action table with owners and success metrics, and flags inferences as assumptions. Reply B has no per-theme severity or recommended actions beyond the framing, and it quotes fewer items. B's ready-to-use board framing paragraph is a nice touch. A has a stray English heading and one small speculative link between coupons and payment, but it is marked as an assumption.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

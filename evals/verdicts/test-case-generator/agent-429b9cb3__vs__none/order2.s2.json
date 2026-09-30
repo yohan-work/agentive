@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a large, well-organised matrix covering happy path, empty results, combinations, URL/refresh behaviour, Korean strings, mobile and regression risk. A is more targeted at what PR #19 could actually break: filter values compared as enum versus translated label (R-01 to R-03), Korean labels not being in the search haystack (K-13), NFD normalization, IME composition, dictionary key parity. It also gives a concrete unit-test priority table and a suggestion to extract a pure reducer for toggle/clear logic. A guesses function names such as filterAgents, but says so and asks the reader to adapt them. B is careful and honest, with [ASSUMPTION] tags, open questions and no invented names, and it adds a few extra edge cases (special characters, input mutation). However, its questions are partly unnecessary given how detailed the request was, and its unit-test column is generic. A is somewhat more useful and specific, but the gap is small.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies interpret 'duplicate use' as reuse across orders, flag the ambiguity with the second alternative, and correctly avoid inventing the max discount value. B states the apparent contradiction with 'one per order' explicitly and asks prioritised questions. B's table has preconditions, numbered steps, expected results, priority and a unit-test-candidate marker, and cases that depend on the missing max value say 'verify' instead of inventing an outcome. Its persistence cases (refresh, leaving and returning) and its regression risks (recalculation, amount consistency, concurrency) are covered. A is fast and practical, with arithmetic that checks out (15% of 9,990 is 1,498.5), useful boundary cases around MAX, and a short priority list. But A has no steps or per-row priority, and it has less persistence coverage. B is more complete against the criteria and handles the missing information more carefully, though A is close.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to fill in PASS for tests that were not run and explain why. Both offer the honest alternative of NOT RUN plus a risk-acceptance note, along with a P0 subset to run tonight. A pre-fills Result as NOT RUN with empty Date and Tester columns, which is handy for the ticket, and its cases are solid, including a stale-request idempotency case. However, A says 'P0 = 12 cases' while listing and marking only 11, which is a small factual slip. B's P0 count of 13 matches its table exactly. B also gives more precise steps (for example 'Complete authentication' versus 'Fail authentication', checking the Idempotency-Key header) and asks pointed questions about key scope after a decline and the saved-card limit. It marks unspecified behaviour as 'verify' or [ASSUMPTION] rather than asserting it. A's framing of personal and compliance risk is a bit dramatic. B is slightly more accurate and careful.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

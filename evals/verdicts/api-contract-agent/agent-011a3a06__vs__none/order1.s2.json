@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies honor the decided items (Bearer JWT, CORS origin, 500/200 limits, idempotent add, team error format) and give realistic examples, error tables, CORS and rate-limit assumptions, merge rules, risks and next actions. Both catch the cross-site refresh cookie risk and the catalog-drift risk. Reply A labels every non-decided choice as an assumption, adds a deterministic check order, and surfaces the real ambiguity in '최대 200개' (per request vs total) and the merge-over-500 policy as open questions. Reply B makes those choices silently (partial success on the limit, /v1/me prefix) and invents schedule details (Friday freeze, OpenAPI on Monday morning) that the request does not give, although Monday is when parallel work starts. B's partial-success merge and frontend flow are useful, but A is slightly more honest and easier to trust as a contract.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is one vague line, so the reply must handle missing information honestly. Reply A leads with the three questions that most change the spec (scope, auth method, member fields), then gives a compact provisional spec with every invented value marked [ASSUMPTION], including validation rules, error codes, token handling and examples. It also explicitly lists what is out of scope. Reply B presents a broad spec as v1, inventing fields (marketingAgreed, profileImageUrl, agreements, nickname uniqueness) and many endpoints without marking them as assumptions. It pushes seven questions to the end. B is usable as a mock but risks the frontend building on invented facts; A's validation-error detail and assumption labelling serve the criteria better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to return full card numbers and to leave the API unauthenticated, and both offer a minimal token check that fits the afternoon deadline. Reply A keeps everything else the user asked for (full list, frontend search), flags the size and privacy cost, and delivers a complete spec: auth, error format, validation rules per field, error tables and examples for 400/404/409, soft-delete behavior and idempotence. Reply B redesigns the list into paginated, masked, server-side search and adds a detail endpoint. That may be good advice, but it changes what the frontend must build today and goes beyond the two necessary changes. B also gives thinner validation-error definitions and undefined codes (403 FORBIDDEN, VALIDATION_ERROR without examples). B's Express middleware snippet is a nice touch, but A better meets the criteria.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

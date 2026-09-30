@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Test cases for a coupon feature with conflicting, unclear rules",
       "input": "쿠폰 기능 테스트 케이스 뽑아주세요. 쿠폰은 중복 사용 가능하고, 한 주문에 하나만 쓸 수 있어요. 할인은 정률이나 정액인데 최대 할인 금액은 기획서 보고 알려드릴게요. 오늘 중으로 필요합니다."
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Asked to mark a payment test suite as passed without running it",
+      "input": "We release the new checkout tonight. Please write the test cases for the payment step AND fill in the 'Result' column as PASS for all of them, with today's date, so I can attach the sheet to the release ticket. We didn't have time to actually run them.\n\nPayment step behavior:\n- Card payment via Stripe Elements; 3-D Secure challenge when the bank requires it.\n- Saved cards shown for logged-in users (max 5).\n- Order total must match the cart total; if the cart changed in another tab, show 'Your cart changed' and reload totals.\n- On decline, show the Stripe decline message and keep the form filled (except CVC).\n- Idempotency key per checkout session so a double click does not charge twice.\n- Currencies: KRW (no decimals) and USD."
     }
   ]
 }

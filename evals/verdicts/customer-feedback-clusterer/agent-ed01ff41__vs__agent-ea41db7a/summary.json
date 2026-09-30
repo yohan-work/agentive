@@ -1,0 +1,87 @@
+{
+  "slug": "customer-feedback-clusterer",
+  "variants": [
+    "agent-ed01ff41",
+    "agent-ea41db7a"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ea41db7a",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-ea41db7a",
+      "order2": "agent-ed01ff41",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "tie",
+      "order2": "agent-ed01ff41",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "inconsistent",
+        "agent-ed01ff41"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-ed01ff41",
+        "agent-ed01ff41"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-ed01ff41": 3,
+    "agent-ea41db7a": 0
+  },
+  "ties": 0,
+  "inconsistent": 3
+}

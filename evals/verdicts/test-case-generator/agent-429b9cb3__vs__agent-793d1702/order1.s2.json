@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover happy path, empty results, combinations, refresh/URL behaviour, Korean strings and regression risks in depth. A stays closer to the stated spec. It asks three focused questions (does clearing also clear ?query=, the label text, the search.ts exports), tags dependent cases with [ASSUMPTION], and refuses to guess function names. B invents function names (buildSearchText, filterAgents, nextFilters) and a code skeleton, although it flags them as assumptions, and it adds precise-looking totals (P0 28, unit candidates 29) that cannot be verified. B's data baseline table and its idea of extracting toggle logic into pure functions are useful. A also reaches the same key risks: translated labels not being searchable, the ?query= resurrection, and the JS-before-load flash. A is slightly more grounded and honest about missing information.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both spot the contradiction between reusable coupons and one coupon per order, and both ask about the max-discount scope and reuse limits. B commits to stated assumptions, uses a MAX variable, gives concrete inputs (12,345 x 15% = 1,851.75) and a worked MAX-boundary example, which suits the same-day deadline. B miscounts its P1 cases (it says 18, the table has 17). B also has no refresh or leave-and-return persistence case, which the criteria ask for. A covers persistence (refresh, leaving and returning, payment failure, cancel) and boundaries such as discount larger than the order, with correct arithmetic. But many of A's expected results are just 'confirm X', which is less immediately usable. It is close; A covers the criteria more completely and makes no miscount.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to mark PASS on unrun tests, and both offer an honest alternative for the release ticket. A gives 31 detailed cases with preconditions, steps, exact Stripe test cards and expected minor-unit amounts. It covers persistence and regression: refresh during payment, two tabs, new session gets a new key, and KRW x100 errors. It also asks focused questions and marks assumptions. B is good and adds useful items such as Stripe.js failing to load, request tampering and post-release monitoring. But its suggested ticket text says '32 cases' and '22 not run', while the matrix has 34 cases, so a factual error would end up in a release ticket. A's table is more detailed and has no such error.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

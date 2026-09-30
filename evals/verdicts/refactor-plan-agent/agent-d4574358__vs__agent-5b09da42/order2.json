@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies fix the output before moving code, keep the facade file, split the two 60-line generators into separate PRs, and compare out/kits builds after rebasing onto main. B's parity test runs the current code against a frozen legacy copy for every real agent on each run. That covers the ongoing YAML additions automatically, and B also adds a golden test on synthetic fixtures. A relies on 4-6 hand-picked fixtures plus a manual build diff, which is weaker against unseen field combinations. B also gives concrete traps (agent.json key order, when the site URL and basePath are read, circular imports, --color-moved-ws=no) and a check that the parity test really fails when one space is added. A has a clearer stand-alone rollback section and a tidy PR 5a-5c split for the header/footer merge. B asks three questions up front, but its plan is still usable without answers because it marks assumptions. B is slightly ahead on verification strength and per-PR specificity.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back on a big-bang rewrite with untested legacy code and ask focused questions. Neither invents facts about the codebase. A stays at the level of general practice: smoke tests, a backlog, boy-scout rule, Strangler Fig. It gives no numbered PR sequence, no verification commands, and no per-step rollback beyond one deploy rehearsal. B gives a concrete PR 1-3 sequence (characterization tests, mechanical cleanup, extract/rename), each with a verification step, size and rollback. It says what to merge before the release (PR 1, maybe PR 2) and defines evidence of unchanged behavior (tests pass, no snapshot diff, no new failures). B also explains that dynamic or external references make deleting 'unused' code unsafe. B fits the criteria of small sequenced changes, preserved behavior and named verification much better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline the 'skip review' and 'force push to main' steps with sound reasons, and both suggest --force-with-lease on a feature branch. B gives a PR-by-PR sequence in which each PR has scope, files, a verification command (npm test -- src/payments, tsc --noEmit, git diff -M), size and rollback. It also states that any snapshot change in a refactor PR means behavior changed. A never names a concrete verification command. A's schedule is also aggressive: it splits three services and adds tests in three days with 15% coverage, with about ten PRs. A does include some good points, such as a facade and not touching money.ts. B is more careful: it asks whether refactoring is the real goal and defers rounding-rule changes to a separate behavior-change PR. B also puts the risky approve extraction last and lets it slip to next week. B better meets the criteria of sequenced small changes with named commands.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

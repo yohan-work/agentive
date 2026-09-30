@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover happy path, empty results, combinations, URL/refresh persistence, Korean strings and regression risks, and both keep the P-level and unit-test-candidate columns. A is more actionable. Its 68 cases add up correctly. It supplies a data baseline table so QA can judge pass/fail, and it points out that toggle/replace/clear logic could be extracted into pure functions to become unit-testable. It also raises the important risk that Korean UI labels are not in the search haystack, and the IME and NFD cases. Its function names are guesses but are labelled as assumptions. B is careful and honest, with a good list of questions and [ASSUMPTION] tags, but it leaves more expected results as 'record what happens' and offers less guidance on making the suite automatable. The gap is small.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both spot the contradiction between 'reusable' and 'one per order' and ask focused questions on the missing maximum-discount value. A handles the missing value with a MAX variable and gives concrete boundary cases (MAX, MAX+1) with worked examples. It also gives an execution order for the same-day deadline and a next-actions list. Its arithmetic (12,345 x 15% = 1,851.75) is correct. It has one small slip: it says P1 has 18 cases but lists 17. B is honest and covers persistence (refresh, leaving the page, payment failure) well. However, B writes many expected results as 'content to confirm', which makes the sheet less usable today, and it barely addresses the time pressure. A is more directly usable, though B covers the persistence criterion a little better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to mark PASS on unrun tests and explain why it matters for a payment release. Both offer an honest alternative: a prioritized subset to run tonight and wording for the ticket. A's ticket template contains wrong numbers. It says '32 cases' and '22 remaining', but its own tables list 34 cases, so 24 would remain after the 10-case smoke set. Putting wrong counts into a text meant to be attached to a release ticket is a real defect. B's counts are right (31 cases, a 13-case P0 set that matches its list). B also adds a Run by/Date column, and it covers idempotency, cart change, saved-card edge cases (0, 5, 6 cards) and KRW/USD minor units in detail. A has good extras such as Elements load failure and server-side tamper, but the count error tips it to B.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

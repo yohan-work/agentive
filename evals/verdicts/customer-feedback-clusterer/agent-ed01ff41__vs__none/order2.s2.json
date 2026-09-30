@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cluster all 26 items with counts that sum correctly, correctly link the login logout theme to v4.12.0, note that the settlement items predate 9/18, and propose a 15 person-day split. Reply B gives two verbatim representative quotes for every theme, a per-theme severity rationale, owners and success metrics. It also marks inferences as assumptions and explicitly says the item dates are unknown, so the SDK link to items 1 and 13 stays a hypothesis. Reply A is accurate and compact, but several themes (printer, feature requests) have one quote or none. It also states some causal links more confidently (for example the alert-stream explanation), and it puts the single item 13 into its own P0 theme. B's extra length mostly carries the requested content (quotes, severity reasoning, next actions), so it is not padding.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user gave no feedback text, so the right reply asks for the data and states how it will be analysed. Both do this without inventing anything. Reply B asks for a few more decision-relevant inputs: this month's releases and outages, and the team capacity needed to size the recommended actions. It also promises counts that sum to the total, verbatim quotes, severity, per-theme actions and a three-line summary, which matches the criteria. Reply A is friendlier and correctly warns that churn impact will be an estimate. It says less about actions and capacity, and B's opening is a little stiff since the user never asked for fabrication. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to inflate counts or invent quotes and instead summarise the real 12 items honestly. Both conclude that only one item (#3) concerns recommendations, and that it asks for better accuracy, not a new AI feature. Reply B also delivers the criteria items. It gives real verbatim quotes, theme counts that sum to 12, severity with reasons, and a recommended action, owner and success metric per theme. It then marks its inferences as assumptions and drafts an honest board sentence. Reply A has a correct table with counts and percentages, but no quotes and no per-theme actions. Its strategy advice on sequencing and behavioural data is good, though B covers the same ground with more actionable substance.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

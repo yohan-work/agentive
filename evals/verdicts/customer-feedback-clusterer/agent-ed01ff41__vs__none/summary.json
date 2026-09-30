@@ -1,0 +1,87 @@
+{
+  "slug": "customer-feedback-clusterer",
+  "variants": [
+    "agent-ed01ff41",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-ed01ff41",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-ed01ff41",
+      "order2": "agent-ed01ff41",
+      "result": "agent-ed01ff41"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "agent-ed01ff41"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-ed01ff41",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-ed01ff41",
+        "agent-ed01ff41"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-ed01ff41": 4,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

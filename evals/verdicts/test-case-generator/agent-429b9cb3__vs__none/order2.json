@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a large, well-organised matrix covering search fields, filters, AND combinations, empty state, URL/refresh, Korean strings, mobile, hydration and regression. A is broader (IME Enter, NFD, dictionary key sync, run order) and gives a unit-test skeleton, but it invents details (basePath, aria-live, Suspense risk) and pushes dictionary tests beyond the stated search.ts-only automation constraint. B states its assumptions and unknowns up front (does in-page search update the URL, what does Clear all do to ?query, what does search.ts export) and writes expectations as record-and-confirm where the spec is silent. B also adds a before/after PR #19 comparison for regression and flags that an English search now matches Korean use-case text. B ties unit candidates to specific functions with clear limits. Both are strong, and I slightly prefer B for grounding and honesty about gaps.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both spot the tension between reusable coupons and one coupon per order, adopt the same sensible interpretation, and leave the max discount as a placeholder. A is easy to use today and adds an ordered priority list. But it pads with cases the user never mentioned (expiry, minimum order, admin deactivation) and has no per-case priority. It also sets some invented expected results (for example that 0% or negative coupons are rejected). B has a priority column, boundary cases around the cap (equal, and one won below), and persistence and regression cases (refresh, recalculation after cart change, server-side amount tampering). B is closer to the stated rules and honest about open questions. Its unit-test column is unrequested and it asks about tooling, but overall B covers the criteria better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to mark unrun cases as PASS with today's date, and both supply a full case sheet with the Result column left empty or NOT RUN, plus a P0 minimum set. A is more compact (29 cases), with concrete Stripe test cards and a useful ticket note. B has 45 cases and covers more of the specified behaviour, including a false-alarm check on the cart-changed message, idempotency across a cart change and across a decline, cross-user saved-card isolation and reload mid-payment. B also suggests the honest fallback of marking the sheet as not executed with a named risk sign-off, and it flags assumptions explicitly. A includes a few invented expectations (empty cart returns to an empty-cart state) and a speculative claim about what reviewers accept. B's extra column and questions are slightly noisy, but its coverage of the criteria is better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

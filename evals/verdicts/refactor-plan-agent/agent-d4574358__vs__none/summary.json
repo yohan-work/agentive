@@ -1,0 +1,87 @@
+{
+  "slug": "refactor-plan-agent",
+  "variants": [
+    "agent-d4574358",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-d4574358",
+      "order2": "agent-d4574358",
+      "result": "agent-d4574358"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-d4574358",
+        "agent-d4574358"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-d4574358",
+        "agent-d4574358"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-d4574358",
+        "agent-d4574358"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-d4574358": 6,
+    "none": 0
+  },
+  "ties": 0,
+  "inconsistent": 0
+}

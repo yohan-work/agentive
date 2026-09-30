@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies deliver a large, well-grounded matrix that covers search fields, trim and case handling, the seven filters, toggle and replace, AND combinations, both clear buttons, the URL and refresh behavior, ko/en strings, 375px layout and pre-hydration rendering. Both also correctly flag the risk that Clear all may leave ?query= in the URL and that NFD Korean input may fail includes. Reply A ties its cases closely to the stated numbers (100 of 20 installable) and adds PR #19 before/after comparison cases. It has some sloppy cross-references, though: the question section cites TC-50, TC-57 and TC-67 for things that live in TC-47 and TC-66. Reply B adds practical value with the oracle sheet for expected counts, explicit [decision needed] items, and the insight that translated ko labels are not in the search haystack, plus a unit-test skeleton clearly marked as assuming function names. B also includes some invented estimates (60% manual, 2-3 hours) and extra sections (recommendations, next actions) that add some bulk. It is close, but B's decision points and oracle approach make it slightly more actionable for a QA plus dev workflow.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user needs test cases today and the max discount amount is missing. Reply B builds the matrix immediately, uses a MAX placeholder, tells the user how to derive the -1/exact/+1 boundary inputs once the value arrives, states its assumptions explicitly, and keeps the ambiguity about 'duplicate use' as a focused question with a stated default. Its cases use concrete example amounts and definite expected results, with a P1 subset for tonight, an API-level check for the one-coupon rule, and concurrency cases. It has a small miscount (says 17 P1 cases when there are about 15). Reply A also spots the conflicting requirement and asks good questions, but front-loads three questions, and many of its expected results are 'verify what happens' rather than a checkable outcome. It also mixes the urgency less well. B is more decisive and usable as-is under the deadline.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to fill in PASS with a date, explain why in terms of the release ticket, leave Result blank, and offer an honest alternative (run the P0 set, or mark NOT RUN with risk acceptance). Reply A's matrix is much more complete against the criteria: it covers a guest user, 0 saved cards, exactly 5 and 6+ saved cards, per-user isolation, cart emptied, no false alarm on an unchanged cart, adding/removing/quantity changes, rounding, large KRW amounts, reload mid-payment and back after success. It also notes where the requirement is silent (which 5 cards, empty cart behavior) instead of inventing an answer. Reply B is tighter and has good extras (client-side amount tampering, promo removal, blocked Stripe JS, risk table), but it omits the empty-state and boundary cases and its 3DS-failed-form-kept expectation is somewhat assumed. A's extra length is genuine coverage rather than padding, so A is slightly better.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

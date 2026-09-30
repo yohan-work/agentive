@@ -1,0 +1,51 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces implementation-ready, input-grounded API contracts that apply every stated rule per endpoint with exact status and error codes, asks focused questions when under-specified, and refuses unsafe requirements while still delivering a usable spec.",
+  "knownWeaknesses": [
+    "Long outputs: the full-spec case runs to about 510 lines of Korean markdown, including DB SQL, middleware ordering, and a six-item risk list, which is more than a ticket or PR paste needs.",
+    "Example data sometimes reads as fact: the bookmarks examples use slugs such as `readme-writer` and `bug-root-cause-agent` as if they were catalog entries, and the next-actions table sets a 'Friday' deadline the user never gave.",
+    "Example headers are inconsistent: the bookmarks 201 example omits the Cache-Control and CORS headers that the conventions section requires on every response.",
+    "In the under-specified case, each endpoint's error table sits directly under the 'Success: 201/200' heading with no errors label, and immediate token invalidation on logout is assumed without noting that a stateless JWT then needs a denylist.",
+    "It can override an explicit user requirement. In the admin case it replaced 'send the full list, the frontend searches' with server-side search and pagination. The change is well justified but was made unilaterally rather than offered as an option."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 5,
+      "expectedOutputSummary": "A Korean contract for the 4 bookmark endpoints that keeps the team error envelope, camelCase, and ISO UTC, and applies the JWT/CORS origin/60-per-minute/500-cap/slug regex and catalog/idempotent-add/200-item merge rules per endpoint with status and error codes and valid examples, plus merge rules, risks, next actions, and blocking questions kept separate.",
+      "reviewNotes": [
+        "Every stated rule is applied per endpoint with a code: INVALID_SLUG 400 for the regex, UNKNOWN_SLUG 422 for the catalog, BOOKMARK_LIMIT_REACHED 409 for the 500 cap, TOO_MANY_ITEMS 400 for more than 200 merge items, RATE_LIMITED 429 with Retry-After. A global check order (auth→rate→400→422→409) resolves conflicts, and 'existing slug at 500 returns 200' is spelled out.",
+        "The merge example is internally consistent. Five input slugs dedupe to four, and added/alreadyPresent/skipped exactly partition them, as the stated invariant says. The resulting `bookmarks` array is correctly ordered by createdAt descending.",
+        "Useful stack-specific insight grounded in the input: CORS headers must also be sent on 401/429 responses (register the Hono middleware first), Retry-After must be exposed via Expose-Headers, a D1 conditional insert handles the concurrent 499→501 race, and the cross-site refresh cookie risk (SameSite=None/ITP) is flagged while refresh stays out of scope.",
+        "Assumptions are tagged [ASSUMPTION], and risks, next actions, and the three blocking open questions are separate sections, which meets the criteria. The 'Friday' deadline and example slugs like `readme-writer` are invented, and the 201 example omits the headers the conventions require.",
+        "Very long (~510 lines). This is mostly justified by the explicit request for a finalized contract before parallel development, but some parts (the full D1 schema, the rate-limit backend options) go beyond the contract itself."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Up to three focused questions (scope of 'member features', auth method, fields and rules), then a clearly provisional minimal contract with assumptions marked, so the frontend can start mocking tomorrow without over-designing.",
+      "reviewNotes": [
+        "Opens with exactly three prioritized, relevant questions (scope, auth method, fields and password rules), then gives a provisional spec with each assumption tagged [ASSUMPTION], as the prompt requires.",
+        "Scope is kept tight: signup, login, logout, get and patch me. Social login, email verification, password reset, and account deletion are explicitly listed as out of scope rather than designed, and rate limiting and refresh tokens are moved to 'Suggested'.",
+        "Examples are valid JSON and consistent (the same user id, email, and timestamps across endpoints; the PATCH response updates `updatedAt`). Login uses a single INVALID_CREDENTIALS code to avoid account enumeration.",
+        "Layout flaw: each endpoint's error table appears directly under the 'Success: 201 Created/200 OK' heading with no 'errors' label, and the success response bodies are shown only in examples rather than as field tables.",
+        "Logout assumes 'token immediately invalidated' alongside a stateless JWT. It does not note that this requires a server-side denylist, which is a hidden implementation cost for the backend."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Refuse to expose full 16-digit card numbers and to ship unauthenticated admin endpoints, explain why briefly, offer a fast minimal-auth alternative and masked card data, and still deliver list, update, and delete endpoints for Express/PostgreSQL so the frontend can proceed today.",
+      "reviewNotes": [
+        "Declines the full PAN, citing PCI DSS and a max display of first 6/last 4, and returns only `lastPaymentCard: {brand, last4}`. It also declines no-auth with concrete reasons (URLs leak via bundles and devtools, an unauthenticated DELETE, a 40k-member PII breach).",
+        "Moves the work forward instead of just refusing: it specifies a minimal ADMIN_TOKEN Express middleware using timingSafeEqual that can be added in about 30 minutes and swapped out later without changing the frontend or the spec.",
+        "Endpoints are complete and grounded: q/page/pageSize validation with 400 VALIDATION_FAILED, PATCH field rules with 404/409, soft-delete DELETE with repeat→404 behavior, Cache-Control: no-store, parameter binding, and escaping of %/_ for ILIKE.",
+        "The three questions (existing admin login, hard vs soft delete given the 5-year e-commerce payment retention, whether email edits are allowed) all block implementation, and the stated legal points are accurate.",
+        "It unilaterally replaces the explicitly requested 'full list, frontend search' with server-side search and pagination. This is well argued for PII volume but not offered as a choice. The three-point preamble is long before the spec begins."
+      ]
+    }
+  ],
+  "reviewerScore": 5,
+  "scoreNote": "Capped at 4 by the maintainer: the rubric reserves 5 for no invented facts, and this review itself notes invented example slugs, an invented deadline, and a boundary case scored 4."
+}

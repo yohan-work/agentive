@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies build a byte-level safety net first (fixture golden tests, a full-data comparison, .gitattributes -text) and separate pure moves from the one logic-changing header/footer PR. B is more rigorous on verification. It compares bytes with Buffer.equals, and its build-diff script copies head's content/agents into the base worktree, which directly handles the concurrent-YAML constraint. It also gives expected outputs per command, a node coverage check for the branch-heavy runbook and evaluation functions, and a grep guard against circular imports and server-only imports. A has a clearer standalone rollback section, including the post-deploy byte-diff scenario, and a good assumptions section. Its build-sha comparison does not align content between base and head, though. B's per-PR rollback notes and its questions on the real header differences are useful, and its PR 7 export-name check is a bit clumsy. Both are close, and B is slightly stronger on concrete, checkable verification.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both push back on the big-bang rewrite and propose characterization tests first. A gives a day-by-day schedule that assumes a Friday deploy and never names a verification command. It only says to write tests and check CI, so it does not really meet the criterion of naming commands. B breaks the work into PR 1 to PR 3, each with change, files, verification, size and rollback. It uses explicit placeholders for commands it cannot know and flags them as assumptions. It also adds a risk table with a check for each risk, and a stop point before the deploy. B is more honest about missing information and better matches the criteria: small sequenced changes, behavior preserved, verification named.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to include skipping review and force-pushing main, and both explain why using the auto-deploy and 15% coverage facts. Both offer safer alternatives: feature-branch force push, small PRs, a test net before extraction, and a facade with delegation. A gives a day-by-day plan with concrete domain test cases, but it names no test or verification commands. It also has a few loose spots, such as a Friday-only deploy window. B lists concrete commands (npm test scoped to src/payments, typecheck, coverage) marked as assumptions. It gives per-PR verification and rollback, ties a post-merge monitoring pause to each PR, and flags shared-state and locking risks when extracting. It is also candid that PR 2 to PR 4 is the realistic scope for Friday. B better fulfills the sequencing, behavior-preservation and verification-command criterion.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

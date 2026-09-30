@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a complete, well-grounded contract: PUT/{slug} for idempotent add, 201/200 semantics, delete without catalog check, a merge response with added/already-present/skipped, CORS on error responses, and the third-party refresh-cookie risk. A follows the stated slug rule exactly (lowercase letters, digits, hyphen, 3-64 chars) and specifies a deterministic sort tie-break and check order. B tightens the slug regex beyond the request (no leading, trailing or double hyphens) and adds an IP-based limit for unauthenticated requests, both invented, though it flags them as assumptions. B does add shared TS types, a frontend flow with chunking and a merged flag, and a deleted-bookmark resurrection question, which are useful. A's fidelity to the given decisions and its narrower, blocking-only open items make it slightly more reliable as a contract to freeze.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is extremely vague (\"member feature API\"). A asks three focused questions, then gives a minimal tentative spec of five endpoints with every assumption tagged. It includes a request/response example and error codes for each endpoint, and lists what is out of scope. B produces 13 endpoints, including password reset, email verification, withdrawal and profile images, which nobody asked for, and invents many numbers (lockout, TTLs, agreements). It also gives examples for only a few of them. B's refresh-cookie auth design is thoughtful and it lets the frontend start with mocks, but the spec is far broader than the information supports. A handles missing information more honestly and meets the criteria for payloads, validation errors and examples more fully.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to return the full 16-digit card number, refuse to omit authentication, and propose server-side search with pagination, all with accurate reasoning, and both keep the afternoon deadline in mind. A delivers a full spec: per-field validation tables, error tables per endpoint, and concrete request/response and error examples for all three endpoints. It also covers the soft-delete and payment-retention trade-off, idempotency behavior, and a minimal auth middleware description. B is more compact, and its list response uses a placeholder (\"...User\") instead of a real example. It has no example error payloads for the endpoints, but it does add ready Express auth code, trigram indexes and an audit-log suggestion. B's extras are practical. A better satisfies the criteria of payloads, validation errors and realistic examples, and it states its assumptions more explicitly.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

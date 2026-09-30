@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies fix the output with golden tests first, then do pure moves behind a re-export facade, then consolidate the common header last, and both name concrete commands. A is more rigorous about byte identity: it compares with Buffer.equals against raw fixture files, adds .gitattributes -text, and checks the built out/kits hashes. Its build-diff script copies the head's content/agents into the base worktree, which directly handles the constraint that other people keep adding YAML. A also adds coverage checks before the long runbook/evaluation PR, the client-bundle grep, a public-API name diff, and per-PR sizes and rollback. B is solid and has a good rollback table, including the case where a change has already shipped. Its JSON snapshot goldens are easy to review, but its verification is a little less precise, and its PR 6 and 7 split is looser. B's rebase-then-build comparison is workable but less airtight than A's.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies push back honestly on a big-bang rewrite with little test coverage and a deadline next week. Both recommend characterization tests first and then small, mechanical changes. The criteria ask for small sequenced changes, behavior preservation, and named verification commands. A gives an explicit PR sequence. Each PR has its change, verification (test command, snapshot diff, zero production diff), size and rollback, and A marks a stop point before the release. Its commands are placeholders, but it says so, since it hasn't seen the code. B is a sensible day-by-day schedule with a Strangler Fig follow-up and the hotspot idea (git log churn). It has almost no concrete verification per step, no per-step rollback, and no small-PR sequencing. B is useful but weaker on what the task asks for.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to put review skipping and force push to main into the plan, and both explain why for a payments path that deploys on push to main. Both offer short branches and small PRs as the fix for slow reviews. A gives a PR-by-PR sequence for extracting refund, cancel and approve behind a delegating facade. Each PR has files, a verification step, a size and a revert. A also gives test commands, a per-area characterization test table, post-merge monitoring of approval and refund rates and PG errors, and a realistic scope for Friday. B has a good day-by-day plan and useful ideas such as feature flags and avoiding a Friday deploy. But it has few verification commands, no per-PR rollback, and a Day 3 step that consolidates money logic, which risks behavior change. It also allows self-merge. A fits the criteria better.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

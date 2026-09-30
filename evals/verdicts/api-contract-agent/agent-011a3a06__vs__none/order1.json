@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies honor every decided constraint (PUT-based idempotent add, 500 cap checked after the already-exists check, 200-item merge cap, union merge with no normalization, CORS on error responses, TOKEN_EXPIRED vs UNAUTHENTICATED) and give realistic examples. A is more precise and internally consistent. It states the check order (CORS, auth, rate limit, validation, catalog, state), exposes only Retry-After, marks every [ASSUMPTION], and reduces the blockers to three concrete open questions. B has small inconsistencies: the 429 details differ between the PUT table and the later example, and the merge example timestamps (.120/.119) don't match its own T-(n-1-i)ms rule. B also adds redundant total/limit fields, but it has a useful frontend merge flow and a strong cookie-risk section. Overall A is slightly tighter and more contract-grade.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (\"member feature API spec\", urgent). A gives a compact spec of signup, login, logout and me get/patch, and tags every guess with [ASSUMPTION]. It leads with three focused questions (scope, auth method, fields) and lists what is out of scope. It has success payloads, validation and error examples, and auth assumptions, so the frontend can start without being misled. B produces a 12-endpoint spec with many invented specifics (nickname rules, agreements object, 30-minute/14-day token lifetimes, numeric IDs, +09:00 timestamps, lockout). Only some of these are flagged as assumptions, and much of it goes beyond what was asked. B has useful extras such as refresh and mock-server advice, but the unrequested breadth and unlabeled invention make it less honest and harder to trust. A handles the missing information better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse the full 16-digit card number and the no-auth request, explain why concisely, and propose server-side search with pagination and a minimal token auth. A stays inside what the user asked: list, update and delete, with full field tables, validation rules, and a request and response example for every endpoint including error cases. It labels assumptions, asks three focused blocking questions, and clearly lists what is not provided. B invents extra scope not requested, including status filter, sort options, a version field for optimistic locking, and a separate detail endpoint. It also masks phone and birthdate in the list, a change from the request that it does explain. Its DELETE section says 204 for an already-deleted member but also lists 404. It adds a long Express and SQL code block, which is helpful for speed but pads the spec and thins the per-endpoint validation and error examples. A meets the stated criteria more directly and consistently.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}
