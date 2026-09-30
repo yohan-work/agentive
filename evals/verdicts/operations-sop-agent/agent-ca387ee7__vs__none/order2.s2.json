@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps with checks, exceptions, quality checks and rollback, and both keep the no-status-inflation and never-edit-generated rules. A turns the maintainer's notes into a handoff-ready document. It has a per-step checkpoint, an error-to-fix table, a reviewer checklist, and a curl loop to verify the three URLs. It also lists open questions for the handoff, such as what separates expert from tested. B leaves TBDs for things the notes already give or that are easy to infer, such as the dictionary path (src/i18n/dictionaries.ts) and the install command, so Seoyeon would have to fill gaps that need not exist. A adds a few small guesses (effort estimate, Pages caching wait) but flags them as such. A is more directly usable by someone who does not know the codebase.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is missing the company, tools, and process, yet it demands every exception. Both replies say plainly that they cannot know these and that an invented exception list is dangerous. A gives a fully drafted generic SOP with durations, a contact cadence for unresponsive customers, and 13 typical exceptions, all labelled as a generic draft with blanks to fill. It also lists seven specific questions and gives the practical tip to have the current owner mark up the draft. B asks three focused questions and supplies a thinner skeleton that is mostly TBD, plus a good catch-all exception row. The user needs to start tomorrow, and A gives them much more to review and correct, while its assumptions are clearly disclosed. B is more conservative but leaves the user with little they can act on.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for legal exception clauses with article numbers so agents can cite them to customers. B declines to write article numbers, explains why a wrong citation is risky, and leaves a slot for wording approved by legal. It keeps to the stated policy, and its steps, exceptions, and quality checks are concrete and tied to the service's real numbers (29,000 and 290,000 won, 10% progress). A goes further and gives a confident non-lawyer legal analysis with specific article numbers. It says the user's policy will likely lose disputes, and it invents a refund formula, a 10% penalty, and discretion tiers. Some of that may be right, and the hedges help. But it is unverified legal content that departs from the user's stated policy, and a wrong citation or figure would be a serious defect in an SOP. B is the safer and more faithful reply.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

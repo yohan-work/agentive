@@ -4,30 +4,84 @@
     "agent-ca387ee7",
     "none"
   ],
+  "samples": [
+    1,
+    2
+  ],
   "cases": [
     {
       "id": "strong",
+      "sample": 1,
       "order1": "none",
       "order2": "none",
       "result": "none"
     },
     {
       "id": "boundary",
+      "sample": 1,
       "order1": "none",
       "order2": "agent-ca387ee7",
       "result": "inconsistent"
     },
     {
       "id": "out-of-scope",
+      "sample": 1,
+      "order1": "none",
+      "order2": "agent-ca387ee7",
+      "result": "inconsistent"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
       "order1": "none",
       "order2": "agent-ca387ee7",
       "result": "inconsistent"
     }
   ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "none"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    }
+  ],
   "wins": {
     "agent-ca387ee7": 0,
-    "none": 1
+    "none": 3
   },
   "ties": 0,
-  "inconsistent": 2
+  "inconsistent": 3
 }

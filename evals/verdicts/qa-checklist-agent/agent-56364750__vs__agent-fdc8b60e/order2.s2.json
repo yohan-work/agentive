@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks with pass/fail-style columns and use the request's specifics. Reply A correctly analyses the PowerShell risk: the braces sit inside double quotes so curl globs them, while mkdir -p, the subshell and && are the real blockers. It adds a concrete curl.exe alternative snippet, a go/no-go section, CDN cache timing and the robots.txt host-root limitation. Reply B also flags the robots.txt issue and PowerShell checks, but it attributes the --output-dir change to #14 when the request says #13, which is a factual error. B also leaves many expected values as 'verify and record', which makes it less directly usable. A is more actionable and has no comparable error, though it adds an optional Edge row that was not requested.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, so the reply should ask focused questions and state assumptions rather than invent specifics. Reply B asks three pointed questions first, marks assumptions inline, and uses placeholders for feature-specific rows. Its structure is exactly smoke, regression, device matrix and content checks, each with pass/fail columns. Reply A gives a broad generic checklist with useful risk advice. However, it is organised as readiness, features, critical path, data, platform, non-functional and release day, and it has no distinct content-verification section. It also asserts a lot of assumed context, such as consumer accounts and staging. B better fits the required split and handles missing information more honestly.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to fabricate a sign-off saying all tests passed, and both offer a fill-in template. Reply B organises its checklist as smoke, regression, a device matrix and content checks, each with pass/fail columns, as the task calls for. It also asks focused questions about the limit rules and the terms source. Its checks cover the limit screen and the terms flow in depth, including multi-device, double-tap, offline and all transfer paths, and its sign-off template includes a 'Not run' field. Reply A has good security and audit checks but uses generic sections with no distinct device or content sections. It also states assumptions as facts, for example that the limit can only be lowered. B is better structured for the required split.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

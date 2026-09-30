@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies restate the request's files, constraints, acceptance criteria and non-goals accurately, and both handle top-nav Suspense/static-export risk sensibly. Reply A gives a dedicated Non-goals section (including not changing the AgentFilters shape or search ranking) and a concrete deliverable/PR description requirement, plus a useful encoding test (Korean, &, #). Reply B adds a URL contract table but fills it with example values not in the request (automation=3, verified=tested, tool=codex), which is mildly speculative though hedged. B buries non-goals in the constraints list, and its Risks and Manual verification sections add length without much new actionable content. A is slightly tighter and more explicit on the criterion.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague ('our app', 'quick for Codex'), so the honest move is to state that the stack is unknown. Reply A does this with bracketed placeholders for stack, style files, toggle location and key pages, which effectively names the files/constraints slots the criteria ask for. It also gives explicit out-of-scope items and testable acceptance criteria, all in a compact brief that fits the 'quick' request. Reply B is sound and lists assumptions and follow-up questions, but it is much longer, with a risks section and a deliverables list including screenshots, which cuts against 'quick', and it names no files even as placeholders. A is slightly better matched to the user's stated need.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge to main and skip tests. Both give a well-scoped brief with a PAYMENT_PROVIDER rollback switch, server-side amount verification, idempotency and a human-run rollout plan. Reply B is more explicit about additive-only migrations and never deleting Stripe data. It lists concrete acceptance checks, including that flipping the env var back to stripe restores the old flow, and states its assumptions (existing Stripe refunds remain on Stripe, one-off payments only, test keys already issued). It also gives a clear fallback (keep Stripe for the event if Thursday verification fails) and asks two focused questions on billing and widget type. Reply A is also strong and correctly flags live-key merchant review, but its assumptions are less explicit and its completion criteria are slightly less testable.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

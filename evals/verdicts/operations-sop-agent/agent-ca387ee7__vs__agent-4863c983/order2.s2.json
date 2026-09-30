@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps with checks, exceptions, quality checks and rollback, and both keep the never-inflate-status rule and the never-hand-edit-generated-file warning. Reply A uses the details the user supplied (the exact commands, the `npm install` prerequisite, the three URLs, the status table, trigger B handling) and turns them into concrete checkpoints that a git-literate but codebase-new maintainer can follow. Reply B leaves [TBD] markers for things that are easy to fill or already known, such as the install command and the reasonable question of which dictionary file holds the ko strings. That makes it less ready to hand off. A's extra sections (recommendations, risks, next actions) are somewhat padded, but its steps and exceptions table are more actionable and its assumptions are stated openly.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives almost no facts about the onboarding process, so the honest move is to ask focused questions and avoid inventing steps. Reply B says so plainly, asks three targeted questions, and gives a skeleton where every unknown is marked [TBD], including a sensible catch-all exception (E6) that lets the new hire stop and ask. Reply A also flags the gap and asks six questions, but its skeleton then fills in specifics the user never gave: B2B, a 14-day timeline, D+1/D+3/D+7 deadlines, and named exceptions with time limits. It labels these as assumptions, and they give the user something to react to, but they contradict its own warning that invented content is dangerous for a new hire. B is more consistent and tighter, so it wins slightly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for legal exception clauses that agents could cite by article number. Both replies decline to have agents cite statute numbers to customers, which is defensible given the legal risk. Reply A still provides a substantial internal reference table with mostly recognisable Korean provisions (E-commerce Act art. 17, the continuing-transaction rules, the unfair-terms act). It also makes the important point that a 14-day cutoff may not hold for annual subscriptions, and it flags that legal counsel must verify the table. It adds a worked refund formula whose arithmetic is right (182,700), scripts, escalation rules and clear roles. Reply B is safe and well structured, but it defers all legal content and leaves many [TBD] markers, so the user gets much less to act on. A invents some policy, such as its exceptions A-D and approval levels, so its winning margin is only slight.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

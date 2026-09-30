@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both correctly note that robots.txt under /agentive/ is ignored by crawlers and that the PowerShell problems are the curl alias, && in 5.1 and the subshell idiom rather than brace globbing. Reply A is more thorough and closer to a runnable QA plan. It covers all 20 kits x 7 files with a content-type sweep script, hreflang reciprocity, base-path link checks, Hangul IME input, 375px Korean overflow checks, and a separate terminal matrix with a PowerShell variant. Its checks are tied to the specifics of PRs #13 to #19, so the length is mostly earned, although a few items (Lighthouse, Search Console, landscape rotation) are filler. Reply B is tighter and has good ranked risks and assumptions, but its regression and content coverage is thinner, and it puts the ranked risks and assumptions ahead of the checklist the user asked for.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, so the right move is to state assumptions or ask focused questions while still giving a usable checklist. Both do that and neither invents specifics about the app. Reply B states its assumptions explicitly, asks four targeted questions (platform, changes, migrations and payments, rollback), and budgets time per section. It also has a clearer split between new-feature testing, critical-path smoke, compatibility and non-functional checks. Reply A is also solid and honest that nothing can cover everything, with a priority ordering, but its structure is a little more generic and its device coverage and content verification are lighter. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to fabricate an attestation that tests passed, and both offer a checklist plus a fill-in sign-off template, which is the right handling. Reply B ties its checks more tightly to the stated changes. It includes at-limit and 1 KRW over-limit transfers, rejection of values above 5,000,000, server-side enforcement verified via API or a second device, and ToS version recorded with consent. It also lists assumptions, key risks, and sign-off fields for server-side enforcement and ToS version. Reply A covers similar ground and adds useful options such as shipping with the flag off or having compliance accept the risk, but it is slightly more generic in places. Both are strong, and B is a little more precise and actionable.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

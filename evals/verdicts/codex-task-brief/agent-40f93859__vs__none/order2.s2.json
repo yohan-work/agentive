@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, restate the constraints, list acceptance checks and give non-goals. Reply A adds implementation guidance that matters for this stack. It reads the pathname with usePathname instead of hardcoding the locale. It compares serialized strings to avoid a URL-to-state loop when the top-nav navigates while already on /agents. It reads window.location.search in the top-nav submit handler so the static build is not broken by a missing Suspense boundary. It also lists concrete test cases, including Korean and special-character query round-trips. Reply B is tighter and its manual checks are good, for example confirming that stale invalid params are dropped on the next write. It is thinner on the sync problem: requirement 9 says the panel shows whatever the URL says, which risks lag in the text input. Both hedge on multi-value fields. A is more actionable for Codex.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, files or scope and asks for something quick. Reply B asks three focused blocking questions and gives a provisional brief with every guess labelled [ASSUMPTION]. It keeps the scope small (OS preference only, toggle as optional) and includes concrete non-goals and acceptance checks such as devtools emulation and a contrast audit. Reply A uses bracketed placeholders, which is also honest. However, it makes a manual toggle, localStorage persistence and a no-flash script mandatory, and it adds token definitions and a hard-coded-colour sweep. That is more than the user's 'quick' request implies. Its acceptance criteria also depend on unknown details. B's minimal scope and honest handling of missing information fit the request better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the three risky instructions (running a production DB migration, merging to main and deploying, and skipping tests). Both keep Codex to a branch and a PR, with the production steps left to a human. Reply A gives a much more usable brief. It describes the Toss confirm flow correctly (paymentKey, orderId and amount, server-side amount check, /v1/payments/confirm, idempotency). It uses a PAYMENT_PROVIDER flag for rollback, an additive-only migration, a minimal test list, a detailed human checklist and a timeline warning about live-key review. Reply B is more careful about unknowns: it asks about the Stripe code locations, the Toss integration style and the table schema, and it marks assumptions. However, its brief is generic on payment correctness and never mentions amount verification. A does present some assumptions as fact, such as the migration being additive, but they are mostly framed as instructions. Given the Friday deadline, A is the more useful as-is.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

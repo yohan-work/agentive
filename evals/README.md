@@ -24,7 +24,7 @@ A **variant** is one way of running the agent: `agent-<first 8 hex of the prompt
    - `boundary`: under-specified or contradictory. A good answer asks focused questions or states its assumptions, and still moves the work forward.
    - `out-of-scope`: a request the agent shouldn't fully take on, or one that invites invented facts.
    Inputs never contain the expected answer.
-2. **Runs.** Each case runs in a fresh, isolated session with only the system prompt and the user message (`evals/prompts/runner.md`). Outputs are saved verbatim. Run the candidate prompt, the current prompt if one exists, and the `none` baseline on the same cases with the same model.
+2. **Runs.** Each case runs in a fresh, isolated session with only the system prompt and the user message (`evals/prompts/runner.md`). Outputs are saved verbatim. Run at least two samples per case (`--sample 2` stores `<case>.s2.md`). One sample is not enough: the same prompt has swung from a 4–0 loss to a 3–0 win against a fresh baseline sample. Run the candidate prompt, the current prompt if one exists, and the `none` baseline on the same cases with the same model.
 3. **Judging.** A judge from a different model than the generator compares two variants blind, case by case (`evals/prompts/judge.md`):
    - Pairwise, not a 1–5 scale. Absolute scales cluster (the first 20 agents all scored 4/5).
    - Both orders. `order1` shows the first variant as A and `order2` swaps them. A case only counts when both orders agree, which cancels position bias. In our first run, only 26 of 40 pairs agreed.
@@ -40,7 +40,8 @@ A **variant** is one way of running the agent: `agent-<first 8 hex of the prompt
 npm run eval:prepare -- <slug> --model <generator-id>                 # current prompt
 npm run eval:prepare -- <slug> --model <generator-id> --prompt <file> # candidate prompt
 npm run eval:prepare -- <slug> --model <generator-id> --baseline      # no system prompt
-npm run eval:pairs -- <slug> <variantA> <variantB>
+# add --sample <n> to any prepare command for repeated samples
+npm run eval:pairs -- <slug> <variantA> <variantB> [--sample <n>]
 npm run eval:collect
 npm run eval:aggregate -- <slug> <variantA> <variantB>
 npm run eval:apply -- <slug> <variant> --judge <judge-id> --date <YYYY-MM-DD>
@@ -60,6 +61,10 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - Only `qa-checklist-agent` improved. The old prompt lost all three cases to the baseline, while the new one beat both the baseline and the old prompt, 2–1 each.
   - `codex-task-brief` shows how noisy one sample per case is: the same old prompt lost 4–0 to a baseline sample in one round and won 3–0 against a fresh baseline sample in the next.
   - **Use at least two samples per case before drawing conclusions.**
+- **2026-09-30, second sample of the pilot.** Each case was run again for every variant and judged blind in both orders.
+  - `qa-checklist-agent` held up: the new prompt beat the baseline 4–2 and the old prompt 4–2, and both samples agreed on every case. It wins under-specified and out-of-scope requests but still loses the fully specified one to no prompt, where it runs long.
+  - `codex-task-brief` stayed a coin flip. The new prompt went 3–3 against the baseline, and the strong and boundary cases flipped between samples.
+  - `operations-sop-agent` did not beat the baseline with either prompt (new 0–3, old 1–2, many order-inconsistent cases), so this agent adds no measurable value yet.
 
 ## Known limits
 

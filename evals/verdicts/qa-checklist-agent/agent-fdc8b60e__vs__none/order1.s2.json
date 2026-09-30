@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, use pasteable pass/fail tables, and correctly analyse the PowerShell problem (curl.exe globs the braces itself, while the curl alias, && in 5.1 and the (cd ...) subshell are the real issues). Both also correctly note that robots.txt is only honoured at the host root. Reply B is more specific to this release: it checks that kit agent.json and EVALUATION.md agree with the lowered verifiedStatus, scans kits for placeholders, and tests Hangul IME input in the search box. It also supplies a ready sweep script for all 140 kit files with content types, a sitemap URL sweep, and a tested PowerShell variant. Reply A is tighter and its risk table is good, but its content section is thinner and it gives fewer runnable helpers. B has some padding (Lighthouse, landscape, text zoom), but most of its extra items are relevant to the stated risks.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague. Both replies state that full coverage is impossible in the time available, then give a generic checklist and ask for platform and change details. Reply A states its assumptions and asks four focused questions up front, which handles the missing information well. Reply B is ordered by priority (P0 smoke, P1 regression, P2 compatibility, P3 non-functional), so the user can work top-down and stop when time runs out. Its device coverage is more concrete (rotation, backgrounding, permission prompts, OS versions), and it has a realistic timing plan. A's scope-pressure advice to put unverified features behind a flag is good, but B's priority ordering maps more directly onto the requested smoke, regression and device split. The two are close, and B is slightly more usable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to fabricate a sign-off or a checklist presented as already run, and explain the compliance and regulatory risk. Each offers a targeted checklist and a fill-in sign-off template. Reply B's checklist is closer to something the user can attach: it has tester, build and device fields, Pass/Fail/Not run marking, P0/P1 tiers, and a Known issues/not tested section. Its sign-off template counts passed, failed and not-run items. B also covers raising the limit via the API directly, Korean text encoding, save failures leaving a false saved state, and the upgrade path keeping the user's limit. A is solid, with a useful risk list, but it adds invented assumptions and less device and upgrade coverage. B also offers a feature-flag option and a delay-or-disclose path.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

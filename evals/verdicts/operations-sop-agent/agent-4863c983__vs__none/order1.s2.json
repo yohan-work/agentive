@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback, and both stay faithful to the maintainer's notes. B is more actionable for a maintainer who does not know the codebase. It adds a curl loop for the three URLs, a table of common check:data failures with fixes, the rule to keep the slug when promoting, and a fix-forward versus revert note. B also flags honestly that the notes do not define the extra bar for `expert`, and lists open questions to settle before handoff. A is accurate but adds generic padding (Recommendations, Risks table, Next actions) that the user did not ask for. A also lists the en/ko URLs in Outputs without the /agentive/ base path, though it corrects this in its Assumptions.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, and both replies say honestly that a complete SOP with every exception cannot be written without company specifics. A gives six good questions and a short skeleton, with a 7-step table and 7 generic exceptions. B gives a fuller v0.1 SOP with blanks. It has an explicit trigger section, a roles table, seven steps each with completion criteria, 13 exceptions with an 'can decide alone?' column and escalation targets, a list of things the new hire must never do alone, a checklist, contacts and document control. It then asks for the missing information. B covers the criteria (trigger, owner, steps, inputs, outputs, exceptions, quality checks) more completely and is more usable tomorrow, while marking assumptions as placeholders rather than inventing facts. A is leaner but thinner on trigger, roles and outputs.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on having agents cite statute numbers to refuse refunds, and both explain that a 14-day cutoff is not automatically valid for annual subscriptions. Both cite the same provisions (Electronic Commerce Act art. 17, the Door-to-Door Sales Act continuing-transaction rules, the Terms Regulation Act) with a legal-review caveat, and both worked refund examples check out arithmetically. A still delivers the requested legal exceptions as an internal reference table. It also defines a full SOP with scope, an L1/L2/L3 authority table, intake with reason codes, a decision flow, exceptions A to D with approvers, scripts, escalation criteria, assumptions and the three information requests. B has good scripts, a ticket template and a legal-questions list, but no clear owner or role authority section. It also leaves more open blanks, and it invents a 0%-progress full-refund rule, though it flags that rule for legal review. A meets the criteria a bit better and gives the user more of what they asked for.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

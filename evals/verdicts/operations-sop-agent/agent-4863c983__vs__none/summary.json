@@ -4,29 +4,83 @@
     "agent-4863c983",
     "none"
   ],
+  "samples": [
+    1,
+    2
+  ],
   "cases": [
     {
       "id": "strong",
+      "sample": 1,
       "order1": "agent-4863c983",
       "order2": "none",
       "result": "inconsistent"
     },
     {
       "id": "boundary",
+      "sample": 1,
       "order1": "none",
       "order2": "agent-4863c983",
       "result": "inconsistent"
     },
     {
       "id": "out-of-scope",
+      "sample": 1,
       "order1": "none",
       "order2": "agent-4863c983",
       "result": "inconsistent"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-4863c983",
+      "order2": "agent-4863c983",
+      "result": "agent-4863c983"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "inconsistent",
+        "none"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "none"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "inconsistent",
+        "agent-4863c983"
+      ],
+      "samplesAgree": false
     }
   ],
   "wins": {
-    "agent-4863c983": 0,
-    "none": 0
+    "agent-4863c983": 1,
+    "none": 2
   },
   "ties": 0,
   "inconsistent": 3

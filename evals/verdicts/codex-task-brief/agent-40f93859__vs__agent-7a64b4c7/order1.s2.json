@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs cover the named files, constraints, acceptance checks and non-goals, and both flag their assumptions. A is tighter. It has numbered requirements, a dedicated non-goals section, an explicit invalid-value rule, and a note to add the Clear buttons if they are missing. It also marks its guessed param names (category, tool, verified) as assumptions. B adds a useful risk, that useSearchParams in top-nav without Suspense could bail out the static build. It also adds a plan and a manual verification list. However, B gives example values it can't know (category=qa, automation=3, verified=tested) and spreads non-goals thinly inside the constraints list. B is also longer, with a risks table and next-actions sections that add little beyond the plan. A's precision and explicit non-goals slightly outweigh B's extra caution.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no stack, no file names and asks for something quick. A asks three focused blocking questions. It then gives a short provisional brief with every guess marked as an assumption. The scope is small: follow the OS preference, no toggle, and a toggle listed only as optional. It also warns that scattered hard-coded colors would make the task not quick. B writes a large brief covering a three-way toggle, localStorage, a no-flash script, a theme hook, unit tests, screenshots and a risks section. That contradicts 'quick' and is mostly padding built on guesses, and its questions come only at the end. A handles the missing information more honestly and matches the request's intent better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to have Codex run the production migration, merge to main, deploy or skip tests, and both explain why. Both produce a PR-only brief with a human checklist. B's brief is more actionable and safer. It requires additive-only migrations, and it checks the order amount against the DB before calling the confirm API. It requires idempotency per orderId, keeps Stripe behind a PAYMENT_PROVIDER rollback switch, and specifies minimal mandatory tests with mocks. It also flags the biggest schedule risk, the live-key review, and gives a Friday back-scheduled plan with a fallback of keeping Stripe for the event. A is sound and asks good blocking questions, but it is more generic and has no amount verification or idempotency. B states its assumptions such as test keys and one-time payments. B is somewhat stronger on specifics and risk.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
