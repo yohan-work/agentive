@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 // @ts-expect-error -- plain ESM script without type declarations
-import { localDate, parseArgs, promptHash, resolveWinner, variantFor } from "../scripts/eval/lib.mjs";
+import { localDate, parseArgs, parseSample, promptHash, resolveWinner, runPath, sampleSuffix, variantFor } from "../scripts/eval/lib.mjs";
 
 describe("eval variants", () => {
   it("derives a stable id from the prompt text, ignoring surrounding whitespace", () => {
@@ -50,5 +50,20 @@ describe("localDate", () => {
   it("formats the local calendar date as YYYY-MM-DD", () => {
     assert.equal(localDate(new Date(2026, 0, 5, 23, 59)), "2026-01-05");
     assert.equal(localDate(new Date(2026, 8, 30, 0, 1)), "2026-09-30");
+  });
+});
+
+describe("samples", () => {
+  it("keeps plain file names for the first sample and suffixes later ones", () => {
+    assert.equal(sampleSuffix(1), "");
+    assert.equal(sampleSuffix(2), ".s2");
+    assert.ok(runPath("slug", "none", "strong").endsWith("/none/strong.md"));
+    assert.ok(runPath("slug", "none", "strong", 3).endsWith("/none/strong.s3.md"));
+  });
+
+  it("accepts only positive integer sample numbers", () => {
+    assert.equal(parseSample(undefined), 1);
+    assert.equal(parseSample("2"), 2);
+    for (const value of ["0", "-1", "1.5", "two"]) assert.throws(() => parseSample(value), /positive integer/);
   });
 });

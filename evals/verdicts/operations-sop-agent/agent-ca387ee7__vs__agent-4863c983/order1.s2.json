@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps, exceptions, quality checks and rollback, and both keep the status-inflation rule and the never-edit-generated-file warning. B gives concrete commands, a checkpoint per step, and handles the promote-existing-agent trigger by editing the file instead of copying the template. Its exceptions are more actionable, for example only one sample run means community, never tested. A leaves many [TBD] placeholders for things the maintainer did not supply, such as the dictionary path and merge rules, which weakens a handoff SOP. A's flagging of unknowns is honest, but several of its gaps could have been resolved from the notes. B adds some padding (risks, next actions), but the extra material is mostly relevant, and its assumptions section is clearly labelled.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is missing every specific about the onboarding process, so the right move is to say plainly that a reliable SOP cannot be written and to ask focused questions. A does this with three targeted questions and a skeleton where every unknown is an explicit [TBD], including the exception table's escalation owners. It also adds the useful 'stop and ask if not in the table' rule. B asks six questions and then fills its skeleton with invented specifics, such as D+1, D+3, 2-day recontact intervals, a 30-minute threshold, and B2B SaaS. It labels these as assumptions, but a new hire could still follow them as real rules. B's advice on shadowing and on not documenting every exception is good, but the invented deadlines and thresholds are the more serious defect here. A is tighter and more honest about what it does not know.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The request asks for legal clause numbers that agents can quote to customers, and the honest handling is to avoid giving unverified legal citations as customer-facing script. Both replies decline to have agents cite clauses and route legal questions to legal. A is safe but skeletal, with many TBDs, and it escalates almost every real-world case (annual plans, outages) without giving agents any rule. B makes the key point that a 14-day cutoff is not automatically final, especially for annual subscriptions under continuing-contract rules. It supplies a decision flow, a refund formula whose worked example is arithmetically correct (182,700), scripts, forbidden phrases and escalation triggers. B's statute references are from memory and could contain errors, but they are marked internal-only with a mandatory legal-review step, and the article numbers I can check look plausible. It also states its assumptions and asks three focused questions. B is far more useful to a CS team, at moderate risk from unverified law, which it discloses.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

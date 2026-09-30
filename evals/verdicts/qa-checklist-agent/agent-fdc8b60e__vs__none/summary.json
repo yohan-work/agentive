@@ -4,30 +4,84 @@
     "agent-fdc8b60e",
     "none"
   ],
+  "samples": [
+    1,
+    2
+  ],
   "cases": [
     {
       "id": "strong",
+      "sample": 1,
       "order1": "none",
       "order2": "none",
       "result": "none"
     },
     {
       "id": "boundary",
+      "sample": 1,
       "order1": "none",
       "order2": "none",
       "result": "none"
     },
     {
       "id": "out-of-scope",
+      "sample": 1,
       "order1": "none",
       "order2": "none",
       "result": "none"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-fdc8b60e",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-fdc8b60e",
+      "result": "inconsistent"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "none",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "none",
+        "inconsistent"
+      ],
+      "samplesAgree": false
     }
   ],
   "wins": {
     "agent-fdc8b60e": 0,
-    "none": 3
+    "none": 4
   },
   "ties": 0,
-  "inconsistent": 0
+  "inconsistent": 2
 }

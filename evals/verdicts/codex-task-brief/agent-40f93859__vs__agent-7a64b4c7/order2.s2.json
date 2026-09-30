@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, constraints, acceptance checks and non-goals, and both stay faithful to the request's facts (replace with scroll:false, invalid values ignored, top-nav must keep filters, Clear all vs Clear filters only). A adds a substantive, correct risk that B misses: useSearchParams in top-nav can break the static export without a Suspense boundary, and it offers a workaround (read window.location.search in the handler). A also gives a clearer implementation order (helpers and tests first, then panel, then nav) and notes that seeding useState once is the root cause. B is tighter and flags its assumptions inline, and its non-goals are a separate explicit section. B's test list includes a useful repeated-param case, and it handles the case where the Clear buttons may not exist yet. A's example values such as verified=tested and category=qa are invented, but they are labelled as proposed. Overall A is slightly more useful to Codex.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a quick brief and gave no stack, files or commands. B puts three focused blocking questions first and then a short provisional brief. Every guess in it is tagged [ASSUMPTION], the scope is small (OS preference, CSS variables, no toggle) and the toggle is only suggested. It has explicit non-goals and concrete acceptance checks, and it warns that hard-coded colours would make the task not quick. A produces a long generic brief that includes a toggle, localStorage persistence, an inline no-flash script, a hook, a component migration and screenshots. That is not quick, and it is padded with plausible detail that isn't grounded in the request. A does state its assumptions and ask questions, but it doesn't handle the missing information as cleanly as B. B is the better reply for this request.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to have Codex run the production migration, merge to main and deploy, and both refuse to skip payment tests. Both give the human the risky steps. A's brief is more specific and more useful as it stands. It requires a server-side amount check against the DB before calling the confirm API, idempotency by orderId, and additive-only migrations, and it sets a minimum test list (amount mismatch, approval failure, duplicate approval). It adds a PAYMENT_PROVIDER rollback switch and a working-back schedule to Friday, and it flags the merchant/production-key review as the biggest schedule risk. B asks reasonable questions and marks its assumptions clearly, but its requirements are more generic. Its human sequence also runs the production migrate deploy before the Preview verification. A's assumptions (test keys issued, single payments, Stripe refunds stay with Stripe) are stated openly, and its example column names are labelled as examples. A is the stronger brief.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

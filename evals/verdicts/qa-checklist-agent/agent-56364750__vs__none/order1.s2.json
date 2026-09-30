@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks and use the request's specifics. Reply A mislabels the `--output-dir` fix as #14 when the request says it belongs to #13, which is a factual error. Reply A's PowerShell checks (K7/K8) are vague: they say to record what happens rather than saying what will break. Reply B correctly explains the PowerShell problems: `&&` is a parse error in Windows PowerShell 5.1, bare `curl` is an alias for Invoke-WebRequest, and `( cd )` does not act as a subshell. It also supplies a working PowerShell variant, a kit sweep script, and a sitemap sweep script. B adds useful pre-flight checks for CDN caching, the deployed SHA and the rollback path, and it states that robots.txt only counts at the host root. B has some extras that were not asked for (Edge, Search Console, Lighthouse), but it is more accurate, more actionable, and lists release blockers.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, with no platform, change list, or device list. Reply A asks three focused questions up front and marks each assumption explicitly. It then gives separate smoke, regression, device matrix, and content sections, as the criteria require, with placeholders for the unknown change list. Reply B also acknowledges the missing information and gives a useful prioritized list with backend and release-safety items. However, it organizes by priority rather than the four required categories: there is no explicit smoke, device matrix, or content verification section, and it has no pass/fail structure. A is the better fit for the criteria and is more honest about what it assumed.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false attestation that tests passed, and both offer a runnable checklist and a fill-in sign-off template. Reply A structures the checklist into the required smoke, regression, device matrix, and content sections. It asks focused questions and phrases unknowns as things to verify rather than inventing expected values. Reply B has strong substantive points, such as server-side enforcement, checking the API directly, and audit logging. However, it groups items as A/B/C by feature and priority, with no distinct smoke section, device matrix, or content verification section. B also asserts a few assumptions, such as 'cannot raise the limit above the current limit'. It does hedge these with 'if the spec says'. A meets the structural criteria better and stays cleaner on assumptions.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

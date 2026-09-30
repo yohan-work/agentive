@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, acceptance checks and the static-export pitfalls, and both correctly propose pure parse/serialize helpers, router.replace with scroll:false, and a top-nav fix that reads window.location.search to avoid a Suspense bailout. A commits to URL-as-source-of-truth and adds manual verification and a risk table, which is useful, but it also invents example values (category=qa, verified=tested, automation=3) and folds the non-goals into the constraints list instead of stating them separately. B has an explicit Non-goals section that matches the request, adds 'don't change the AgentFilters shape', and has broader test coverage (Korean and special-character encoding, duplicate params, installable=0/yes). B also describes the URL/state sync loop and how to avoid it. The two are close, and B is slightly more precise against the criterion of explicit non-goals and acceptance checks.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, with no stack given, and asks for something quick. B gives a compact, paste-ready brief with bracketed placeholders for the framework, style files, toggle location and key pages, so it names the files Codex needs to touch once filled in. It also has an explicit out-of-scope list, checkbox acceptance criteria, and a note telling Codex to inspect the repo if the placeholders are left empty. A is far longer, with a step list, risks, deliverables and screenshots, which works against 'quick'. It names no files at all and leans on assumptions and three follow-up questions. A's content is sound, but B fits the request better and is easier to act on.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the same three risky instructions (Codex running prod migrations, merging to main, skipping tests) and give a PR-only brief with additive migrations, a PAYMENT_PROVIDER rollback switch, server-side amount verification, idempotency and a human-run rollout checklist. B has two defects. It says the env switch allows rollback 'without redeploying', which is wrong on Vercel because env changes need a redeploy, and its own checklist then says to redeploy. It also tells Codex to replace refunds with the Toss cancel API, which would break refunds of existing Stripe-paid orders. A avoids both by assuming past Stripe orders are still refunded through Stripe, and it adds an explicit back-scheduled timeline, a check on merchant-account approval, and a note to split out recurring billing. A's acceptance criteria and non-goals ('하지 말 것') are also clear.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

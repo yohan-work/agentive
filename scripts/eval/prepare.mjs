@@ -1,6 +1,6 @@
 // Writes one runner input file per case for a variant, and records the variant's run conditions.
 //
-//   node scripts/eval/prepare.mjs <slug> --model <generator model id> [--prompt <file> | --baseline]
+//   node scripts/eval/prepare.mjs <slug> --model <generator model id> [--prompt <file> | --baseline] [--sample <n>]
 //
 // Default variant: the agent's current prompt. --prompt tries a candidate prompt from a file;
 // --baseline sends the input with no system prompt. Prints the variant id and the files to run.
@@ -11,6 +11,8 @@ import {
   evalsDir,
   localDate,
   parseArgs,
+  parseSample,
+  sampleSuffix,
   promptHash,
   readAgent,
   readCases,
@@ -24,8 +26,9 @@ import {
 const { flags, positional } = parseArgs(process.argv.slice(2), ["baseline"]);
 const [slug] = positional;
 const baseline = flags.baseline === true;
+const sample = parseSample(flags.sample);
 if (!slug || !flags.model) {
-  console.error("Usage: node scripts/eval/prepare.mjs <slug> --model <id> [--prompt <file> | --baseline]");
+  console.error("Usage: node scripts/eval/prepare.mjs <slug> --model <id> [--prompt <file> | --baseline] [--sample <n>]");
   process.exit(1);
 }
 
@@ -51,12 +54,12 @@ if (existsSync(metaPath)) {
 }
 
 for (const testCase of readCases(slug)) {
-  const input = join(workDir, slug, variant, `${testCase.id}.txt`);
+  const input = join(workDir, slug, variant, `${testCase.id}${sampleSuffix(sample)}.txt`);
   writeFile(
     input,
     prompt
       ? `=== SYSTEM PROMPT ===\n${prompt}\n\n=== USER MESSAGE ===\n${testCase.input.trim()}\n`
       : `=== USER MESSAGE ===\n${testCase.input.trim()}\n`
   );
-  console.log(`${variant}\t${testCase.id}\t${input}\t${runPath(slug, variant, testCase.id)}`);
+  console.log(`${variant}\t${testCase.id}\t${input}\t${runPath(slug, variant, testCase.id, sample)}`);
 }

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks with paste-ready pass/fail columns and use the request's specifics. B is more actionable: it correctly explains why the PowerShell command fails (braces are globbed by curl inside quotes; mkdir -p, subshell and && are the real blockers), supplies a ready PowerShell curl.exe alternative, and adds a go/no-go rule, deployed-SHA check, and CDN cache timing. B also flags the robots.txt host-root limitation, as A does in SEO6. A has a small factual slip, attributing the --output-dir fix to #14 when the request says #13, and leaves many expected values as 'verify and record'. A's per-browser matrix columns are neat, but B's ranked risk mapping and concrete mitigations make it more useful to run.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no platform, no change list), so the right response asks focused questions and states assumptions while still delivering the four required sections. A asks three targeted questions, then gives a provisional checklist explicitly split into smoke, regression, device/environment matrix and content checks, with assumptions tagged and placeholders for the unknown features. B gives a sensible release-readiness list but is organised around release management (readiness, backend, monitoring, release day), with no distinct device matrix table and no dedicated content-verification section beyond one localization line. B's advice about rollback and migrations is good but goes beyond the QA checklist asked for. A meets the criteria far better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false all-tests-passed sign-off and offer a runnable checklist plus a fill-in sign-off template. A is organised exactly into smoke, regression, device matrix and content checks, and asks focused questions instead of inventing rules (minimum limit, re-auth, terms language). B has strong substance (server-side enforcement, audit trail, cumulative limit) but lacks a device matrix and a content verification section, mixing them into a regression list. B also bakes in unverified assumptions such as lower-only limits and approved ToS. A better meets the structural criterion while staying honest about unknowns.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

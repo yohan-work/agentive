@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Reply A gives the four requested sections (smoke, regression, device matrix, content) with pass/fail columns that paste into an issue. It addresses nearly every risk the user listed: content types for .mdc/.md/agent.json, 375px Korean overflow, leftover English on /ko, stale Tested badges, and PowerShell brace and syntax problems. It works out the PowerShell details correctly: 5.1 rejects && and aliases curl, ( cd ) is not a subshell, and curl.exe does its own brace globbing. It also gives a working PowerShell variant, sweep scripts, and the point that robots.txt only counts at the host root. It is long and adds a few speculative items (Search Console, Lighthouse), but most of the length is substantive. Reply B is solid and honest about what is unspecified, but it makes a factual slip: it attributes the --output-dir fix to #14 when the request says #13. Its coverage is thinner, with no dedicated mobile layout checks beyond one row, and it leaves many expected values as 'verify'. A is more useful as-is.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, with no platform, no change list and no device list. Reply B handles that better: it asks three focused questions up front and marks every guess as [ASSUMPTION]. It leaves fill-in placeholders for the changed features rather than inventing them. It also follows the required split, with numbered smoke, regression, device matrix and content sections and pass/fail columns. It adds a useful note on triaging with one tester. Reply A is a decent generic priority-ordered list that also flags missing info. However, it has no dedicated content-verification section and no real device matrix, and it is a broad list of everything rather than a set of testable checks. B is more actionable and better structured for the stated need.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false all-tests-passed sign-off and offer a real checklist plus a fill-in template. Reply B is organized into the requested smoke, regression, device matrix and content sections, with concrete IDs, expected results and pass/fail columns. It also asks focused questions on limit rules (minimum, raise-back, re-auth), ToS languages and supported devices, and phrases unknowns as things to verify. Reply A has strong substantive points: server-side enforcement, audit logging, and the feature-flag and delay options. But it groups items by feature with P0/P1 and has no separate device matrix or content-verification section. B follows the required structure more closely and is more directly usable, though A's risk framing is also good.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

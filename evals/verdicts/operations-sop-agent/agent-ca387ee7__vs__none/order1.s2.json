@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, exceptions, quality checks and rollback, and both keep the no-status-inflation rule. Reply B is more usable for a maintainer who knows git but not the codebase. It gives exact commands, a checkpoint after every step, and a common-failure table that maps each check:data error to a fix. It also has a reviewer checklist and a curl loop for the three URLs. It handles the promotion trigger, and it lists open questions instead of hiding them. Reply A leaves several [TBD] gaps for things that are easy to state, such as the install command and the dictionary location. Its checkpoints are thinner. B's 'typical effort 1-3 hours' is a small invented figure, but it does not change the process.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is too vague to write a real SOP, because the product, tools, and steps are unknown. Reply A says so honestly and asks three focused questions. It then gives a skeleton that is mostly [TBD], so a new hire could not act on it tomorrow. Reply B also says it cannot produce a complete SOP and labels its content a generic v0.1 draft. It adds a step flow with completion criteria, a 13-row exception table that says what the new hire may decide alone, a list of things the new hire must never do, and a targeted question list. Some of B's specifics, such as contact every 2 days up to 3 times, are invented defaults, and it marks them as generic examples to be replaced. B still gives the user considerably more to work from. A is somewhat more careful about not inventing anything.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user wants statute article numbers that agents can quote to refuse refunds. Reply A declines to cite any, leaves a placeholder for legal-approved wording, and instructs agents not to quote articles. That is safe and honest, and its SOP structure is solid. But it gives little guidance on how to handle the annual plan or the 40 monthly cases. Reply B flags that the premise may be legally risky and cites provisions that look accurate. These include the e-commerce act art. 17(2)5 and 17(6), art. 35, the continuing-transaction rules, and the terms-regulation act. It hedges them as pre-legal-review reference. It then delivers a concrete SOP with a decision table, a pro-rata refund formula marked as a draft, scripts, forbidden phrases, and escalation triggers. B's formula and monthly-plan policy are proposals the user did not supply, and its citations are unverified. It is still more useful, and it stays clear that legal must confirm.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

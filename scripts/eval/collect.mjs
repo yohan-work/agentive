@@ -3,11 +3,11 @@
 //   node scripts/eval/collect.mjs
 //
 // Reads .eval-work/judge-manifest.json (written by pairs.mjs), copies each finished
-// <id>.verdict.json to evals/verdicts/<slug>/<variantA>__vs__<variantB>/order<N>.json, and drops it
+// <id>.verdict.json to evals/verdicts/<slug>/<variantA>__vs__<variantB>/order<N>[.s<n>].json, and drops it
 // from the manifest. Pending entries stay for a later run.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { verdictDir, workDir, writeJson } from "./lib.mjs";
+import { verdictPath, workDir, writeJson } from "./lib.mjs";
 
 const judgeDir = join(workDir, "judge");
 // Kept outside judgeDir so a judge browsing its own folder cannot find the variant mapping.
@@ -24,7 +24,7 @@ for (const entry of JSON.parse(readFileSync(manifestPath, "utf8"))) {
     pending.push(entry);
     continue;
   }
-  const target = join(verdictDir(entry.slug, entry.variantA, entry.variantB), `order${entry.order}.json`);
+  const target = verdictPath(entry.slug, entry.variantA, entry.variantB, entry.order, entry.sample ?? 1);
   writeJson(target, JSON.parse(readFileSync(verdictFile, "utf8")));
   console.log(`collected\t${target}`);
 }

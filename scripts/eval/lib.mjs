@@ -33,18 +33,36 @@ export function readCases(slug) {
   return JSON.parse(readFileSync(path, "utf8")).cases;
 }
 
-export function runPath(slug, variant, caseId) {
-  return join(evalsDir, "runs", slug, variant, `${caseId}.md`);
+/**
+ * Repeated samples of the same case. Sample 1 keeps the plain file names used before samples existed;
+ * later samples add ".s<N>" (strong.md, strong.s2.md, ...).
+ */
+export function sampleSuffix(sample = 1) {
+  return sample === 1 ? "" : `.s${sample}`;
 }
 
-export function readRun(slug, variant, caseId) {
-  const path = runPath(slug, variant, caseId);
+export function parseSample(value) {
+  const sample = value === undefined ? 1 : Number(value);
+  if (!Number.isInteger(sample) || sample < 1) throw new Error(`--sample must be a positive integer, got ${value}`);
+  return sample;
+}
+
+export function runPath(slug, variant, caseId, sample = 1) {
+  return join(evalsDir, "runs", slug, variant, `${caseId}${sampleSuffix(sample)}.md`);
+}
+
+export function readRun(slug, variant, caseId, sample = 1) {
+  const path = runPath(slug, variant, caseId, sample);
   if (!existsSync(path)) throw new Error(`Missing run: ${path}`);
   return readFileSync(path, "utf8").trim();
 }
 
 export function verdictDir(slug, variantA, variantB) {
   return join(evalsDir, "verdicts", slug, `${variantA}__vs__${variantB}`);
+}
+
+export function verdictPath(slug, variantA, variantB, order, sample = 1) {
+  return join(verdictDir(slug, variantA, variantB), `order${order}${sampleSuffix(sample)}.json`);
 }
 
 export function writeFile(path, content) {

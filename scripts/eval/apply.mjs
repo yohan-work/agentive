@@ -50,7 +50,9 @@ const comparisons = listDirs(verdictsRoot)
   .map((dir) => {
     const summary = readJson(join(verdictsRoot, dir, "summary.json"));
     const other = summary.variants.find((candidate) => candidate !== variant);
-    return `Blind pairwise comparison against ${describe(other)} (judged in both orders by ${flags.judge}; a case counts only when both orders agree): won ${summary.wins[variant]} of ${summary.cases.length} cases, lost ${summary.wins[other]}, ${summary.ties} tied, ${summary.inconsistent} order-inconsistent.`;
+    const samples = summary.samples?.length ?? 1;
+    const scope = samples > 1 ? `case runs (${summary.byCase.length} cases × ${samples} samples)` : "cases";
+    return `Blind pairwise comparison against ${describe(other)} (judged in both orders by ${flags.judge}; a case run counts only when both orders agree): won ${summary.wins[variant]} of ${summary.cases.length} ${scope}, lost ${summary.wins[other]}, ${summary.ties} tied, ${summary.inconsistent} order-inconsistent.`;
   });
 
 const runNote = `Real run on ${meta.preparedAt}: ${meta.generator} with the agent prompt as instructions and this input, single turn, no tools. Graded by a separate model reviewer against the evaluation criteria; not yet reviewed by a human maintainer.`;

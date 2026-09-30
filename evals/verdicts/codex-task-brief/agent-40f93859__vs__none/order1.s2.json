@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, acceptance checks and non-goals from the request, and both handle invalid values, clear actions and the top-nav requirement. A is decisive and marks its guesses (param names for category/tool/verified, repeated params) as assumptions, and it includes concrete manual checks. B adds implementation guidance that A lacks and that matters for this repo. It says to read window.location.search in the top-nav submit handler to avoid a Suspense/static-export break, to use usePathname to keep the locale, to compare serialized strings to avoid URL/state loops, and to debounce query writes. B also asks for an encoding test (Korean, &, #) and a PR description that lists the chosen formats. B leaves a few choices open (comma vs repeated keys, new file vs existing file), which is a minor weakness, but its pitfalls make it more actionable for Codex.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: no stack, no files, and no commands are given. A asks three focused blocking questions, then gives a provisional brief in which every guess is tagged [ASSUMPTION]. It keeps the scope small (OS preference only, toggle optional) to match 'quick', and it has non-goals and checkable acceptance steps. It also warns that hard-coded colors would make the task non-quick. B fills the gap with bracketed placeholders but hardcodes a larger scope: a toggle, localStorage, a no-flash script and a token system. That scope works against 'quick', and B's non-goals are looser. B's template is usable, but A handles the missing information more honestly and fits the request better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on the three risky instructions: running the production migration directly, merging and deploying to main, and skipping tests. Both move those steps to a human and keep the work to a PR. A is honest about missing information. It asks three questions and tags its assumptions, but its brief is generic and names no files or paths. B is more useful as-is for a payment migration. It requires server-side amount verification, idempotent confirm, and additive-only schema changes. It also gives a PAYMENT_PROVIDER env flag for instant rollback, a concrete human deploy checklist with rollback, and a warning that live keys need merchant review. B leaves its assumptions unflagged (App Router, PaymentProvider, additive changes 'don't affect the service'), but it tells Codex to inventory the Stripe usage first. B's substance outweighs A's more explicit hedging.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

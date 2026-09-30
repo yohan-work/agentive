@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies follow the user's 11 steps faithfully and keep the status-inflation rule. A adds a common-failures table that maps directly to the mistakes the user listed (category typo, template date, hand-edited generated file). A also gives runnable curl URL checks, a fix-forward option in rollback, and an exceptions table covering more cases (Pages caching, CI failing only on main, no reviewer available). A's step 6 also honestly flags that the `expert` bar is unclear, and its closing open-questions list gives Seoyeon concrete things to settle. B is tighter and its reviewer checklist is good. Its sections 11-13 (recommendations, risks, next actions) are mostly generic extras the user did not ask for, and it lacks a per-step failure guide. A is more actionable for a maintainer who does not know the codebase.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is underspecified: no industry, tools or real exceptions are given, and it demands 'all exceptions' so a newcomer can work alone. Both replies say honestly that a complete SOP cannot be written without that information and offer a skeleton. A's skeleton is far more complete and usable. It has roles, trigger conditions, seven steps with completion criteria, and a 13-row exception table that says whether the newcomer may decide alone and who to escalate to. It also lists things the newcomer must never do alone and gives a copyable checklist. A ends with a targeted list of the information it needs. B leads with sharp questions and a sound recommendation not to try to document every exception. Its skeleton is thinner, with only six exception rows and no trigger definition, and it spends space on generic assumptions, risks and next-action headings. A meets the criteria better while staying honest with its bracketed blanks.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for legal exception clauses to be cited by article number to refuse refunds. Both replies push back appropriately: agents should not cite statutes to refuse, and 14 days past payment does not mean no refund for a continuing subscription. Both recommend legal review. Both give an annual-plan refund formula with arithmetic that checks out (A: 208,800 won; B: 182,700 won). B still gives the user the article-level legal map they asked for, framed as internal reference. It cites the Act on Consumer Protection in E-Commerce art. 17(1), 17(2)5, 17(3) and 17(6), the Door-to-Door Sales Act arts. 31-32, and the Standardized Terms Act. A covers these in prose but less precisely, and it hedges with 'around art. 31, 32'. B also has clearer SOP structure for the task: L1/L2/L3 authority, reason codes, a decision flow, exceptions A-D with approvers, and an escalation threshold. It also states its assumptions and asks three focused questions. B carries some padding in its risks and recommendations sections, but its substance and role clarity edge out A.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
