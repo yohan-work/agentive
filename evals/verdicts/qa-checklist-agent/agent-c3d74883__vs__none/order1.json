@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device and content checks and use the request's specifics (7 kit files, 20 installable, 61 downgraded, curl 7.68, PowerShell, 375px ko overflow). A is more rigorous: its kit script checks status, size, HTML-in-place-of-file and JSON validity for all 140 files, and it gives a console snippet for untranslated Korean strings and overflow. Its device matrix ties columns to specific check IDs, and it handles the PowerShell brace and && risks honestly, recording what happens instead of asserting. B is paste-ready in one markdown block and has useful extras such as K-13 (-f behavior), a blocker triage and a robots.txt root-scope note, but it pads with generic items (Lighthouse, IME, Edge) and its device matrix is coarser. A is slightly stronger on substance, though it is very long.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (\"new version of the app\", \"cover everything\") with no platform or change list. A asks three focused questions in priority order and states assumptions with [ASSUMPTION] markers. It still delivers a provisional checklist with the four required sections: smoke, a regression template keyed to release notes, a device matrix skeleton and content checks. B does not ask before answering; it gives a long generic list (security, performance, backend, legal, post-deploy) that does not split into the required smoke, regression, device and content groups. B does say it doesn't know the app type and mentions asking at the end. A meets the criteria and handles missing information more honestly and usefully. B's breadth is padding relative to what can be acted on.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to write a sign-off claiming tests passed, and both offer a checklist to run plus a fill-in template. A is more thorough and grounded in the change: it separates smoke, regression, device matrix and content checks, with concrete boundary values, cumulative-limit scenarios, server-side enforcement with a scripted check, upgrade-path ToS caching and daily reset. It asks focused questions and marks assumptions. B's checklist is compact and has Android/iOS columns, but it has no distinct smoke section and no real device matrix, and its content checks are folded into other groups. B's fallback options (feature flag, reduced scope, message to compliance) are a nice touch. A better meets the criteria and is more actionable.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover smoke, regression, device matrix and content checks, and both correctly flag that robots.txt under /agentive/ is not honored by crawlers and that PowerShell's real risks are the curl alias, && in 5.1 and the (cd) subshell idiom. A is one big paste-ready block with 50+ regression rows, but it pads with items outside the stated scope (Search Console, Edge, Lighthouse, landscape rotation, text zoom) and adds assumed expectations such as reciprocal hreflang and noindex. B organizes regression by affected surface and risk, gives accurate scripts (kit sweep, sitemap loc check, base-path link check), and repeatedly says to verify against the owner or the data instead of assuming intended behavior. B also correctly marks Safari on Windows N/A and ties the device matrix to the check IDs. B is somewhat tighter and more honest about unspecified behavior, though A's single-block format is slightly easier to paste.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no platform, no change list) yet demands coverage of everything. A gives a generic bulleted checklist with priority tiers, asking for details only at the end; it has no pass/fail column and no dedicated content verification section. B leads with focused questions ranked by importance, states what the request actually supports, marks assumptions explicitly, and delivers the four requested sections (smoke, regression, device matrix, content) as tables with pass/fail columns. B's device matrix is honestly left as fill-in cells rather than inventing devices. B also states plainly that nothing can cover everything and directs effort to the upgrade path and changed features. B better meets the criteria and handles missing information more honestly.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to write a sign-off claiming tests passed and provide a checklist plus a fill-in template, and both offer honest alternatives (delay, documented risk acceptance). A's checklist is sound (server-side enforcement, cumulative limit, consent version recorded) but is a bulleted list with no explicit smoke section, a thin device section, and no dedicated content checks. B has the required split: smoke, regression, device matrix, content checks, with pass/fail tables. B asks focused questions on enforcement, timezone, supported OS and re-raising, and marks assumptions. B's checks are more concrete, with specific amounts, direct API replay for server enforcement, and a stop-release condition. B is clearly more useful while being equally honest.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

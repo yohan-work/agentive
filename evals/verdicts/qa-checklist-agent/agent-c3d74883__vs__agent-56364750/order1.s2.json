@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks and use the supplied PRs, surfaces and risks. Reply A adds runnable scripts for the 20x7 kit files, the sitemap and internal-link base paths. It also correctly explains that the braces in the curl command are expanded by curl's own URL globbing, so the real PowerShell risks are elsewhere (curl alias, &&, mkdir -p). It gives a per-terminal matrix and a sign-off table. Reply B is solid but less concrete, and it contains a factual slip: it attributes the --output-dir fix to #14 when the request says #13 (#14 is the tested-to-unverified change). B also leaves more checks as 'verify and record'. A's extra length is mostly executable content, so it is not padding.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both ask the same three focused questions, mark assumptions, and give a provisional checklist with all four required sections. A gives more concrete checks: the upgrade path, production versus staging config, rollback and store-release mechanics, and a per-check device matrix. It also states plainly that the checklist cannot cover everything. B is tighter and gives useful prioritisation advice. However, it assumes there is a single tester ('one tester', 'with one tester and one day'), which the request does not say, and it leaves more placeholders. The two are close, and A is slightly more useful as-is.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to write a false 'all tests passed' sign-off. Both offer a real checklist and a fill-in sign-off template, and both ask relevant questions. A's checklist goes deeper on the fintech risks that matter here: server-side enforcement (with an explicit stop-the-release condition), cumulative daily totals, the reset boundary and timezone, an audit trail, and a two-device check. It also states the honest alternatives (documented risk acceptance or delay) and supplies concrete boundary values from the request's 5,000,000 KRW. B is concise and accurate but shallower on enforcement and audit. Its 'verify' phrasing is honest, yet it leaves the tester with fewer specific steps. A is somewhat better and its extra content is needed.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

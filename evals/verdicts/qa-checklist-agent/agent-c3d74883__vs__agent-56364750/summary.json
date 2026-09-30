@@ -1,0 +1,87 @@
+{
+  "slug": "qa-checklist-agent",
+  "variants": [
+    "agent-c3d74883",
+    "agent-56364750"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-c3d74883",
+      "order2": "agent-c3d74883",
+      "result": "agent-c3d74883"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-c3d74883",
+      "order2": "agent-56364750",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-c3d74883",
+      "order2": "agent-c3d74883",
+      "result": "agent-c3d74883"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-c3d74883",
+      "order2": "agent-c3d74883",
+      "result": "agent-c3d74883"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-c3d74883",
+      "order2": "agent-c3d74883",
+      "result": "agent-c3d74883"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-c3d74883",
+      "order2": "agent-c3d74883",
+      "result": "agent-c3d74883"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-c3d74883",
+        "agent-c3d74883"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "agent-c3d74883"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-c3d74883",
+        "agent-c3d74883"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-c3d74883": 5,
+    "agent-56364750": 0
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

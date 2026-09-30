@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, acceptance checks and non-goals from the request. Reply B is more precise and easier to verify. It states one validity rule for every filter key. It says URL writes happen only in event handlers, which avoids replace loops. It gives exact expected URLs for manual checks, build-output checks and a diff check that package.json is untouched. It marks its assumptions (param names, raw values, single-value fields) and lists them for confirmation. Reply A is also solid, with a good plan for the top-nav and the debounce. But it is more prescriptive about implementation, hedges on multi-value handling, and its acceptance checks are less concrete. Its tests include useful encoding and duplicate cases.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack given) and asks for something quick. Reply B asks three focused blocking questions. It then gives a minimal provisional brief in which every guess is tagged [ASSUMPTION]. That brief has narrow requirements, clear non-goals and testable checks (DevTools prefers-color-scheme emulation, a contrast ratio, screenshot comparison). Reply A uses bracket placeholders and a fuller brief, which is a usable template. But its scope (toggle, localStorage, no-flash inline script, replacing hard-coded colors, tests) is larger than 'quick'. Its acceptance checks mention no files or commands because they are unknown. B fits the 'quick' request better and is more honest about the missing information, although its Tailwind assumption is a guess.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back on the three risky instructions (production migration, merging to main, skipping tests) and move those steps to a human. Reply A then gives a complete, immediately usable brief. It tells Codex to find the Stripe usages itself, which suits an agent that can read the repo. It proposes a PAYMENT_PROVIDER env flag for rollback without a redeploy, and an additive-only migration. It keeps a small but concrete test set (amount validation, idempotency, cancel, webhook) and adds a human production checklist and a schedule warning about merchant review for live keys. Reply B is also strong, with good checks and marked assumptions. But it asks the user for file paths and model shapes that Codex could discover. It also downgrades tests to manual verification and leaves automated tests as optional, which partly accepts the user's bad instruction. A is slightly more actionable and more protective.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

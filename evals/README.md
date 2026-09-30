@@ -71,6 +71,12 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - The judges preferred the longer answers on the fully specified case because they covered the risks the user named in more depth: the PowerShell failure modes, `robots.txt` under a sub-path, and runnable scripts. Capping rows removed exactly that.
   - `codex-task-brief` v2 went 3–3 against the baseline and 3–2 against the current prompt (one case order-inconsistent). It did not beat both, so neither v2 was adopted.
   - Next hypothesis: require depth on every risk the request names, and cap only the extras nobody asked for.
+- **2026-09-30, depth rule (v3), adopted for both.**
+  - v3 is v1 with the caps removed and one rule added: "go deep on every risk, constraint, and edge case the request names (failure mode, exact steps or commands, a matching check or script), and keep anything unasked-for to one line". It was tested on 3 cases × 2 samples.
+  - `qa-checklist-agent` v3 beat the baseline 6–0 and v1 5–0 (one case order-inconsistent).
+  - `codex-task-brief` v3 beat the baseline 5–1 and the current prompt 5–0 (one inconsistent).
+  - For the first time a prompt won the fully specified case, in both samples, for both agents.
+  - The lesson for the other agents: a useful prompt tells the model where to spend depth (the user's stated risks and constraints), not how long to be or which sections to print.
 
 ## Known limits
 

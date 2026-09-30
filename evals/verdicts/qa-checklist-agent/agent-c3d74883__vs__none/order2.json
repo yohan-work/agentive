@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a thorough, request-specific checklist with the four requested sections, a pass/fail column, and helper scripts. Both correctly flag the PowerShell 5.1 problems (&& and the curl alias) and that crawlers ignore robots.txt under /agentive/. Reply B is more careful about not asserting unknowns: it says there is no confirmed expected content type for .md/.mdc and says to record the actual behaviour. It adds checks tied to the stated risks, such as the subshell/pwd side effect, a stale bookmark badge, a Korean-string console sweep and a 375px overflow snippet, and it checks the check:data rule locally. Reply A is also strong and has a nice fixtures and rollback preamble, but it is somewhat broader and less verifiable in places, and it pads with generic items like Lighthouse and Edge. B's device grid and terminal matrix map more directly onto the stated devices, so B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: no app type, no change list, and a demand to cover everything. Reply B asks three focused questions, states its assumptions with [ASSUMPTION] tags, and provides the four requested sections: smoke, regression as a template, a device matrix skeleton, and content checks. It does not invent facts about the app. Reply A is a generic, long checklist that assumes accounts, payments and mobile apps, and it lacks the explicit smoke, device-matrix and content split, so much of it is padding for an unknown app. A does offer to narrow the list if given details, but it is less honest about what can be checked without knowing what changed. B better fits the criteria and the missing-information handling.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies rightly refuse to write a false all-tests-passed sign-off, and both give a checklist plus a fill-in-later sign-off template. Reply B follows the required structure explicitly: smoke, regression grouped by surface, a device and OS matrix, and content checks. It asks focused questions on the missing spec, such as raising the limit, the minimum value, ToS re-acceptance and the supported OS range. It also flags unknowns as spec-dependent instead of assuming, and it includes a server-side enforcement check with a clearly caveated placeholder script. Reply A is good and practical, with options for shipping under time pressure, but its sections (A to E) don't include a distinct device matrix or content section, and it asserts some details, like KST, as if known. B is more precise and better aligned to the criteria.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

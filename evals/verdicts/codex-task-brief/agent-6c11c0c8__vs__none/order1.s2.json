@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover files, constraints, acceptance checks and non-goals, and both use router.replace with scroll:false and read window.location.search in the top-nav handler to avoid a Suspense problem. Reply A commits to exact, testable rules: case-sensitive exact match, only \"1\" means installable, first duplicate wins, a fixed key order, and no URL writes outside event handlers to prevent replace loops. It also gives concrete manual checks with exact expected URLs, such as the Back-button check and the top-nav merge result. It marks its parameter-name and single-value assumptions as assumptions and asks for confirmation. Reply B is solid but leaves more decisions open (\"optionally also true\", \"either works\", repeated keys or comma-separated), and it adds an external-URL sync scheme that is fuzzier. That leaves Codex more room to guess. A is more precise and easier to verify, though longer.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack, files or scope) and asks for something quick. Reply A asks three focused blocking questions and then gives a provisional brief with every guess labelled [ASSUMPTION]. Its scope is minimal (follow the OS setting via prefers-color-scheme, no restyling of the light theme), which fits \"quick\". It has concrete acceptance checks (DevTools emulation, contrast of 4.5:1, screenshot comparison) and explicit non-goals. Reply B gives a fill-in-the-blank template that does not invent facts. But it expands the scope to a manual toggle, persistence, a no-flash script and a token system, which works against \"quick\". A handles missing information more honestly and stays closer to the user's constraint. B is still useful.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the risky parts (running the migration on the production DB, merging to main and deploying, skipping tests). Both keep the essential safeguards: server-side amount verification, idempotent confirmation, and an additive migration. Reply A opens with three blocking questions and fills the brief with assumed paths and model names, which slows down a user with a Friday deadline. It also cuts automated tests down to manual checks. Reply B is more actionable without inventing paths: it tells Codex to inventory the Stripe usage first. It adds a PAYMENT_PROVIDER flag for rollback without a redeploy and keeps a small mocked test set. It supplies a human go-live checklist, and warns about timing and the fact that live keys need merchant review. B's remark that the additive migration has no impact on the existing service is slightly overconfident. A is more explicit on some checks, but B is the more complete and practical brief.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
