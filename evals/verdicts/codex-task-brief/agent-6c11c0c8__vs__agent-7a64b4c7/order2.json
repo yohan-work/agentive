@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, the static-export constraints, the router.replace and scroll:false rules, invalid-value handling, and the non-goals. B turns the request into numbered, testable requirements. It fixes exact behavior for installable (only `1` counts as on), repeated params, empty values and param order. It also gives a nine-row manual check table that maps directly to the stated acceptance criteria. A is solid and adds a good point about reading window.location in top-nav to avoid a Suspense requirement. But it opens with chatty meta-talk, invents example values (tool=github, category=testing, verified=tested), and pads with a risks table and a next-actions list that repeat the plan. A's proposal of a new module also drifts from the request's file list. B is tighter, marks its assumptions inline, and is easier for Codex to verify.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a quick brief and gave no stack details. A writes a large brief that includes a three-way Light/Dark/System toggle, localStorage persistence, an inline head script, hydration handling, screenshots and a PR note. That is not quick, and it goes beyond what was asked. It also leaves bracketed placeholders and adds three questions at the end. B asks the blocking questions up front (stack, trigger, scope) and gives a small provisional brief with every assumption marked. Its scope is OS-driven dark mode only, with the toggle listed as not required. B has explicit non-goals and concrete acceptance checks, such as emulating prefers-color-scheme and comparing light-mode screenshots, and it stays true to the quick-task constraint. B handles the missing information more honestly and fits the request better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to have Codex run the production migration, merge to main and deploy, or skip tests, and both explain why in Korean. Both keep Stripe code for rollback. A is a fuller implementation spec: provider abstraction, server-side amount check, webhook idempotency, four minimal tests and a Mon-Fri schedule. However, it invents details such as \"반나절이면 됩니다\" and a day-by-day schedule, and it makes the webhook and provider toggle part of the required scope. B asks for the missing facts (Stripe file paths, integration method, existing data) and marks assumptions explicitly. It puts webhooks and the flag under \"suggested\", and lists concrete non-goals, including no live keys and no prod env changes. Its acceptance checks are verifiable: prisma validate, a no-DROP SQL check, a grep showing the secret key is absent from the client bundle, and amount-mismatch and duplicate-approval cases. B is slightly more grounded and checkable, and A is slightly more prescriptive.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use the supplied files and constraints and cover replace/scroll:false, invalid-value handling and the top-nav requirement. Reply A turns them into unambiguous, testable requirements. It gives one validity rule (case-sensitive exact match, installable only '1', first duplicate key wins), a fixed key order, no URL writes from effects, and no useSearchParams in top-nav. Its manual checks give exact expected URLs, for example the Clear all and Clear filters only results. It also has a real non-goals section and a diff check on package.json. Reply B is solid and adds a useful risk table, but it hedges more ('Probably no change', 'or otherwise accept any non-empty string'), and its non-goals are a single line. Reply B also leaves top-nav as two options and never says how to test the clear actions, so Codex has to make more choices.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack) and asks for something quick. Reply A first asks the three questions that block the work, then gives a compact provisional brief with every guess marked [ASSUMPTION]. That brief has a clear goal, requirements, non-goals and concrete acceptance checks (emulated prefers-color-scheme, screenshot comparison, 4.5:1 contrast). Its scope matches 'quick': it follows the OS setting, and the toggle is optional. Reply B has good content (tokens, no-flash script, risks), but it expands into a much larger task: a three-way toggle, persistence, an inline head script, a hook with a unit test, and migrating many components. That works against 'quick for Codex', and the size of the job is decided by guesses about the stack. Reply A also puts its non-goals in a clearer place, and its questions come before the brief, so they are hard to miss.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the unsafe parts (running the production migration, merging to main and deploying without review, skipping tests), explain why, and move those steps to the human. Reply A keeps the brief lean for the Friday deadline. It requires a server-side amount check and idempotency, creates the migration file only, and lists minimal test-key verification checks. It has an explicit 'do not' list, a human checklist, and an [ASSUMPTION] for each guess about the repo. Reply B adds valuable ideas, namely additive schema changes, a PAYMENT_PROVIDER rollback switch, a day-by-day schedule, and a warning about production-key approval. But the provider abstraction plus webhook plus mocked integration tests is a much bigger job for a rushed task, and it drops the user's stated priority. It also assumes the merchant contract and test keys already exist. Reply A's acceptance checks are more concrete and more closely tied to the request. It is close, and Reply B's schedule advice is a real plus.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

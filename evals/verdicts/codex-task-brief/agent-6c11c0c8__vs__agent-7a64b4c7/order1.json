@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, non-goals and acceptance checks, and both mark guesses (the param names for category, tool and verified, and whether the clear controls exist). A gives precise, testable requirements: a stable param order, per-param invalid handling, a round-trip property, a nine-row manual check table, and the exact test cases. B adds a step-by-step plan and spots a real pitfall: top-nav should read window.location at submit time, because useSearchParams there would need Suspense on every page and could break the static build. A leaves open how top-nav learns the current params, which is a gap. B also drifts a little: it preserves unrelated utm params, invents example values such as category=testing and verified=tested, and adds Risks and Next actions sections that mostly restate earlier content. B's top-nav insight and concrete implementation guidance make it a bit more actionable for Codex, though A is tighter and its manual checks are stronger.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack, no repo) and asks for something quick. A asks three focused questions and then gives a short provisional brief with every assumption marked. It defaults to OS-driven dark mode with a toggle as optional, which fits 'quick'. It also has clear non-goals and checkable acceptance criteria. B produces a much larger brief: a three-way toggle, localStorage persistence, an inline head script, a hydration workaround, a token migration, and a PR with screenshots. That contradicts 'quick for Codex to do'. B also relies on bracketed placeholders and generic advice for a stack it doesn't know, and it still asks its own questions at the end. A handles missing information more honestly and stays within the requested size.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly decline to have Codex run the production migration, merge and deploy, or skip testing. Both move those steps to a human and keep the work to a reviewable PR with an additive, create-only migration. A asks the blocking questions (where the Stripe code lives, widget or API integration, what to do with existing payment data) and labels its assumptions. It has strong checks: server-side amount comparison, idempotent approval, and a grep confirming the secret key is absent from the client bundle. B picks the payment widget without asking and invents some specifics. It makes an unsupported claim that the work takes half a day, assigns a Monday-to-Wednesday schedule, and lists a TOSS_WEBHOOK_SECRET variable that may not apply. It does add useful things: a PaymentProvider abstraction with a rollback flag, four mocked tests, and a correct description of the confirm endpoint and Basic auth. Overall A is more honest about what it doesn't know, while B is more prescriptive but includes some invented detail.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

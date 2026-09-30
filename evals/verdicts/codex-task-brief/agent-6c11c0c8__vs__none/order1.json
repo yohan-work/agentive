@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies are grounded in the request's files and constraints and give solid parse/serialize designs. A states precise, testable requirements: the invalid-value rules per param, the round-trip property, no-op replace avoidance, and top-nav behavior on /agents versus other pages. It also gives a concrete manual-check table covering en/ko and clear behavior, and it lists explicit non-goals. B is also strong, and its note that top-nav may need its own Suspense boundary for useSearchParams is useful. But B leaves several decisions open, such as whether serialize keeps unknown keys and whether 'true' is accepted for installable, and it adds a base-param parameter and repeated-key handling the request never asked for. A is slightly tighter and more directly executable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: no stack, no files, and it asks for something quick. A asks three focused questions about stack, trigger, and scope, then gives a compact provisional brief with every assumption marked. It keeps the scope small (OS-driven dark palette, toggle only as a suggestion), which fits the 'quick' ask, and it states non-goals and checkable acceptance criteria. B fills the gaps with bracket placeholders but expands the scope to a three-mode toggle, persistence, a no-flash script, migration of hardcoded colors, and new tests. That is not quick for Codex and it is more speculative. A handles the missing information more honestly and matches the request better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge, and deploy, and both keep minimal payment tests, with a clear explanation and a human-steps list. A adds blocking questions (Stripe code paths, widget vs. payment window, existing data) and marks its assumptions. Its acceptance checks are concrete and verifiable: no DROP in the migration SQL, amount-tampering rejection, idempotent confirm, and a grep confirming the secret key is absent from the client bundle. B is also good and adds a useful note about Toss live keys needing merchant review. But it makes a webhook and a PaymentProvider abstraction mandatory, which enlarges the scope under a Friday deadline, and its completion criteria are looser. A is somewhat more precise and more honest about unknowns.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

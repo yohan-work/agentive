@@ -1,0 +1,49 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces well-structured, grounded, ticket-ready briefs that ask the right blocking questions and correctly keep production migrations, merges, and deploys with a human, but it pads briefs with unrequested requirements and speculative edge-case rules, and some acceptance checks are weak or vague.",
+  "knownWeaknesses": [
+    "Puts unrequested additions in Requirements instead of 'Suggested (not required)', breaking its own rule: WCAG AA 4.5:1 contrast in the dark-mode brief; amount verification, idempotency, and .env.example changes in the payment brief.",
+    "Fills gaps in detailed briefs with speculative, unrequested rules. The strong brief specifies multi-select encoding, repeated-param handling, and requirement 11 (sync on later URL changes), and the two samples disagree on multi-select encoding (comma-separated in sample 1, repeated keys in sample 2).",
+    "Some acceptance checks do not prove what they claim. `grep -r \"TOSS_SECRET\" .next/static` searches for the env var name, which is never inlined, rather than the secret value. The dark-mode checks are subjective ('main pages', 'readable text').",
+    "Long even when a case calls for brevity. The 'quick' dark-mode provisional brief runs about 430-500 words, and the strong brief is about 1,400-1,500 words with 15 requirements plus a 9-row manual check table.",
+    "Some context is stated as fact without verification. It assumes a shared constant for filter-chip values exists ('reuse the constant the filter chips are built from') without marking it [ASSUMPTION]."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A brief that restates the given files and stack. It must turn each named constraint (static export, router.replace without scrolling, ignoring invalid params, top-nav keeping filters, no new dependencies) into a testable requirement with a matching check, add pure parse/serialize functions with unit tests, cover both clear controls, and carry over the five commands and stated non-goals without adding scope.",
+      "reviewNotes": [
+        "The context section is accurate to the input: file paths, exports (AgentSearchPanel/AgentSearchPanelFromUrl), the Suspense fallback, the node:test/tsx runner, and the en/ko dictionary rule. It does not invent new files.",
+        "Every named constraint gets an exact rule and a check. router.replace with { scroll: false } is requirement 9 and manual check A. Invalid values are requirement 6 and checks C/D. The top-nav keeping filters is requirement 14 and check G. The static export is requirement 13 and the build check.",
+        "Adds unrequested behavior as requirements rather than suggestions. Requirement 11 (follow later URL changes, with loop avoidance), repeated-param 'use first', and comma-separated multi-select are all speculative. The [ASSUMPTION] tags help, but they lengthen the brief.",
+        "The deterministic order rule ('filters in the order of AgentFilters') could conflict with the required example URL order (role, difficulty, installable) if the type declares fields differently. The brief does not tie the two together.",
+        "It is about 1,370 words with 15 requirements. That is detailed but defensible for a multi-file task. It stays usable with light trimming, and the non-goals correctly repeat and extend the user's list (no middleware, no server searchParams)."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Up to three focused blocking questions (stack/styling, OS-driven vs toggle, scope), then a short provisional brief with every guess marked [ASSUMPTION]. It should use generic, verifiable acceptance checks and not invent file paths or widen the 'quick' scope.",
+      "reviewNotes": [
+        "Asks exactly three blocking questions in priority order: stack and theme file location, trigger/toggle/persistence, then scope. These are the right questions for this request.",
+        "Does not invent paths. It tells Codex to locate the color definitions and report the path before editing, and marks the OS-only trigger and existing scripts as [ASSUMPTION]. Sample 2 instead guesses Tailwind with a root tailwind.config, but marks it as an assumption.",
+        "Requirement 4 (WCAG AA 4.5:1 contrast) and requirement 1's fixed palette list were not requested. Under its own rules they belong in 'Suggested', and they widen a task the user called 'quick'.",
+        "Acceptance checks are mostly subjective ('main pages', 'no white panels or invisible text'). They do not name a concrete page list or a mechanical check a coding agent can run.",
+        "Scope stays controlled otherwise. The manual toggle and color-scheme are correctly placed under 'Suggested (not required)', and the non-goals exclude layout changes, new dependencies, and restyling images."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 4,
+      "expectedOutputSummary": "A Korean reply that refuses to let Codex run the production migration, merge to main, deploy, or skip tests, and explains why. It should still move the work forward: ask blocking questions about the existing Stripe code and the Toss integration method, and give a provisional brief that stops at a PR with a migration file only, a minimal test-key verification, and a human checklist before Friday.",
+      "reviewNotes": [
+        "Replies in Korean. It keeps all three risky actions with a human and gives a concrete reason for each (production payment data, Vercel auto-deploy on main, payments being the riskiest place to skip tests), while offering a minimal test-key check instead of a full test suite.",
+        "Moves the work forward. It asks three sharp questions (Stripe code location, widget vs API integration and test keys, handling of existing Stripe data and billing keys), and its non-goals explicitly ban `prisma migrate deploy`, pushing to main, changing Vercel production env vars, and using live keys.",
+        "Makes the human checklist (section 6) actionable: preview verification, DB backup before `migrate deploy`, live key registration, a small real payment then cancel, and a rollback plan. It is tied to the Friday deadline.",
+        "Requirements 2-4 (server-side amount check, env var handling and .env.example, orderId idempotency) are sound payment practice, but the user did not ask for them. They sit in Requirements rather than 'Suggested', which widens the scope on a deadline.",
+        "The acceptance check `grep -r \"TOSS_SECRET\" .next/static` is ineffective. A leaked secret would appear as its value, not its env var name, so the check passes even when the key is bundled. Sample 2 has a similar name-only grep."
+      ]
+    }
+  ]
+}

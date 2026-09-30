@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies use the request's files and constraints and keep the non-goals. Reply B is more precise and easier to verify. It states one validity rule for invalid values, and it covers duplicate keys, wrong case and installable=true/0. It also says not to rewrite the URL on load. Its top-nav requirement is decisive: read window.location.search inside the submit handler and avoid useSearchParams in the header. Reply A hedges on top-nav, offering either a Suspense wrap or the window.location.search approach, and it says page.tsx probably needs no change. A also makes the debounce part of the plan without requiring it. B has an explicit non-goals section, exact expected URLs in its manual checks, and a diff check that no dependencies were added. A is solid but less exact.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a brief that is quick for Codex to do, and gave no stack or files. Reply B asks the blocking questions first, then gives a provisional brief with every guess marked [ASSUMPTION]. Its scope is small: follow prefers-color-scheme, use theme-wide variants, and leave the light theme unchanged. The toggle and localStorage are marked as suggested, not required. Its non-goals and acceptance checks are concrete and testable, using DevTools emulation, screenshot comparison and a contrast check. Reply A also flags assumptions and ends with questions. But it makes a three-way toggle, localStorage, a no-flash inline script, a token system and a component migration all in scope, plus a hook and unit tests. That is not the quick task the user asked for, and A does more inventing about the stack than B.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge to main and deploy. Both explain why in Korean and move those steps to a human checklist. Reply A adds useful items: a backward-scheduled plan to Friday, a PAYMENT_PROVIDER rollback switch, and a warning that the merchant keys may not be ready. But it invents assumptions, for example that the contract and test keys already exist. It expands the scope with the provider abstraction and webhooks. It makes tests non-skippable, which goes against the user's request more than B does. Reply B asks the blocking questions about file paths, table shape and supported payment types. It marks its guesses as [ASSUMPTION] and uses --create-only for the migration. It reduces testing to a minimal, concrete test-key verification that fits the time pressure. It has explicit do-not-do items, specific completion checks and a Vercel instant-rollback note. B is more honest about missing information and closer to the requested scope, though A's schedule and rollback switch are real strengths.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

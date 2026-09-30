@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both correctly note that robots.txt only works at the host root and that curl (not the shell) expands the braces. A gives runnable, request-specific scripts for the 140 kit files, sitemap validation and the base-path check. It also gives concrete 375px overflow checks for the Korean-badge risk, and a browser-by-check matrix that marks Safari on Windows as N/A. It keeps the Pass/Fail cells empty and treats the PowerShell risk as something to verify. B is also strong: it has a ready-to-paste code block, a PowerShell variant, and a blocker list. But it adds items the request did not ask for (Lighthouse, Search Console, a native-speaker read, Edge), and its device matrix is coarser. A covers the listed risks more precisely and more directly, so it edges ahead.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, so the right reply asks focused questions and states its assumptions without inventing facts. A asks three prioritised questions and labels its assumptions. It then delivers a checklist with exactly the four required parts: smoke, regression by surface, a device matrix with placeholders, and content checks. Each row has steps, an expected result and a Pass/Fail cell. B is a sensible priority-ordered list with a helpful note about timing. But it does not separate smoke, regression, device coverage and content verification as the criteria require. It scatters those items across priority tiers and adds non-functional sections like security and performance. A is the more actionable reply and matches the criteria better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to attest that tests passed and offer a fill-in template instead. A additionally provides the four required sections with concrete, request-specific cases: the 5,000,000 KRW cap, 1,000,001 boundary, cumulative enforcement, server-side API bypass, KST reset, and ToS version recording. It also has a device matrix and a content section, and asks focused questions about enforcement and re-consent. B is honest and its P0/P1 checklist is good, and it suggests a feature flag. But it has no separate smoke section, no device matrix, and only thin content checks, and it gives no concrete test values. A meets the criteria more fully and is more useful to run tonight.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

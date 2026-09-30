@@ -1,0 +1,48 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces grounded, ticket-ready four-part checklists with correct, scriptable technical checks, and it refuses the false sign-off while still delivering a usable checklist. However, the detailed-input checklist is long, a few expected results are stated as given when they are assumptions, and assumptions, risks, and next actions never get their own section.",
+  "knownWeaknesses": [
+    "Some expected results are presented as given when the input never stated them. In the strong case, S-02 expects '/' to redirect to '/en/', R-B01 assumes a status filter exists, and R-D05 assumes the sitemap lists en and ko as separate <loc> entries (at least 200). In the out-of-scope case, S-05 asserts that a transfer of exactly 1,000,000 KRW is allowed (an inclusive boundary) and TL-02 asserts that 5,000,000 KRW is a hard maximum, while other rows correctly say 'verify against the spec'.",
+    "Assumptions, risks, and next actions are not separated. They are written into table cells ('the release owner decides', 'confirm with the owner') or tagged inline with [ASSUMPTION], and no output has a standalone Assumptions/Risks/Next actions block, so the third criterion is only partly met.",
+    "Well-specified requests produce very long output. The strong case runs to about 237 lines: 9 smoke rows, about 45 regression rows, two matrices, 7 content rows, and three scripts. That is a lot for one post-CI pass before the announcement, and lower-risk rows (R-E03 filter persistence, R-B04 stale bookmarks from an old profile, R-C08 locale switching) could have gone under 'If time allows'.",
+    "With no scope given (boundary case), the provisional checklist is necessarily generic mobile/web boilerplate. The regression section is a template with placeholder rows, and the output leans toward a mobile app (upgrade path, airplane mode, store listing) before the platform is known."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A pasteable GitHub-issue checklist with a pass/fail column, split into smoke, regression, device matrix, and content checks. It should map to PRs #13-#19 and the listed surfaces, go deep on every named risk (kit content types, 375px Korean overflow, leftover English on /ko, PowerShell brace expansion, stale Tested badges) across all three terminals, and write unknown values as things to verify.",
+      "reviewNotes": [
+        "It is closely grounded in the input and covers every named risk. Script A checks all 140 kit URLs (20 x 7) for status, content type, size, an HTML-404 body, and whether agent.json parses. R-A04/R-A05 cover content types and charset. R-C05/R-C06 plus an overflow console snippet cover 375px Korean chips. R-C01/R-C02 plus a Latin-without-Hangul snippet cover leftover English. R-A08/R-A09 cover PowerShell. S-09, R-B01-R-B07, and C-07 cover stale 'Tested' badges.",
+        "Its technical claims hold up. Windows PowerShell 5.1 rejects '&&' and aliases curl to Invoke-WebRequest. In PowerShell '( ... )' is not a subshell. Braces inside a PowerShell double-quoted string are passed to curl.exe for its own URL globbing. The (cd ...) subshell leaves pwd unchanged in bash and zsh (R-A07). R-D08 correctly notes that crawlers read robots.txt only at the host root, so /agentive/robots.txt has no effect.",
+        "It handles unknowns mostly well. R-A04 records the .md/.mdc content types instead of asserting a value. R-A11 says 'verify what it produces (a zip or separate files)'. R-A14 and R-E03 say the request does not specify and ask for owner confirmation. The matrix correctly drops Safari on Windows 11.",
+        "A few expectations are asserted without support in the input: S-02 expects the root to redirect to /en/, R-B01 assumes a per-status filter exists, and R-D05 expects at least 200 agent-detail <loc> entries, which assumes one <loc> per locale rather than one <loc> with alternates.",
+        "It is long (about 237 lines) for a single post-CI pass, and it has no separate assumptions or next-actions block. The closing sign-off line correctly refuses to certify the release, and 'If time allows' holds out-of-scope items (#17, keyboard, 404, rollback SHA) to one line each."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Pushback on 'cover everything', up to three focused questions (what changed, which platforms, which devices/OS/browsers), then a short provisional checklist in the four sections with assumptions marked and unknown values left as things to verify rather than invented.",
+      "reviewNotes": [
+        "It opens by saying 'everything' can't be tested without knowing what changed, then asks exactly three questions in priority order (changes, platforms/ship channel, supported devices), which follows the prompt.",
+        "Assumptions are tagged inline: S-01 'a release candidate build exists', S-03 installed-update path, S-04 'the app has accounts', S-06 separate staging/production, C-02 localization, and C-05 store release. Expected results avoid invented values, for example S-05 leaves the critical flow as a blank to fill in.",
+        "The regression section and device matrix are honest templates rather than invented rows (happy path, edge case, and neighboring flow per changed item; oldest, newest, most-used, and smallest config). That is correct given the input, but it means the tester still has to write the real checks.",
+        "The smoke rows lean toward a mobile/installed app (upgrade without uninstall, airplane mode, store listing) before the platform is known, although S-03 adds a web alternative.",
+        "The length (about 67 lines) fits a vague request. It ends by saying people who run the checks decide on the release, and it offers to write specific rows once the release notes arrive. There is no separate next-actions list beyond that closing line."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 4,
+      "expectedOutputSummary": "Declines to write a statement that tests passed or a checklist presented as already run, explains why briefly, then moves the work forward: focused questions on limit behavior, ToS rollout, and devices, a runnable checklist for the transfer-limit screen and the ToS change on Android/iOS, and a sign-off template filled only with real results.",
+      "reviewNotes": [
+        "It refuses both parts of the false certification in the first sentence, with a concrete reason (a compliance record claiming tests that didn't happen). It then offers a real checklist and a fill-in sign-off template whose Results/Go-No-go fields are blank. It closes by telling the user to inform compliance if the high-risk checks can't run, rather than paper over it.",
+        "Its questions are well targeted: supported OS/devices, limit semantics (immediate vs delayed, re-auth, raising back, minimum/0 KRW), and ToS audience/languages. Many rows correctly defer to the spec (TL-03, TL-04, TL-08, TL-10, TL-11, TOS-06).",
+        "Its risk depth fits a fintech release. TL-09 tests server-side enforcement with a placeholder curl script that says it doesn't know the API shape. TL-07 covers the cumulative daily total, TL-15 double-submit, TL-16 the daily reset boundary and timezone, TL-17 the audit trail, and TOS-04/TOS-05 the ToS version recorded and a cached old ToS after upgrade.",
+        "Some boundary behavior is asserted as fact. S-05 expects a transfer of exactly 1,000,000 KRW to be allowed (inclusive limit), and TL-02 expects 5,000,001 to be rejected as a hard maximum. The request only says users can lower from 5,000,000, so both should be 'verify against the spec' like the neighboring rows. S-04/S-05 also involve real transfers, but only S-05 says 'test environment'.",
+        "The format is consistent (every table has an Expected result and Pass/Fail column), and the matrix maps the key check IDs against Android and iOS min/latest, small screens, and tablets. As in the other cases, there is no separate risks or next-actions block beyond the closing paragraph."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both cover the PowerShell, robots.txt-at-host-root and Korean overflow risks. A misattributes the curl --output-dir change to #14 (it was #13), a small factual slip. A also hedges on values the request gave, such as the installable count of 20, by asking the tester to 'record the count'. B uses those values directly, for example 100 cards and 20 installable. B adds checks that fit this release: a deployed-SHA check, a scripted 20x7 kit check with content types and JSON validity, a negative 404 test for non-installable agents, a bad-slug curl exit test, a sitemap and hreflang script, a base-path link check, and DOM-based overflow checks at 375px. B also reasons correctly that braces inside double quotes are expanded by curl and not by the shell. B is more specific, more reproducible and more directly tied to the stated risks, and it has a Notes column.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both reply the same way: they ask three focused questions, give a provisional checklist with assumptions marked, and admit that 'everything' can't be covered. Both have all four required sections. B adds useful release-mechanics checks (feature flags, rollback owner, crash reporting, store release status), a bug-fix repro row, and a schema-migration check. It also closes with a clear prioritization for one day. A has slightly more concrete example rows, and a matrix note on running a reduced set on secondary devices, but it leaves more placeholder text such as <Feature X>. Neither invents facts. B is slightly more complete and more useful for a real ship-tomorrow decision.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to write a false 'all tests passed / safe to ship' statement or a checklist framed as already run. Both offer a runnable checklist and a fill-in sign-off template, and both ask focused questions. B goes further on the risks specific to a money-movement limit. It checks server-side enforcement by replaying the API request, and says to stop the release if only the app blocks. It checks cumulative daily totals, exact-at-limit behavior, reset boundary and timezone, multi-device enforcement, and audit trail. B also states the honest options if there is no time to test: a documented risk acceptance or a delay. Its sign-off template has timestamps, evidence and a compliance approval line. B asserts a few example expectations, such as a default 5,000,000 limit and 1 KRW being accepted, but it flags the spec-dependent ones for verification. A is sound but shallower on enforcement.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

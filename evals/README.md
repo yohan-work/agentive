@@ -71,6 +71,14 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - The judges preferred the longer answers on the fully specified case because they covered the risks the user named in more depth: the PowerShell failure modes, `robots.txt` under a sub-path, and runnable scripts. Capping rows removed exactly that.
   - `codex-task-brief` v2 went 3–3 against the baseline and 3–2 against the current prompt (one case order-inconsistent). It did not beat both, so neither v2 was adopted.
   - Next hypothesis: require depth on every risk the request names, and cap only the extras nobody asked for.
+- **2026-09-30, depth rule (v3), adopted for both.**
+  - For `qa-checklist-agent`, v3 is v1 with the caps removed ("at most ten smoke checks", "what one tester can run") and a depth rule added: go deep on every risk, surface, and environment the request names (the failure mode, exact steps or commands, a script where possible), and keep anything unasked-for to one line.
+  - For `codex-task-brief`, v3 is the unadopted v1 candidate with its edge-case rule replaced by the same depth rule plus a one-line cap on unrequested suggestions. It was compared with the prompt the agent currently ships (`agent-7a64b4c7`), not with that candidate.
+  - Both were tested on 3 cases × 2 samples.
+  - `qa-checklist-agent` v3 beat the baseline 6–0 and v1 5–0 (one case order-inconsistent).
+  - `codex-task-brief` v3 beat the baseline 5–1 and the current prompt 5–0 (one inconsistent).
+  - For the first time a prompt beat the no-prompt baseline on the fully specified case, in both samples, for both agents. Against the current prompt it also won that case, except one order-inconsistent codex sample.
+  - The lesson for the other agents: a useful prompt tells the model where to spend depth (the user's stated risks and constraints), not how long to be or which sections to print.
 
 ## Known limits
 

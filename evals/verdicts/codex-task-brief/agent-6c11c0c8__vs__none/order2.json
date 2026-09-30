@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, acceptance checks and non-goals from the request. B labels its guesses as [ASSUMPTION]: the category/tool/verified param names, how multi-select values are encoded, and whether the clear controls already exist. B's requirements are numbered and testable, and its acceptance table maps each manual check to an expected URL, including the invalid-value and top-nav cases. A adds a lot of unrequested design: debounce, repeated-key plus comma parsing, a fallback to window.location.search, and a placeholder param table with '…' entries. A also spreads its non-goals into a recap rather than a dedicated section. A is not wrong, but it is longer and less crisp for a hand-off, and it treats guesses as instructions. B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack) and asks for something quick. A produces a generic template full of [brackets] and adds requirements the user did not ask for: three modes, persistence, a no-flash inline script, a toggle component and a new test. That is not quick, and it puts the stack questions in the middle of the brief. B first asks three focused questions, then gives a short provisional brief with every assumption marked. It scopes to OS-driven dark mode, lists explicit non-goals, and gives concrete acceptance checks such as DevTools emulation, before/after screenshots for light mode and the 4.5:1 contrast check. B handles the missing information honestly and matches the 'quick' request better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge to main and deploy, and both keep minimal payment tests. A includes accurate Toss API details (confirm, cancel, amount validation) and a useful human timeline. However, A makes the webhook part of the required scope, invents a branch name and a Thursday deadline, and asks no questions about where the Stripe code lives or which Toss integration is used. B asks three blocking questions (Stripe file paths, widget vs payment-window, treatment of existing data and billing keys). It marks its assumptions, and its acceptance checks are concrete and verifiable: prisma validate, no DROP or DELETE in the migration SQL, no secret key in the client bundle, idempotent confirm, and amount tampering rejected. B follows the criteria more closely and is more honest about unknowns, though A is somewhat richer on implementation guidance.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

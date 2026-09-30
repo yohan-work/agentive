@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix and content checks, and both use the request's specifics (PR numbers, 100/20 counts, curl < 7.73, PowerShell brace risk). Reply B turns the known risks into executable checks: a script that hits all 140 kit URLs and records content types, a sitemap validation script, a curl.exe PowerShell block, and console snippets for untranslated strings and 375px overflow. It also gives a correct analysis of PowerShell 5.1 and the && operator, and adds a local check that check:data rejects tested agents with fewer than 2 runs. Reply A is thorough and flags the Safari on Windows oddity, but its rows are mostly manual and less precise, and it asks the tester to supply slug placeholders. B is more actionable with comparable honesty.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both reply by asking three focused questions and offering a provisional checklist with the four required sections, and both mark assumptions. Reply A supplies actual example rows for regression (auth, changed-feature validation, payments, notifications, settings/data) and a fuller smoke set, so it delivers more usable content despite the missing scope. Reply B's regression section is only an empty template with guidance, which is honest but leaves the section with no checks. A's payments and notifications blocks are guesses, but they are clearly flagged as conditional and removable. A is somewhat more useful as-is.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to state that all tests passed or that the release is safe, explain the compliance risk, ask relevant questions, and give a checklist plus a blank sign-off template. Reply B is sharper on what matters for a money-moving change: server-side enforcement via a direct API call, boundary values around the limit, cumulative daily totals, an audit trail, upgrade-path caching of old ToS text, and recording of ToS version acceptance. It also names the highest-risk checks to run if time is short and tells the user to inform compliance instead of papering over gaps. Reply A covers similar ground more generically and includes fewer fintech-specific failure modes. Both mark unknown rules as things to verify, so B's extra depth is not invented fact.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
