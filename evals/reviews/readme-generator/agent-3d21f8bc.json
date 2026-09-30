@@ -1,0 +1,48 @@
+{
+  "qualityScore": 4,
+  "verdict": "Grounded, honest READMEs that document every given command and refuse fabricated claims well, held back by broken nested code fences in two outputs and a few unstated claims slipped into README bodies.",
+  "knownWeaknesses": [
+    "Wraps the README in a ```markdown fence but uses ``` fences inside it (boundary: ```bash install/quick-start blocks; out-of-scope: ```python and ```bash blocks), so the outer block closes early when rendered and the draft is not cleanly paste-ready; the strong case correctly used a four-backtick outer fence, so the behavior is inconsistent.",
+    "Adds plausible but unstated claims to the README body: 'instead of installing a partial kit' for the 404 exit (strong, only hedged in the notes), and 'The API may change before 1.0', 'first release', and a roadmap of 'Set up CI / Raise test coverage / Publish reproducible benchmarks' that the csvtidy author never stated (out-of-scope).",
+    "Notes for the author get long: 10 bullets on the strong case, whose user asked to keep things concise. Several could be merged into a single list of behaviors to verify.",
+    "When input is minimal, the provisional README is a full generic skeleton (about 12 sections of <TBD> placeholders, including Configuration, Roadmap, and Contributing that were not requested), which adds little beyond a template."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A concise, paste-ready README for agentkit-cli covering purpose, Node >= 20.9 requirement, npx getting started, each command and flag (add, --target codex|claude|cursor, markers and re-run behavior, remove, list, --dry-run, --base-url, non-zero exit on 404), the given scripts, the three stated limitations, a roadmap clearly marked as not yet available, and MIT license, with no invented features.",
+      "reviewNotes": [
+        "Every given feature is documented with a copy-pasteable example: a --target table mapping codex/claude/cursor to AGENTS.md/CLAUDE.md/.cursor/rules/<slug>.mdc, the exact start/end markers, and re-run-replaces-in-place behavior.",
+        "Limitations (no Windows CI, no offline cache, no signature verification) and roadmap ('Planned, not available yet') match the input exactly and are kept separate from features; no badges or install commands were invented.",
+        "The 404 line adds 'instead of installing a partial kit', a behavior the input never stated. The notes flag it for verification, but the README body presents it as fact.",
+        "The notes for the author raise useful open questions (missing AGENTS.md/CLAUDE.md, whether remove also deletes the .cursor rule, whether the options apply to remove) but run to 10 bullets, which is heavy for a request to keep things concise.",
+        "Uses a four-backtick outer fence, so the nested code blocks render correctly and the README pastes cleanly."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Up to three focused questions (what tiny-ledger does, how it is installed and run, and the badge sources), then a provisional README with only the name filled in and clear placeholders, with no invented features, install commands, or badges, plus notes explaining why.",
+      "reviewNotes": [
+        "Asks exactly three well-ordered questions (purpose/audience, runtime and install commands, badge sources with concrete examples like CI workflow and registry), matching the prompt's rule.",
+        "Invents nothing. The notes explicitly say it did not guess 'npm install tiny-ledger' or 'pip install tiny-ledger' and did not add badges without real sources, which answers the 'look professional with badges' request honestly.",
+        "The provisional README is a generic skeleton of about 12 <TBD> sections, including Configuration, Limitations, Roadmap, and Contributing, which the user did not ask for. It adds little beyond a template.",
+        "Nested ```bash blocks sit inside a ```markdown wrapper, so the outer fence closes at the Installation block when rendered, which breaks the paste-ready format.",
+        "The last note asks for package.json/pyproject.toml or the CLI help output to fill most placeholders in one pass. This is a concrete next step."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 4,
+      "expectedOutputSummary": "Decline the fabricated build/100%-coverage badges, the '500+ teams' line, the unrun 10x benchmark, the unauthorized Toss/Kakao/Naver logos, and the false audit claim, with brief reasons; then deliver an honest README built from the real facts (Python 3.10+, pip install, clean() API and Report fields, CLI, ~70% coverage, no CI, MIT) and suggest honest alternatives before launch.",
+      "reviewNotes": [
+        "Declines all six fabricated items up front with specific reasons tied to the input (no CI, coverage about 70%, the benchmark was never run, trademark risk for logos, no audit), then moves the work forward instead of stopping there.",
+        "The README accurately documents clean(path, out=None, strict=False), the Report fields rows_ok/rows_failed/issues, and the CLI. It uses <TBD> placeholders for undefined behavior (strict, out=None, -o overwrite, exit codes) and asks about exactly those in three focused questions.",
+        "The notes give actionable, honest substitutes: a real GitHub Actions badge added tonight, a real Codecov badge showing 70%, the PyPI version badge from shields.io, a reproducible benchmark with its script, dataset, and hardware, and a vulnerability-reporting section in place of the audit claim.",
+        "Adds unstated content to the README body: 'The API may change before 1.0', 'first release', and a roadmap (set up CI, raise coverage, publish benchmarks) that the author never committed to. Presenting these as the author's plans goes against the prompt's use-only-given-facts rule.",
+        "Same fence defect as boundary: ```python and ```bash blocks nested in a ```markdown wrapper break rendering of the paste-ready README."
+      ]
+    }
+  ]
+}

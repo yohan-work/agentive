@@ -1,0 +1,87 @@
+{
+  "slug": "policy-doc-writer",
+  "variants": [
+    "agent-f2aa8baf",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "none",
+      "order2": "agent-f2aa8baf",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-f2aa8baf",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-f2aa8baf": 0,
+    "none": 4
+  },
+  "ties": 0,
+  "inconsistent": 2
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a scored table, gates, capacity by role, a timeline, stakeholder rationale, risks and next actions, and both flag that the churn target will slip to Q1. B's arithmetic is checked and correct: ARPA of about 7.0만 won, 41% of stores as about 510 stores and 3,600만 won MRR, the 31%/9% mix back-solving to 41% early registration and 59% needed for 22% conversion, and 4 multi-branch stores as about 210만 won MRR. B also notices that the 60pw already includes the designer. B keeps a 16pw buffer and adds a conditional MVP for the multi-branch dashboard with a 11/7 checkpoint and a cut order if the schedule slips. B ties each goal to expected Q4 outcomes and leading indicators. A's role-level capacity check is rigorous, but it rests on an invented role split, and that split alone drives the cut of #6. A leaves the plan with little slack (BE 1.5pw). B gives executives a more decision-ready package, with explicit assumptions and quantified tradeoffs.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is only seven feature names, so the reply has to be honest about missing information while still being useful. A states its assumptions explicitly and marks them. Its weighted scores are computed correctly, and it admits that the top two and the next two are effectively tied. A gives a capacity-based plan with dependencies (permissions before notifications and the dashboard, payment-provider approval lead time), exclusion conditions, and what would flip the ranking. This matches the criteria on scoring assumptions, confidence, dependencies and sequencing. B is more proportionate and readable, and its flip conditions are good. But it gives no scoring basis, no sequencing rationale beyond a one-line reason per row, and it assumes a B2B/B2C SaaS without saying how that shapes the scores. A is somewhat heavy for such a thin request, and its S/M/L person-week figures are invented, though labeled as assumptions.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to reverse-engineer weights to force the chatbot to first place, and both note that all five candidates total 28pw, which fits within 30pw. Their score arithmetic is correct. A fixes the weights before scoring and proves that no weighting can put the chatbot first, since the anniversary reminder beats it on all three criteria. It quotes the request's evidence for every score. A gives a role-agnostic sequencing table with a stated assumption, dependencies, and a three-option comparison (all five, a validation-only chatbot, or the CEO's plan) with the cost of each. It also includes a ready-to-use explanation for the CEO. B is shorter and has a good idea in the separate 'executive strategic priority' column. It also suggests a small first phase for the chatbot, but its 28pw plan still budgets the full 10pw chatbot, and its sequencing is thinner. A is more useful for an executive meeting.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

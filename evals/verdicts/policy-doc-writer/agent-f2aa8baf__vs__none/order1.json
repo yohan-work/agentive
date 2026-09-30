@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies respect all six agreed rules, name the four approved tools correctly, and give support and sales examples, an exceptions section, escalation to security@relaymint.io within 24 hours, enforcement, and an owner checklist. A opens with questions and pads the policy with [TBD]/[ASSUMPTION] markers, some of which are unnecessary. It also states Rules 2 and 4 as having 'no exceptions', an assumption that goes beyond the brief, though it flags it. B is easier for non-engineers to act on: it has a TL;DR, a redaction example, per-team allowed/not-allowed tables, and a one-page cheat sheet. Its review checklist is more concrete, covering DPAs, Cursor privacy mode at org level, and exception logs. B also raises useful gaps: contractors' seats, AI features inside the helpdesk or CRM, translation tools, and Japan's APPI. B's promise that reporting won't get anyone in trouble is a small invention. Overall B is slightly more useful as-is.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a short policy of one page at most that covers everything. A front-loads three questions and a conflicts discussion. Its policy is riddled with [TBD] fields, including the approved tools, the definition of confidential, the exception approver, the reporting deadline and enforcement. It is followed by examples, edge cases, owner notes and optional additions, so it is far from one page and hard to use. B names the tension between the two goals in a single paragraph and then delivers a genuine one-page policy. The policy has an approved-tools stance, a public/internal/confidential/restricted data table, responsibilities, reporting, enforcement and a short rollout checklist, so it is usable after filling a few brackets. B has no explicit exceptions section, only a route to request a new tool, and A labels the requested sections more literally. B's fit to the length constraint and its actionable data table outweigh that.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to write the false 'GDPR fully compliant and law-firm reviewed' line, explain why, and treat health data as sensitive information requiring separate consent. A is very honest but leaves most of the policy as [TBD] (purposes, retention handling, cross-border details, safeguards, DPO, effective date). That makes it hard to publish by Monday, and the user's deadline is explicit. B delivers a nearly complete, legally structured Korean policy. It covers Article 23 sensitive information, the Article 28-8 cross-border disclosure table, retention under the e-commerce law and the 3-month log rule, the 14-under choice, rights, redress bodies and change notice. Its inline brackets flag facts to verify, and its pre-publication checklist targets real risks such as the missing consent screen, health data leaking into analytics events, and the Google Fit to Health Connect migration. B does assert a few unverified facts in the body, such as no advertising use and encryption, but flags most of them. Its usefulness for the Monday deadline outweighs this.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

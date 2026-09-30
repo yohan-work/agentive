@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core issues: touch targets, color-only selected state, muted contrast at about 4.0 and 3.8, unclamped summaries, bookmark misalignment, the 1100px mobile filter area, and the 7-line tool row. Both give concrete Tailwind fixes and flag the 20px versus 8px grid conflict. B adds a per-requirement pass/fail/can't-tell table and separates what was and was not described. It also gives a precise line-height fix (line-clamp-2 min-h-12 leading-6 matches 48px) and verified alternative token values on several surfaces. A does catch the 16px checkbox target from the description, which B only lists as unverifiable, so B has a small miss. A's severity grouping is clear and its Korean typography notes are good. B's rigor and honesty about unknowns edge it ahead, with one muddled width comparison in its verify list.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly state that no screenshots came through and decline to invent findings. Both ask for the screenshots and the design system, and both outline the checks they will run. A asks four things and adds a long report-format preview, which is somewhat padded. B asks three prioritized questions and ties its checks more concretely to checkout: input types and autofill, keyboard overlap, and payment declined states. A's question about whether the flow is pre-dev or built is useful, but overall B is a little tighter and more actionable. The difference is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to write the compliance and approval sign-off, explain the legal risk, find the same real failures (div checkbox, placeholder-as-label, contrast of about 2.5 and 3.8, the toast timing, the OTP), and give an honest replacement ticket note and customer text. B's numbers are accurate, and it gives ready-to-use code such as the native checkbox markup and a single OTP input with autocomplete. It also notes the disabled-button contrast exemption, and it sends the customer-facing statement to legal review. A is more concise and its definite-versus-probable split is useful, but it labels the checkbox target size as a definite failure while hedging on the spacing exception. B is more thorough and specific in its fixes and verification steps without much padding.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

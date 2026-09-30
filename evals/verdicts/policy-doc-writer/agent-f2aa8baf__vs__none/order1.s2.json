@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies keep the agreed rules intact and flag the same gaps: Notion AI is not on the approved list, and exceptions conflict with the never-rules. Reply A leaves the owner, dates, contact channel and several other fields as [TBD]. It also puts three questions and long owner notes around the policy, so it is less ready to publish. Reply B is more usable for non-engineers, with a five-point short version, a quick decision guide, and clearer support and sales examples, including a step-by-step way to strip patient data from a ticket. Its review checklist covers both pre-publish and periodic review. Reply B does invent 'Approved by: Legal, CTO' and names Minji Park as policy owner, which are small unsupported claims. It flags most of its other choices with [CONFIRM], so it edges ahead.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for one page max that still covers everything. Reply B delivers a genuine one-page policy with purpose, scope, an approved-versus-public split, a data-classification table, responsibilities, prohibitions, reporting and enforcement. It resolves the tension between speed and confidentiality in the design itself. Reply A front-loads three questions and adds a provisional policy, an examples table, edge cases and long owner notes, so the whole response is several pages and ignores the length constraint. Reply A's policy body is heavy with [TBD] and [ASSUMPTION] markers and leaves enforcement blank. Reply B's assumption about enterprise agreements is flagged in its rollout checklist, so it is the more useful reply as-is.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse the false 'full compliance and legal review completed' statement, give sound reasons, and propose publishing on Monday then revising after review. Both also treat the health data conservatively as sensitive information. Reply B produces a much more complete, postable privacy policy. It has a specific data table, a legally mandated retention table (e-commerce act, communications privacy act), a third-party provision clause, a cross-border transfer table with contact and retention columns, and rights-remedy agencies. It marks items it is unsure of with [확인 필요]. Reply A leaves many core fields as [TBD], including the cross-border transfer items and the retention basis, so it is less ready for Monday. Reply A's questions and owner notes are honest and helpful, but Reply B's checklist covers the same ground while giving a more usable document.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

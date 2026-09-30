@@ -1,0 +1,87 @@
+{
+  "slug": "design-qa-agent",
+  "variants": [
+    "agent-f9596652",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-f9596652",
+      "order2": "agent-f9596652",
+      "result": "agent-f9596652"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "none",
+      "order2": "agent-f9596652",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-f9596652",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-f9596652",
+      "order2": "agent-f9596652",
+      "result": "agent-f9596652"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-f9596652",
+      "order2": "agent-f9596652",
+      "result": "agent-f9596652"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-f9596652",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "agent-f9596652"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "none",
+        "agent-f9596652"
+      ],
+      "samplesAgree": false
+    }
+  ],
+  "wins": {
+    "agent-f9596652": 3,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 2
+}

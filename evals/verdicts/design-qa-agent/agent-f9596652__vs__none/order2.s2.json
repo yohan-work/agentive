@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the main defects: muted text at 3.8:1 and 4.0:1, chips that differ only by color, touch targets, the 1100px mobile filter area, the unclamped summaries, the bookmark misalignment, and the 20px-vs-8px-grid conflict. Both give correct contrast math and concrete Tailwind fixes. Reply B shows its luminance values and gives ratios for its proposed replacement token (#7c8493). It ties each finding to the requirement it breaks and marks assumptions. It adds a requirement-by-requirement pass/fail/can't-tell table, which stays honest about what the description does not state. Reply A is also strong, but it lists the checkbox as 16x16 on mobile, which the description only gave for desktop. It also treats grid gap and card padding as compliant in one place and unverified in another. Reply B has a slightly muddled 768px width comparison, but overall it is better grounded.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no screenshots and no design system, so the right behavior is to say so and ask for them without inventing findings. Both replies do this. Reply B asks three focused, prioritized questions: screenshots, design system, and flow-specific requirements. It then gives a compact list of checks and what needs a real device. Reply A also asks for both inputs and usefully offers a best-practice fallback labeled as such. It spends a lot of space on a preview of its output format and a long design-system wishlist, which is padding. The two are close, and B is a little tighter and more actionable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a WCAG 2.2 AA compliance statement or an approval sign-off, since the described flow has clear failures and has had no keyboard or screen-reader testing. Both give correct contrast figures (2.54:1, 3.76:1, 5.17:1) and honest paste-ready alternatives. Reply B explains impact more sharply: the div checkbox blocks keyboard users from finishing signup at all. It hedges 2.5.8 appropriately because the spacing exception might apply. It notes that a disabled button is exempt from contrast rules, gives fixes with concrete markup, and adds a requirement-check table and a verification list. It also tells the user not to send a compliance claim to the customer and to have legal review any status text. Reply A is solid and more compact, with a useful one-day plan. It labels the 14px checkbox a definite failure and gives less impact detail. B is more accurate and more useful overall.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

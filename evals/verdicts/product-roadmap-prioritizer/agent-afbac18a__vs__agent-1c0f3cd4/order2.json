@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give scoring rules, capacity checks, sequencing, stakeholder rationale and risks, and both hold up on the numbers I checked. Reply A is cleaner to paste into an executive review. It also gives a candid churn forecast (2.6-2.7% in December, 2.3% by February) and flags its 40-50% dunning recovery rate as unverified. Reply B is more rigorous on grounding and confidence. It quotes the request's evidence for each item and grades confidence per item (correlation vs. causation). It adjusts the 60pw capacity for holidays and the designer's leave, checks load per role (mobile at 98%) and runs a weight-sensitivity check. It also converts the stakes into concrete figures: about 508 stores and about 35.6M KRW MRR at risk from the POS change, and about 2.1M KRW/month for the four multi-branch accounts. Its stakeholder sections state what each excluded request would cost (the CEO's 12pw would displace the order-recommendation work, for example), which is what the request asked for. Its upfront questions and a few labeled assumptions (a December freeze, a plan ending 12/24 instead of 12/26) slightly reduce paste-readiness, but it labels them honestly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives only a feature list, so the right reply is honest about missing goal, capacity and data while still delivering something usable. Reply A asks three good questions, states assumptions and gives a sensible Now/Next/Later split with sensible risks. It rates impact and urgency only qualitatively and gives no confidence levels or sequencing beyond the buckets. Reply B asks equally good questions and marks every score, weight and effort estimate as an assumption. It states that confidence is low everywhere and that no evidence was supplied. It shows a worked score calculation and a capacity example, and it lays out a week-by-week order with a PG-contract lead-time rationale. It also lists exclusions with re-entry conditions and shows how the ranking changes under different goals. That covers the required assumptions, confidence, dependencies and sequencing much more fully. B is longer than the input strictly warrants, but the extra content is substantive and it invents no facts. A's B2B-leaning ranking is reasonable but rests on more unlabeled inference.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to rig the weights and offer honest alternatives (a narrower chatbot scope tied to the delivery-inquiry data, or a separately labeled strategic bet). Both compute their scores correctly. In Reply A the plan table lists 3+5+8+4 plus a 6pw buffer and a held 2pw item, which sums to 28 rather than 30. Its 4pw chatbot pilot is an estimate it flags as needing team confirmation. Reply B lays out its weights and per-criterion scores, and its weights are set from the goal before the results. It also points out that the chatbot scores at or below the reminder on every criterion, so no weighting can make it first, which is true and a strong argument for the executive. It gives a capacity table, weekly sequencing, dependencies (each marked as an assumption) and a cut list with re-entry conditions. It quantifies what a chatbot-first order would cost (a 4-5 week delay to the other items) and adds a decision gate at week 7. Its 13-week, two-stream schedule is a bit tight for a 10pw chatbot, but it says so. B is more complete on the tradeoffs and confidence, while A's plan is tidier but less rigorous.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies compute contrast correctly from the hex values and find the main issues: touch targets, color-only chip state, muted text below 4.5:1, unclamped summaries, the bookmark misaligned by wrapping badges, the 7-line tool group, the tall mobile filters, and Korean keep-all. B also flags the 16px checkbox as a touch-target failure, where A only lists it under verify. B notes that the selected and unselected chip backgrounds differ by only about 1.1:1, and it adds useful accessibility findings such as the repeated 'View agent' link text and the aria-live result count. A has a helpful requirement-check table and an honest verify list, but some of its 768px width arithmetic is muddled. B's ordered next actions and its call to fix the chip size and the mobile filter drawer together make it slightly easier to act on.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly say that no screenshots came through and decline to invent findings. Both ask for the screenshots and the design system reference. A adds a question about flow-specific requirements and lists the checks it will run in some detail. B asks for labelled screenshots, the states captured, and whether this is a pre-dev design or a built implementation. It also asks for accessibility targets and known WIP areas, then gives a compact report outline. The two are close in quality. B's questions are a little more targeted and its preview is a bit tighter, so I give it a very slight edge.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to write the compliance statement or the approval sign-off, and both give honest replacement text for the ticket and the customer. The contrast numbers in both are correct (2.54:1, 3.76:1, 5.17:1). A gives concrete, copy-ready fixes for each issue: native checkbox markup, label markup, new color tokens with ratios, and a single one-time-code input. It also covers the WCAG criteria more fully, including 3.3.8, 2.5.8, 4.1.3, and the point that disabled buttons are exempt from contrast. Its verify list is specific, and it suggests a tenant-only launch. B is accurate and well organised, but its fixes are more summary-level, and it does not state the exact conformance criteria for the disabled button or the timer as clearly. A better meets the criterion of concrete fixes.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

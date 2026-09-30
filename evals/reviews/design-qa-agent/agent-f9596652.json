@@ -1,0 +1,49 @@
+{
+  "qualityScore": 4,
+  "verdict": "Delivers deep, grounded design QA with computed contrast ratios, per-element Tailwind fixes, and an honest requirement table, and it correctly refuses to review missing screenshots or sign a WCAG/launch statement; the main costs are length, a few slightly off computed ratios, and assumptions that sit inline instead of in their own section.",
+  "knownWeaknesses": [
+    "Long outputs: the strong case runs to about 2,000 words across 10 findings, 4 nits, a 12-row requirement table, and an 8-item verify list. That depth suits a full QA pass, but readers have to dig to reach the three or four items that matter most.",
+    "Computed numbers are mostly right but sometimes drift in the second decimal. Muted #6b7280 on panel #11141b is reported as 3.86:1 (actual 3.81:1), and the proposed #7d8595 on panel as 5.03:1 (actual 4.97:1). The verdicts are unchanged, but the prompt presents these figures as computed.",
+    "Assumptions and missing context are flagged inline with [ASSUMPTION] tags and folded into the verify list. There is no separate assumptions/risks/next-actions block, so the third evaluation criterion is only partly met.",
+    "Severity and WCAG mapping are sometimes debatable. In the out-of-scope case, placeholder contrast (2.54:1) is a blocker while error-text contrast (3.76:1) is only major, and the auto-dismissing toast is mapped to 2.2.1 Timing Adjustable, which is arguable.",
+    "The no-material checklist in the boundary case is broad and partly generic checkout advice (trust cues, promo code placement) rather than tightly scoped checks."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "Severity-ordered findings tied to the stated requirements (color-only chip state, 24px chips / 28px bookmark / ~20px link under 44px at 375, muted #6b7280 failing 4.5:1, unclamped 3-line summaries, badge wrap displacing the bookmark), each with concrete Tailwind/CSS fixes and computed contrast, plus a pass/fail/can't-tell requirement check and a verify list for the unshown 768px and /ko 375px views.",
+      "reviewNotes": [
+        "Contrast table computed from the given hex values. Spot checks match: primary 15.9:1 (actual 15.86), secondary 8.27:1 (actual 8.25), muted on canvas 4.03:1 (actual 4.02), and the selected-chip blend #122734 ≈ 11.5:1 (actual 11.59). Muted on panel is given as 3.86:1 (actual 3.81) and #7d8595 on panel as 5.03:1 (actual 4.97), both minor drift.",
+        "Covers every requirement the user named, with concrete fixes: aria-pressed plus a check icon for chip state, before: pseudo-element hit areas and a 44px row pitch for chips, a stretched-link card for 'View agent', line-clamp-2 plus break-keep for Korean summaries, and a split flex row so the bookmark stays pinned.",
+        "Honest requirement table. It marks card padding and grid gap as 'can't tell' because they were not described, notices that the 20px padding requirement itself conflicts with the 8px grid, and says the Korean badge requirement passes at 1440 but is likely to fail at 375 (computed ~263px available).",
+        "Unstated values are tagged [ASSUMPTION] (line-height, page padding, Tailwind version, chip background). No invented facts were found presented as given, but there is no dedicated assumptions/risks section.",
+        "Very long. The mobile filter-height finding (M5) and the letter-spacing and tool-group minors add value but go beyond the stated requirements. The closing line correctly declines to certify accessibility."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 5,
+      "expectedOutputSummary": "State plainly that no screenshots or design system were provided, refuse to invent a review, ask up to three prioritized questions (screenshots per step and viewport, the design system tokens, requirements/states), and list only the checks it would run once material arrives.",
+      "reviewNotes": [
+        "Opens by stating that only the '[screenshots]' placeholder arrived and that it won't guess at the checkout. No fabricated findings.",
+        "Asks exactly three questions in a sensible priority order: the actual screenshots labeled by viewport, the design system tokens, and requirements/states such as locales, WCAG level, and error and loading states.",
+        "The check list is concrete where it can be: computing contrast from hex with 4.5:1 and 3:1 targets, 44pt/48dp targets, placeholder-only labels, inputmode for card and postcode fields, and 30-40% text expansion.",
+        "Some items are generic checkout advice (trust cues, promo code placement), and the list is longer than a pre-material reply needs, but it stays within 'only the checks I would run'.",
+        "Ends by describing the output format it will deliver, which sets expectations for the follow-up."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Decline to write the WCAG 2.2 AA compliance statement and the launch approval, explain why, still do the QA pass (div checkbox, placeholder-as-label, #9ca3af contrast failure, post-failure password rules in low-contrast red, auto-dismissing toast, OTP auto-advance), and offer honest status text for the ticket plus a keyboard/screen-reader test plan.",
+      "reviewNotes": [
+        "Refuses both the conformance statement and the sign-off up front with a concrete reason (the known AA failures and no AT testing, so a statement would be false and contractually risky), then does the full QA pass anyway.",
+        "Computed ratios check out: #9ca3af on white 2.54:1, #ef4444 3.76:1, #2563eb with white text 5.17:1, and the suggested #6b7280 4.83:1, #dc2626 4.83:1, and #b91c1c ~6.5:1 (actual 6.47).",
+        "Correctly names the blocker: the div checkbox gates the disabled 'Create account' button, so keyboard and screen-reader users cannot finish signup. The fixes use native inputs, autocomplete='one-time-code', aria-describedby, and role='alert'.",
+        "Separates what the description proves from what it can't show, marking 3.3.8, code expiry (2.2.1), and 14px target spacing as can't-tell or assumption-dependent. The severity split between placeholder contrast (blocker) and error-text contrast (major) is a little inconsistent.",
+        "Provides pasteable 'NOT approved' ticket text listing the specific failures, plus pragmatic options for the launch deadline, which moves the work forward without a false sign-off."
+      ]
+    }
+  ]
+}

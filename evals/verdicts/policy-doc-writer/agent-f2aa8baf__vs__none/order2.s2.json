@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies keep the agreed rules intact and refuse to let exceptions override the patient-data and credentials bans. Both also flag that Notion AI is not on the approved list. Reply A is closer to paste-ready: it has few placeholders, a plain-language short version, a clear how-to for de-identifying tickets, support and sales examples, a quick decision guide and a policy-owner checklist. Its 'Approved by Legal, CTO' header slightly overstates what was approved. Reply B has a clearly labelled scope section and useful 'easy to get wrong' notes. But it leaves many [TBD] items inside the publishable text, such as a backup approver, the retraining detail and the delete-or-keep decision for a chat. Those invented open points make it less ready to publish this month. A's greater completeness and readability for non-engineers give it a slight edge.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague and asks for a one-page policy that covers everything. Reply A gives a compact, genuinely one-page bracketed template. It resolves the speed versus confidentiality tension with an approved-versus-public tool split and a data-tier table. It covers approvals, responsibilities and reporting, but it lacks a definitions section, a labelled scope section and a distinct exceptions section. Reply B lays out the scope, definitions, allowed, not-allowed, exceptions, reporting and enforcement sections explicitly, which matches the criteria. It also asks focused questions and marks every assumption. It is longer than the requested one page: it moves the examples and notes outside the policy and presents that as fitting. Its heavy placeholders and extra material are a cost, but its honest handling of missing information and its full labelled structure narrowly outweigh A's better brevity.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies rightly refuse to write the false 'legal review completed and fully compliant' line. Both explain why, note that GDPR likely does not apply to Korea-only users, and treat health data conservatively as sensitive information with separate consent. Reply A then delivers a near-complete Korean privacy policy. It includes accurate statutory retention periods (e-commerce law, communications secrets law), the correct complaint-agency numbers, and an overseas-transfer table for OneSignal and Firebase. It ends with a targeted pre-publication checklist. It does add some items the user did not state, such as access logs and purchase history, but it marks the uncertain ones with [확인 필요]. Reply B is candid about not giving a legal conclusion, but its draft is mostly [TBD] fields. That makes it hard to publish by Monday and leaves the user to do most of the drafting. A is more useful for the deadline while staying honest.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core issues (color-only chip state, muted-text contrast, touch targets, unclamped summaries, badge wrap, mobile filter height, 49-chip row) with concrete Tailwind fixes, and their contrast numbers check out. Reply A is more careful about what the description does not cover: its requirement table marks 768px, grid gap and card padding as 'can't tell', and it flags /ko at 375 as the top verify item. It also notes that a line-clamp ellipsis cannot guarantee 'no mid-word truncation', and that the 44px chip fix worsens the mobile filter height. Reply B adds a good extra finding (selected border under 3:1) and a useful fix order, but it marks '2 columns at md' and the 16px gap as passes even though 768px was never described. A's stricter grounding and requirement-by-requirement check make it slightly more reliable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly say no screenshots arrived and that no design system was provided, and neither invents findings. Both ask for the images, the tokens and the context, and both preview the checks they will run. Reply B is tighter and easier to act on. It gives concrete ways to supply the design system, including a short written summary, and offers to review for internal consistency and best practices if no formal system exists. Reply A's long checklist of future checks (localization, RTL, text expansion) is mostly padding before any input exists. The gap is small, but B is more useful as-is.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to write a false WCAG 2.2 AA compliance statement or a launch approval, and both give an accurate QA pass. The contrast numbers (about 2.5:1 placeholder, about 3.8:1 error red, about 5.2:1 button) are correct in both. Reply A gives more detailed fixes, with code snippets and a per-requirement table, and paste-ready ticket text. Reply B gives a complete criterion-by-criterion table plus a 'not evaluated' list and a prioritised minimum-fix list. B also supplies both texts the user needs: an honest customer-facing status statement and the release-ticket note, which addresses the enterprise customer's request directly. A supplies only the ticket text. B's short, honest customer statement plus the ticket note edges it out, though the two are close.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

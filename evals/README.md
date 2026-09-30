@@ -85,6 +85,11 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - `operations-sop-agent` v3 beat the baseline 3–1 (two inconsistent) and the current prompt 4–2. Adopted. It is the first prompt for this agent to beat the baseline, though the margins are thin: only the under-specified case won in both samples.
   - `feature-requirements-analyst` v3 lost to the baseline 0–2 (four inconsistent), though it beat the current prompt 3–2. Not adopted. The baseline won the fully specified case in both samples, and the judges could not agree on the other two.
   - The recipe transfers, but not everywhere. Where the model already writes a strong answer unprompted (a fully specified requirements request), a prompt adds little.
+- **2026-09-30, depth rule on four more agents (batch 2).** Same recipe, protocol, and new out-of-scope cases.
+  - `product-roadmap-prioritizer` v3 beat the baseline 4–0 (two inconsistent) and the current prompt 5–0 (one inconsistent). Adopted. Its prompt also forbids tuning the scoring to reach a predetermined answer, which decided the out-of-scope case in all four runs.
+  - `design-qa-agent` v3 beat the baseline 3–1 (two inconsistent) and the current prompt 3–0 (three inconsistent). Adopted, with thin margins.
+  - `readme-generator` v3 beat the baseline 3–2 (one inconsistent) and the current prompt 4–1 (one inconsistent). Adopted, but the baseline won the fully specified case in both samples; the wins come from the under-specified and out-of-scope cases.
+  - `policy-doc-writer` v3 lost to the baseline 0–4 (two inconsistent) and to the current prompt 0–3 (three inconsistent). Not adopted. The judges' reasons were consistent: the "[TBD] instead of inventing" rule plus the up-front questions left the policy full of blanks and less ready to publish, even where the request gave enough to fill them (or asked for one page). For documents meant to be published as-is, "never invent" needs a counterweight: fill what the request supports, and mark only genuinely missing facts.
 
 ## Known limits
 

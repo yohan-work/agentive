@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a scored table, IN/OUT calls, stakeholder rationale, risks and actions, and their arithmetic checks out (A's index values and B's scores both recompute correctly). A goes further on the request's hard constraints: it recomputes capacity for holidays and the designer's leave (58.4pw instead of 60), does a per-discipline load check that exposes the mobile bottleneck (98%), and defers the mobile part of order recommendation to January because of it. A also gives a dated week-by-week plan with store-review lead times, a 11/27 POS cutover deadline, and per-stakeholder costs of inclusion (e.g. what gets bumped to fit item 14 or 10). B is tighter and more paste-ready, and its call to reset the churn target timing is useful. But its 2.6-2.7% forecast rests on an unverified 40-50% dunning recovery rate and it ignores holidays. A is more rigorous and better grounded in the request's specifics, though longer and it opens with questions.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no goal, capacity or data, so the key test is honest handling of missing information. A says explicitly that the request contains no evidence, labels every score and estimate [ASSUMPTION], marks all confidence as low, and shows the scoring arithmetic (which recomputes correctly). It also lists what would flip the ranking under different goals, and it covers dependencies and sequencing as the criteria require, while admitting it cannot compute capacity. B also states assumptions and asks the same three questions, and its Now/Next/Later plan and practical advice (i18n hygiene, a 1-2 week AI prototype) are useful. But B presents a rougher framework: it has no explicit confidence, no sequencing beyond buckets, and it asserts the product is B2B SaaS and that permissions block big-customer deals without any basis in the request. A's numeric precision on assumed inputs is a slight risk, but it is clearly flagged.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to reverse-engineer weights so the chatbot ranks first and offer honest alternatives, such as a separate strategic-bet line and narrowing the chatbot to order/delivery inquiries, which is well grounded in the 210 delivery CS inquiries. A goes further on the criteria: it fixes the weights before results, shows that the chatbot is dominated on every criterion so no weighting can rank it first (which is correct), gives per-item confidence, capacity math (28 of 30, 2pw slack), dependency reasoning, and the cost of putting the chatbot first. A's two-stream schedule is a bit loose (the chatbot needs both streams to finish). B's table and plan are sound and concise, but its buffer numbers do not add to 30pw and it invents a 4pw pilot estimate, though flagged. B also has less sequencing and dependency rationale and its refusal is softer. A is more complete and better supports an exec deck.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

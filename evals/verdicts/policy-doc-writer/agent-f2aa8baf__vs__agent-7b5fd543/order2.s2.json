@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Reply A gives a complete, publishable policy that follows all six agreed rules faithfully. It has definitions, scope, exceptions with the 90-day limit, a 24-hour escalation path, and enforcement. It includes concrete support-ticket and sales-email examples of allowed and not-allowed use, a quick decision guide, and a policy-owner review checklist. Its assumptions (Notion AI not approved, exceptions cannot cover patient data) are flagged inline with [Confirm] and repeated in an appendix. Reply B is also correct and flags the same conflicts, but it opens with questions, and it leaves many [TBD] holes for things the request already settled or that could be reasonable defaults. That makes it less ready to publish this month. B's examples and 'easy to get wrong' notes are good, but A is more complete and more actionable.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user wanted a short, one-page policy that covers everything, with no long preamble. Reply B's policy section explicitly labels Scope, Definitions, What is allowed, What is not allowed, Exceptions, and Reporting, which matches what a good reply must achieve. It resolves the speed-versus-confidentiality tension with a stated default (confidentiality wins when in doubt). Reply A is more compact and has a useful data-classification table, and its risk note that 'never leaves the company' is not literally true with a cloud vendor is sharp. However, A has no exceptions section and no explicit scope or definitions labels, and it invents a four-level classification scheme. B front-loads questions and adds long examples and owner notes, which cuts against 'short', but its core policy is the more complete one. The margin is slight.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write the false 'fully compliant, law firm reviewed' sentence and explain why, and both treat health data conservatively as sensitive information. Reply A goes further toward what the user needs for a Monday launch. It gives a nearly complete Korean-law-structured policy with a concrete retention schedule, the cross-border transfer table, the legal statutory retention periods (conditionally bracketed), and a safe replacement sentence. It also gives a sharp risk list, including that the consent screen and the existing 80k users' consent must match the policy, and a timeline. It cites PIPA Article 23 correctly. A has small unflagged assertions, such as the company not using health data for ads, but it tells the user to keep only measures actually in place. Reply B is honest but leaves the policy riddled with [TBD] items, so it cannot be published Monday without substantial work.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

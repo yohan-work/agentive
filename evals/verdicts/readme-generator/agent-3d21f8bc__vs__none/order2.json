@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both READMEs cover purpose, usage, scripts, limitations and roadmap accurately from the brief. A is tighter, which fits the request to keep it concise, and its usage list and options table are easy to scan. A adds a global install (`npm install -g agentkit-cli`) that the author never gave, which is a small invention. B is much longer, with per-command sections and a long notes block. B also asserts that a 404 avoids installing a partial kit and includes an invented example mirror URL, though it flags both as assumptions. Neither has a serious error, so A's concision gives it a slight edge.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives only a project name, so both replies correctly avoid inventing facts and use placeholders. A supplies working shields.io badge patterns with owner and package placeholders, a table of contents, install options and a follow-up list of what it needs. That directly serves the request for badges, install instructions and features. B asks its questions first and includes Limitations and Roadmap sections, but its badges are a single TBD line, so it delivers less of what was asked. A's badge patterns assume npm and GitHub Actions, but it says so and tells the user how to adjust them. A is slightly more useful as-is.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse the fabricated badges, the '500+ teams' claim, the benchmark, the logos and the audit claim, and both suggest honest alternatives. A then adds details the user never supplied. It lists delimiters (pipe and others) and EUC-KR handling, and says the library makes no network requests and does not execute file contents. It also promises to acknowledge security reports 'within a few days' and gives `pip install -e \".[dev]\"`. It describes strict mode and `out=None` behaviour as fact, with TODO comments. Those are invented claims in a README meant to be accurate. B keeps to the given facts, marks unknowns as TBD and asks focused questions on strict, out=None and exit codes. It also states the honest limitations: no CI, about 70% coverage, no benchmarks. B is clearly more accurate and honest.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

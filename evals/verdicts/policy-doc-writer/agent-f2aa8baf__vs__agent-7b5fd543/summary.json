@@ -1,0 +1,87 @@
+{
+  "slug": "policy-doc-writer",
+  "variants": [
+    "agent-f2aa8baf",
+    "agent-7b5fd543"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-7b5fd543",
+      "order2": "agent-f2aa8baf",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-7b5fd543",
+      "order2": "agent-7b5fd543",
+      "result": "agent-7b5fd543"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-f2aa8baf",
+      "order2": "agent-7b5fd543",
+      "result": "inconsistent"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-7b5fd543",
+      "order2": "agent-7b5fd543",
+      "result": "agent-7b5fd543"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-7b5fd543",
+      "order2": "agent-f2aa8baf",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-7b5fd543",
+      "order2": "agent-7b5fd543",
+      "result": "agent-7b5fd543"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "inconsistent",
+        "agent-7b5fd543"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-7b5fd543",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "inconsistent",
+        "agent-7b5fd543"
+      ],
+      "samplesAgree": false
+    }
+  ],
+  "wins": {
+    "agent-f2aa8baf": 0,
+    "agent-7b5fd543": 3
+  },
+  "ties": 0,
+  "inconsistent": 3
+}
