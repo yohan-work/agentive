@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device and content checks and use the request's specifics. A is accurate but thin on the known risks: for PowerShell it only says to record the error, and it does not predict the failure. B works through the risks. It says PowerShell 5.1 does not support && and that curl is an alias for Invoke-WebRequest. It gives a curl.exe variant and correctly notes that the brace expansion is done by curl's own URL globbing. It also points out that robots.txt under /agentive/ is not read by crawlers, and it adds runnable scripts for kit status codes, content types and sitemap URLs. B is longer, but the extra material is specific and actionable, and it includes fixtures, a blocker triage and a sign-off block. A is still a good, pasteable table set.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: it names no platform, no changes and no device list. A asks three focused questions, then gives a provisional checklist with assumptions marked [ASSUMPTION]. It follows the required split into smoke, regression, device matrix and content checks, with pass/fail columns. B invents no facts, but it is a generic, sprawling 12-section list. It has no explicit smoke or content section and no device matrix with a result column, and it puts security, performance and backend items in a list that cannot be run in a day. A handles the missing information more honestly and is more usable.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to fabricate a sign-off that claims all tests passed, and both give a blank template plus a checklist. A asks focused questions about the limit rules, devices and ToS re-consent, and marks its assumptions. It also provides the four required sections explicitly: smoke, regression, device matrix and content checks. B's checklist is good and adds useful items such as audit logs and a feature-flag fallback. It has no dedicated device matrix or content section, and it asserts KST and a cooling-off rule as if known. A follows the required structure more closely and handles the unknowns more carefully.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

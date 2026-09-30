@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device, and content checks and use pass/fail tables. Reply A covers every listed risk in far more depth. It tests all 20 kits and 7 files with content types, adds a PowerShell 5.1 versus 7 analysis (`&&` parse error, the `curl` alias, and the `( cd )` idiom), and gives a working PowerShell variant. It also has a 375px-specific mobile section and sitemap/hreflang checks, and it notes that robots.txt only takes effect at the host root under /agentive/. Those details are correct and specific to the request. A is long and includes a few speculative rows such as Search Console and Lighthouse, but nearly all of it is actionable for this release. Reply B is accurate and tight but only samples 3 kits, has thin device and content sections, and gives little guidance on the PowerShell and content-type risks the user flagged.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, with no platform or change list. Reply B asks three focused questions up front and marks its guesses with [ASSUMPTION]. It then delivers the requested structure: smoke, regression, device matrix, and content checks in pass/fail tables. Reply A honestly says it lacks information and gives a broad, useful priority-ordered checklist. However, it organises by priority tiers instead of the smoke/regression/device/content split, so device coverage and content verification are scattered or missing as distinct sections. Reply A's 'cover everything' framing is also handled less sharply than B's explanation that the list must focus on what changed. B fits the criteria and handles the missing information more cleanly.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a false all-passed attestation and offer a real checklist plus a fill-in sign-off template. Reply A's checklist is well grounded, with server-side enforcement, cumulative limits, and consent recorded with the ToS version. It also adds sensible advice to delay or to ship behind a feature flag. But it is organised by feature and P0/P1 tiers, not the smoke/regression/device/content split the criteria call for. Reply B provides that split with a smoke table, regression tables, a device matrix, and content checks. It also asks focused questions about re-raising the limit and re-consent for existing users, and it marks unspecified behaviour as 'verify' instead of inventing it. Both are substantively strong, and B is better structured for the task.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

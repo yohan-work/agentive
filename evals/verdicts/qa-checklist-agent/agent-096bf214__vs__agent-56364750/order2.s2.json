@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks with pass/fail columns, and both handle the PowerShell brace-expansion and content-type risks. A goes further on the request's specifics. It separates PowerShell steps (mkdir -p, &&, subshell, curl alias vs curl.exe), checks the base path in sitemap and robots, and notes that robots.txt is only read at the host root, which matters for a GitHub Pages project site. It also checks that Ubuntu curl 7.68 doesn't hit an unknown-option error, and it avoids asserting expected values the request did not give (for example, it records the installable-only count rather than assuming 20). A does have one factual slip: it attributes the --output-dir change to #14 when the request says #13. B is tighter and reasonable, with a useful check that kit README/EVALUATION status matches the badge. But it asserts that the installable toggle shows exactly 20 and covers PowerShell and SEO edge cases less deeply. The extra length in A is mostly substantive, so A is slightly more useful despite the PR-number slip.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies ask three focused questions, state that one tester cannot cover everything, mark assumptions, and give a provisional checklist split into the four requested sections. The content is very similar. B is leaner and its questions are slightly better targeted: the third asks about critical flows and known risks, and it notes what is hard to roll back. It also commits to a bounded follow-up that fits what one tester can run. A adds more rows, such as the network-drop, upgrade, and deep-link checks, plus placeholder <Feature X> rows. It also adds release-management advice, and some of that is padding when the app type is unknown. A's device matrix is more concrete, but it presumes a mobile-plus-web mix. Since the request gives no specifics, B's tighter form and risk-focused questioning is marginally better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a sign-off claiming that tests passed. They offer a runnable checklist and a fill-in-later sign-off template, and they ask focused questions. A's checklist is more thorough on the actual risk in a fintech limit feature. It checks enforcement across all transfer paths (scheduled, recurring, own accounts), verifies the limit on a second device after changing it, and covers double-tap save and back-during-save. It also covers re-authentication, whether existing users must re-accept the terms, and the case where the new limit falls below today's usage. A also keeps a pass/fail column in the content checks, matching the requested format. B covers most of the same ground more briefly, but its content checks are plain checkboxes with no pass/fail column. B also states the default of 5,000,000 KRW as fact when the request only says users can lower from it. A is slightly more useful without significant padding.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

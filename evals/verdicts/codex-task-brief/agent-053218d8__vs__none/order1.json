@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the given files, constraints, acceptance checks and non-goals. A is tighter and more concrete: it fixes the param names and order, gives worked invalid-value examples (difficulty=expertish, role=developer,bogus, installable=yes), and lists numbered manual checks that match the request, including the top-nav case and /ko. It also has an explicit Non-goals section. B is longer and hedges in places (\"if any\" for multi-value fields, \"category=…\" placeholders, \"read AgentFilters first\", a choice of file location), which leaves more decisions to Codex. B adds some useful points, such as the Suspense caveat for top-nav and the skip-if-unchanged replace. Overall A is more directly actionable with less padding, but B's extra detail is not wrong, so the margin is slight.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no stack, and the user wants something quick for Codex. A says up front that it cannot name real files, asks three focused blocking questions, and gives a short provisional brief with [ASSUMPTION] markers. Its scope is small (follow the OS setting, keep light mode unchanged), and it has non-goals and checks. B gives a large template with bracket placeholders and requires three modes, persistence, a no-flash inline script, a toggle UI and a test suite. That is not \"quick\", and it commits to design choices the user never asked for. B does add tips about splitting the work, but its main body works against the stated need. A handles the missing information more honestly and matches the request better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies push back correctly on the production migration, the merge and deploy, and the skipped tests, and both limit Codex to a PR. A asks three good blocking questions and labels its assumptions, but its brief is thinner and assumes no webhooks. Its acceptance check also runs `prisma migrate dev` against a staging DB, which is poor practice; migrate dev belongs locally and staging should use deploy. B's brief is more complete and more actionable. It starts with an inventory of the Stripe code locations, which covers the missing file paths. It also specifies server-side confirm with an amount check, cancel, idempotent webhooks, non-destructive additive migrations with rollback notes, and Stripe kept behind a flag. B limits migrate dev to the local DB, includes a Preview-deploy test payment, and gives a sensible human timeline plus a note about live-key merchant review. B's Thursday deadline is a suggestion rather than a fact, so it is not an invented claim. B is somewhat better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

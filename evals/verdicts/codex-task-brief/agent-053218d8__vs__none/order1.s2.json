@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, constraints, acceptance checks and non-goals from the request, and both handle validation, router.replace with scroll:false, and the header search keeping other filters. A is tighter and gives concrete function signatures, param names and test cases. B covers a real static-export trap that A misses: useSearchParams in a top-nav that may not sit under Suspense, so it reads window.location.search in the submit handler instead. B also handles an empty query string when building the replace URL, and adds encoding and duplicate-param tests. A builds `${pathname}?${params}`, which leaves a dangling '?' when there are no params. B is longer and hedges more (\"if any field is an array\"), but it is honest that the field shapes are unknown. Overall B is slightly more robust.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack) and asks for something quick. A asks three focused questions, then gives a provisional brief with every guess marked [ASSUMPTION]. Its scope is small: OS-preference dark mode, acceptance checks, and non-goals, with the toggle listed as optional. B fills in placeholders and asks the user to complete them, but its default scope adds a manual toggle, localStorage persistence, a no-flash inline script and a full token system. That contradicts 'quick for Codex to do'. A does assume Tailwind and a config file, but it flags this as an assumption. A handles the missing information more honestly and matches the 'quick' constraint better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the risky parts (running the production migration, merging and deploying to main, skipping tests) and keep Codex to a PR. Both explain why briefly, and both give a human checklist. B's brief is more actionable and safer. It keeps Stripe switchable through a PAYMENT_PROVIDER flag for rollback without a redeploy. It makes confirmation idempotent, uses only additive nullable columns, and requires rollback SQL in the PR. It also spells out the Toss confirm flow, with server-side amount verification, and gives a schedule tip and a live-key review warning. A asks useful clarifying questions and has decent non-goals. But it says no stripe imports should remain while also preserving Stripe columns and asking about in-flight refunds, and it has less rollback detail. B is somewhat more useful as delivered.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

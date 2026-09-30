@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both briefs name the files, constraints, acceptance checks and non-goals from the request, and both flag their multi-select assumption. A adds a point that matters for a static export: useSearchParams in top-nav without a Suspense boundary can break the build, and it gives two mitigations. A also gives a concrete plan, a test list and manual verification steps that Codex can follow. B is tighter and has a cleaner Non-goals section and sharp acceptance checks, including the header-search scenario. However, it misses the top-nav Suspense risk. A is longer, and its risk table is partly padding, but the extra content is mostly actionable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a brief that is quick for Codex to do, and gave no stack. B asks three focused questions up front. It then gives a minimal provisional brief with [ASSUMPTION] tags, a narrow requirement (OS-preference dark mode), explicit non-goals and checkable acceptance steps. A also asks questions, but its brief expands into tokens, a three-way toggle, a no-flash script, a component migration and screenshots. That is not quick, and it invents many stack details. A does list assumptions, but its scope contradicts the request. B is better matched and keeps unknowns honest.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to let Codex run the production migration, merge to main or skip tests, and both explain why. Both keep Codex to a PR and hand the risky steps to a human. A goes further in ways that fit the Friday deadline: a PAYMENT_PROVIDER rollback switch, additive-only schema changes, a working-backwards schedule, and advice to keep Stripe for the event if production validation is not done. Its assumptions, such as the Toss contract and test keys being in place, are stated openly. B is more concise, has clean non-goals and asks better questions up front. But its acceptance check that no stripe import remains sits awkwardly with keeping Stripe compatibility, and it gives no rollback or timeline guidance. A is more useful overall despite its length.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

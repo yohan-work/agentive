@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover the goal, files, constraints, non-goals and acceptance checks, and both take the same core approach: pure parse/serialize helpers, router.replace with scroll:false, and a top-nav that keeps other params. Reply A adds material that is invented or hedged. Its URL table gives example values such as tool=github, category=testing and verified=tested. Its assumptions section asks Codex to guess whether fields are arrays and whether the Clear buttons exist, even though the request already supplies the details. It also adds extras like accepting installable=true, and it is much longer. A's window.location idea for the top-nav is a good point. Reply B is tighter and stays with the request's specifics. Its acceptance checks are concrete and directly verifiable, such as the exact URL, the invalid-param page still rendering with only role applied, the header search giving ?query=review&role=developer, and a /ko check. B is easier for Codex to act on, and A's extra length adds little.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: no stack is given, and the user wants it to be quick for Codex. Reply A produces a large brief covering tokens, a three-way toggle, localStorage, a no-flash script, and replacing hard-coded colors. That is not a quick task and it makes up scope. It also invents a PR title and deliverables such as screenshots. It does flag its assumptions and ask questions, but the questions come after a long brief. Reply B asks the three questions that actually block the design first. It then gives a small provisional brief that follows the OS setting only, with the toggle as a suggestion, plus non-goals and checks marked [ASSUMPTION]. That matches 'quick' and handles the missing information honestly. It cannot name files, and it says so.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly decline to have Codex run the production migration, merge, deploy, or skip tests. Both hand those steps to a human and produce a brief that ends at a PR. Reply A gives a complete, ready-to-use brief. It has a PaymentProvider abstraction, a PAYMENT_PROVIDER rollback flag, a correct description of the Toss confirm endpoint and server-side amount check, and idempotent webhooks. It also adds an additive-only migration, four minimal tests, explicit non-goals, and a human timeline that leaves a buffer before Friday. Some details are invented, such as the Mon-Wed schedule and the 'half a day' estimate. B asks blocking questions first, and they are reasonable. Its brief is thinner, with no tests in the requirements, and it suggests running `prisma migrate dev` against a staging DB, which is questionable. A is more actionable and gives the user a usable result immediately.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

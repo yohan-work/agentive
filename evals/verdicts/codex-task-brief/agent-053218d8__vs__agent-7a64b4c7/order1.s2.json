@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies name the files, constraints, non-goals and acceptance checks from the request, and both keep router.replace with scroll:false and treat invalid values as dropped. A is tighter and more decisive. It sets one validation rule, a fixed param order, and a concrete top-nav rule. It handles re-sync from outside changes and the Suspense fallback, and gives checks that can be run, including /ko and the mixed valid/invalid URL. B adds useful points: non-owned params are kept, and a warning that useSearchParams in top-nav may bail out of static rendering. But it hedges more (\"Probably no change\", a conditional multi-select encoding, an optional test file name) and pads with a risk table, manual verification and next actions that mostly restate the criteria. The gap is small because B's top-nav Suspense warning is a real build risk that A does not mention.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague (no stack given) and asks for something quick. A asks three focused questions, then gives a short provisional brief with each guess marked [ASSUMPTION]. It keeps scope minimal with prefers-color-scheme and darkMode media, and moves the toggle and tokens to an optional Suggested section. It states non-goals and acceptance checks that can be run. B invents a much larger job: a three-way toggle, localStorage persistence, a no-flash inline script, token migration and a hook with unit tests. That contradicts \"quick\" and rests on guesses about the stack. Its risks and deliverables sections are padding for an unknown codebase. B does flag assumptions and ask questions, but A's reply fits the user's stated need and handles missing information more honestly.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the same three risky asks (running the production migration, merging and deploying without review, and skipping tests). Each keeps Codex to a branch and PR, and each gives a clear list of tasks for the human. Both add server-side amount verification, idempotency, and a non-goals section. B goes further on what matters for a Friday launch. It keeps Stripe behind a PAYMENT_PROVIDER switch for instant rollback, and it makes the migration additive with the SQL attached to the PR. It also flags that the live-key review from Toss is the biggest schedule risk, and it recommends holding the Stripe path for the event if verification slips. A's brief is cleaner and asks good questions about where the Stripe code lives and about billing keys. But it has no rollback switch and only a vague schedule. B is longer, but most of the extra content is needed for a payment cutover, so B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

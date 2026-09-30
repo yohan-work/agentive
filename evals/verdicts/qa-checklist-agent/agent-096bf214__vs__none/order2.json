@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies split smoke, regression, device matrix, and content checks and use the release specifics (#13-#19, 20 kits, 61 downgrades, the listed browsers and terminals). A goes further where it matters. It flags that crawlers only read robots.txt at the host root, so a file under /agentive/ won't keep /bookmarks out of the index, and it notes that PowerShell 5.1 does not support && and aliases curl. It also explains that quoted braces are expanded by curl's own URL globbing. A adds helper scripts for kit availability, sitemap URL status, and stale Tested badges, plus a blocker triage and a sign-off block. A is long, but nearly all of it is specific and actionable. B is correct and concise, but shallower: it has fewer regression items, no scripts, and an awkward Windows Safari row. It also misses the Pages caching and robots.txt-location pitfalls. A is more useful for this release.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: it names no app type, platform, or change list, and it demands 'everything'. B handles this honestly. It asks three focused questions, marks every guess as [ASSUMPTION], and gives a provisional checklist split into smoke, regression, device matrix, and content, with pass/fail columns. It also says plainly that one tester can't cover everything. A is a broad, generic 12-section checklist. It does state that it doesn't know the app type, and its ordering advice is sound. But it covers security, performance, legal, and more, and does not split the work into smoke, regression, device, and content checks. It is also a generic dump that the user must trim. B better matches the required structure and handles the missing information more carefully.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies rightly refuse to write a false 'all tests passed' sign-off and give a fill-in template plus a checklist to run. Both explain the compliance and regulatory risk. Both cover the transfer-limit and ToS specifics well, including server-side enforcement, audit logs, boundary values, and re-consent. B asks focused questions on the minimum limit, re-authentication, and ToS re-consent. It marks assumptions and organises the checklist into the four requested parts: smoke, regression, device matrix, and content. A's checklist is thorough, with per-platform columns and fallback options such as a feature flag. But it is organised by feature (A-E) and has no separate smoke section, device matrix, or content checks. That makes it a weaker fit for the required structure. B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
