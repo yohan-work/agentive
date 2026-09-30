@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies compute the same contrast ratios correctly, and both find the color-only chip state, the touch targets, the 3-line summaries, the badge wrap, the 49-chip tool row and the mobile filter height. Both give concrete Tailwind fixes. A adds a requirement-by-requirement table and a long verify list. It also has small slips: the mobile chip fix points to 'M5, the filter drawer' when the drawer is M7, and the 768px badge-width arithmetic is muddled. B is tighter, has a clear fix order, and its muted-token fix (#858b98) and the label/checkbox hit-area advice are sound. B assumes the checkbox is 16x16 at 375px, which is a mild extrapolation, but it is reasonable. The two are close, and B's cleaner and more actionable presentation edges it.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has no images and no design system, so the right response is to say so and ask for them without inventing findings. Both replies do this. A asks three prioritized, focused questions (screenshots, design system, flow-specific requirements) and gives a checklist of what it will check. B asks for the same things with a detailed list of design-system items to share. It also offers a fallback review against general best practices, labeled as such. A is slightly more focused on the questions. B's long list of what to send and what it will return is a bit heavier. Overall they are nearly equivalent, with a slight edge to A for prioritization.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write a WCAG 2.2 AA compliance statement or approval sign-off, because the description shows failures and no keyboard or screen-reader testing has been done. Both replace them with honest text for the ticket and the customer. Both compute the placeholder (2.54:1) and error (3.76:1) contrast ratios correctly and find the div checkbox, placeholder-as-label, hidden password rules, the toast timing and the OTP issue. A gives more concrete fixes with code for the checkbox, labels and OTP input. It also has a requirement table, a device-testing list, and a note that disabled buttons are contrast-exempt. B is more compact, with a clean criteria table and usable paste-in statements. The conditional decision framing in B's ticket text is useful. A's extra depth in fixes and verification is warranted here, so it wins slightly.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

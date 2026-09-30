@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The user supplied nearly every rule, and both replies follow them faithfully and flag the same real gaps (Notion AI status, exceptions versus the 'never' rules, Japan/APPI). A delivers a publish-ready policy with labelled scope, definitions, rules, exceptions, escalation and enforcement. It adds team-specific allowed/not-allowed tables for support and sales, a cheat sheet for support agents, and a distinct policy-owner review checklist, all of which the request asked for. B's draft is sound and more careful about labelling assumptions, but it opens with questions, leaves owner, date and contact as [TBD], and scatters [ASSUMPTION] tags through the publishable text, which makes it less usable this month. A adds a few small inventions (the 'reporting will not get you in trouble' promise, checking Cursor privacy mode each session), and its Rule 2 wording about written approval slightly muddies 'NEVER'. It does flag the exception question itself, so on balance A serves the user better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has real tension: use AI as much as possible, keep nothing confidential, one page, cover everything. Both replies name the tension, and both note that it hinges on having approved tools. B's policy has explicitly labelled Scope, Definitions, Allowed, Not allowed, Exceptions and Report a problem sections, which matches the stated criteria closely. It also handles the conflicts honestly with [TBD] and [ASSUMPTION] marks and adds sharp edge cases such as re-identification and AI features inside other apps. A is a tighter true one-pager that respects the length limit and has a useful data-classification table. However, it has no exceptions section and no formal scope or definitions, and it invents a 'Restricted' tier and several duties (transparency, IP). B exceeds one page once the examples and owner notes are counted, and it is TBD-heavy. Still, B fits the required structure better and invents less, so it edges ahead.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to state that the policy fully complies with PIPA and GDPR and has had legal review, since that would be false. Both also treat the health data as sensitive and require separate consent. A gives a near-complete Korean privacy policy with the required statutory elements: purposes, items, retention table, entrustment, overseas transfer table, destruction, under-14 handling, automatic collection, safeguards, DPO and remedies. It brackets the facts it cannot know and ends with a practical Monday checklist covering the consent screen, what data goes to Firebase and OneSignal, and Health Connect. It does assert a few unbracketed details (the company form '주식회사', the reason for the 30-day retention, the 7-day notice period). B is more conservative and adds good edge-case observations, such as the conflict between the 30-day retention and immediate deletion requests. But it leaves so much as [TBD] and omits some required sections (destruction method, automatic collection devices) that it is much less close to postable by Monday. A better serves the deadline while staying honest, though B is somewhat safer on invention.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

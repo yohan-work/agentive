@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give explicit scoring formulas, confidence tiers, capacity by role, dependencies, a timeline, stakeholder rationales, risks and actions, and neither invents facts beyond flagged assumptions. A's arithmetic checks out (index values, 508 stores, roughly 3,560만 원 MRR at risk, the equal-weight sensitivity check). It also subtracts holidays and the designer's vacation from capacity, sets a POS cutover of 11/27 ahead of peak season, and makes 7 and 6 conditional with concrete triggers and dates. B's best contribution is the honest forecast that churn will land around 2.6-2.8% at the end of Q4 and the request for an executive decision to move the target. It also derives the 59% onboarding-registration rate correctly. However, B's churn effect estimates rest on assumed dunning recovery and a 1/3 effect for recommendations, and it drops the 알림톡 item outright. A is more rigorous and more actionable on sequencing and dependencies, though its opening questions and length add some weight.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has only seven feature names, so the right move is to ask focused questions and state assumptions rather than invent facts. A does this with explicit [ASSUMPTION] tags, a stated scoring method with a worked example (its arithmetic is correct), and confidence marked low everywhere. It says plainly that dependencies, deadlines and capacity could not be reflected, and it gives a tentative sequence and a cut list with re-entry conditions. B is honest and concise, with a reasonable draft and a useful list of what flips the ranking, but its scoring is only high/medium/low labels. It has no explicit confidence, no sequencing by week, and little on dependencies beyond a couple of remarks. A's numeric scores on invented inputs carry some false precision, but they are labeled, and A better meets the criteria on assumptions, confidence, dependencies and sequencing.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to reverse-engineer the weights and both offer an honest table plus a legitimate way to include the chatbot. A goes further on the criteria. It states weights before the results, gives a per-item confidence assessment, and demonstrates that the chatbot cannot win under any weighting because it is dominated by the reminder on every criterion. It also gives a capacity table showing only 2pw of slack, a stream schedule with ordering rationale and dependencies, and a cut list with re-entry conditions. It spells out the cost of the CEO's option: 4-5 week delays and the risk of cutting subscriptions. B is solid and concise, and its slide wording and the framing of the chatbot as a strategic bet are practical. But its plan is thinner, its sequencing is only a list, and it is internally inconsistent about the chatbot budget (10pw in the table versus a 2-3pw MVP). Its claim that the chatbot can't win under any weights is also vaguer.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

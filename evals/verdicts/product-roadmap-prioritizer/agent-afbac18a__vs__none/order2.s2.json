@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies are thorough, arithmetically sound and cover scoring, dependencies, sequencing, stakeholder rationale and risks. A keeps a conditional multi-branch MVP with checkpoints and a 16pw buffer, and correctly computes MRR figures (about 210만 for the 4 stores). B derives goal weights from the stated goal ordering, gives an explicit confidence coefficient, and shows a per-role capacity model that identifies the backend and mobile bottleneck, which explains the cut of #6. B's role breakdown is an invented assumption, but it is labelled [ASSUMPTION] and next actions ask for the real numbers. B also ties dates to the Friday review (10/2) and gives a per-item re-entry condition. A includes more invented outcome estimates (Q4 churn 2.6~2.8%, 30~50% dunning recovery), though it flags them as assumptions. B's opening questions block slightly hurts paste-readiness, but overall B's scoring and capacity logic is more transparent and rigorous.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives only feature names, so the honest handling is to state assumptions, mark confidence low, and ask focused questions. A does this in a light form: a provisional ranking, a list of conditions that flip it, and five questions. It shows no scoring method, no dependencies and no sequencing. B builds an explicit scoring rubric with worked arithmetic and marks every input [ASSUMPTION] with low confidence. It also notes that 1st and 2nd (and 3rd and 4th) are effectively tied, adds a capacity plan with a dependency rationale (permissions before notification center and dashboard), and lists re-entry conditions and next actions. B is heavier than a short list needs and its S/M/L figures are invented, but they are clearly flagged and it warns against sharing the ranking as final. B fits the criteria far better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to reverse-engineer the weights and both correctly note that all five items fit in 28pw of 30pw, and their score arithmetic checks out. A offers useful honest alternatives: a chatbot hypothesis, a small phase 1, and a separate strategic-priority column. B goes further. It fixes the weights before scoring, cites the request's data for each score, and proves that no weighting can put the chatbot first because the reminder feature beats it on every criterion. It also gives an A/B/C decision table quantifying the cost of the CEO's preferred ordering, a parallel-track sequence with dependencies, and risks with triggers. B asks focused questions and states assumptions for team size and reminder data. B is more useful for an executive meeting and better covers tradeoffs, confidence and sequencing.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

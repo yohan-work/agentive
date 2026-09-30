@@ -1,0 +1,87 @@
+{
+  "slug": "product-roadmap-prioritizer",
+  "variants": [
+    "agent-afbac18a",
+    "agent-1c0f3cd4"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-afbac18a",
+      "order2": "agent-afbac18a",
+      "result": "agent-afbac18a"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-afbac18a",
+      "order2": "agent-afbac18a",
+      "result": "agent-afbac18a"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-afbac18a",
+      "order2": "agent-afbac18a",
+      "result": "agent-afbac18a"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-1c0f3cd4",
+      "order2": "agent-afbac18a",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-afbac18a",
+      "order2": "agent-afbac18a",
+      "result": "agent-afbac18a"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-afbac18a",
+      "order2": "agent-afbac18a",
+      "result": "agent-afbac18a"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-afbac18a",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-afbac18a",
+        "agent-afbac18a"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-afbac18a",
+        "agent-afbac18a"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-afbac18a": 5,
+    "agent-1c0f3cd4": 0
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

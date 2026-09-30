@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core issues: muted text contrast, color-only chip state, 3-line summaries, small touch targets, the 1100px mobile filter area, bookmark misalignment, and the off-grid spacing. Reply A backs its findings with a full contrast table computed from the given hex values. It gives more precise fixes, such as a chip hit-area approach that avoids overlapping rows, the 44px pitch math, and break-keep for Korean. It also has a per-requirement pass/fail/can't-tell table and a specific verify list, including the flagged risk of /ko at 375px. Reply B is solid and well prioritized, and it adds the aria-live count and the token-sweep risk, but its fixes are somewhat less concrete and it has no requirement-by-requirement check. A is somewhat more useful, though not padded.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly say that no screenshots or design system were provided, and neither invents findings. Both ask for the screenshots, the design system tokens, and context. Reply A adds a long list of checks it will run, which is informative but partly padding. Reply B is more concise and previews the report format, and it asks a useful question about review stage and strictness. The two are essentially equivalent in quality and honesty, so I can't genuinely prefer one.",
+      "winner": "tie",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to write the compliance statement and sign-off, and both give an honest status note to paste instead. Their contrast numbers agree and are correct (2.54:1, 3.76:1, and about 5.2:1 for the button). Reply A gives each finding its own who-is-affected, criterion and concrete fix, often with markup. It also distinguishes confirmed failures from things it can't tell, such as whether the code expires and password manager behavior. It also adds a requirement-check table and a verify list. Reply B is well organized and adds a customer message draft and a deadline-oriented action order, which is practical. But its fixes are terser, and some failures are marked more firmly than the description supports, such as 2.4.7 on the div. A is slightly stronger on the requested QA depth.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

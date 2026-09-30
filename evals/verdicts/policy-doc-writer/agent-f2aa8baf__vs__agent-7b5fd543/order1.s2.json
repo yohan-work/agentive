@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover all six agreed rules, definitions, exceptions, escalation, examples for support and sales, and a checklist, and both sensibly flag the Notion AI gap and the conflict between the patient-data ban and the exception process. B is closer to publishable this month: it adds a short-version summary, a quick decision guide, concrete engineer guidance on .env files, and a review checklist split into before-publish and every-review. A leaves many [TBD] fields and front-loads questions, so more work remains before it can be published. B invents a few details, such as 'Approved by Legal, CTO', Minji Park as policy owner, and APPI, though most are marked [Confirm]. It also promises leniency for self-reporting, whereas A flags that promise as an assumption. B's overall usefulness still outweighs these defects.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a short, one-page policy that covers everything. B delivers a real one-page policy with a four-level data classification table that reconciles 'use AI freely' with 'nothing confidential leaves'. It also states plainly that cloud vendors mean data does leave, and it adds a short assumptions, risks, and next-actions section. A's actual policy is reasonable but is buried in questions, a long examples table, edge cases, and owner notes. Its policy body is also dotted with [TBD] placeholders, including for enforcement, which makes it less usable and less concise than the user requested. B covers scope, allowed and prohibited use, incident reporting, and enforcement, though it has no explicit exceptions section beyond the tool request route. A has one, but with TBDs. B better fits the brief.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to add the false statement claiming legal review and full GDPR compliance. Both treat health data conservatively as sensitive information, note that the app's consent screens must match, and suggest publishing first and revising later. B gives a truthful replacement sentence and cites PIPA Art. 23 for sensitive information. B also produces a near-complete, publishable draft with retention periods, the overseas-transfer table, the children rule, and the complaint agencies. A leaves dozens of [TBD] fields, including basics such as required or optional, which makes the Monday deadline hard to meet. B does state some security measures and a no-ad-use commitment as fact, but it warns to keep only the measures actually in place and flags others as needing confirmation, so this is a minor defect. A is more cautious about unknowns, while B is more useful and adds the risk that existing users need to give fresh consent.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

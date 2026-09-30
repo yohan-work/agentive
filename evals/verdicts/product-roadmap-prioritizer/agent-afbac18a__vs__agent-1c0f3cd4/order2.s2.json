@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies are thorough and mostly arithmetically correct (A's 43pw total, the 41% onboarding back-calculation, and B's role-level capacity table and 2.6 score all check out). A gives an explicit score formula, an honest Q4 churn forecast (2.6-2.8%), and a reduced 4pw multi-branch option, but that 4pw scope is its own invention and its pw capacity is treated as one pool, so the mobile bottleneck only shows up later as a risk. B converts the 60pw into per-role capacity (backend, frontend, mobile, design) with the vacation and a proposed freeze, and shows that backend has only 1.5pw of slack, which explains the cuts far more rigorously. B's role splits are invented, but they are flagged as [ASSUMPTION] and the reply says which decision (excluding #6) depends on them. B also ties each score to a quote from the request, gives re-entry conditions for every cut, and lays out a delay-response order for the POS work. B's slightly stronger dependency and capacity reasoning outweighs A's more directly pasteable framing.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is only seven feature names, so the best reply prioritises honestly and is transparent about assumptions. B states the missing inputs first, then defines weighted criteria and shows worked arithmetic (3.65 vs 3.55). It correctly notes the top two are effectively tied, marks every confidence as low, and gives a capacity calculation with stated S/M/L assumptions. It also names a dependency (admin permissions before notifications and dashboard) and lists what would change the ranking. A gives a reasonable RICE-lite table and Now/Next/Later, but its scores are unweighted ranges with no calculation, and it does not resolve the ranking into a capacity-checked plan. A's risk notes (PG contract, account merging) are useful and specific. Overall B better meets the criteria of shown scoring, confidence, dependencies and sequencing.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to reverse-engineer weights for the chatbot and both notice that the five items total 28pw, within the 30pw available. A gives a sound alternative: a simple impact x confidence / effort score, a separate strategic-bet track for a 6pw chatbot pilot, and the point that shipping delivery-time selection first shrinks the chatbot's target inquiries. B commits its weights before looking at results and gives per-criterion scores whose arithmetic is correct (4.0, 3.8, 3.3, 1.8, 1.5). It quotes the request for each score and shows the chatbot cannot win under any weights because the anniversary reminder beats it on all three criteria. It then adds a week-by-week sequence with dependencies and a three-option comparison for the meeting (all five, a chatbot validation version, or the CEO's version), including the measurement-window cost of putting the chatbot first. A includes an outside claim about subscription conversion rates that is unsupported, while B stays grounded in the request. B is more useful for the executive meeting.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

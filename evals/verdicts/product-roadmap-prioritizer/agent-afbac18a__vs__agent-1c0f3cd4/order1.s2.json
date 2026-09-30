@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a scored table, gate items, cuts, sequencing, stakeholder rationale, risks and honest guidance that the 2.3% churn target will not be reached in Q4. Reply A builds a per-role capacity model (backend 22.5pw before freeze, mobile 0.5pw slack) and a week-by-week plan tied to the designer vacation, the 3-day app review and the POS timeline. Its weakness is that cutting the multi-branch dashboard rests on an invented role split, though it is flagged as an assumption. Reply B quantifies stakeholder trade-offs more concretely: 508 stores, about 7 lakh-won ARPU, the 41% to 59% onboarding back-calculation (which checks out), the dunning maths and a Q4 outlook table. It also flags its assumptions, such as the industry recovery rate and the reduced 4pw dashboard scope. B's plan ignores per-role limits, so it is less rigorous on capacity, but it is more directly pasteable for executives and stronger on the CEO and sales arguments. It is close, and I slightly prefer B for its exec-ready quantification.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request supplies only feature names, so the replies must state assumptions and show scoring. Reply A gives explicit weights, computes weighted scores (I verified the arithmetic), and admits that 1st and 2nd place are effectively tied. It also builds a capacity table with labelled effort assumptions, names dependencies (permissions before notifications and dashboard, payment-provider approval lead time), and lists re-entry conditions for each excluded item and what would change the ranking. Reply B uses a reasonable RICE-lite table and a Now/Next/Later split with sensible risks, but has no computed scores, no capacity math, and thinner sequencing rationale. B's advice on the dashboard and AI summary is sensible but less traceable. A better meets the scoring-assumptions, confidence and sequencing criteria.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to reverse-engineer weights and both notice that all five items fit in 28 of 30pw. Reply A fixes the weights before scoring, and its arithmetic is correct. It also shows that the reminder beats the chatbot on every criterion, so no weighting can make the chatbot first. It gives a capacity table, a two-track schedule, dependencies, an A/B/C decision table with the cost of the CEO's option, an exclusion list with re-entry conditions and risks with triggers. Reply B has a simpler formula score, a good insight to sequence the chatbot after delivery-time selection, and a useful strategic-bet framing with pilot success criteria. However, it asserts that subscription conversion is typically single digits to low teens without a source, and its sequencing and assumptions are thinner. A is more complete on scoring assumptions, tradeoffs and sequencing, though B is more concise.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

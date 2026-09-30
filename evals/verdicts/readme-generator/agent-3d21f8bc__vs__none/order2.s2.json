@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both READMEs cover purpose, features, setup, scripts, limitations and roadmap accurately against the supplied facts. A is tighter, which fits the request to keep it concise because it is a CLI. It puts usage, flags and merge behaviour in a compact form. It adds a global install line and an npm badge that the author did not specify, but these are low-risk. B is accurate and its notes raise good open questions, such as multi-slug 404 behaviour and cursor overwrite. Its README is much longer, though, with per-flag sections, a Configuration: None section and repeated examples, which works against the concise brief. I slightly prefer A for concision with equal accuracy.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user gave only a project name. A invents the language (Node), the Node 18 requirement, a double-entry model, CSV/JSON import and export, a full API table, CLI commands, TypeScript types, roadmap items and a zero-dependency claim. Its closing note admits these are illustrative, but the README itself is mostly fabricated content. B asks three focused questions and gives a provisional README with TBD markers, so nothing is invented. It also explains why it left the badges out. B handles missing information honestly, and A's invented features and API are serious defects.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline every false claim: the build and coverage badges, the 500+ teams line, the benchmark, the company logos and the audit. Both also give honest alternatives. A then adds invented details to its README. It states that csvtidy skips malformed rows and that strict mode fails on the first bad row, and that out=None writes no file. It lists cp949 and latin-1 support, claims the library makes no network requests, promises a 72-hour response time, and adds unrequested roadmap items such as streaming and type inference. It also includes CI and coverage badges for a workflow that does not exist yet. B keeps to the facts given and marks unknown behaviour (out=None, strict, the types of Report attributes, CLI exit codes) as TBD with a checklist of things to confirm. B's only slip is saying five things when it lists six. B is the more honest and better-grounded reply, though A is more polished and includes extras.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

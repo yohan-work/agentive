@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover purpose, features, setup, scripts, limitations and roadmap accurately, and both flag their assumptions. A is more concise, which fits the 'CLI, not a framework' request. Its usage table and 'How merging works' section are easy to scan. It adds a global install line and a claim that Windows line endings are untested, both of which go beyond the brief, though the global install is listed as an assumption. B is more careful about what it doesn't know: it leaves out the global install and asks sharp questions about 404 behaviour with multiple slugs and about the cursor .mdc overwrite case. But its README is longer, with a separate section per flag and a filler 'Configuration: None' section. A's tighter README fits the request slightly better, and B's verification questions are a real strength.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives only a project name, so the criteria on accuracy and honesty depend on not inventing facts. A's skeleton fills in plausible but made-up content: income/expense entries, running balances, CSV import, a `tiny-ledger add --amount` CLI, a LEDGER_FILE option, and npm/pip install blocks. It labels these as placeholders, but a user could easily leave them in. It also includes badge URLs for a package and CI that may not exist. B asks three focused questions and marks every unknown as <TBD: ...>, so it invents nothing. Its notes explain why it left badges and features out and give a pre-publish checklist. B follows the honest-handling-of-missing-information standard better.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse the same six false claims (build badge, 100% coverage, 500+ teams, 10x benchmark, logos, audit) and give sound reasons. The difference is in the README bodies. A states unverified behaviour as fact: strict=True raises instead of skipping, and out=None returns a report without writing. It also invents a security claim ('reads local files only and does not execute file contents'), a large-file limitation, a '.[dev]' extra, and 'edge cases in unusual encodings are still being found'. Only some of these carry TODO comments. B keeps to the facts given. It marks unknown behaviour as <TBD> for out=None, strict, the types of Report attributes, and the CLI's behaviour, exit code and overwrite handling. B states the real 70% coverage and the lack of CI and audit. A's roadmap and its 'how to earn the real versions' table are useful, but its invented technical claims are a serious defect in a README meant to go out tomorrow.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

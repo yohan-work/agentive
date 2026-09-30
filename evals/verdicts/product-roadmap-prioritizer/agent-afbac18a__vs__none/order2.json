@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies give a scoring formula, assumptions, a capacity check, dependencies, a timeline, per-stakeholder rationale, risks and actions, and both are largely correct. Reply A gives an honest expectation reset (the 2.3% churn target likely slips to Q1) and a useful back-calculation of the onboarding conversion target. However, its effect estimates (dunning recovery 40-50 percent, the 1/3 effect factor for order recommendations) are partly invented, and the 'POS v2 precedes order recommendations' dependency is speculative. Reply B quotes the request's evidence per row and shows the capacity arithmetic, including the 60pw to 58.4pw correction for the designer's vacation and the holidays. It identifies mobile as the real bottleneck (98 percent utilization) and defers the mobile recommendation screen accordingly. It also adds a weight sensitivity check, quantifies what each stakeholder's item would displace, gives re-entry conditions for every excluded item, and assigns owners and dates. B explicitly says no effect data exists rather than inventing impact numbers. B's opening questions slightly delay a paste-ready document, but the substance is a bit more rigorous and actionable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is a short, casual list of seven features with no context. Reply A asks five focused questions, states its assumptions (growth-stage SaaS, revenue and conversion goal), and gives a compact impact/effort ranking with reasoning. It also proposes a quarter composition and lists the conditions that would flip the ranking, which is proportionate and immediately usable. Reply B flags everything as an assumption, but it builds a weighted numeric scoring model on inputs that do not exist, such as reach of 4 and goal contribution of 5, and it produces a fake-precision table. It also pads with a capacity framework, a Gantt-like sequence and a risks section, all resting on invented S/M/L sizes. B's honesty labels help, but the numeric scores add little beyond A's qualitative ranking, and the length is not warranted by the available information. A serves this user better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to reverse-engineer the weights, correctly note that all five items fit in 28 of 30pw, and produce an honest ranking with the chatbot last or near last. A's arithmetic checks out, and its slide wording for a 'validation bet' is practical. However, A's roadmap loosely suggests a 2-3pw chatbot MVP while still counting 10pw. Its sequencing rationale is thin and it names no dependencies. B lays out weights before results, a sensitivity argument that is valid for chatbot vs. reminder, and an explicit sequencing rationale with dependencies marked as assumptions. It also includes a cut list with re-entry conditions and the concrete cost of putting the chatbot first. It also suggests scoping the chatbot to delivery and order-status questions so that CS data supports it. B's invented 13-week/2.3-developer assumption is labelled, and it asks the right clarifying questions. B better satisfies the criteria on tradeoffs, confidence and sequencing.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

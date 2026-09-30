@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover purpose, features, setup, scripts, limitations, and roadmap accurately from the supplied facts. Reply A stays closest to the brief and asks useful verification questions, such as multi-slug 404 behaviour and cursor file collisions. However, its README is longer, with a section per command, which sits awkwardly with the request to keep it concise. Reply B is tighter, using a command table and a short merge section, which suits a small CLI. It adds a global-install line and a Windows line-endings remark that the brief doesn't support. It also assumes --dry-run and --base-url apply to remove, but it states these assumptions openly. The differences are small; B's conciseness edges it.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user gave only a project name and asked for badges, install instructions, and features. Reply A asks three focused questions and gives a skeleton where every unknown is an explicit TBD placeholder. It invents no facts and declines to add badges without sources. Reply B says it won't invent facts but then does: it makes up features (income/expense entries, CSV import/export), a LEDGER_FILE config default, sample CLI commands, and a description, and it gives npm and pip install lines. It also adds live-looking badges with OWNER placeholders and an assumed MIT license. Some of this is flagged as placeholder, but it contradicts its own claim and could ship as false content. A handles the missing information more honestly.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies rightly refuse the false claims: build and coverage badges, 'trusted by', the benchmark, the company logos, and the audit. Both give a honest launch README. Reply A restricts itself to the stated facts and marks unknown behaviour of out=None, strict, the CLI, and the Report types as TBD. Reply B fills those gaps with invented specifics. It says strict raises on failure, out=None returns a report without writing, output is UTF-8, and issues include row locations. It also claims the library reads local files only and doesn't execute contents, and it assumes a [dev] extra. Only a few of these are flagged TODO. B's practical next-steps table is helpful, but the invented API behaviour is a serious defect in a README users will trust. A is the safer and more accurate reply.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

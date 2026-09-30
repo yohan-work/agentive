@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the core failures: muted text contrast, color-only selected chips, 3-line summaries with no clamp, undersized touch targets, the tall mobile filter area, the bookmark misalignment and the 49-chip tool row. Both give concrete Tailwind fixes and compute contrast correctly. Reply B works through the chip hit-area geometry (24px chip plus 8px gap gives a 32px pitch, so 44px targets would overlap) and proposes a pitch-based fix. It also estimates the summary capacity, gives a requirement-by-requirement pass/fail/can't-tell table, and marks its assumptions explicitly. Reply B also spots that the mobile chip fix makes the filter-height problem worse and says to fix the two together. Reply A is solid and well prioritised, but it is less precise and less careful about what the description does and does not show.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The input contains only a '[screenshots]' placeholder, and both replies correctly say nothing can be reviewed and invent no findings. Both ask for the screenshots and the design system, and both preview what they will check. Reply B puts the questions in priority order and keeps them focused. Its preview of checks is specific and useful, covering form field types, autofill, keyboard overlap, localization and totals shown before pay. Reply A is also good and asks for the useful extras (breakpoints, WCAG level). It spends more space on a report-section outline, which is closer to structure for its own sake. B is marginally more substantive, but the two are close.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to write the compliance statement or the launch sign-off. Both explain the contractual risk and give an honest status note to paste into the ticket instead. Both find the same main failures: the div checkbox, placeholder-only labels, placeholder and error contrast, the 3-second toast, and password rules shown only after a failed submit. Reply B shows the contrast calculations (2.54:1, 3.76:1, 5.17:1) and groups the findings into blockers, major and minor. It gives markup-level fixes, notes 3.3.1 for the toast, gives a single-input approach for the OTP field, and adds a requirement table and a verify list. It also offers realistic options for tomorrow's deadline: delay the statement rather than the launch, or share a dated known-issues list. Reply A adds a draft message to the customer, which is helpful. It is a little less rigorous, for example in how it treats the 3.3.8 items, so B is slightly ahead.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

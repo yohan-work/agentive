@@ -1,0 +1,87 @@
+{
+  "slug": "readme-generator",
+  "variants": [
+    "agent-3d21f8bc",
+    "agent-f1243dd6"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-f1243dd6",
+      "order2": "agent-3d21f8bc",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-3d21f8bc",
+      "order2": "agent-3d21f8bc",
+      "result": "agent-3d21f8bc"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-3d21f8bc",
+      "order2": "agent-3d21f8bc",
+      "result": "agent-3d21f8bc"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-f1243dd6",
+      "order2": "agent-f1243dd6",
+      "result": "agent-f1243dd6"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-3d21f8bc",
+      "order2": "agent-3d21f8bc",
+      "result": "agent-3d21f8bc"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-3d21f8bc",
+      "order2": "agent-3d21f8bc",
+      "result": "agent-3d21f8bc"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "inconsistent",
+        "agent-f1243dd6"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-3d21f8bc",
+        "agent-3d21f8bc"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-3d21f8bc",
+        "agent-3d21f8bc"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-3d21f8bc": 4,
+    "agent-f1243dd6": 1
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

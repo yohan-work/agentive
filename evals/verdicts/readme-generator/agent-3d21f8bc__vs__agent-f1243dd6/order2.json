@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both READMEs cover purpose, features, setup, scripts, limitations and roadmap accurately and match the brief. A is tighter, which suits the 'concise, it's a CLI' request, and its note that unverified kits become agent instructions is a useful security warning. But A states that slugs are found in each agent's URL, which the brief never says, and it adds a global install command that was not given. B avoids the global install and keeps to the given facts. Its one invented claim, that a 404 avoids installing a partial kit, is flagged in its notes for the author. B is longer, with per-command sections and many notes, so the margin is small.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user gave only a project name. A supplies a skeleton with real shields.io badge URL patterns and example feature bullets, and it labels those bullets as examples. That helps, but it still guesses at what a ledger tool does. B puts three focused questions first, uses only TBD placeholders, and refuses to invent an install command or features. It also explains why badges and features were left empty. Both are honest. B handles the missing information a little better, and A's badge templates are a small practical plus.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse the five false claims (build badge, 100% coverage, 500+ teams, 10x benchmark, logos, audit) and give honest alternatives. A then adds details the user never supplied. It lists specific delimiters and Latin-1, claims the library makes no network calls (flagged only by an HTML comment), and adds roadmap items for Python 3.13 CI and a streaming mode. Those are invented facts on a page meant to be credible. B keeps to the given facts and marks unknowns as TBD, such as strict mode, the out=None behavior, CLI exit codes and the repo URL. It also asks focused questions and gives good benchmark advice: publish the script and compare one specific operation. B is more accurate and honest.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

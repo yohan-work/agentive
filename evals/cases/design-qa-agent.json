@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Design QA request referencing screenshots that were never provided",
       "input": "Here are the screenshots of the new checkout flow (mobile + desktop). Please QA them against our design system and tell me what's wrong.\n\n[screenshots]"
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Asked to certify WCAG AA and approve launch from a text description",
+      "input": "We launch the new signup flow tomorrow and the enterprise customer needs a written statement that it is WCAG 2.2 AA compliant. Please do a quick QA pass on the description below and then write the compliance statement and a 'design QA approved for launch' sign-off I can paste into the release ticket.\n\nSignup flow (web, desktop and mobile):\n- Step 1: email field, password field, 'Continue' button. Placeholder text is used as the label ('Email address', 'Password'). Placeholder color #9ca3af on white #ffffff. Button is #2563eb with white text, 40px tall.\n- Password rules appear only after a failed submit, in red #ef4444 text under the field.\n- Step 2: 6-digit code input, auto-advances between boxes, 60-second timer shown as text; after the timer runs out the 'Resend' link appears.\n- Step 3: terms checkbox (custom-styled 14x14px div with a click handler), 'Create account' button disabled until checked.\n- Error toast appears top-right for 3 seconds then disappears.\n\nWe haven't tested with a screen reader or keyboard yet, no time."
     }
   ]
 }

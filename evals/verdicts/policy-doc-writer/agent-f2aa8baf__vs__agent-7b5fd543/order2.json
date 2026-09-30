@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies follow the six agreed rules faithfully and both raise the Notion AI gap and the question of whether exceptions can override Rules 2 and 4. B's policy has explicit Scope, Definitions, What is allowed, What is not allowed, Exceptions and How to report sections. Its support-ticket and sales-email examples each say why they are allowed or not, and its edge-case table (first name only, an appointment reason with no name, a screenshot, a personal account) is useful. B also keeps owner notes separate and marks its guesses as assumptions. A is thorough, and its policy-owner checklist is stronger. However, it puts a rollout plan, a risks section and open questions into the document meant to be published, which is padding. A also states some invented details as fact: the @relaymint.io SSO check, the promise that people who report promptly are treated as acting in good faith, and the instruction not to delete the chat. B flags comparable guesses with [ASSUMPTION] or [TBD]. B is slightly more focused and more honest.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The user asked for a short, one-page policy that covers everything. A delivers a policy that fits on one page and can be used now. It names the tension between using AI freely and keeping confidential data in, and resolves it with approved and unapproved tools. It also covers scope, tool tiers, prohibited data, output review, meetings, incidents and enforcement, with short assumptions, risks and next actions after it. Its section 3 wording is correct, and it flags the enterprise-contract dependency. It adds a few unrequested rules, such as no AI for hiring decisions, but these are reasonable and clearly written. B asks good questions and correctly marks gaps, but its policy is mostly [TBD] fields and runs well past one page once the examples and owner notes are added. It also leaves the user with little that is usable as written. A better meets the brief while staying honest about assumptions.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to insert the false 'compliant and legally reviewed' statement and explain why. Both treat health data conservatively as sensitive information needing separate consent, and both note that GDPR probably does not apply. A gives a complete, publishable Korean privacy policy structure that covers what is required. It includes items collected, purposes, sensitive-data handling, retention with the statutory retention table, outsourcing, overseas transfer, destruction, rights, automatic collection, safeguards, the privacy officer and remedy agencies. It marks the unknowns with [확인 필요], and gives a before-Monday to-do list. B is honest, and its edge-case table shows the tension between the 30-day retention and the right to erasure. But its policy is heavy on [TBD], with no destruction procedure, no retention table and no safeguards content. That leaves much more work before Monday. A states a few things without flagging them, such as the health-data no-advertising sentence, but it discloses most of its assumptions. On balance A is slightly more useful.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}
