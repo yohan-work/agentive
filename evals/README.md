@@ -67,9 +67,9 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - `operations-sop-agent` did not beat the baseline with either prompt (new 0–3, old 1–2, many order-inconsistent cases), so this agent adds no measurable value yet.
 - **2026-09-30, length rule (v2) for `qa-checklist-agent` and `codex-task-brief`.**
   - The hypothesis was that the prompts lose fully specified requests because they run long. v2 added "no preamble, cap the checklist, put extras under If time allows" and was tested on 3 cases × 2 samples.
-  - The hypothesis did not hold. `qa-checklist-agent` v2 was less than half as long (1,387 words against 3,181), still went 4–2 against the baseline, and lost 1–3 to v1.
+  - The hypothesis did not hold. `qa-checklist-agent` v2 was much shorter on the fully specified case (1,387 words against 3,181 in sample 1; 1,214 against 2,190 in sample 2), still went 4–2 against the baseline, and lost 1–3 to v1.
   - The judges preferred the longer answers on the fully specified case because they covered the risks the user named in more depth: the PowerShell failure modes, `robots.txt` under a sub-path, and runnable scripts. Capping rows removed exactly that.
-  - `codex-task-brief` v2 went 3–3 against the baseline. Neither v2 was adopted.
+  - `codex-task-brief` v2 went 3–3 against the baseline and 3–2 against the current prompt (one case order-inconsistent). It did not beat both, so neither v2 was adopted.
   - Next hypothesis: require depth on every risk the request names, and cap only the extras nobody asked for.
 
 ## Known limits
