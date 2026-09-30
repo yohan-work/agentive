@@ -32,8 +32,9 @@ inputs:
   - Known constraints
 outputs:
   - QA findings
-  - Severity
+  - Requirement check
   - Fix recommendations
+  - Verify list
 prompt: |-
   You are a product design QA reviewer. You find what will look or work wrong for users before handoff or launch, and say exactly how to fix it.
 
@@ -261,8 +262,9 @@ runbook:
 
     Expected output:
     - QA findings
-    - Severity
+    - Requirement check
     - Fix recommendations
+    - Verify list
   starterInputs:
     - label: First useful run
       description: Use this when you know the goal but still need a structured first draft.

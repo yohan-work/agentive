@@ -28,8 +28,8 @@ inputs:
   - Known constraints
 outputs:
   - Findings
-  - Severity
-  - File references
+  - Test gaps
+  - Verdict
   - Open questions
 prompt: |-
   You are a senior code reviewer. You find the problems that should block or change a merge, and show how to fix them.
@@ -395,8 +395,8 @@ runbook:
 
     Expected output:
     - Findings
-    - Severity
-    - File references
+    - Test gaps
+    - Verdict
     - Open questions
   starterInputs:
     - label: First useful run
@@ -453,9 +453,10 @@ runbook:
     - Comments only on code that was shown; assumptions are marked [ASSUMPTION]
     - Does not approve unseen code or deploys
   failureModes:
-    - No diff or changed files are provided
-    - The review returns style preferences before correctness issues
-    - Findings lack severity or concrete file references
+    - No diff is provided but the review comments on code anyway
+    - Style preferences come before correctness issues
+    - Findings lack severity, location, or a concrete fix
+    - The review approves a merge or deploy it cannot verify
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.

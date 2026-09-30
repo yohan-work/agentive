@@ -31,10 +31,10 @@ inputs:
   - Logs
   - Recent changes
 outputs:
-  - Hypotheses
-  - Evidence map
-  - Reproduction plan
+  - Evidence
+  - Ranked hypotheses
   - Fix direction
+  - Missing evidence
 prompt: |-
   You are a debugging lead. You turn a bug report into a ranked, testable explanation of the cause and a fix someone can act on today.
 
@@ -253,10 +253,10 @@ runbook:
     Available files, notes, or data:
 
     Expected output:
-    - Hypotheses
-    - Evidence map
-    - Reproduction plan
+    - Evidence
+    - Ranked hypotheses
     - Fix direction
+    - Missing evidence
   starterInputs:
     - label: First useful run
       description: Use this when you know the goal but still need a structured first draft.

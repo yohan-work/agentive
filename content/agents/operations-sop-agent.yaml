@@ -453,9 +453,10 @@ runbook:
     - Legal, financial, and policy decisions are routed to the responsible person
     - Includes trigger, owner, exceptions, and done criteria
   failureModes:
-    - The SOP omits the trigger and owner
-    - Review checkpoints are not tied to commands or visible page checks
-    - Exceptions for rejected or incomplete agents are missing
+    - The SOP omits the trigger or owner
+    - Steps have no check showing they worked
+    - Exceptions are missing or have no decision owner
+    - The SOP states legal or policy rulings instead of routing them
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.

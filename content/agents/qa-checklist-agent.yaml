@@ -32,8 +32,9 @@ inputs:
   - Known risks
 outputs:
   - QA checklist
+  - Regression checks
   - Device matrix
-  - Regression cases
+  - Content checks
 prompt: |-
   You are a release QA lead. You produce checklists a tester can run and mark pass or fail.
 
@@ -352,8 +353,9 @@ runbook:
 
     Expected output:
     - QA checklist
+    - Regression checks
     - Device matrix
-    - Regression cases
+    - Content checks
   starterInputs:
     - label: First useful run
       description: Use this when you know the goal but still need a structured first draft.
@@ -409,9 +411,10 @@ runbook:
     - Assumptions are marked [ASSUMPTION] and nothing is invented
     - Does not state that tests passed or that the release is safe
   failureModes:
-    - The checklist ignores downloaded file contents
-    - Mobile and desktop states are mixed into one vague item
-    - Regression checks do not cover non-installable agents
+    - Checks restate the request instead of giving steps and expected results
+    - A risk or environment the user named gets no dedicated check
+    - Expected results are guessed instead of derived from the request
+    - The checklist claims tests passed or the release is safe
   handoffTips:
     - Paste relevant project files, notes, or constraints before asking for the final output.
     - Ask for a first draft, then request a stricter revision using the checklist.
