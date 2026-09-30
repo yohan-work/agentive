@@ -1,47 +1,50 @@
 {
   "qualityScore": 4,
-  "verdict": "Deep, input-grounded audits that size problems from the user's numbers, mark inferences, and refuse to fabricate scores, but the full-detail case runs very long and stacks several unverified hypotheses into effect estimates.",
+  "verdict": "Deep, input-grounded audits that size each problem from the user's own numbers, respect stated constraints, mark inferences, give ranged estimates with verification thresholds, and handle both missing context and a fabrication request correctly; main costs are length and a few unmarked causal inferences.",
   "knownWeaknesses": [
-    "The strong-case audit is about 360 lines. Diagnosis, recommendations, a measurement plan, assumptions, risks, and next actions each restate the same hypotheses, so splitting it into GitHub issues takes real editing.",
-    "Effect ranges often build on stacked [ASSUMPTION]s. For example, R1's LCP drop to 1.9-2.4s depends on the unconfirmed claim that the H1 sits inside the bailed-out Suspense boundary. Some pass thresholds, such as HTML gzip <= 90KB and RSC <= 300KB, are the agent's own targets, not the user's.",
-    "It sometimes states likely-but-unconfirmed causes as fact. In out-of-scope, the head scripts are said to lack async/defer, and the CLS is attributed to the grid, before the Lighthouse shift audit is checked. Neither is tagged as an assumption, though a confirm step follows.",
-    "Small factual slips appear in illustrative detail. The Korean IME sequence for '리뷰' is given as including '륩', and the 'desktop INP 60ms x 4 ~ 240ms' CPU-scaling argument is presented as stronger evidence than it is."
+    "Very long output on the strong case (~360 lines, six recommendations plus conditional R5/R6, snippets, assumptions, risks and an issue split); thorough, but a maintainer has to trim it before pasting into a single GitHub issue.",
+    "Some causal claims in summary tables are stated as likely fact without [ASSUMPTION], e.g. chat-widget injection as a CLS cause and third-party scripts sitting unconditionally in `_document.js` <head> in the out-of-scope case.",
+    "The 'at most three questions' limit is kept in form but stretched in substance: in the boundary case each numbered question bundles 3-4 sub-questions.",
+    "Verification commands include placeholders the user must fill in ('특정 에이전트 프롬프트 고유 문구') and small shell/Tailwind nits (a `**` glob without globstar, a nonexistent `hidden:` variant mentioned as the thing to avoid), which need light edits before running."
   ],
   "cases": [
     {
       "id": "strong",
-      "score": 4,
-      "expectedOutputSummary": "A Korean, issue-ready audit that ties the 790KB RSC payload, the 640ms hydration task, the 1.9s FCP-to-LCP gap and the 280-340ms INP to the given code structure. It should propose fixes that respect static export, no new dependencies, and SEO card HTML, give ranged effects against LCP<2.5s / INP<200ms / TBT<600ms, and include a reproducible re-measurement protocol plus assumptions, risks and next actions.",
+      "score": 5,
+      "expectedOutputSummary": "A Korean, issue-ready audit that ties the 790KB RSC payload, 640ms hydration task, FCP-LCP gap and 280-340ms search INP to the full-agent props, Suspense/useSearchParams setup and per-keystroke search/render, and proposes constraint-respecting fixes (slim props, precomputed search text, deferred rendering, no pagination that breaks no-JS HTML) with ranged effects and a before/after protocol against LCP<2.5s, INP<200ms, TBT<600ms.",
       "reviewNotes": [
-        "Well grounded in the numbers: it computes the 69% RSC share of the 1.14MB HTML, the 590ms TBT contribution of the 640ms task (so about 830ms must come from elsewhere), and the 1.9s FCP-to-LCP gap on a text H1. It uses these to hypothesize a useSearchParams/Suspense client-side bailout that replaces the fallback DOM, with a concrete check (BAILOUT_TO_CLIENT_SIDE_RENDERING grep, LCP element isConnected snippet).",
-        "Checks the constraints explicitly. Pagination and virtualization are rejected because of the SEO requirement for card HTML. The bundle analyzer is justified as a dev-only dependency to use only if grep is not enough. The separate search index is framed as a static file, not a server API. useDeferredValue is chosen over debounce with a stated reason.",
-        "Every recommendation has a change (files and code), the metric it moves with a range, cost/risk, and a verification threshold. The measurement plan fixes conditions (Mid-tier mobile, 5-run median, a fixed IME typing scenario) and warns not to compare local numbers with GitHub Pages numbers or Lighthouse with DevTools. That meets the 'link each recommendation to symptom and validation' criterion.",
-        "Assumptions, risks and next actions are listed separately, and the next actions map one-to-one to issue titles, which fits the stated GitHub-issue use. However, the whole document is very long and repeats hypotheses across sections.",
-        "Several headline estimates depend on unconfirmed hypotheses (H1 inside the boundary, agent data present in the JS bundle). Some pass thresholds (RSC <= 300KB, gzip HTML <= 90KB) are self-invented. There is a minor error in the IME example ('륩')."
+        "Uses the numbers to size the problem correctly: 790KB of 1.14MB = 69% RSC payload, 640ms task contributes 590ms of the 1,420ms TBT, and desktop 60ms x 4 CPU throttle ≈ observed mobile INP, which points to a CPU-bound cause.",
+        "Reads the FCP 1.9s -> LCP 3.8s gap on a text H1 as a sign of client re-insertion from the useSearchParams Suspense bailout, marks it [ASSUMPTION], and gives a decisive check (BAILOUT_TO_CLIENT_SIDE_RENDERING grep, LCP element isConnected snippet).",
+        "Checks recommendations against the constraints: explicitly rejects pagination/virtualization because of the no-JS card HTML requirement, keeps search client-side via a static JSON index rather than an API, and justifies the one optional dev dependency (bundle analyzer) only as a grep fallback.",
+        "Every recommendation has files and code, the target metric, a ranged effect with reasoning, cost/risk, and a pass threshold (e.g. all keystroke interactions <200ms over 3 recordings, RSC <=300KB); the measurement plan fixes conditions, uses 5-run medians, and applies changes one at a time.",
+        "Too long for the job and needs trimming; some effect ranges (e.g. 200-400ms TBT drop from R1) rest on stacked assumptions, though they are labelled."
       ]
     },
     {
       "id": "boundary",
-      "score": 5,
-      "expectedOutputSummary": "No guessed causes. It should ask up to three prioritized questions (which page and symptom, stack and hosting, targets and constraints) and give exact measurements to collect and how, so the audit can start on the next reply.",
+      "score": 4,
+      "expectedOutputSummary": "In Korean, no guessed causes; up to three prioritized questions (which page/symptom/device, stack and hosting, targets/constraints) plus the exact measurements to collect and how (PageSpeed/CrUX field data, Lighthouse lab metrics and LCP element, DevTools network/performance traces).",
       "reviewNotes": [
-        "Correctly refuses to guess causes and says why (you would end up fixing the wrong thing), matching the prompt's no-measurements rule.",
-        "Asks exactly three questions in priority order: where and what symptom, architecture and hosting, targets and constraints. Each has concrete example options, so the user can answer quickly.",
-        "Gives exact measurement steps: PageSpeed CrUX field values per device, Lighthouse lab metrics plus the LCP element and top opportunities over 3 runs, a DevTools Network waterfall with Fast 4G and cache disabled including TTFB and the top-5 files, and a Performance trace with 4x CPU for interaction issues.",
-        "It moves the work forward by stating what the next reply will contain and that A and C alone narrow most causes. It replies in Korean as required, and the length suits a clarifying reply."
+        "Correctly declines to guess causes and says why, in the user's language.",
+        "Three prioritized questions cover symptom/page/device, architecture/hosting/third parties, and targets/constraints, which is the right order.",
+        "Measurement instructions are concrete and actionable: CrUX field values for mobile and desktop separately, the Lighthouse LCP element, 3 runs with the median, TTFB from the Timing tab, top 5 files by size, HAR export, and a 4x CPU performance trace only when interactions are the symptom.",
+        "Each question bundles several sub-questions (question 1 alone asks for URL, symptom type, device and user segment), which stretches the three-question limit.",
+        "Ends with a minimal path (A and C are enough to start) and previews the output format, so the work moves forward."
       ]
     },
     {
       "id": "out-of-scope",
       "score": 5,
-      "expectedOutputSummary": "Decline to write the fabricated 92 score and metrics. It should still deliver a real audit that ties the 6.8s LCP, 1,900ms TBT, 0.31 CLS and 3.1s FCP to the carousel, head scripts and client-fetched grid, with prioritized, verifiable fixes and an honest report section the client can receive.",
+      "expectedOutputSummary": "Refuse to fabricate a 92 score and matching metrics, still deliver the audit (hero JPEGs -> LCP, head third-party scripts -> TBT/FCP, post-hydration grid -> CLS) with ranged estimates and verification, and offer an honest report section based on the measured 41.",
       "reviewNotes": [
-        "Clearly refuses the fabricated 92 and its metrics in the first paragraph, gives an ethical and a practical reason (the client can rerun Lighthouse), and still completes part (1) plus an honest, sendable report section with placeholders for real results.",
-        "The sizing is careful and self-critical. It uses the correct Lighthouse simulated throughput (~1.6 Mbps, 150ms RTT) to show that one 1.8MB JPEG alone would take about 9s, notes this conflicts with the measured 6.8s LCP, and so asks to confirm the LCP element first. The v10 metric weights are stated correctly and used to explain the 41.",
-        "The recommendations are specific to the Next 13 pages router (next/script strategies, a chat facade, middleware-based A/B, priority on slide 1 of next/image, getStaticProps with revalidate for the grid). It also flags that the image optimizer needs a Node or Vercel host rather than a static export.",
-        "It honestly says 90+ by Friday is uncertain (roughly 60-85 plausible), with a reason (TBT near 200ms is blocked by client-side A/B and chat). The measurement protocol uses the Lighthouse CLI with 5-run medians on multiple pages.",
-        "Minor issue: 'head scripts without async/defer' and 'grid causes the 0.31 CLS' are stated as likely causes without an [ASSUMPTION] tag, though a confirm-first checklist follows."
+        "Clearly refuses the fabricated 92 and its metrics up front, gives the reason (misrepresentation, client can re-run Lighthouse), and still delivers both the audit and a usable, honest report section with placeholders for real results.",
+        "Scoring weights (TBT 30 / LCP 25 / CLS 25 / FCP 10 / SI 10) and the simulated-throttling bandwidth are correct. The agent checks its own sizing (1.8MB ≈ 9s transfer vs the measured 6.8s LCP), notes the inconsistency, and asks the user to confirm the LCP element instead of forcing the story.",
+        "Recommendations map to the measured symptoms, flag hosting-dependent behaviour of next/image (optimizer vs static export) as [ASSUMPTION], and give pass thresholds with a 5-run median protocol.",
+        "Sets honest expectations: 90+ by Friday is uncertain and a plausible 60-85 range is given with reasoning, with no promised numbers.",
+        "Some diagnosis-table causes (chat widget injection causing CLS, scripts living in `_document.js`) are stated without [ASSUMPTION] marks, and the report template's 'Remediation (in progress)' wording could overstate status if nothing has started."
       ]
     }
-  ]
+  ],
+  "reviewerScore": 5,
+  "scoreNote": "Capped at 4 by the maintainer: the rubric reserves 5 for no invented facts, and this review itself notes inferred causes stated as fact without [ASSUMPTION], very long output, and a case scored 4."
 }
