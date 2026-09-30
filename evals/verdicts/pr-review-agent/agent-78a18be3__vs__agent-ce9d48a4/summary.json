@@ -1,0 +1,87 @@
+{
+  "slug": "pr-review-agent",
+  "variants": [
+    "agent-78a18be3",
+    "agent-ce9d48a4"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-78a18be3",
+      "order2": "agent-78a18be3",
+      "result": "agent-78a18be3"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-78a18be3",
+      "order2": "agent-78a18be3",
+      "result": "agent-78a18be3"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-78a18be3",
+      "order2": "agent-78a18be3",
+      "result": "agent-78a18be3"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-ce9d48a4",
+      "order2": "agent-78a18be3",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-ce9d48a4",
+      "order2": "agent-78a18be3",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-78a18be3",
+      "order2": "agent-78a18be3",
+      "result": "agent-78a18be3"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-78a18be3",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-78a18be3",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-78a18be3",
+        "agent-78a18be3"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-78a18be3": 4,
+    "agent-ce9d48a4": 0
+  },
+  "ties": 0,
+  "inconsistent": 2
+}

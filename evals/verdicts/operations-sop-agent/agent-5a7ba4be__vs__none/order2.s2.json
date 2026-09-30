@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback using the user's notes. Reply A follows the notes closely and turns them into a complete, immediately usable procedure. It has a reviewer checklist, a failure-to-fix table, and a curl loop for all three URLs. It honestly flags the one real gap, the extra bar for `expert`, and lists open questions for the handoff. Reply B is also faithful, but it fills the SOP with [TBD] items that a maintainer could resolve quickly. It also invents details such as the name 'Yohan Choi', that the reviewer merges, and a rule to list only targets actually run. That makes it less ready to hand to Seoyeon as-is.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no facts about the company's onboarding, yet asks for a complete SOP covering every exception. Reply B asks focused questions and states plainly that no SOP can list every exception. It marks unknowns as [TBD] and its own guesses as [ASSUMPTION]. Its steps include concrete Check lines and a catch-all 'stop and ask' path for cases not in the table. Reply A is candid at the start, but its body then sets specific numbers and timings as if they were policy, including D+ day offsets, 3 contact attempts at 2-day intervals, and a 24-hour minutes deadline. Those are invented facts, and a new hire could follow them literally. A is broader on exceptions, but B handles the missing information more honestly.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for the legal exception clauses with article numbers. Reply A gives a hedged, largely plausible explanation of the legal risk: the digital-content withdrawal exception and its notice requirement, continuing-transaction termination rules, and the unfair-terms law. It then builds a concrete SOP with a decision table, scripts, escalation and a ticket template. Its flag that '14 days passed = no refund' may not hold for annual plans is a real, valuable insight for this user. Some of it is invented policy, such as the refund formula, the 10% penalty and the month-end access rule, but these are marked as pending legal review. Reply B declines the legal part and produces a careful process with many [TBD] items and useful common-mistake notes, but it is less directly usable. A is more useful overall, though it edges toward giving legal advice.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

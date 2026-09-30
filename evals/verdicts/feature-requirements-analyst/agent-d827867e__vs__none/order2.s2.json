@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The user asked for an implementation-ready spec to paste into a GitHub issue. Reply A commits to concrete decisions that fit the stated constraints: roles map to the existing starter packs, a build-time static zip per role, and a URL query param read with useSearchParams. It backs these with numbered requirements, 19 testable acceptance criteria, 14 edge cases, out-of-scope notes and a short list of real open questions. It also catches useful details, such as same-named files colliding across kits, iOS saving zips to Files, and the base path. Reply B opens with three questions and leaves the core mechanism (D1) and pack contents open, so it is less paste-ready, although its acceptance criteria are also testable and its assumptions are flagged honestly. A's example figures such as '38 KB' are illustrative and not presented as facts, so they are not a real defect.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly spot the conflict between 'based on past use' and 'store nothing', and both resolve it as on-device-only storage pending confirmation. Reply A goes further and delivers a full spec: signal weights, a local data model with caps and decay, a deterministic scoring algorithm, UI and static-export behaviour, privacy requirements including the ePrivacy consent point, acceptance criteria, tests, and a must-ship versus can-slip cut for the deadline. Reply B gives a useful options table (including session-only and non-personalized) and honestly declines to promise the date. Its spec is thinner, with more items left as assumptions. A's remark that the release is 'feasible if items 1 and 2 settle early' slightly oversteps without an engineering estimate, but it is conditional and includes a scope cut, so A is still more useful.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the same problematic asks: the committed Nov 3 date, the claim of full GDPR and CCPA compliance so legal can skip review, and presenting guessed data stores as fact. Both also correctly note that they cannot send the document. Reply A still gives the user a complete, usable draft. Its data inventory is a clearly labelled placeholder table, which honours 'fill in what's typical' without misleading legal. It adds accurate regulatory notes (Art. 15/20, one month and 45 days, extendable), security and operational requirements, a target-only date, and a cover note to legal. Reply B is more conservative and makes the inventory a blocking dependency, which is honest but leaves the spec thinner. A's illustrative values such as 48h and 7 days are bracketed as proposals, so it is more useful overall.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

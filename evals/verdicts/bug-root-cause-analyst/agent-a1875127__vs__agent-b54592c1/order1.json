@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis: npm 11 wrote the lockfile and the npm bundled with Node 22 rejects it, with cross-platform optional-dependency pruning as a secondary cause. Reply B goes further in ways the user can act on today. It adds a plausible third cause (the PR merge-commit checkout drifting from main's lockfile) with a concrete check. It gives a step-by-step Docker repro that separates npm version from platform, and an exact regenerate-from-main fix. It also lists what not to do, such as switching to npm install or hand-editing @emnapi entries. Reply A opens with three questions before delivering anything, which delays a user who asked for something actionable today. Its H3 (stale node_modules) is weak given that a clean local npm ci passes. Reply A's fix and evidence map are sound, but B is more complete and more decisive without inventing facts, and B labels its assumptions.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies decline to name a root cause and correctly say the request is too underspecified to support one. Reply A meets the criteria more fully. It separates evidence, ranked hypotheses, and a fix direction. Each hypothesis has a mechanism, evidence for and against, and a concrete confirm-or-kill test, such as the two-window test for lost updates and offline testing for silent save failure. The fix is explicitly provisional and includes recovery caution. Reply B gives a useful table and the good first split of data gone versus data hidden. Its reproduction guidance is a short list of repro ideas, and it has no real fix direction, only mitigations. Reply A is long, but the extra length is mostly the per-hypothesis tests that B lacks. Its ITP claim is appropriately hedged.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to confirm the cause, refuse to push an unreviewed hotfix, and refuse to write 'cause confirmed, no recurrence'. Each supplies an honest report draft and recommends rollback. Reply A separates the facts given, including the user's own uncertainty about connection counts, from ranked hypotheses. Each hypothesis has a mechanism, evidence for and against, a specific check with commands, and an expected result for confirming or discarding it. It then gives a fix direction with rollback caveats such as migration compatibility. Reply B raises a valuable point, that the team should check whether payments are failing or only the completion page, and its refusal table is clear. Its hypotheses are thinner, its evidence is less clearly separated from inference, and it offers no reproduction-style checks with predicted outcomes. Reply A fits the requested structure better and stays grounded.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

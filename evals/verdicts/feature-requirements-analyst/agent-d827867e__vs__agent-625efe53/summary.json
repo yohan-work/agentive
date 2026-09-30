@@ -1,0 +1,87 @@
+{
+  "slug": "feature-requirements-analyst",
+  "variants": [
+    "agent-d827867e",
+    "agent-625efe53"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-625efe53",
+      "order2": "agent-625efe53",
+      "result": "agent-625efe53"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-d827867e",
+      "order2": "agent-d827867e",
+      "result": "agent-d827867e"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-d827867e",
+      "order2": "agent-d827867e",
+      "result": "agent-d827867e"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "agent-625efe53",
+      "order2": "agent-625efe53",
+      "result": "agent-625efe53"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-d827867e",
+      "order2": "agent-625efe53",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-d827867e",
+      "order2": "agent-d827867e",
+      "result": "agent-d827867e"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-625efe53",
+        "agent-625efe53"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-d827867e",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-d827867e",
+        "agent-d827867e"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-d827867e": 3,
+    "agent-625efe53": 2
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

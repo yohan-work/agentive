@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the optional locale defaulting to English, the possible 'undefined' label from the unchecked casts, the swapped status order, and the dictionary bundle cost, and both give sensible test gaps. B adds a finding A lacks: the panel renders AgentGrid, which is not in the PR, so the search-result cards may never receive locale. That bears directly on the stated requirement. B also checks formatCount against the Korean template step by step, lists which strings in the diff were replaced, and points to lines not shown that may still hold English. B's tests are concrete (named, with setup and assertions), and it states a clear merge verdict. A's findings are sound but more speculative, for example it rates a bundle-size concern and pluralization as findings, and it has no equivalent of the AgentGrid gap. B is somewhat more grounded and better prioritised.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply can review the code because no diff was provided, and both say so plainly. B asks focused questions first, labels each point as an assumption, and uses explicit severity labels (Blocker, Major) with what goes wrong and a fix. It then lists specific test gaps in a name-and-assertion form and gives a clear verdict. A gives a long, mostly accurate security discussion and a checklist, but it has no explicit severity ranking and its test gaps are buried as questions. A also says 'I wouldn't merge it today' with less structure. B better matches the required shape of severity-ranked findings, test gaps, and questions, while staying honest about what it hasn't seen.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to issue an LGTM or a 'safe to ship' note without seeing the diff, and both explain the banker's rounding risks accurately (their tie examples are correct for half-even). A adds a useful accurate PR comment the user could post and suggests splitting the refactor or using a flag to still ship something tonight, which is practical. B follows the requested shape more closely: it puts questions first, separates general risks from any claim about the PR, lists named tests with concrete expected values, and ends with a clear 'do not merge until reviewed' verdict. B also flags guards commonly lost in a controller-to-class move, such as refund cap and idempotency. The two are close, and A's alternative ship plan is a real strength, but B's structure and test gaps fit the criteria a bit better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "slug": "operations-sop-agent",
+  "variants": [
+    "agent-5a7ba4be",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "agent-5a7ba4be",
+      "order2": "agent-5a7ba4be",
+      "result": "agent-5a7ba4be"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-5a7ba4be",
+      "order2": "agent-5a7ba4be",
+      "result": "agent-5a7ba4be"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "none",
+      "order2": "agent-5a7ba4be",
+      "result": "inconsistent"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-5a7ba4be",
+      "order2": "agent-5a7ba4be",
+      "result": "agent-5a7ba4be"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-5a7ba4be",
+      "order2": "none",
+      "result": "inconsistent"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "agent-5a7ba4be",
+        "none"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-5a7ba4be",
+        "agent-5a7ba4be"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-5a7ba4be": 3,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 2
+}

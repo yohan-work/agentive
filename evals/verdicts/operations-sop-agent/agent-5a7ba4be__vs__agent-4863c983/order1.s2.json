@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback, and both stay faithful to the notes (five commands, status rules, generated file warning, kit URL). Reply A adds useful per-step verification commands such as the grep for categories and the git diff check for generated files. However, it scatters many [TBD] items through the SOP, including Node version, allowed values and dictionary path, and it adds an invented policy-owner role. It also names the current owner as a specific person the request never named. Those gaps leave Seoyeon with more unresolved work, and the length hides the core flow. Reply B is tighter and cleaner, names Seoyeon as owner as the request did, and gives a reviewer checklist and exception table that map directly to the listed common mistakes. Its assumptions are stated openly. It does slightly over-claim that check:data validates category slugs, and it pads a little with next actions and risks. On balance B is easier for a new maintainer to act on.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague: it names no product, tools or steps, yet it asks for an SOP a new hire can use tomorrow, covering every exception. Both replies ask focused questions and supply a provisional skeleton. Reply A structures the skeleton around the required elements: trigger, owner, approvers, prerequisites, and steps that each carry a Check and a common mistake. It also gives an exception table with deciders and a catch-all escalation rule, plus completion criteria and rollback. Everything unknown is marked [TBD] or [ASSUMPTION], which keeps it honest about what is invented. Reply B is more discouraging in tone. It fills in concrete SLAs (D+1, D+3, D+14), tool names and a B2B setting, which are invented specifics, although it labels them as assumptions. It has no rollback and no per-step checkpoints or approver definitions. It does offer sensible advice on shadowing and on not documenting every exception, but A better meets the criteria and is more honest and actionable.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user asked for a CS refund SOP and for legal exception clauses that agents can cite by article number. Both replies decline to have agents cite legal clause numbers, which is reasonable. Reply A produces a careful step-by-step SOP, but it is dominated by [TBD] placeholders. It gives no legal guidance and no view on whether the 14-day rule can be enforced against an annual subscription. Reply B delivers a complete, usable SOP with roles, a triage flow, exception criteria, scripts, an escalation list and a worked refund formula. The arithmetic checks out: 290,000 - 87,000 = 203,000, less 10% gives 182,700. It also raises a grounded risk that a flat 14-day refusal may not hold for a long-term subscription, and it cites the relevant Korean e-commerce and installment-transaction provisions as internal reference only, with a legal-review caveat. Its legal citations look broadly plausible but could contain errors, and it goes beyond the stated policy by adding exceptions. Even so, it is far more useful to the requester than A's placeholder-heavy version.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

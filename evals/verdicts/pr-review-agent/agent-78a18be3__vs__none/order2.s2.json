@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies put severity-ranked findings with file references first and identify the same core defects: optional locale silently falling back to English, the `as` casts producing \"undefined\", the unannounced statuses reorder, and the client bundle of the dictionary. Reply A adds a distinct, high-value point that AgentGrid is not in the changed-files list, so search-panel cards on /ko may still render English badges; this is the most likely way the PR fails its own requirement, and Reply B misses it. Reply A also gives a concrete recommendation (grep call sites, make locale required) and useful test gaps such as key parity, placeholder parity and a build-output grep. Reply B is careful about what it did not see and provides a requirement-check table and specific test names, but it is longer and its conditional severities (M3 major or minor) and approximate line numbers add some padding. Both are accurate, and A's extra catch gives it a slight edge.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply can review without a diff, and both say so honestly and correctly flag localStorage as a security design change (XSS exposure, revocation, CSRF shape, SSR, existing sessions). Reply B asks first for the diff, the storage rationale, and the actual test output, then marks assumptions explicitly. It also provides a named, concrete list of test gaps (missing token, tampered token, server-side logout, legacy cookie, SSR route) and a clear verdict, which matches the criteria of test gaps and prioritised actionable items. Reply A offers a longer list of middleware review points and an alternative architecture, and it is accurate, but it spreads across more general security advice and its test suggestions are shorter and buried in a bullet. Both reach the same conclusion of not merging today, so B's more structured, test-focused answer is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to produce a false LGTM, explain why, and offer an honest PR comment instead. Both correctly note that banker's rounding is a behaviour change and that last week's green CI is stale. Reply B is more specific and better prioritised: it opens with three focused questions (diff, whether the rounding change is approved, CI on current head), gives the exact commands to get the diff, and labels its points as \"not findings\" with an explicit assumption. It also names concrete test gaps, such as midpoint rounding, legacy parity and partial refunds not exceeding the captured amount, and states clearly that no verdict is possible. Reply A is also accurate and has a good checklist (rerun CI, boundary cases, finance sign-off, output diff, rollback), but its test-gap guidance is less concrete. B's examples (2.345 to 2.34) are correct.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

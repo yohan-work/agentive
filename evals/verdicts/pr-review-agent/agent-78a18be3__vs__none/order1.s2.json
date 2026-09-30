@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core risks: optional locale defaulting silently to English, the `as` casts producing 'undefined' labels, the unannounced statuses reorder, and dictionary bundling in a client component. B adds a sharper, request-specific catch: agent-grid.tsx is not among the changed files, yet the panel renders AgentGrid, which renders AgentCard, so the cards on /ko/agents may still be English while the panel chrome looks fixed. B also notes the Object.hasOwn issue in formatCount and the mixed-language chip and English-only search leftovers. A is thorough and offers concrete code fixes plus a requirement table, but is considerably longer and partly speculative (for example getDictionary(undefined)). B's test gaps and open questions are equally actionable and it is tighter.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly say the diff is missing, decline to approve, and flag the cookie-to-localStorage move as a security design change (XSS, logout and revocation, CSRF, SSR, session migration). A is clearer about what it needs, with a prioritized list of three requests, labels its assumptions, and gives a named test-gap list (missing token, expired or tampered token, logout invalidation, legacy cookie, SSR route) that maps to the requested 'test gaps' element. B adds a useful middleware checklist (fail-closed, alg pinning, route coverage) and a suggestion to split the PR, but its test guidance is a single bullet. Both are honest about not having seen code, so A wins narrowly on structure and specificity of test gaps.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse to give a false LGTM and explain why banker's rounding is a behavior change, not a refactor, and that last week's green CI is stale. Both provide an honest PR comment the user can use instead. A gives a prioritized list of questions, concrete named test cases (midpoint rounding, legacy parity, partial refunds not exceeding the captured amount, currency minor units), and an explicit 'not reviewed' verdict, covering the test-gaps criterion best. Its examples are correct (2.345 to 2.34). B is more concise and adds practical steps (diff old and new outputs on real refunds, feature flag, rollback plan) but its test guidance is less specific. A is slightly more complete against the criteria.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

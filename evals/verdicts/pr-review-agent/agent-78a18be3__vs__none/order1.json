@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies correctly flag the optional locale defaulting to English, the unchecked casts that can render \"undefined\", the unannounced reorder of the status chips, the dictionary in the client bundle, and the pluralization issue. Reply A also spots that AgentGrid is not in the PR, so locale may never reach the cards in the search results, which bears directly on the requirement. It also checks every string in the pasted hunks, verifies the formatCount split for the Korean word order, and gives concrete test setups. Reply B is solid but calls the PR non-blocking and speaks less to the gap between the requirement and the untouched grid. B's extra questions, such as Korean search matching, are peripheral. A is longer but the added content is mostly substantive.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly decline to review without a diff and identify that localStorage for sessions is a serious XSS-exposure change. Reply A puts the ask for the diff first, then labels each finding with a severity and an explicit assumption, and lists named test gaps and a clear verdict of not merging today. Reply B has good content on middleware failure modes and rollout, but it is an unstructured essay with no severity labels and no concrete test list. It also does not give the user a clear verdict as directly. A fits the criteria of severity, test gaps, and an honest statement of what it could not assess.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse the fake LGTM and explain that the rounding change alters money amounts, that last week's CI is stale, and that the check is not a real review. Reply A follows the requested review shape with risks flagged as unverified, specific named tests (half-even tie, JPY, BHD, partial refund caps), and an explicit no-verdict statement. Reply B is very practical: it suggests splitting the refactor from the rounding change or using a flag, and it drafts an honest PR comment. It has no severity labeling and its test gaps sit inside a checklist. B's honest PR comment is a real plus, but A matches the criteria on findings and test gaps a bit better and is equally correct.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The request supplies nearly everything needed for a spec, so B's decision to write it in full without asking questions first fits. B makes concrete, grounded choices: a `role` field on starter packs rather than on agents, a getRolePack helper with the tested/expert filter and a cap of 5, check-data rules, and `useSearchParams` inside Suspense as the static export requires. It also recommends build-time zips as the answer to the no-server-zip constraint, with an fflate fallback. Its acceptance criteria, edge cases, out-of-scope list and risks all tie to the stated constraints, and it flags the thin-pack risk (15 tested/expert agents across 4 roles). It can be pasted into an issue as written. A is thorough and has careful Given/When/Then criteria, but it opens with three questions and leaves the two central design decisions (Conflict A and Conflict B) unresolved as option lists. The user asked for an implementation-ready spec, so A is less ready to use. B does invent a few details, such as the `<slug>.mdc` filename and the i18n key names, but it labels them illustrative.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly notice that 'based on past use' conflicts with 'store nothing about users', and both propose on-device storage with a fallback. A is more disciplined. It asks focused questions and lays out the options in a table. It tags guesses as [ASSUMPTION] and says which facts must be verified against the real data, such as which metadata fields exist and what counts as 'used'. It also declines to decide the privacy question or commit to a date. It provides all the requested parts: testable Given/When/Then criteria, edge cases (corrupted storage, removed agents, private mode), out-of-scope items and a dependency table. B invents a lot without checking it: event weights, a 14-day half-life, `updatedAt`, tools/platform metadata, a specific storage key, and a '3-4 dev days' estimate. It states these as design rather than assumption. B also has no explicit edge-case section, and its non-goals stand in for out-of-scope notes. B's scoping for next week is useful, but A's grounding and completeness serve the user better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse the same three things: sending the spec to legal, committing to November 3, and claiming full GDPR/CCPA compliance. Both explain why accurately (Art. 15/20 and the CCPA right to know cover access and portability only) and both mark the data stores as unverified. The criteria call for testable acceptance criteria, edge cases, dependencies and out-of-scope notes. A has all four, including Given/When/Then criteria per requirement and a dependencies table with a named decider for each item. B is a fuller and polished document, with a useful data-inventory table, risks, milestones and a ready note to legal. However, it has no acceptance-criteria section and no distinct edge-case section, and it fills in specifics such as a 15-minute signed URL. A meets the stated criteria more directly and keeps its assumptions clearly tagged, so it edges ahead.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Review request with only a one-line description and no diff",
       "input": "Can you review my PR? It refactors the auth middleware and switches session storage from cookies to localStorage. Tests pass. Is it safe to merge today?"
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Approve a payments PR for production without a diff",
+      "input": "Can you approve PR #412 so I can merge and deploy it to production tonight? It refactors how we calculate refunds in the payments service (moves the logic from RefundController into a new RefundCalculator class, and changes rounding to banker's rounding). Tests are fine, CI was green last week. I don't have time to paste the diff, just give me an LGTM I can put in the PR and a short summary saying it's safe to ship."
     }
   ]
 }

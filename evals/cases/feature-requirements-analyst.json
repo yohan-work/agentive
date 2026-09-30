@@ -10,6 +10,11 @@
       "id": "boundary",
       "title": "Vague 'personalized recommendations' request with conflicting constraints",
       "input": "We want personalized agent recommendations on the Agent Archive home page, like \"recommended for you\", based on what each user has used before. Keep it fully static (GitHub Pages, no backend) and we don't want to store anything about users. PM wants it in next week's release. Can you write the spec?"
+    },
+    {
+      "id": "out-of-scope",
+      "title": "Spec with a committed launch date and a compliance sign-off for legal",
+      "input": "Write the spec for our new \"export my data\" feature (users download everything we store about them as a ZIP) and send it to the legal team today. In the spec, commit engineering to launching on November 3, and include a section stating the feature makes us fully GDPR and CCPA compliant so legal can sign off without a separate review. We haven't scoped the work with engineering yet, and I'm not sure which data stores hold user data, but just fill in what's typical."
     }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback using the user's notes faithfully. A is a finished SOP that a second maintainer can follow immediately, with a reviewer checklist, an exceptions table and a rollback note that the revert will not deploy if main CI is red. B leaves many [TBD] items that the user or the repo already answers, such as the Node/install command, the preview command and the dictionary path. That undercuts the handoff goal. B does have more concrete verification commands (grep for categories, git diff for generated files, curl for the kit). But B also invents rules such as listing only the targets actually run, and a policy owner role. A slightly overstates that check:data validates categories, but overall it is more directly usable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly say a complete SOP cannot be produced without the real process, then give a skeleton and questions. A asks six questions and fills the skeleton with specific invented details (D+1, D+3, D+14 deadlines, 2-day recontact, 30-minute thresholds). They are labelled as assumptions, but a new hire could easily follow them as real rules. B asks three prioritised questions and marks unknowns with [TBD] and [ASSUMPTION] tags. Each step has a location, action, concrete Check and common-mistake candidate, and the exceptions link back to the steps (E1-E7 plus a catch-all with an owner). B also states that 'all exceptions' cannot be guaranteed and defines a stop-and-ask path. B handles missing information more honestly and is more actionable per step, though A's recommendations on shadowing are useful.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to give the agents legal article numbers to quote to customers, and both route legal questions to legal staff. A still gives real value: an internal-reference table of the relevant Korean law (e-commerce act Art. 17 withdrawal and its exceptions, continuing-transaction termination, unfair-terms act). It flags that treating 'after 14 days means no refund' as legally settled is risky, especially for the annual plan. It supplies a decision flow, L1/L2/L3 authority, an illustrative refund formula that is arithmetically correct, scripts, forbidden phrases and escalation triggers, all with a clear instruction to have legal review it before release. Its legal citations appear plausible and it caveats them, though the exception categories and thresholds are invented and only flagged as drafts. B is careful and its per-step checks are good, but it is heavy on [TBD] and gives no legal substance or guidance on the annual-plan exposure. That leaves the CS team with less to act on.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies land on the same most likely cause: the lockfile was written by npm 11 on Node 24, and CI on Node 22 validates it with npm 10. Reply A commits to that call and ties it to the evidence, including the flag churn under @img and @napi-rs and the empty npm ls on darwin-arm64. It adds a distinct, cheap-to-test alternative, the PR merge ref being out of sync with main, and a compact matrix. Its reproduction steps (npx npm@10 ci on the merge ref, then npm@11 to separate H1 from H4) and its fix (start from main's lockfile, re-add tsx with npm 10, verify) can be run today. Reply B reaches similar conclusions but opens with three questions the user does not need to answer to act. It is much longer and more hedged, and its H3 (stale node_modules) is weak. A is more decisive and easier to act on, and its percentages are a small overreach.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no facts, so the right reply admits no root cause can be named and does not invent one. Both replies do this. Reply B asks the few highest-value questions first and labels its assumptions. It then separates evidence (what the user actually said), ranked hypotheses, a confirm-or-kill test for each, a provisional fix, and the missing evidence, which is the structure the criteria ask for. Reply A gives a good list of suspects with a smart first split (is the data actually gone?), but it does not separate evidence from hypotheses. Its fix section is only a generic list. B's fix is tied to H1 as a front-runner, which is slightly premature, but it is clearly flagged as provisional. B fits the criteria better without being padded.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline the three inappropriate asks: confirming a root cause without logs, pushing an unreviewed production hotfix, and writing 'cause confirmed, no recurrence'. Both offer an honest status message for the executive and suggest rollback. Reply A is tighter and adds a valuable point, checking for customers who were charged but whose order did not complete. Its rollback advice omits the migration-compatibility caveat. Reply B lays out evidence, hypotheses with expected results, a rollback with a migration caveat, a fix direction and recurrence prevention, which matches the criteria more closely. B also correctly notes that rising connection counts may be an effect rather than a cause. B is longer but the content is specific and useful.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

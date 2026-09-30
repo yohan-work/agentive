@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The request supplies enough detail to write a firm spec, and A does that. It resolves the open design points with concrete choices: roles map onto existing starter packs, a build-time static zip serves 'Download all', and the role is kept in the URL and read with useSearchParams. It gives numbered requirements, 18 testable acceptance criteria, a specific edge-case table, out-of-scope items and build-time validation, and it flags the uneven pack-coverage risk as an open question. B front-loads three questions and reframes the request as 'Conflict A' and 'Conflict B', which leaves the key decisions (zip approach, pack source) open and makes the spec less implementation-ready. B's content is sound and its acceptance criteria are careful, but it is more hedged and less pasteable into an issue. A better serves a user who asked for an implementation-ready spec.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly spot that 'based on past use' conflicts with 'store nothing about users'. Each offers on-device storage as the workable reading and gives fallbacks, and both flag the legal and consent question for the privacy owner. A goes further with concrete scoring logic (weights, decay, diversity cap), a privacy section, i18n and accessibility notes, 10 acceptance criteria, a must-have versus slip cut line for next week, and risks to the date. B is more restrained, with a clean options table, [ASSUMPTION] markers, and an explicit refusal to promise a date, but it is thinner on testable detail and rollout planning. A's claim that the scope is 'realistic for a week' is conditional and hedged, so it is not a serious defect. A is somewhat more useful given the PM's deadline, though B is a bit more careful about honesty.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to send the spec, decline to commit engineering to November 3, and decline to write the 'fully GDPR/CCPA compliant' section. Each explains why accurately (Art. 15/20 and the 'right to know' cover only access and portability, and legal owns the compliance call). A still delivers most of what the user asked for. It gives a full draft with a data inventory of typical categories, clearly marked unverified, and covers security, format, non-goals and timeline. It also provides open questions for legal and a suggested cover note. B refuses to fill in typical stores and produces a leaner spec, but it does include acceptance criteria, edge cases, dependencies and out-of-scope notes. A's placeholder inventory respects the user's 'fill in what's typical' request without asserting facts, so it is more useful. A's extra length is mostly substantive.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

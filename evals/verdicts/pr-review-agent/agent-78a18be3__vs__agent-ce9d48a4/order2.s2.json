@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core issues: the optional locale prop that silently falls back to English, the unmentioned reorder of the status chips, the casts that can render \"undefined\", and the client bundle size. Both also point out that the tests can't prove /ko is free of English. B ties each finding to a file and code location, labels severity, and states plainly what depends on the unseen files. It also adds a table checking each stated requirement and constraint, and it gives concrete test cases with setup and assertions. A is well calibrated on severity, but it opens with a verdict, while the criteria want findings and test gaps first. A also cites line numbers it can't verify. B rates the cast issue as Major, which may be a little high, but it explains what would lower it.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply has the diff, and both say so. Both flag the localStorage change as a likely blocker for the same reasons: XSS token theft, logout and revocation, CSRF, and existing sessions at deploy. A labels severities (Critical/High) on code it hasn't seen and adds process advice to split the PR. That is useful, but it treats assumptions as findings. B asks for the diff, the storage rationale and the test output first, then keeps its description-based points clearly labelled as assumptions. B also adds the SSR and non-browser caller risk, and it lists concretely named tests. B's test gaps are more actionable, and its handling of missing information is more honest. A is stronger on explicit severity labels, so the margin is slight.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies refuse to give an LGTM without seeing the diff, and both explain the banker's-rounding risk correctly (2.345 rounds to 2.34) and why stale CI doesn't count. A provides a broad self-check checklist and a PR note for merging without review. That note is honest, but it nudges the user toward shipping unreviewed refund code. B lists what it will check, gives concrete, named test-gap cases (midpoint rounding, parity with legacy results, partial refunds not exceeding the capture, currency minor units), and gives the exact commands to produce the diff. B's verdict, \"Not reviewed\", is accurate, and its suggested PR text records what is still pending. B fits the criteria better on test gaps and actionable specifics.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

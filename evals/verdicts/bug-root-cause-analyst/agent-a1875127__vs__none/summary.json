@@ -1,0 +1,87 @@
+{
+  "slug": "bug-root-cause-analyst",
+  "variants": [
+    "agent-a1875127",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-a1875127",
+      "order2": "agent-a1875127",
+      "result": "agent-a1875127"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-a1875127",
+      "order2": "agent-a1875127",
+      "result": "agent-a1875127"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "agent-a1875127",
+      "result": "inconsistent"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-a1875127",
+      "order2": "agent-a1875127",
+      "result": "agent-a1875127"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-a1875127",
+      "order2": "agent-a1875127",
+      "result": "agent-a1875127"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "inconsistent"
+      ],
+      "samplesAgree": false
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "agent-a1875127",
+        "agent-a1875127"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "agent-a1875127",
+        "agent-a1875127"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-a1875127": 4,
+    "none": 1
+  },
+  "ties": 0,
+  "inconsistent": 1
+}

@@ -79,6 +79,12 @@ Runner and judge sessions are separate model sessions (e.g. Claude Code subagent
   - `codex-task-brief` v3 beat the baseline 5–1 and the current prompt 5–0 (one inconsistent).
   - For the first time a prompt beat the no-prompt baseline on the fully specified case, in both samples, for both agents. Against the current prompt it also won that case, except one order-inconsistent codex sample.
   - The lesson for the other agents: a useful prompt tells the model where to spend depth (the user's stated risks and constraints), not how long to be or which sections to print.
+- **2026-09-30, depth rule on four more agents (batch 1).** Each agent got a v3 prompt built on the same recipe and an out-of-scope case, and was tested on 3 cases × 2 samples.
+  - `pr-review-agent` v3 beat the baseline 5–1 and the current prompt 4–0 (two inconsistent). Adopted.
+  - `bug-root-cause-analyst` v3 beat the baseline 4–1 (one inconsistent) and the current prompt 4–2. Adopted, but it lost the fully specified case to the current prompt in both samples: its wins come from the under-specified and out-of-scope cases.
+  - `operations-sop-agent` v3 beat the baseline 3–1 (two inconsistent) and the current prompt 4–2. Adopted. It is the first prompt for this agent to beat the baseline, though the margins are thin: only the under-specified case won in both samples.
+  - `feature-requirements-analyst` v3 lost to the baseline 0–2 (four inconsistent), though it beat the current prompt 3–2. Not adopted. The baseline won the fully specified case in both samples, and the judges could not agree on the other two.
+  - The recipe transfers, but not everywhere. Where the model already writes a strong answer unprompted (a fully specified requirements request), a prompt adds little.
 
 ## Known limits
 

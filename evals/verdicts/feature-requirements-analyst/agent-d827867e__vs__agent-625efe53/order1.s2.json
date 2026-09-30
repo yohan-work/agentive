@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies keep to the constraints and both add build-time guards for the 3-5 tested/expert rule. B makes concrete, grounded design decisions. It adds a role key to starter-packs.ts, extends check-data.mjs, builds a deterministic build-time zip, uses useSearchParams inside Suspense, and covers basePath, iOS Safari and the byte-identical kit files. It also states its unverified assumptions honestly. A gives thorough, well-structured acceptance criteria. But it defers the key download mechanism to the reader as an open decision, and it opens by asking three questions, which makes it less paste-ready than the user asked for. A also over-hedges on whether a build-time zip is allowed, even though the user only ruled out a server-side zip. B is more implementation-ready and better matches the request for a spec to paste into an issue.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies spot the conflict between personalization and storing nothing. Both offer on-device history as the route and give fallbacks. A is more honest about unknowns. It flags that it can't assume which events the site tracks, that metadata richness needs checking, and that the release date can't be promised. Its spec has explicit numbered requirements, Given/When/Then acceptance criteria, an edge-case list, an out-of-scope section and a dependencies table. That maps directly onto the stated criteria. B is richer, with ranking weights, the opt-in option and a scope-cut plan. But it invents many specifics (event types, 50 entries, 90 days, decay) and a day-by-day schedule with no engineering input. Its acceptance criteria are thinner and its edge cases are mostly a scenario table. A fits the criteria and the honesty bar slightly better.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to state full GDPR/CCPA compliance, to commit engineering to November 3, and to claim they sent anything. Both treat the data inventory as a blocking dependency. B goes further on the user's real need. It writes the spec in full: it lists typical data stores as an unverified checklist to confirm, and it covers the flow, security, format, and the timeline as a target rather than a commitment. It cites Art. 15/20, the CCPA right to know and the 1-month and 45-day deadlines correctly. It also includes a cover note to legal. But B has no acceptance criteria section and only implicit edge cases, both of which the criteria ask for. A supplies Given/When/Then acceptance criteria, an edge-case list, an out-of-scope section and a dependencies table. It is shorter and more honest, but it refuses to fill in typical stores. The criteria fit tips it to A, though B is close.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

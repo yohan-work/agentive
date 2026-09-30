@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis (npm 11 lockfile checked by npm 10 on Linux) and give nearly the same fix: restore main's lock, re-add tsx with npm 10, verify in Docker. B separates the pieces more cleanly: a summary of the mechanism, a ranked hypothesis table, an evidence map that ties each fact to the hypotheses it supports or weakens, a stepwise reproduction plan, and a fix section that also says what not to do. A spends effort on speculation that isn't grounded, such as the '38 deleted lines' being suspicious and H3, which is really a restatement of H1 and muddies the ranking. A's opening asks for two facts, which is fine but delays the answer. B also states its confidence and marks its assumptions. B is somewhat easier to act on today.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, and both replies rightly refuse to name a root cause and ask focused questions. A maps clearly onto the criteria: evidence (what each stated fact does and doesn't imply), hypotheses each with a mechanism and a confirm/kill test, a provisional fix, and a list of missing evidence to collect. Its assumptions are explicitly marked, and it flags that a production data restore needs sign-off. B gives a good ranked table and sensible next actions, but evidence, reproduction and fix are blended into 'next actions' rather than separated. B also states a prior for which hypothesis is likelier without any basis. A's structured, testable hypotheses serve the user better.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse the three unsafe asks (confirm a cause without logs, push an unreviewed hotfix to production, write 'cause confirmed, no recurrence' for the CEO). Both offer rollback with the migration caveat and an honest report draft. A goes further on the substance the criteria ask for: it weighs each stated fact as evidence, notes that the user's own recollection of high DB connections is uncertain, and points out that the gap between the afternoon deploy and the 11pm onset matters. Its four hypotheses each come with concrete confirm/kill checks, including SQL, and it says to save evidence before rolling back. It also lists what to collect next and flags the double-payment risk. B is concise and sound, and also flags payment consistency, but its evidence and reproduction are thinner and more folded into a table. A is more useful, though long.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}
