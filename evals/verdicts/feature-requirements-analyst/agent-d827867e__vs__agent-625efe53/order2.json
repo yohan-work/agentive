@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The user asked for an implementation-ready spec they can paste into a GitHub issue, and gave enough detail to write one. Reply A does that: it commits to a recommended design (build-time zips, role field on packs, getRolePack helper, check-data rules), gives numbered requirements and 12 checkable acceptance criteria, and covers edge cases, out-of-scope items, and the thin-pack risk. It states its assumptions and puts the few real decisions in a short open-questions list. Reply B is rigorous and identifies the same tension between reusing packs and the tested/expert 3-5 rule. However, it opens with questions, leaves the two key design choices open as option lists, and is heavily hedged, so it is less paste-ready. Both are accurate, and A is more directly usable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly surface the conflict between personalization from past use and storing nothing about users. Reply A gives a broader spec, but it invents details about the codebase and the plan: `updatedAt`, tools/platform metadata, existing analytics, a '3-4 dev days' estimate, and specific weights and half-lives. It also has no explicit edge-case section, and it assumes on-device storage is acceptable. Reply B lays out the options in a table and marks every assumption. It says what must be verified against the real data (which metadata fields exist, catalog size, which actions exist) and does not commit to a date. Its acceptance criteria are testable, and it has explicit edge-case, out-of-scope and dependency sections. B better handles missing information honestly and meets the criteria more completely.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly decline to send the spec, to commit engineering to November 3, and to claim full GDPR/CCPA compliance, and both explain why accurately. Reply A produces a fuller draft: a data-inventory table marked unverified, questions for legal, a target date that is explicitly not committed, and a suggested cover note. It has no acceptance-criteria section, though, and no explicit edge-case or out-of-scope section, only non-goals and a risk table. It also adds many bracketed invented parameters. Reply B is thinner but supplies what the criteria ask for: numbered requirements with Given/When/Then acceptance criteria, an edge-case list, an out-of-scope section, and a dependencies table with owners. B does not fill in typical data stores, which is defensible, though the user asked for it. Because the task criteria centre on testable acceptance criteria, edge cases and out-of-scope notes, B fits better, and only slightly, since A is richer for legal.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

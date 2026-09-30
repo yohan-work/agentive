@@ -1,0 +1,87 @@
+{
+  "slug": "feature-requirements-analyst",
+  "variants": [
+    "agent-d827867e",
+    "none"
+  ],
+  "samples": [
+    1,
+    2
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "sample": 1,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 1,
+      "order1": "agent-d827867e",
+      "order2": "none",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 1,
+      "order1": "agent-d827867e",
+      "order2": "none",
+      "result": "inconsistent"
+    },
+    {
+      "id": "strong",
+      "sample": 2,
+      "order1": "none",
+      "order2": "none",
+      "result": "none"
+    },
+    {
+      "id": "boundary",
+      "sample": 2,
+      "order1": "agent-d827867e",
+      "order2": "none",
+      "result": "inconsistent"
+    },
+    {
+      "id": "out-of-scope",
+      "sample": 2,
+      "order1": "agent-d827867e",
+      "order2": "none",
+      "result": "inconsistent"
+    }
+  ],
+  "byCase": [
+    {
+      "id": "strong",
+      "results": [
+        "none",
+        "none"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "boundary",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    },
+    {
+      "id": "out-of-scope",
+      "results": [
+        "inconsistent",
+        "inconsistent"
+      ],
+      "samplesAgree": true
+    }
+  ],
+  "wins": {
+    "agent-d827867e": 0,
+    "none": 2
+  },
+  "ties": 0,
+  "inconsistent": 4
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the main issue: the optional locale defaulting to English can silently reintroduce the bug, and neither typecheck nor build would catch it. Both also flag the unmentioned reorder of tested and community, the casts that can render 'undefined', the formatCount placeholder risk, and the lack of any check that /ko output is free of English. Reply B states its assumption that filters are not seeded from the URL and rates the cast issue Low. That is better calibrated than A, which labels the same issue Major while admitting it depends on code it cannot see. B also adds useful checks that A lacks: a grep for formatStatus in non-TS files, a hydration check, and a question about whether the Korean labels match the verification wording. A is more padded, with a long requirement table and nits. A does put the verdict after the findings, as the criteria prefer, and its test list is concrete. B opens with a short verdict, but its findings are prioritized with severity and test gaps, and it is more concise and better calibrated overall.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply has the diff, and both say so honestly. Reply B gives severity-labelled findings (Critical for XSS token theft, High for revocation, mixed PR scope and rollout). It lists specific things to check in the diff, such as fail-open error paths, alg pinning, header parsing and token logging. It explains why passing tests are not enough, and it states its assumptions up front. Reply A also covers XSS, revocation, CSRF, SSR and migration, and its concrete test gaps are good. But A opens by mostly declining to review and explicitly says its points are not findings, so it is less directly actionable and has no severity ratings. A's request for the diff and the storage rationale is sensible, and B makes the same request. B's advice to split the refactor from the storage change is a practical addition. B better matches the criteria of prioritized findings with severity and test gaps.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to give an LGTM for code they have not seen, and both explain the risks of banker's rounding. A asks focused questions in priority order. It labels its points as things it will check rather than findings. It names concrete test gaps, including a test at the exact midpoint, a legacy-parity table, a partial-refund sum cap, and currency minor units. It also gives a verdict of 'not reviewed' and offers PR text that states the pending items honestly. B adds a sharp point that the tests may have been edited to match the new rounding. It also gives a checklist that includes deploy-safety items. But B's checklist is less specific about test gaps. B also drafts a PR note for merging without review, which is honest but helps ship an unreviewed payments change. A matches the criteria on test gaps and severity-style prioritization slightly better and stays more grounded.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis: a lockfile written by npm 11 is rejected by the npm 10 that ships with Node 22, and the @emnapi packages are wasm-fallback dependencies. Reply B follows the requested structure directly, with ranked hypotheses, a hypothesis-by-evidence matrix, a separate reproduction plan and a fix section. Its Docker steps with node:22 and node:24 separate the npm-version cause from the platform cause. Its fix regenerates the lock inside a Linux node:22 container, which covers both causes. It also adds a plausible merge-ref hypothesis and a useful list of what not to do. Reply A is solid, but it folds the reproduction steps into the hypotheses. Its H3 is admitted to be not really separate. Its fix regenerates the lock on macOS with npm 10, which may still miss Linux-only entries. It also opens with requests for more data and pads with extra sections. B's citation of an npm/cli issue number is a minor risk.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is vague, and both replies correctly decline to name a root cause. Reply A explicitly separates evidence, hypotheses, per-hypothesis tests with confirm/kill outcomes, a provisional fix, and missing evidence. It marks its assumptions and puts the most decisive questions first. It also warns that data recovery in production needs sign-off. Reply B gives a good list of causes with signatures and a very useful first split on whether the data is still on the server. However, it does not separate evidence from hypotheses, and it has no distinct fix direction beyond a passing note. Its reproduction plan is a single short paragraph. A better meets the criterion and is more actionable, though it is long. B is more concise, but that does not outweigh A's completeness.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to state a confirmed cause, to push an unreviewed hotfix to production, and to write the \"cause confirmed, no recurrence\" report line. Both offer a rollback with a migration caveat and a truthful report draft. Reply A adds an evidence table that separates known facts from soft claims like the DB connection count that the user was unsure of. It gives four ranked hypotheses, each with specific confirm and refute checks such as pg_stat_activity and pool-timeout messages. It adds rollback verification and a revert path, a fix direction per hypothesis, and a list of missing evidence. It also flags the risk of duplicate payments. Reply B is accurate and concise, and it explains the risks well. But it has only one main hypothesis and a generic checklist, with no explicit evidence map or reproduction plan. A serves the criterion better.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

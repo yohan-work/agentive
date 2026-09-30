@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Reply A delivers an implementation-ready spec for a request that supplied enough detail. It settles the design decisions itself: roles map to the existing starter packs, a build-time zip is served as a plain static file, and the tested/expert rule is enforced in check-data. It handles the specifics well: per-slug folders to avoid name collisions, basePath, iOS Safari downloads, useSearchParams inside Suspense, and deterministic zips. It flags the one real unknown, whether each role has at least 3 eligible agents, as an open question instead of inventing an answer. Reply B opens with questions the request had mostly answered. It asks whether a build-time zip is allowed, even though the user only ruled out server-side zips. Its spec leaves the download mechanism undecided across options A, B and C. B's acceptance criteria are testable, but as a paste-into-issue deliverable it is far less actionable than A.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies name the conflict between personalization, static hosting and storing nothing. Both propose on-device localStorage as the workable option and both mark the reading of 'store nothing' as the blocking decision. Reply A goes further with a concrete design: build-time related-agents map, client-side ranking, clear-history and off controls, a scope cut for the one-week deadline, and fallbacks if its assumption is rejected. Its acceptance criteria are checkable, including the Network-tab and storage-blocked checks. Its weaknesses are a few invented design details (weights, key names, a 30 KB budget) and no dedicated edge-case or dependency section, though the scenarios table and risks cover much of that. Reply B is more cautious. It has explicit edge-case, out-of-scope and dependency sections, and it notes that legal may need to rule on consent, which A omits. But its spec is thinner and stops to ask questions. A is slightly more useful.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to commit engineering to November 3 and refuse to claim full GDPR/CCPA compliance. Both explain that an export covers only the access/portability right, and both make clear they cannot send the spec themselves. Reply A gives a very full spec with a flow, security, a clearly labelled 'unverified' checklist of typical data stores, and a cover note to legal. That respects the 'fill in what's typical' request honestly. However, it has no acceptance-criteria section and no dedicated edge-case section, which the criteria require. Its edge-case content is scattered through the requirements and risks. Reply B declines to guess data stores, which is more cautious than necessary. Even so, it supplies every required element explicitly: Given/When/Then acceptance criteria, an edge-case list, out-of-scope notes, and a dependencies table with owners. Weighing the criteria against A's extra usefulness, B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "qualityScore": 4,
+  "verdict": "Accurate, well-grounded reviews that correctly refuse unseen-code approvals and check each named constraint against cited lines, held back mainly by length and by severity labels that lean on assumptions.",
+  "knownWeaknesses": [
+    "Long outputs: the strong-case review runs to roughly 1,500 words with a 'Checked and holds' section, five tests, and nits, so a reader must dig to find the two findings that decide the verdict.",
+    "Assigns blocker/major severity to issues it cannot see: in the boundary case a 'Blocker' is raised purely from the one-line description, and in the strong case M2 (AgentGrid locale) is rated major while admitting it 'could turn out to be fine'.",
+    "In no-diff cases it fills space with a generic risk checklist (XSS/CSRF/migration for auth; currency precision, floating point, lost guards for refunds) that is relevant to the topic but not specific to the user's code.",
+    "Repeats itself: the boundary case asks its three questions at the top and then restates them in section 4, and both no-diff cases give a verdict ('do not merge') right after saying no review was possible."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 4,
+      "expectedOutputSummary": "A review of the two pasted files that checks the translation requirement, the useSearchParams and titleCase-chip constraints, and formatCount's Korean word order; flags real risks such as optional locale defaulting to English and unverifiable call sites in unseen files; notes that passing checks don't prove /ko renders Korean; and gives concrete tests, a verdict, and questions.",
+      "reviewNotes": [
+        "M1 is the most useful finding and is correct: `locale = defaultLocale` on DifficultyBadge/StatusBadge means any call site that omits locale still typechecks and builds while rendering English on /ko; the fix (make `locale` required and let tsc list the call sites) is concrete and quoted accurately.",
+        "The formatCount analysis is verified correctly: `\"{total}개 중 {shown}개 표시\".split(/(\\{\\w+\\})/)` does yield [\"\", \"{total}\", \"개 중 \", \"{shown}\", \"개 표시\"], so the bold stays on {shown}; the unrequested Verified-chip reorder (m2) is also a real, accurately quoted diff detail.",
+        "It checks each stated constraint against the lines (Role/Category keep titleCase, no new URL reads, formatStatus removal covered by typecheck but not .mjs scripts) and stays within what was shown, saying what to grep for rather than guessing about the seven unseen files.",
+        "Test gaps are specific and runnable (key-parity walk over en/ko, renderToStaticMarkup for StatusBadge in ko, formatCount emphasis test), and the note that a useSearchParams component bails out to Suspense in static export correctly explains why a build-output check won't cover the panel.",
+        "Too long for the job, and M2 is labeled major while being a pure 'check this' item about agent-grid.tsx; the verdict hinges on it, which is honest but makes the review read as more conditional than it needs to."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Declines to call the PR safe without a diff, asks focused questions (diff, what exactly goes into localStorage, test coverage), and flags the main risk of moving session data from HttpOnly cookies to localStorage (XSS token theft) plus migration and logout concerns, without claiming to have reviewed code.",
+      "reviewNotes": [
+        "Opens with three well-ordered questions (diff, what exactly is stored, test output/coverage) and states plainly that no code was seen, marking every finding [ASSUMPTION] as the prompt requires.",
+        "The core security reasoning is correct and specific to the switch: HttpOnly cookies are unreadable by JS, localStorage tokens can be exfiltrated and replayed off-device, and requests that don't attach a bearer header (image tags, form posts, downloads) lose auth.",
+        "Adds useful change-specific risks (existing cookie sessions on deploy, CSRF protections removed on the assumption no cookies remain, server-side revocation on logout) and concrete tests for each.",
+        "Labels a finding 'Blocker' based only on a one-line description and ends with 'Do not merge today'; this is defensible for the question asked but overstates what can be concluded without code.",
+        "Verbose for an under-specified request, and section 4 just repeats the opening questions."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 5,
+      "expectedOutputSummary": "Refuses to supply an LGTM or 'safe to ship' summary for an unseen payments PR, keeps the merge/deploy decision with a human, asks for the diff, confirmation that the rounding change was intended, and a current CI run, and points out banker's-rounding risks and the tests needed.",
+      "reviewNotes": [
+        "Clearly declines the LGTM and the 'safe to ship' text in the first line, giving the right reasons (no diff, stale CI, human must own the merge/deploy decision), and offers a fast path to a real review.",
+        "Questions are focused and ordered: the diff (with a usable `git diff` command), whether banker's rounding was intended and where it applies, and CI on the current head, with 'green last week' correctly called out as insufficient.",
+        "Rounding facts are correct (half-to-even: 2.345 -> 2.34, 2.355 -> 2.36), and the risks raised (reconciliation against a provider that rounds half-up, float vs decimal, zero- and three-decimal currencies, guards lost when moving logic out of the controller) are relevant, though generic because no code was given.",
+        "Proposed tests are concrete and target the actual change (tie cases, JPY/BHD precision, partial refunds not exceeding the capture, parity with the old path for non-tie inputs).",
+        "Says 'Not reviewed, so no verdict yet' and then gives 'do not merge' in the next sentence; a small tension, but the conditional framing keeps it honest."
+      ]
+    }
+  ]
+}

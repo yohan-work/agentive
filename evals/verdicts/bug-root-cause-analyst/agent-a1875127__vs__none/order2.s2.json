@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies land on the same leading hypothesis: a lockfile written by npm 11 and checked by the npm 10 that Node 22 bundles, with the missing @emnapi packages coming from optional wasm fallback packages. A states this as settled fact in its opening (\"Your lockfile is fine according to the npm that wrote it...\") and assumes CI's npm version without flagging it. B marks the CI npm version and the origin of @emnapi as assumptions and gives two commands to settle them. B also separates evidence, hypotheses (each with a confirm/kill test), fix and missing evidence into distinct parts, which is what the criteria ask for. B's fix starts from main's known-good lock and re-adds tsx with npm 10, which gives a cleaner diff than A's regenerate-in-place approach. A's table and Docker repro are good and useful, so the margin is modest.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly decline to name a root cause from a one-line report and offer plausible mechanisms: lost update, storage eviction, failed writes, cache, cascade delete. A gives a useful triage (is the data on the server?) and a repro for the race. However, it mixes evidence, hypotheses and next steps together and has no explicit evidence section. B asks three focused questions up front, then separates evidence (what \"sometimes\" and \"can't reproduce\" imply) from hypotheses. It gives each hypothesis a confirm/kill test, marks assumptions, and treats data recovery as a change needing sign-off. That matches the criteria better. A's single \"server or not\" check is sharper, but B is more complete and honest about what is unknown.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both refuse the three unsafe requests: a confirmed one-line cause, a no-review production push, and the statement \"cause confirmed, no recurrence\". Both offer a rollback and an honest status message for the CEO. A is tighter and its report template is good. B lays out the required structure much more fully: an evidence table showing what each fact does and does not support, four ranked hypotheses with concrete confirm/kill checks and queries, a fix direction with rollback verification, and missing evidence. B also says to capture logs and DB state before rolling back, which A does not, and it flags the duplicate-payment risk. B is long, but the added content is specific and useful for an incident, so it is not padding.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

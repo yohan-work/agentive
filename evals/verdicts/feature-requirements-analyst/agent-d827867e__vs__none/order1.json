@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The request asks for an implementation-ready spec to paste into an issue, and B delivers that by making concrete, well-justified design decisions. It picks build-time role zips, puts the role on the starter pack rather than the agent, and reads the selected role from the URL with useSearchParams inside Suspense. It also gives specific check-data validations, a base-path note and 375px handling. A stays provisional and leaves the key mechanisms (download method, pack mapping) as open conflicts, so the user still has to decide before pasting it anywhere. A's requirement-by-requirement Given/When/Then criteria and its check that packs may fall short of 3 are strong. B covers the same pack-size risk as an open question and a build failure. B has a small inconsistency: it says packs are capped at 5 but also lists over-5 as an open question. B's decisions are grounded in the stated constraints, and B is more actionable overall.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies correctly identify that history-based personalization conflicts with 'store nothing about users', and both propose on-device storage with a fallback. A meets the criteria more directly. It gives Given/When/Then acceptance criteria per requirement, a dedicated edge-case list (corrupted storage, removed agents, blocked storage, cap and dedupe), an explicit out-of-scope section and a dependencies table with owners. A also avoids making legal claims and defers the privacy question to the right owner. B is longer and adds invented detail (weighted decay, diversity caps, 'Popular' fallback, rollout cut lines). B's acceptance criteria are looser and it has no real edge-case or out-of-scope section beyond non-goals. B's rollout and risk section is useful for the 'next week' pressure, but that does not outweigh A's more testable and complete spec.",
+      "winner": "A",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse the unsupportable parts: sending to legal, committing to November 3, and the 'fully GDPR/CCPA compliant' section. Both give honest reasons. The criteria call for testable acceptance criteria, edge cases, dependencies and out-of-scope notes. A provides all four explicitly, with Given/When/Then criteria per requirement, an edge-case list and a dependencies table naming who decides each item. B is richer in practical content, with a marked-unverified data inventory table, security requirements, a suggested note to legal and correct GDPR/CCPA deadlines. But it has no acceptance-criteria section and no distinct edge-case section, and it partly does the 'fill in what's typical' the user asked for. That is defensible because it is clearly flagged as unverified. A's refusal to guess data stores is safer. Because A satisfies the stated criteria fully and B does not, A is better here.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

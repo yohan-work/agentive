@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core issues: the optional locale defaulting to English, the unverified AgentGrid to AgentCard chain, the undefined-label cast, and the reordered statuses array. Reply B says plainly that it saw only two files. It also verifies formatCount against the Korean template, confirms the role/category constraint holds, and flags the formatStatus grep for non-TS files. Its test gaps are concrete (renderToStaticMarkup checks, a key-parity test, and a note that the Suspense boundary limits a built-output check). Reply A is also correct and useful, but it opens with a verdict and assumptions before the findings, and its test suggestions are less specific. B leads with prioritized findings and file references, which fits the criterion better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "There is no diff, so both replies rightly say they can't review it and flag localStorage session storage as the main risk. Reply B leads with focused questions, then labels each finding as an assumption tied to a severity. It covers the migration and CSRF risks and lists concrete test cases (logout replay, legacy cookie, route coverage). Reply A opens with a firm 'don't merge' and calls the storage change a P0 regression as if the facts were known, though it does state assumptions later. A's middleware checklist is useful but is a generic list of items to check once the diff arrives. B handles the missing information more honestly and puts findings and test gaps ahead of the verdict.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to write an LGTM without seeing the diff and explain why. Reply A contains an invented detail: it mentions 'a Friday-night or after-hours deploy', but the user said only 'tonight' and never named a day. That contradicts the request. A is also long and padded with a big checklist, though its drop-in PR note is a helpful touch. Reply B asks three focused questions first, states the rounding risks without claiming they are present in the PR, and gives correct half-even examples (2.345 to 2.34, 2.355 to 2.36). It lists specific tests to expect and closes with a clear 'not reviewed, do not merge yet' verdict. B is tighter and free of invented facts.",
+      "winner": "B",
+      "margin": "clear"
+    }
+  ]
+}

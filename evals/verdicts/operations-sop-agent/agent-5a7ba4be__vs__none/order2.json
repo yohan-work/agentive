@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback, and both keep the no-status-inflation rule. A is cleaner and easier to follow, but it adds facts the notes never gave: an 'expert' tier needing an extra expert review, a 1-3 hour effort estimate, a 14-day contributor timeout, and a never-rename-slug rule. Presenting these as SOP content is a risk for a maintainer who does not know the codebase. B stays within the notes and marks real gaps (merge method, expert definition, who owns CI) as TBD, and its per-step checks with grep commands target the listed common mistakes directly. B is heavier with TBD markers, but they are honest and it also adds a promotion exception and a UI-string step.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request gives no facts about the onboarding process. A says so up front, but then writes a fairly complete SOP with invented specifics: D+0 to D+30 timelines, a payment check, welcome email content, a kickoff, and nine exceptions with thresholds. These are only lightly bracketed, so a new hire could take them as real. B asks the three most important questions first, labels each guess as ASSUMPTION or TBD, and gives every step an observable Check. It also handles rollback and the case where exceptions are unknown, and it avoids overpromising 'all exceptions'. A does give useful practical advice, such as shadowing the first runs. B is more honest about missing information and better fits the criteria.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly decline to have agents cite legal article numbers and route legal questions to a person. A goes further and gives legal analysis from memory (subscription contract termination rules, article numbers, the digital-content exception), and admits it is unverified. The point that a flat 14-day no-refund rule may be legally risky, especially for annual plans, is valuable. A also invents policy such as a 30-day goodwill exception, one per customer, a document number, and 3-day legal SLAs. B stays within the given facts and asks focused questions about who approves, which tools are used, and annual-plan handling. It catches practical pitfalls such as renewal payment dates and how to count days at the 14-day boundary. B's steps have checks, its exceptions are concrete, and it handles rollback. B is safer and more grounded, though A's legal warning has some value.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

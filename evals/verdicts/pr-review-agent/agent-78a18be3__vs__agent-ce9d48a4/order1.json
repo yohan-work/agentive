@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies find the same core risks: locale defaults to English so a missed call site still compiles, AgentGrid is not in the PR, the `as` cast can render \"undefined\", and the statuses array was reordered. Reply A goes further on the two files the user was unsure about. It walks through the formatCount split for the Korean template and confirms the bold span lands on {shown}. It also checks that no visible string was left in English and that the Role/Category constraint holds. Its test gaps are concrete (renderToStaticMarkup assertions, a key-parity test, and a caveat about Suspense in the static export). Reply B is solid and concise, but it opens with the verdict before the findings, which goes against the criterion of findings first. Its formatCount finding is mostly a request for tests. A's verdict comes after the findings and test gaps, and it states clearly what would change the decision.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Neither reply has the diff, and both say so and give a no-merge recommendation grounded in the localStorage token risk. Reply A labels each finding as an assumption, gives severity, covers the migration and CSRF risks, and lists specific test gaps. It puts the verdict after the findings and asks focused questions. Reply B opens with a short answer, states some things flatly (\"it's a regression\"), and folds the test gaps into a shorter section. Its advice to split the PR and its middleware review checklist are useful. A handles missing information more honestly and follows the findings-before-summary structure more closely.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both correctly refuse to give an LGTM without seeing the diff and explain the real risks of a rounding change on refunds. Reply A's risks are correct and specific: half-even examples 2.345 to 2.34 and 2.355 to 2.36 are right, and it covers float types, currency precision, and guards lost in the extraction. It also gives concrete test names and a clear verdict. Reply B offers a useful honest PR note and a checklist. But it says \"A Friday-night or after-hours deploy\", and the user never mentioned Friday, so that detail is invented. B is also more checklist-shaped and less about findings and test gaps. A is more grounded, and its assumptions are marked.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

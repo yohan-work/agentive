@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps, exceptions, quality checks and rollback, and both keep the honest status rules and the common-mistake list. Reply A puts a concrete, verifiable check on nearly every step (grep of taxonomy, updatedAt vs template, sample-run count, git diff for generated files). It ties each known mistake to the step that catches it, which matches the request for steps with checkpoints. It also handles promotion of an existing agent, the ko dictionary and rollback verification. Its many [TBD] markers are honest but slightly noisy. Reply B is cleaner and gathers its assumptions in one table, but its checkpoints are coarser. It adds Recommendations, Risks and Next actions sections that pad the SOP without helping the maintainer run it. A is somewhat more actionable for a maintainer who does not know the codebase.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies say honestly that the SOP cannot be finished without knowing the real process, and that not every exception can be listed. Both give a skeleton with an escalation rule for unlisted cases. Reply A asks three focused questions, then gives a complete SOP frame with trigger, owner, prerequisites, nine steps with a concrete Check each, an exceptions table with decision-makers, completion criteria and rollback. Every guess is labelled [ASSUMPTION] or [TBD]. Reply B asks seven questions, several of them broad. Its skeleton is thinner (a generic six-row table with mostly blank tools). It invents specifics such as the 48-hour reminder, though it does list its assumptions. B's advice on paired first runs and the unlisted-situation rule is good, but A meets the criteria more fully (inputs, outputs, quality checks) and is closer to usable.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies decline to give legal clause numbers for agents to quote, and both route legal disputes to legal counsel. Reply A delivers a full SOP with trigger, owner, prerequisites, eight steps with checks, an exceptions table, completion criteria and rollback. It flags the unresolved renewal-date and annual-plan questions as TBD. It invents no policy. Reply B raises a valuable point: a blanket no-refund rule after 14 days may not hold for annual subscriptions, and terms can be void under consumer law. It cites statutes only with hedges, and those references look plausible. However, B lacks an explicit trigger or inputs section and has no per-step quality checks. It also invents discretionary refund thresholds (15-21 days at 100%, and so on), labelled as examples, and puts policy the user never gave into the SOP. A meets the stated criteria more completely and stays grounded, though it misses B's legal-risk warning.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

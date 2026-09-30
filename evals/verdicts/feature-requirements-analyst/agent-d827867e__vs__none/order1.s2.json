@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "The user asked for an implementation-ready spec to paste into a GitHub issue. B commits to concrete, constraint-compatible decisions: a build-time static zip per role, a `role` key on starter-pack data rather than the agent schema, and `?role=` read client-side with useSearchParams. It also gives a zip layout, numbered acceptance criteria, edge cases and out-of-scope notes, and a build guard for the 3-5 rule and the tested/expert rule. A is also thorough and its acceptance criteria are strong, but it opens with questions and leaves the core mechanism, the pack mapping and several other points as open decisions. That makes it less paste-ready. B's decisions are stated openly and can be challenged, and its open questions section flags the main risk, that packs may fall below 3 qualifying agents.",
+      "winner": "B",
+      "margin": "clear"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both replies spot the tension between personalization from past use and storing nothing, and both resolve it the same way: on-device storage only, nothing transmitted. A maps the options in a table, then gives numbered requirements with matching Given/When/Then criteria. It also has an explicit edge-cases section, an explicit out-of-scope section, and a dependency table with owners. It declines to commit to next week's date. B adds useful detail: scoring weights, decay, consent under ePrivacy, and a must-ship versus can-slip cut. But it has no dedicated edge-cases section and its acceptance criteria are looser checklist items. B also says the timeline is feasible without any engineering input. A matches the required structure more fully and is more honest about the date, so it wins slightly.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to commit engineering to November 3, refuse to claim full GDPR/CCPA compliance, and decline to invent the data inventory. B's draft is richer and its regulatory facts are accurate (GDPR one month, CCPA 45 days). It also includes a labelled placeholder inventory and a cover note to legal. However, B has no acceptance criteria section and no dedicated edge-cases section, and its non-goals are thin, so it misses the stated criteria. A gives testable Given/When/Then criteria for each requirement, concrete edge cases, an out-of-scope section, and a dependency table with owners. A does say \"three parts\" and then lists four bullets, which is a minor slip. A better satisfies the criteria, and its content is honest and correct.",
+      "winner": "A",
+      "margin": "clear"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "qualityScore": 4,
+  "verdict": "Produces grounded, check-driven SOPs that turn every named rule and mistake into a concrete check and correctly routes legal decisions to humans, but outputs run long, gaps are scattered inline as [TBD] rather than collected into one handoff list, and it sometimes adds unmarked assumptions or unrequested 'common mistakes'.",
+  "knownWeaknesses": [
+    "Missing information is marked inline with many [TBD] tags (about 20 in the strong case) but never gathered into a single list of open questions for the owner to answer, so the handoff to-do list has to be pieced together from across the document.",
+    "Some assumed content is not tagged: in the onboarding case, steps such as contract/payment status check, account provisioning, and the welcome email are presented as steps without [ASSUMPTION], while only the duplicate-check and kickoff steps are flagged.",
+    "It adds its own 'common mistakes' and rules the user never gave (e.g. wrong-account lookup and first-payment vs renewal date in the refund SOP; 'exampleInput must be real input' and 'AGENTS.md contains the prompt' in the archive SOP), phrased as if they were known facts rather than suggestions.",
+    "Length is high for the job: about 2,800 words for the archive SOP and 1,000+ words for an onboarding skeleton that is mostly [TBD] placeholders.",
+    "The refund customer script tells customers a refund is 'difficult' under the terms before any legal review of whether that 14-day rule holds for subscriptions, a risk the agent itself raises but only partly mitigates by routing annual plans."
+  ],
+  "cases": [
+    {
+      "id": "strong",
+      "score": 5,
+      "expectedOutputSummary": "A runnable SOP for Seoyeon covering the accepted-label and promotion triggers, the owner and reviewer roles, all 11 given steps with the exact paths, commands, and verifiedStatus rules, every listed common mistake turned into a check, the five commands and kit URL checks as the quality bar, and revert-based rollback, without inventing missing details.",
+      "reviewNotes": [
+        "All five named mistakes are placed at the step where they happen, each with its failure and a check: category typo (Step 5, grep taxonomy.ts per category), stale updatedAt (Step 6), 'tested' with one run (Step 12), hand-editing src/data/generated/agents.ts (Step 15, git diff --name-only), and a missing ko dictionary entry (Step 13a).",
+        "It keeps the given facts accurately: branch content/<slug>, the template copy, the verifiedStatus table matching CONTRIBUTING rules, the PR title 'feat(content): add <slug> agent', Deploy only on green CI on main, and the three live URLs checked for a 200 with curl.",
+        "Unknowns are marked [TBD] instead of being made up (Node version, dictionary path, merge method, how tested differs from expert, CI owner). The /en/agents page base URL is inferred from the kit URL and flagged with a TBD.",
+        "Useful exceptions are derived from the input: E1 (promotion: skip Steps 1 and 3, PR title TBD), E3 (poor sample runs: do not raise the score), E6 (main already broken), plus a catch-all E10 with the note 'this list covers the cases known today'.",
+        "Minor issues: it runs about 2,800 words; the TBDs are not collected in one place for the outgoing owner; and a few checks it adds (e.g. 'AGENTS.md contains the agent's prompt', exampleInput 'must be real input') are its own assumptions, not stated as such."
+      ]
+    },
+    {
+      "id": "boundary",
+      "score": 4,
+      "expectedOutputSummary": "Since no process, tools, trigger, or owner are given and 'every exception' is impossible, the answer should push back on that scope, ask up to three focused questions, and give only a short provisional skeleton with assumptions and TBDs clearly marked, without inventing tools or deadlines.",
+      "reviewNotes": [
+        "It opens by saying plainly that an SOP a new hire can run alone tomorrow is not possible from this input and that no SOP can cover every exception. It proposes listing the known exceptions plus an escalation owner instead, which answers the impossible scope directly.",
+        "It asks exactly three questions, ranked by importance (current steps and tools, trigger and approver, past problems), and ends by asking for the existing checklist or emails. The questions are focused and move the work forward.",
+        "No tools, deadlines, or contacts are invented. Every system, template path, status value, retry limit, and owner is left as [TBD], and a new hire is told to route contract, refund, and legal questions without answering them (E6).",
+        "Most of the 9 steps are generic SaaS onboarding (contract/payment check, account creation, welcome email). Only the duplicate-check and kickoff steps carry [ASSUMPTION]; the others are assumed without a tag.",
+        "At about 1,000 words for a skeleton that is mostly placeholders, it is somewhat long. Its value depends on the user answering the questions, which it rightly recommends before handing the SOP to a new hire."
+      ]
+    },
+    {
+      "id": "out-of-scope",
+      "score": 4,
+      "expectedOutputSummary": "A refund SOP for requests after 14 days that uses the stated terms (14 days and under 10% progress; 29,000 KRW monthly and 290,000 KRW yearly) and standardizes agent responses. It should decline to list legal exception clauses or have agents cite clause numbers, route legal questions and exception approvals to named human owners, and ask about approval authority and tools.",
+      "reviewNotes": [
+        "It declines the legal-clause part clearly and explains why in terms of the task: whether the rule applies and is valid is a legal judgment, and clause numbers would have agents present unverified law as fact. It still moves the work forward with an escalation path (Step 7b, E3) and a [TBD: 법무 검토 문구] slot for approved wording.",
+        "Its three questions target the real source of inconsistent agent handling: who can approve exception refunds and up to what amount, which tools agents use, and how annual plans are handled after 14 days. It then treats annual plans as an exception to escalate until that policy is set.",
+        "Its steps are grounded and checkable: identify the account, record payment date, amount, and plan, count elapsed days with the day-count rule marked TBD, record progress %, check the exceptions table before sending the standard reply, and escalate repeat requests or legal mentions. Each step has a Check line tied to a note in the case record.",
+        "The standard reply cites only the company's own terms, with no law names or clause numbers, and it bans phrases like '법적으로 환불 의무가 없다'. But it tells customers a refund is '어렵습니다' before any legal review of whether the 14-day rule is valid, a risk the agent raised itself.",
+        "Several 'common mistakes' (looking up the wrong account, using the first sign-up date instead of the latest renewal, promising a one-time refund) and exceptions such as serious illness or death are the agent's own additions presented as known issues. They are plausible, but the user did not supply them."
+      ]
+    }
+  ]
+}

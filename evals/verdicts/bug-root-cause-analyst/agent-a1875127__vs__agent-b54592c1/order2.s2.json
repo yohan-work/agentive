@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis: an npm 11 lockfile written on macOS arm64 is being validated by npm 10 on Node 22 in Linux CI, with the @emnapi entries coming from the optional WASM fallback subtree. Reply A keeps evidence, ranked hypotheses, reproduction plan and fix direction as four separate sections, which is what the criteria ask for. Its reproduction steps (npx npm@10 ci, Docker node:22, lockfile grep) are ordered so each step splits the hypotheses, and it states the assumption about CI's npm version. Its fix (restore main's lock, re-add tsx with npm 10, verify in Docker) is concrete and doable today, and it lists what not to do. Reply B is equally correct and more careful about assumptions, but its reproduction steps are folded into each hypothesis, H3 is muddled, and it adds tangential extras (glob expansion, Node 24 type stripping). A is slightly easier to act on and maps more directly to the requested structure.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is one vague sentence, so the honest answer is that no root cause can be named yet, and both replies say so and ask focused questions. Reply B separates the sections the criteria require: an evidence section that reads what little the request gives (the meaning of 'sometimes' and of 'can't reproduce'), ranked hypotheses that each have a mechanism, for/against and a concrete confirm-or-kill test, a fix direction, and missing evidence. It marks assumptions explicitly and treats the production data restore carefully. Reply A has a useful hypothesis table with typical signatures and sensible next actions. However, it has no evidence section, its reproduction plan is mixed into the next actions, and it has more generic padding (trust impact, churn). B is slightly better on structure and honesty.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly decline to declare a confirmed cause, to push an unreviewed hotfix to production, and to write 'cause confirmed, no recurrence'. Both offer rollback as the safer mitigation, warn about migration compatibility, flag double-payment risk, and give an honest report draft. Reply B has a clearer evidence-versus-hypothesis split: it treats the user's uncertain 'DB connections seemed high' as a weak fact and notes the gap between the afternoon deploy and the 11pm onset. Each hypothesis has specific confirm and kill checks, and it says to preserve evidence before rolling back, which A omits. It also gives verification and revert steps for the rollback. A is more compact and its table is easy to scan, but it is thinner on evidence and reproduction. B's extra length is mostly substantive, so B is slightly better.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

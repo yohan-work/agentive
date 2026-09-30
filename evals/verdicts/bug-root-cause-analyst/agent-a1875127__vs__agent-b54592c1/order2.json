@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies reach the same core diagnosis: npm 11 wrote the lockfile and CI's Node 22 npm 10 rejects it. Both give the same fix, which is to restore main's lockfile and regenerate it with Node 22 or in a container. Reply A has a distinct, runnable reproduction plan and a good extra hypothesis (the PR merge-commit drift). It also lists what not to do. But A states unverified claims as fact, such as which packages depend on @emnapi and what npm 10 computes, and it gives confident percentages without having seen the lockfile. Reply B labels its assumptions and has a stronger evidence map. However, it leads with questions even though the user supplied plenty, its H3 (stale node_modules) is weak, and its repro steps are spread across the hypotheses instead of forming one plan. A is somewhat more actionable today, and B is more honest about what is inferred.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request has almost no information. Both replies admit the root cause can't be named and both rank plausible hypotheses. Reply B asks focused questions first and separates its evidence table from its hypotheses. Each hypothesis carries a concrete confirm-or-kill test with expected results, for example the two-window test, offline mode and a primary DB versus API comparison. It also gives a provisional fix with recovery caveats, and it marks assumptions explicitly. Reply A is compact and has a useful data-gone-versus-hidden split. But its reproduction guidance is a short list and its fix direction is thin. B fits the requirement to keep evidence, hypotheses, reproduction and fix separate somewhat better.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both replies correctly refuse to state a confirmed cause, push to production without review, or write a false 'cause confirmed, no recurrence' report. Both supply an honest report draft instead. Reply A adds a useful first check (are payments failing or only the page) and a hypothesis table with expected log signatures. Reply B separates evidence, ranked hypotheses, verification commands with expected outcomes, a rollback fix path (including the migration-compatibility caveat) and prevention. It also points out that the connection count is the user's own uncertain recollection and might be an effect rather than a cause. B follows the requested structure more fully and its reproduction and verification content is more concrete. A is a bit tighter, so the margin is slight.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}

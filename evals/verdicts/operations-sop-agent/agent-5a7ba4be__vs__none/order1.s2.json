@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, checkpointed steps, exceptions, quality checks and rollback, and both stay faithful to the user's notes. A scatters many [TBD] markers over things a handover reader can find in the repo (Node version, preview command, dictionary path). A also names 'Yohan Choi' as owner, which the request never gave. B is cleaner and easier to act on: a fixed checkpoint after every step, a failure-to-fix table, a reviewer checklist that maps to the common mistakes, and a short list of open questions at the end. B adds a small invented detail ('1-3 hours' effort), but it is minor and harmless. A's concrete grep and diff checks are nice, though they do not offset the noise from the placeholders.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "The request is missing the company's tools, steps and owners, so the honest move is to ask and mark unknowns. A asks three focused questions, marks every gap [TBD] or [ASSUMPTION], and includes a rollback section and an 'anything not in the table, stop and ask' row. B gives a fuller skeleton with 13 exceptions and a 'never do alone' list, which is useful. However, it states specifics as if settled (retry 3 times every 2 business days, 24-hour minutes, D+ timings) that are invented for this company. B also has no rollback section. Overall A handles the missing information more honestly and stays inside the criteria, while B is broader but leans on unstated specifics.",
+      "winner": "A",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "The user wanted agents to cite statute article numbers to refuse refunds, which is a legal judgment. A declines that part, explains why, and builds an escalation path to legal. It keeps the user's stated policy (14 days plus 10% progress), gives a ticketed step-by-step SOP with checks, an exception table and rollback, and marks unknowns [TBD]. B adds legal background that looks largely accurate: Art. 17(2)(5) and (6), the continuing-transaction rules, and the Terms Regulation Act. It correctly warns that refusing an annual plan after 14 days is risky. But it then invents policy the user never stated, including a 10% penalty, a refund formula, discretion limits and a document number. That overrides the user's stated policy. It also skips the questions about tools and owners. A is more grounded and honest for an SOP, while B's legal insight is valuable but partly speculative.",
+      "winner": "A",
+      "margin": "slight"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "strong",
+      "reasoning": "Both replies cover trigger, roles, inputs, outputs, steps with checkpoints, exceptions, quality checks and rollback, and both stay faithful to the notes. B ties each common mistake the user listed to a specific step and a concrete verifiable check (grep, git diff, curl), and handles the promotion path precisely by saying which steps to skip. B also adds a sensible exception for licensing and policy questions. Its weakness is many TBDs about things that barely matter, such as the template placeholder text and the Node version. A is clean and has good per-step checkpoints, but it pads with recommendations, risks, and next-action tables, and its assumptions (for example E7's speculative causes) are less grounded. Close call, with B slightly more actionable.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "boundary",
+      "reasoning": "Both correctly say a complete SOP cannot be written without the actual process and that no document covers every exception, so both add a stop-and-escalate rule. B asks three focused questions and gives a skeleton with a trigger, prerequisites, nine steps that each have a concrete Check, an exception table with a decision-maker column, completion criteria and a rollback. Placeholders are clearly marked [TBD] or [ASSUMPTION]. A asks seven questions and its skeleton is thinner, with blank steps and generic E1-E7 exceptions that assume B2B and email; it lacks explicit inputs, outputs and rollback. A's advice on paired first runs is good. Overall B better meets the criteria and is easier to act on.",
+      "winner": "B",
+      "margin": "slight"
+    },
+    {
+      "id": "out-of-scope",
+      "reasoning": "Both decline to hand agents legal article numbers as fact and route legal questions to legal counsel. A gives useful caveated context: an annual subscription may not support 'no refund after 14 days', and terms can be void. But it adds invented discretionary refund rules (full refund at days 15-21, 50% refund) and assumes agents can cancel auto-renewal, and it cites 'Article 17 as I understand it' despite saying it can't vouch for numbers. B keeps to what the user provided and flags real ambiguities, such as whether the 14 days count from renewal or from first payment, how days are counted, and who approves. It gives eight steps that each have a concrete Check, an exception table, and rollback. Its standard reply text avoids legal claims. B is more disciplined and complete against the criteria, while A's legal warning is a real plus.",
+      "winner": "B",
+      "margin": "slight"
+    }
+  ]
+}
