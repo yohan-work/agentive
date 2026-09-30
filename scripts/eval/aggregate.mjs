@@ -17,11 +17,17 @@ if (!slug || !variantA || !variantB) {
 
 const dir = verdictDir(slug, variantA, variantB);
 if (!existsSync(dir)) throw new Error(`No verdicts in ${dir}`);
-const samples = readdirSync(dir)
-  .map((file) => file.match(/^order1(?:\.s(\d+))?\.json$/))
-  .filter(Boolean)
-  .map((match) => (match[1] ? Number(match[1]) : 1))
-  .sort((a, b) => a - b);
+// Samples come from either order's files, so a half-collected sample fails below instead of being
+// skipped, and a folder without any verdicts never produces an empty summary.
+const samples = [
+  ...new Set(
+    readdirSync(dir)
+      .map((file) => file.match(/^order[12](?:\.s(\d+))?\.json$/))
+      .filter(Boolean)
+      .map((match) => (match[1] ? Number(match[1]) : 1))
+  )
+].sort((a, b) => a - b);
+if (!samples.length) throw new Error(`No verdicts in ${dir}`);
 
 function readOrder(order, sample) {
   const path = verdictPath(slug, variantA, variantB, order, sample);
